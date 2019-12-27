@@ -1,0 +1,312 @@
+.path-mod-studentquiz #filterform {
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    display: inline-block;
+    margin-bottom: 20px;
+    min-height: 20px;
+    padding: 9px;
+}
+
+.path-mod-studentquiz #filterform blockquote {
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.path-mod-studentquiz #filterform .fitem {
+    display: inline-block;
+    line-height: 40px;
+    margin-right: .3em;
+    white-space: nowrap;
+}
+
+.path-mod-studentquiz #filterform .fitem label {
+    display: inline;
+    line-height: 20px;
+    padding-right: .3em;
+}
+
+.path-mod-studentquiz #filterform .fitem:before,
+.path-mod-studentquiz #filterform .fitem:after {
+    display: inline;
+}
+
+.path-mod-studentquiz #filterform div,
+.path-mod-studentquiz #filterform fieldset {
+    clear: none;
+    display: inline;
+    float: none;
+}
+
+.path-mod-studentquiz input[type="checkbox"].toggle label {
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    -moz-user-select: none;
+}
+
+.path-mod-studentquiz input[type="checkbox"].toggle {
+    display: none;
+}
+
+.path-mod-studentquiz input[type="checkbox"].toggle + span,
+.path-mod-studentquiz input[type="checkbox"].toggle + label span {
+    background: #eee;
+    border-bottom: 2px solid darkgray;
+    border-radius: 4px;
+    display: inline-block;
+    margin-right: 5px;
+    padding: 5px;
+    transition: all 0.4s ease;
+}
+
+.path-mod-studentquiz .toggle:checked + span,
+.path-mod-studentquiz .toggle:checked + label span {
+    border-bottom: 2px solid #1177d1;
+    color: #1177d1;
+    display: inline-block;
+    transition: all 0.4s ease;
+}
+
+.path-mod-studentquiz #page .quizattemptsummary td p {
+    margin-top: 0;
+}
+
+.path-mod-studentquiz table.quizattemptsummary tr.bestrow td {
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+.path-mod-studentquiz table.quizattemptsummary .noreviewmessage {
+    color: gray;
+}
+
+.path-mod-studentquiz .generaltable.quizattemptsummary {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.path-mod-studentquiz .statedetails {
+    display: block;
+    font-size: 0.7em;
+}
+
+.path-mod-studentquiz .mod-studentquiz-attempt-nav {
+    margin-bottom: 20px;
+}
+
+.path-mod-studentquiz .mod-studentquiz-attempt-nav .col-md-4 {
+    box-sizing: border-box;
+    float: left;
+    width: 33.33333%;
+}
+
+.path-mod-studentquiz .mod-studentquiz-attempt-nav:after {
+    display: table;
+    clear: both;
+    content: '';
+}
+
+.path-mod-studentquiz .error {
+    color: #f00;
+    font-weight: bold;
+}
+
+.path-mod-studentquiz .mod-studentquiz-summary-highlight {
+    background-color: #d9edf7;
+    font-weight: bold;
+}
+
+.path-mod-studentquiz .reportquiz_total_heading {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.path-mod-studentquiz .mod_quiz_edit_forms {
+    display: none;
+}
+
+.path-mod-studentquiz .question-approved {
+    color: #0a0;
+}
+
+.path-mod-studentquiz .question-unapproved {
+    color: #7b1400;
+}
+
+.path-mod-studentquiz table#categoryquestions {
+    table-layout: auto;
+}
+
+.path-mod-studentquiz #categoryquestions .header {
+    text-align: left;
+    white-space: nowrap;
+}
+
+.path-mod-studentquiz #categoryquestions th.checkbox,
+.path-mod-studentquiz #categoryquestions td.checkbox {
+    padding-left: 10px;
+    padding-right: 7px;
+}
+
+.path-mod-studentquiz #categoryquestions .qtype {
+    width: auto;
+}
+
+.path-mod-studentquiz #categoryquestions .questionname {
+    min-width: 180px;
+}
+
+.path-mod-studentquiz #categoryquestions .iconcol {
+    width: 12px;
+}
+
+.path-mod-studentquiz #categoryquestions .rates,
+.path-mod-studentquiz #categoryquestions .difficultylevel,
+.path-mod-studentquiz #categoryquestions .practice {
+    width: 115px;
+}
+
+.path-mod-studentquiz #categoryquestions th.practice .sorters,
+.path-mod-studentquiz #categoryquestions th.difficultylevel .sorters,
+.path-mod-studentquiz #categoryquestions th.rates .sorters {
+    font-size: .8em;
+    font-weight: 400;
+}
+
+.path-mod-studentquiz #categoryquestions th .sorters {
+    font-size: 0.8em;
+    font-weight: normal;
+}
+
+.path-mod-studentquiz #categoryquestions td.difficultylevel,
+.path-mod-studentquiz #categoryquestions td.rates {
+    padding-top: 7px;
+}
+
+.path-mod-studentquiz #categoryquestions td.questionname,
+.path-mod-studentquiz #categoryquestions td.creatorname {
+    white-space: normal;
+    line-height: 1em;
+}
+
+.path-mod-studentquiz #categoryquestions td.qtype .icon {
+    margin-right: 0;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour {
+    margin: 0 0 10px 5px;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour label,
+.path-mod-studentquiz .im-feedback .studentquiz_behaviour label,
+.path-mod-studentquiz .studentquiz_behaviour span.label {
+    margin-right: 15px;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .rate {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour textarea {
+    box-sizing: border-box;
+    height: 100px;
+    width: 100%;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .comment_list > div {
+    border-bottom: 1px solid #fff;
+    border-top: 1px solid #eee;
+    padding: 15px 0;
+    position: relative;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .comment_list div span.remove_action {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    text-decoration: underline;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .comment_list div span.remove_action:hover {
+    text-decoration: none;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .comment_list div p:last-child {
+    margin: 0;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .rate .rating {
+    cursor: not-allowed;
+    display: inline-block;
+    unicode-bidi: bidi-override;
+    height: 0;
+    vertical-align: text-top;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .rate .error {
+    margin-top: 5px;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .star,
+.path-mod-studentquiz .studentquiz_behaviour .rate .rating:hover .rateable.star-empty {
+    background-image: url([[pix:mod_studentquiz|star_icon]]);
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .star,
+.path-mod-studentquiz .studentquiz_behaviour .star-empty {
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .rate .rating .rateable {
+    cursor: pointer;
+}
+
+.path-mod-studentquiz .studentquiz_behaviour .star-empty,
+.path-mod-studentquiz .studentquiz_behaviour .rate .rating .rateable:hover ~ .rateable.star-empty,
+.path-mod-studentquiz .studentquiz_behaviour .rate .rating .rateable.star-empty:hover ~ .rateable.star-empty {
+    background-image: url([[pix:mod_studentquiz|star_empty_icon]]);
+}
+
+.path-mod-studentquiz .change-question-state {
+    display: block;
+}
+
+.path-mod-studentquiz .change-question-state select#menustatetype,
+.path-mod-studentquiz .change-question-state button#change_state {
+    margin-left: 10px;
+}
+
+.path-mod-studentquiz .change-question-state button#change_state {
+    margin-right: 10px;
+}
+
+.path-mod-studentquiz .pagination .form-control {
+    width: 60px;
+}
+
+.path-mod-studentquiz .modulespecificbuttonscontainer input.btn {
+    margin-right: 5px;
+}
+
+.path-mod-studentquiz #mod_studentquiz_statblock .report_more_url,
+.path-mod-studentquiz #mod_studentquiz_rankingblock .report_more_url {
+    text-align: right;
+}
+
+.path-mod-studentquiz #mod_studentquiz_statblock .card-text.content > div,
+.path-mod-studentquiz #mod_studentquiz_rankingblock .card-text.content > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.path-mod-studentquiz .mod_studentquiz_submission_info {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
