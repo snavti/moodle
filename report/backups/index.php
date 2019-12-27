@@ -45,7 +45,6 @@ $strunfinished = get_string('unfinished');
 $strskipped = get_string('skipped');
 $strwarning = get_string('warning');
 $strnotyetrun = get_string('backupnotyetrun');
-$strqueued = get_string('queued');
 
 if ($courseid) {
     $course = $DB->get_record('course', array('id' => $courseid), 'id, fullname', MUST_EXIST);
@@ -153,9 +152,6 @@ foreach ($rs as $backuprow) {
     } else if ($backuprow->laststatus == backup_cron_automated_helper::BACKUP_STATUS_NOTYETRUN) {
         $status = $strnotyetrun;
         $statusclass = 'backup-notyetrun';
-    } else if ($backuprow->laststatus == backup_cron_automated_helper::BACKUP_STATUS_QUEUED) {
-        $status = $strqueued;
-        $statusclass = 'backup-queued';
     } else {
         $status = $strerror;
         $statusclass = 'backup-error'; // Red.

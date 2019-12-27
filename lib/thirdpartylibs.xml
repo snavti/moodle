@@ -4,7 +4,7 @@
     <location>adodb</location>
     <name>AdoDB</name>
     <license>BSD/GPL</license>
-    <version>5.20.15</version>
+    <version>5.20.14</version>
     <licenseversion>2.1+</licenseversion>
   </library>
   <library>
@@ -95,7 +95,7 @@
     <location>phpmailer</location>
     <name>PHPMailer</name>
     <license>LGPL</license>
-    <version>6.1.3</version>
+    <version>6.0.7</version>
     <licenseversion>2.1</licenseversion>
   </library>
   <library>
@@ -273,7 +273,7 @@
     <location>amd/src/adapter.js</location>
     <name>WebRTC adapter</name>
     <license>BSD</license>
-    <version>7.3.0</version>
+    <version>6.4.0</version>
     <licenseversion>3-Clause</licenseversion>
   </library>
   <library>
@@ -306,7 +306,7 @@
     <location>babel-polyfill</location>
     <name>babel-polyfill</name>
     <license>MIT</license>
-    <version>7.7.0</version>
+    <version>6.26.0</version>
   </library>
   <library>
     <location>mdn-polyfills</location>

@@ -3787,7 +3787,7 @@ function xmldb_main_upgrade($oldversion) {
     // Automatically generated Moodle v3.8.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2019120500.01) {
+    if ($oldversion < 2019111800.04) {
         // Delete any tool_cohortroles mappings for roles which no longer exist.
         $DB->delete_records_select('tool_cohortroles', "roleid NOT IN (SELECT id FROM {role})");
 
@@ -3795,30 +3795,7 @@ function xmldb_main_upgrade($oldversion) {
         $DB->delete_records_select('role_assignments', "roleid NOT IN (SELECT id FROM {role})");
 
         // Main savepoint reached.
-        upgrade_main_savepoint(true, 2019120500.01);
-    }
-
-    if ($oldversion < 2019121800.00) {
-        // Upgrade MIME types for existing streaming files.
-        $filetypes = array(
-            '%.fmp4' => 'video/mp4',
-            '%.ts' => 'video/MP2T',
-            '%.mpd' => 'application/dash+xml',
-            '%.m3u8' => 'application/x-mpegURL',
-        );
-
-        $select = $DB->sql_like('filename', '?', false);
-        foreach ($filetypes as $extension => $mimetype) {
-            $DB->set_field_select(
-                'files',
-                'mimetype',
-                $mimetype,
-                $select,
-                array($extension)
-            );
-        }
-
-        upgrade_main_savepoint(true, 2019121800.00);
+        upgrade_main_savepoint(true, 2019111800.04);
     }
 
     return true;

@@ -110,8 +110,8 @@ class store extends external_api {
      */
     public static function execute(string $component, int $contextid, string $itemname, int $gradeduserid,
             bool $notifyuser, string $formdata): array {
-        global $USER, $CFG;
-        require_once("{$CFG->libdir}/gradelib.php");
+        global $USER;
+
         [
             'component' => $component,
             'contextid' => $contextid,
@@ -172,11 +172,7 @@ class store extends external_api {
         // Fetch the updated grade back out.
         $grade = $gradeitem->get_grade_for_user($gradeduser, $USER);
 
-        $gradegrade = \grade_grade::fetch(['itemid' => $gradeitem->get_grade_item()->id, 'userid' => $gradeduser->id]);
-        $gradername = $gradegrade ? fullname(\core_user::get_user($gradegrade->usermodified)) : null;
-        $maxgrade = (int) $gradeitem->get_grade_item()->grademax;
-
-        return fetch::get_fetch_data($grade, $hasgrade, $maxgrade, $gradername);
+        return fetch::get_fetch_data($grade, $hasgrade, 0);
     }
 
     /**

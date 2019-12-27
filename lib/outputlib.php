@@ -1409,9 +1409,6 @@ class theme_config {
         raise_memory_limit(MEMORY_EXTRA);
         core_php_time_limit::raise(300);
 
-        // TODO: MDL-62757 When changing anything in this method please do not forget to check
-        // if the validate() method in class admin_setting_configthemepreset needs updating too.
-
         // Set-up the compiler.
         $compiler = new core_scss();
         $compiler->prepend_raw_scss($this->get_pre_scss_code());
@@ -1488,7 +1485,7 @@ class theme_config {
      *
      * @return string The SCSS code to inject.
      */
-    public function get_extra_scss_code() {
+    protected function get_extra_scss_code() {
         $content = '';
 
         // Getting all the candidate functions.
@@ -1518,7 +1515,7 @@ class theme_config {
      *
      * @return string The SCSS code to inject.
      */
-    public function get_pre_scss_code() {
+    protected function get_pre_scss_code() {
         $content = '';
 
         // Getting all the candidate functions.

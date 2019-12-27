@@ -253,7 +253,7 @@ function quiz_start_new_attempt($quizobj, $quba, $attempt, $attemptnumber, $time
             $forcedvariantsbyseed, $variantstrategy);
     }
 
-    $quba->start_all_questions($variantstrategy, $timenow, $attempt->userid);
+    $quba->start_all_questions($variantstrategy, $timenow);
 
     // Work out the attempt layout.
     $sections = $quizobj->get_sections();
