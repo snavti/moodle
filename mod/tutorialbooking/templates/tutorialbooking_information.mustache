@@ -1,0 +1,47 @@
+{{!
+    This file is part of the Tutorial Booking activity.
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_tutorialbooking/tutorialbooking_information
+
+    Student view of the tutorial booking activity.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * name
+    * summary
+    * totalplaces
+    * totalsignups
+    * locked
+
+    Example context (json):
+    {
+        "name": "My tutorial booking",
+        "summary": "<p>Pick a slot and be merry.</p>",
+        "totalplaces": 20,
+        "totalsignups": 5,
+        "locked": false
+    }
+}}
+<h2 class="sectionname">{{name}}</h2>
+<div id="into" class="generalbox">{{{summary}}}</div>
+<div class="alert alert-info">{{#str}} statsline, tutorialbooking, { "places": "{{totalspaces}}", "signedup": "{{totalsignups}}" } {{/str}}</div>
+{{#locked}}<div class="alert alert-warning">{{#str}} lockwarning, tutorialbooking {{/str}}</div>{{/locked}}
