@@ -22,11 +22,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// This file does not need require_login because capability to verify can be granted to guests, skip codechecker here.
 // @codingStandardsIgnoreLine
 require_once('../../config.php');
 
 $contextid = optional_param('contextid', context_system::instance()->id, PARAM_INT);
 $code = optional_param('code', '', PARAM_ALPHANUM); // The code for the certificate we are verifying.
+$qrcode = optional_param('qrcode', false, PARAM_BOOL);
 
 $context = context::instance_by_id($contextid);
 
@@ -86,7 +88,7 @@ if ($checkallofsite) {
 // The form we are using to verify these codes.
 $form = new \mod_customcert\verify_certificate_form($pageurl);
 
-if ($form->get_data()) {
+if ($code) {
     $result = new stdClass();
     $result->issues = array();
 
@@ -115,8 +117,6 @@ if ($form->get_data()) {
         $params = ['code' => $code, 'customcertid' => $customcert->id];
     }
 
-    $sql .= " AND u.deleted = 0";
-
     // It is possible (though unlikely) that there is the same code for issued certificates.
     if ($issues = $DB->get_records_sql($sql, $params)) {
         $result->success = true;
@@ -129,7 +129,10 @@ if ($form->get_data()) {
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($heading);
-echo $form->display();
+// Don't show the form if we are coming from a QR code.
+if (!$qrcode) {
+    echo $form->display();
+}
 if (isset($result)) {
     $renderer = $PAGE->get_renderer('mod_customcert');
     $result = new \mod_customcert\output\verify_certificate_results($result);

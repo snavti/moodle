@@ -38,7 +38,7 @@ class element extends \mod_customcert\element {
     /**
      * This function renders the form elements when adding a customcert element.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance
+     * @param \MoodleQuickForm $mform the edit_form instance
      */
     public function render_form_elements($mform) {
         global $COURSE;
@@ -73,20 +73,9 @@ class element extends \mod_customcert\element {
      * @param \stdClass $user the user we are rendering this for
      */
     public function render($pdf, $preview, $user) {
-        global $DB;
-
         // Check that the grade item is not empty.
         if (!empty($this->get_data())) {
-            // Get the course module information.
-            $cm = $DB->get_record('course_modules', array('id' => $this->get_data()), '*', MUST_EXIST);
-            $module = $DB->get_record('modules', array('id' => $cm->module), '*', MUST_EXIST);
-
-            // Get the name of the item.
-            $courseid = \mod_customcert\element_helper::get_courseid($this->get_data());
-            $itemname = $DB->get_field($module->name, 'name', array('id' => $cm->instance), MUST_EXIST);
-            $itemname = format_string($itemname, true, ['context' => \context_course::instance($courseid)]);
-
-            \mod_customcert\element_helper::render_content($pdf, $this, $itemname);
+            \mod_customcert\element_helper::render_content($pdf, $this, $this->get_grade_item_name());
         }
     }
 
@@ -99,20 +88,9 @@ class element extends \mod_customcert\element {
      * @return string the html
      */
     public function render_html() {
-        global $DB;
-
         // Check that the grade item is not empty.
         if (!empty($this->get_data())) {
-            // Get the course module information.
-            $cm = $DB->get_record('course_modules', array('id' => $this->get_data()), '*', MUST_EXIST);
-            $module = $DB->get_record('modules', array('id' => $cm->module), '*', MUST_EXIST);
-
-            // Get the name of the item.
-            $courseid = \mod_customcert\element_helper::get_courseid($this->get_data());
-            $itemname = $DB->get_field($module->name, 'name', array('id' => $cm->instance), MUST_EXIST);
-            $itemname = format_string($itemname, true, ['context' => \context_course::instance($courseid)]);
-
-            return \mod_customcert\element_helper::render_html_content($this, $itemname);
+            return \mod_customcert\element_helper::render_html_content($this, $this->get_grade_item_name());
         }
 
         return '';
@@ -121,7 +99,7 @@ class element extends \mod_customcert\element {
     /**
      * Sets the data on the form when editing an element.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance
+     * @param \MoodleQuickForm $mform the edit_form instance
      */
     public function definition_after_data($mform) {
         if (!empty($this->get_data())) {
@@ -129,5 +107,23 @@ class element extends \mod_customcert\element {
             $element->setValue($this->get_data());
         }
         parent::definition_after_data($mform);
+    }
+
+    /**
+     * Helper function that returns the category name.
+     *
+     * @return string
+     */
+    protected function get_grade_item_name() : string {
+        global $DB;
+
+        // Get the course module information.
+        $cm = $DB->get_record('course_modules', array('id' => $this->get_data()), '*', MUST_EXIST);
+        $module = $DB->get_record('modules', array('id' => $cm->module), '*', MUST_EXIST);
+
+        // Get the name of the item.
+        $itemname = $DB->get_field($module->name, 'name', array('id' => $cm->instance), MUST_EXIST);
+
+        return format_string($itemname, true, ['context' => \mod_customcert\element_helper::get_context($this->get_id())]);
     }
 }

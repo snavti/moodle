@@ -134,7 +134,7 @@ class element_helper {
     /**
      * Helper function to render the font elements.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance.
+     * @param \MoodleQuickForm $mform the edit_form instance.
      */
     public static function render_form_element_font($mform) {
         $mform->addElement('select', 'font', get_string('font', 'customcert'), \mod_customcert\certificate::get_fonts());
@@ -151,7 +151,7 @@ class element_helper {
     /**
      * Helper function to render the colour elements.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance.
+     * @param \MoodleQuickForm $mform the edit_form instance.
      */
     public static function render_form_element_colour($mform) {
         $mform->addElement('customcert_colourpicker', 'colour', get_string('fontcolour', 'customcert'));
@@ -163,7 +163,7 @@ class element_helper {
     /**
      * Helper function to render the position elements.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance.
+     * @param \MoodleQuickForm $mform the edit_form instance.
      */
     public static function render_form_element_position($mform) {
         $mform->addElement('text', 'posx', get_string('posx', 'customcert'), array('size' => 10));
@@ -179,17 +179,26 @@ class element_helper {
     /**
      * Helper function to render the width element.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance.
+     * @param \MoodleQuickForm $mform the edit_form instance.
      */
     public static function render_form_element_width($mform) {
         $mform->addElement('text', 'width', get_string('elementwidth', 'customcert'), array('size' => 10));
         $mform->setType('width', PARAM_INT);
         $mform->setDefault('width', 0);
         $mform->addHelpButton('width', 'elementwidth', 'customcert');
+    }
+
+    /**
+     * Helper function to render the refpoint element.
+     *
+     * @param \MoodleQuickForm $mform the edit_form instance.
+     */
+    public static function render_form_element_refpoint($mform) {
         $refpointoptions = array();
         $refpointoptions[self::CUSTOMCERT_REF_POINT_TOPLEFT] = get_string('topleft', 'customcert');
         $refpointoptions[self::CUSTOMCERT_REF_POINT_TOPCENTER] = get_string('topcenter', 'customcert');
         $refpointoptions[self::CUSTOMCERT_REF_POINT_TOPRIGHT] = get_string('topright', 'customcert');
+
         $mform->addElement('select', 'refpoint', get_string('refpoint', 'customcert'), $refpointoptions);
         $mform->setType('refpoint', PARAM_INT);
         $mform->setDefault('refpoint', self::CUSTOMCERT_REF_POINT_TOPCENTER);
@@ -384,6 +393,27 @@ class element_helper {
     }
 
     /**
+     * Helper function that returns the context for this element.
+     *
+     * @param int $elementid The element id
+     * @return \context The context
+     */
+    public static function get_context(int $elementid) : \context {
+        global $DB;
+
+        $sql = "SELECT ct.contextid
+                  FROM {customcert_templates} ct
+            INNER JOIN {customcert_pages} cp
+                    ON ct.id = cp.templateid
+            INNER JOIN {customcert_elements} ce
+                    ON cp.id = ce.pageid
+                 WHERE ce.id = :elementid";
+        $contextid = $DB->get_field_sql($sql, array('elementid' => $elementid), MUST_EXIST);
+
+        return \context::instance_by_id($contextid);
+    }
+
+    /**
      * Return the list of possible elements to add.
      *
      * @return array the list of element types that can be used.
@@ -412,8 +442,11 @@ class element_helper {
                 $classname = '\\customcertelement_' . $foldername . '\\element';
                 // Ensure the necessary class exists.
                 if (class_exists($classname)) {
-                    $component = "customcertelement_{$foldername}";
-                    $options[$foldername] = get_string('pluginname', $component);
+                    // Additionally, check if the user is allowed to add the element at all.
+                    if ($classname::can_add()) {
+                        $component = "customcertelement_{$foldername}";
+                        $options[$foldername] = get_string('pluginname', $component);
+                    }
                 }
             }
         }
@@ -510,18 +543,12 @@ class element_helper {
             return false;
         }
 
-        // Define how many decimals to display.
-        $decimals = 2;
-        if ($gradeformat == GRADE_DISPLAY_TYPE_PERCENTAGE) {
-            $decimals = 0;
-        }
-
         $grade = new \grade_grade(array('itemid' => $courseitem->id, 'userid' => $userid));
 
         return new grade_information(
             $courseitem->get_name(),
             $grade->finalgrade,
-            grade_format_gradevalue($grade->finalgrade, $courseitem, true, $gradeformat, $decimals),
+            grade_format_gradevalue($grade->finalgrade, $courseitem, true, $gradeformat),
             $grade->get_dategraded()
         );
     }
@@ -545,37 +572,44 @@ class element_helper {
             return false;
         }
 
-        $gradeitem = grade_get_grades($cm->course, 'mod', $module->name, $cm->instance, $userid);
+        $params = [
+            'itemtype' => 'mod',
+            'itemmodule' => $module->name,
+            'iteminstance' => $cm->instance,
+            'courseid' => $cm->course,
+            'itemnumber' => 0
+        ];
+        $gradeitem = \grade_item::fetch($params);
 
         if (empty($gradeitem)) {
             return false;
         }
 
-        // Define how many decimals to display.
-        $decimals = 2;
-        if ($gradeformat == GRADE_DISPLAY_TYPE_PERCENTAGE) {
-            $decimals = 0;
+        $grade = grade_get_grades(
+            $cm->course,
+            'mod',
+            $module->name,
+            $cm->instance,
+            $userid
+        );
+
+        if (!isset($grade->items[0]->grades[$userid])) {
+            return false;
         }
 
-        $item = new \grade_item();
-        $item->gradetype = GRADE_TYPE_VALUE;
-        $item->courseid = $cm->course;
-        $itemproperties = reset($gradeitem->items);
-        foreach ($itemproperties as $key => $value) {
-            $item->$key = $value;
-        }
-
-        $objgrade = $item->grades[$userid];
+        $gradebookgrade = $grade->items[0]->grades[$userid];
 
         $dategraded = null;
-        if (!empty($objgrade->dategraded)) {
-            $dategraded = $objgrade->dategraded;
+        if (!empty($gradebookgrade->dategraded)) {
+            $dategraded = $gradebookgrade->dategraded;
         }
 
+        $displaygrade = grade_format_gradevalue($gradebookgrade->grade, $gradeitem, true, $gradeformat);
+
         return new grade_information(
-            $item->name,
-            $objgrade->grade,
-            grade_format_gradevalue($objgrade->grade, $item, true, $gradeformat, $decimals),
+            $gradeitem->get_name(),
+            $gradebookgrade->grade,
+            $displaygrade,
             $dategraded
         );
     }
@@ -593,18 +627,12 @@ class element_helper {
             return false;
         }
 
-        // Define how many decimals to display.
-        $decimals = 2;
-        if ($gradeformat == GRADE_DISPLAY_TYPE_PERCENTAGE) {
-            $decimals = 0;
-        }
-
         $grade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $userid));
 
         return new grade_information(
             $gradeitem->get_name(),
             $grade->finalgrade,
-            grade_format_gradevalue($grade->finalgrade, $gradeitem, true, $gradeformat, $decimals),
+            grade_format_gradevalue($grade->finalgrade, $gradeitem, true, $gradeformat),
             $grade->get_dategraded()
         );
     }

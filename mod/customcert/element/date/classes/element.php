@@ -51,6 +51,11 @@ define('CUSTOMCERT_DATE_COURSE_START', '-3');
  */
 define('CUSTOMCERT_DATE_COURSE_END', '-4');
 
+/**
+ * Date - Current date
+ */
+define('CUSTOMCERT_DATE_CURRENT_DATE', '-5');
+
 require_once($CFG->dirroot . '/lib/grade/constants.php');
 
 /**
@@ -65,15 +70,19 @@ class element extends \mod_customcert\element {
     /**
      * This function renders the form elements when adding a customcert element.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance
+     * @param \MoodleQuickForm $mform the edit_form instance
      */
     public function render_form_elements($mform) {
-        global $COURSE;
+        global $CFG, $COURSE;
 
         // Get the possible date options.
         $dateoptions = array();
         $dateoptions[CUSTOMCERT_DATE_ISSUE] = get_string('issueddate', 'customcertelement_date');
-        $dateoptions[CUSTOMCERT_DATE_COMPLETION] = get_string('completiondate', 'customcertelement_date');
+        $dateoptions[CUSTOMCERT_DATE_CURRENT_DATE] = get_string('currentdate', 'customcertelement_date');
+        $completionenabled = $CFG->enablecompletion && ($COURSE->id == SITEID || $COURSE->enablecompletion);
+        if ($completionenabled) {
+            $dateoptions[CUSTOMCERT_DATE_COMPLETION] = get_string('completiondate', 'customcertelement_date');
+        }
         $dateoptions[CUSTOMCERT_DATE_COURSE_START] = get_string('coursestartdate', 'customcertelement_date');
         $dateoptions[CUSTOMCERT_DATE_COURSE_END] = get_string('courseenddate', 'customcertelement_date');
         $dateoptions[CUSTOMCERT_DATE_COURSE_GRADE] = get_string('coursegradedate', 'customcertelement_date');
@@ -138,10 +147,12 @@ class element extends \mod_customcert\element {
             $customcert = $DB->get_record('customcert', array('templateid' => $page->templateid), '*', MUST_EXIST);
             // Now we can get the issue for this user.
             $issue = $DB->get_record('customcert_issues', array('userid' => $user->id, 'customcertid' => $customcert->id),
-                '*', MUST_EXIST);
+                '*', IGNORE_MULTIPLE);
 
             if ($dateitem == CUSTOMCERT_DATE_ISSUE) {
                 $date = $issue->timecreated;
+            } else if ($dateitem == CUSTOMCERT_DATE_CURRENT_DATE) {
+                $date = time();
             } else if ($dateitem == CUSTOMCERT_DATE_COMPLETION) {
                 // Get the last completion date.
                 $sql = "SELECT MAX(c.timecompleted) as timecompleted
@@ -187,7 +198,12 @@ class element extends \mod_customcert\element {
 
         // Ensure that a date has been set.
         if (!empty($date)) {
-            \mod_customcert\element_helper::render_content($pdf, $this, $this->get_date_format_string($date, $dateformat));
+            $date = $this->get_date_format_string($date, $dateformat);
+            // If we are previewing, we want to let the user know it's an example date so they don't get confused.
+            if ($preview) {
+                $date = get_string('exampledata', 'customcert', 'date') . ' ' . $date;
+            }
+            \mod_customcert\element_helper::render_content($pdf, $this, $date);
         }
     }
 
@@ -215,7 +231,7 @@ class element extends \mod_customcert\element {
     /**
      * Sets the data on the form when editing an element.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance
+     * @param \MoodleQuickForm $mform the edit_form instance
      */
     public function definition_after_data($mform) {
         // Set the item and format for this element.

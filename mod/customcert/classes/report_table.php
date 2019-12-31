@@ -65,14 +65,24 @@ class report_table extends \table_sql {
     public function __construct($customcertid, $cm, $groupmode, $download = null) {
         parent::__construct('mod_customcert_report_table');
 
-        $columns = array(
-            'fullname',
-            'timecreated'
-        );
-        $headers = array(
-            get_string('fullname'),
-            get_string('receiveddate', 'customcert')
-        );
+        $context = \context_module::instance($cm->id);
+        $extrafields = get_extra_user_fields($context);
+
+        $columns = [];
+        $columns[] = 'fullname';
+        foreach ($extrafields as $extrafield) {
+            $columns[] = $extrafield;
+        }
+        $columns[] = 'timecreated';
+        $columns[] = 'code';
+
+        $headers = [];
+        $headers[] = get_string('fullname');
+        foreach ($extrafields as $extrafield) {
+            $headers[] = get_user_field_name($extrafield);
+        }
+        $headers[] = get_string('receiveddate', 'customcert');
+        $headers[] = get_string('code', 'customcert');
 
         // Check if we were passed a filename, which means we want to download it.
         if ($download) {
@@ -84,7 +94,7 @@ class report_table extends \table_sql {
             $headers[] = get_string('file');
         }
 
-        if (!$this->is_downloading() && has_capability('mod/customcert:manage', \context_module::instance($cm->id))) {
+        if (!$this->is_downloading() && has_capability('mod/customcert:manage', $context)) {
             $columns[] = 'actions';
             $headers[] = '';
         }
@@ -93,6 +103,7 @@ class report_table extends \table_sql {
         $this->define_headers($headers);
         $this->collapsible(false);
         $this->sortable(true);
+        $this->no_sorting('code');
         $this->no_sorting('download');
         $this->is_downloadable(true);
 
@@ -125,6 +136,16 @@ class report_table extends \table_sql {
      */
     public function col_timecreated($user) {
         return userdate($user->timecreated);
+    }
+
+    /**
+     * Generate the code column.
+     *
+     * @param \stdClass $user
+     * @return string
+     */
+    public function col_code($user) {
+        return $user->code;
     }
 
     /**

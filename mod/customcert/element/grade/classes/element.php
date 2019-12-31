@@ -43,7 +43,7 @@ class element extends \mod_customcert\element {
     /**
      * This function renders the form elements when adding a customcert element.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance
+     * @param \MoodleQuickForm $mform the edit_form instance
      */
     public function render_form_elements($mform) {
         global $COURSE;
@@ -106,14 +106,9 @@ class element extends \mod_customcert\element {
 
         // If we are previewing this certificate then just show a demonstration grade.
         if ($preview) {
-            // Define how many decimals to display.
-            $decimals = 2;
-            if ($gradeinfo->gradeformat == GRADE_DISPLAY_TYPE_PERCENTAGE) {
-                $decimals = 0;
-            }
-
             $courseitem = \grade_item::fetch_course_item($courseid);
-            $grade = grade_format_gradevalue('100', $courseitem, true, $gradeinfo->gradeformat, $decimals);
+            $grade = grade_format_gradevalue('100', $courseitem, true, $gradeinfo->gradeformat);
+            $grade = get_string('exampledata', 'customcert', 'grade') . ' ' . $grade;
         } else {
             if ($gradeitem == CUSTOMCERT_GRADE_COURSE) {
                 $grade = \mod_customcert\element_helper::get_course_grade_info(
@@ -165,13 +160,7 @@ class element extends \mod_customcert\element {
 
         $courseitem = \grade_item::fetch_course_item($COURSE->id);
 
-        // Define how many decimals to display.
-        $decimals = 2;
-        if ($gradeinfo->gradeformat == GRADE_DISPLAY_TYPE_PERCENTAGE) {
-            $decimals = 0;
-        }
-
-        $grade = grade_format_gradevalue('100', $courseitem, true, $gradeinfo->gradeformat, $decimals);
+        $grade = grade_format_gradevalue('100', $courseitem, true, $gradeinfo->gradeformat);
 
         return \mod_customcert\element_helper::render_html_content($this, $grade);
     }
@@ -179,7 +168,7 @@ class element extends \mod_customcert\element {
     /**
      * Sets the data on the form when editing an element.
      *
-     * @param \mod_customcert\edit_element_form $mform the edit_form instance
+     * @param \MoodleQuickForm $mform the edit_form instance
      */
     public function definition_after_data($mform) {
         // Set the item and format for this element.
