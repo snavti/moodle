@@ -24,6 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_tutorialbooking;
+
 defined('MOODLE_INTERNAL') || die;
 
 /**
@@ -35,143 +37,77 @@ defined('MOODLE_INTERNAL') || die;
  * @author     Neill Magill <neill.magill@nottingham.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_tutorialbooking_export {
-    /** String required at the start of a file to identify the content as UTF 8. */
-    const UTF8_IDENTIFIER = "\xEF\xBB\xBF";
+class export {
+    /** @var bool Flag for formatting data for the Business School. */
+    public static $uonbs = false;
 
     /**
-     * Generates a file for exporting data from the tutorial booking activity in a rather strange format.
+     * Formats a record returned by the data get methods.
      *
-     * @param int $tutorialid The id of the tutorial the export should be for.
-     * @return void
+     * @param \stdClass $record
+     * @return \stdClass
      */
-    public static function export($tutorialid) {
-        $records = self::getexport($tutorialid);
-        $filecontents = array();
-        $filecontents[] = get_string('timeslottitle', 'mod_tutorialbooking')
-                . '�' . get_string('idnumber', 'mod_tutorialbooking')
-                . '�' . get_string('username', 'mod_tutorialbooking')
-                . '�' . get_string('realname', 'mod_tutorialbooking')
-                . '�' . get_string('coursefullname', 'mod_tutorialbooking'); // Titleline.
-        foreach ($records as $record) {
-            // Had to include id field to stop warning and exit of script.
-            unset($record->id); // Needed this to keep moodle happy.
-            $record->description = strip_tags($record->description);
+    public static function format_record($record) {
+        $userfields = get_all_user_name_fields();
+        $record->sessiontitle = strip_tags($record->sessiontitle);
+        if (self::$uonbs) {
             $record->realname = "{$record->lastname}, {$record->firstname}";
-            unset($record->firstname);
-            unset($record->lastname);
-            unset($record->firstnamephonetic);
-            unset($record->lastnamephonetic);
-            unset($record->middlename);
-            unset($record->alternatename);
-            $record = (array) $record;
-            $filecontents[] = implode('�', array_values($record));
-        }
-        send_temp_file(self::UTF8_IDENTIFIER.implode("\n", $filecontents), 'tutorial_export.txt', true);
-    }
-
-    /**
-     * Generates a comma separated file to export the signups for all tutorial booking activities on a course.
-     *
-     * @param int $courseid The id of the course the file is for.
-     * @return void
-     */
-    public static function exportcourse($courseid) {
-        $records = self::getexportcourse($courseid);
-        $filecontents = array();
-        $filecontents[] = '"' . get_string('tutorialbooking', 'mod_tutorialbooking')
-                . '","' . get_string('timeslottitle', 'mod_tutorialbooking')
-                . '","' . get_string('idnumber')
-                . '","' . get_string('username')
-                . '","' . get_string('fullname')
-                . '","' . get_string('coursefullname', 'mod_tutorialbooking') . '"'; // Titleline.
-        foreach ($records as $record) {
-            // Had to include id field to stop warning and exit of script.
-            unset($record->id); // Needed this to keep moodle happy.
-            $record->description = strip_tags($record->description);
+        } else {
             $record->realname = fullname($record);
-            unset($record->firstname);
-            unset($record->lastname);
-            unset($record->firstnamephonetic);
-            unset($record->lastnamephonetic);
-            unset($record->middlename);
-            unset($record->alternatename);
-            $record = (array) $record;
-            $filecontents[] = '"'.implode('","', array_values($record)).'"';
         }
-        send_temp_file(self::UTF8_IDENTIFIER.implode("\n", $filecontents), 'tutorial_export.csv', true);
-    }
-
-    /**
-     * Generates a comma separated file to export the signups for a tutorial booking activities.
-     *
-     * @param int $tutorialid The id of the tutorial the export should be for.
-     * @return void
-     */
-    public static function exportcsv($tutorialid) {
-        $records = self::getexport($tutorialid);
-        $filecontents = array();
-        $filecontents[] = '"' . get_string('timeslottitle', 'mod_tutorialbooking')
-                . '","' . get_string('idnumber')
-                . '","' . get_string('username')
-                . '","' . get_string('fullname')
-                . '","' . get_string('fullnamecourse') . '"'; // Titleline.
-        foreach ($records as $record) {
-            // Had to include id field to stop warning and exit of script.
-            unset($record->id); // Needed this to keep moodle happy.
-            $record->description = strip_tags($record->description);
-            $record->realname = fullname($record);
-            unset($record->firstname);
-            unset($record->lastname);
-            unset($record->firstnamephonetic);
-            unset($record->lastnamephonetic);
-            unset($record->middlename);
-            unset($record->alternatename);
-            $record = (array) $record;
-            $filecontents[] = '"'.implode('","', array_values($record)).'"';
+        // Remove the id.
+        unset($record->id);
+        // Remove the fields used to build the user's fullname.
+        foreach ($userfields as $field) {
+            unset($record->$field);
         }
-        send_temp_file(self::UTF8_IDENTIFIER.implode("\n", $filecontents), 'tutorial_export.csv', true);
+        return (array) $record;
     }
 
     /**
      * Get a list of people that have signed upto tutorial slots.
      *
      * @param int $tutorialid The tutorial id.
-     * @return stdClass[]|false Array of database records, or false if none are found.
+     * @return \moodle_recordset
      */
-    protected static function getexport($tutorialid) {
+    public static function getexport($tutorialid) {
         global $DB;
-        $sql = "SELECT sup.id, ses.description, u.idnumber, u.username, NULL AS realname, "
-                . "u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename, c.fullname "
-                . "FROM {course} c, {tutorialbooking} t, {tutorialbooking_sessions} ses, {tutorialbooking_signups} sup, {user} u "
-                . "WHERE ses.tutorialid = t.id "
-                . "AND sup.sessionid = ses.id "
-                . "AND sup.userid = u.id "
-                . "AND sup.tutorialid = :tutorialid "
-                . "AND c.id = t.course "
-                . "ORDER BY realname";
+        $userdetails = get_all_user_name_fields(true, 'u');
+        $sesfields = "ses.description AS sessiontitle";
+        $userfields = "u.idnumber, u.username, NULL AS realname, $userdetails";
+        $coursefields = "c.fullname AS coursefullname";
+        $sql = "SELECT sup.id, $sesfields, $userfields, $coursefields
+                  FROM {course} c, {tutorialbooking} t, {tutorialbooking_sessions} ses, {tutorialbooking_signups} sup, {user} u
+                 WHERE ses.tutorialid = t.id
+                   AND sup.sessionid = ses.id
+                   AND sup.userid = u.id
+                   AND sup.tutorialid = :tutorialid
+                   AND c.id = t.course";
 
-        return $DB->get_records_sql($sql, array('tutorialid' => $tutorialid));
+        return $DB->get_recordset_sql($sql, array('tutorialid' => $tutorialid));
     }
 
     /**
      * Get a list of all tutorial slot signups on a course.
      *
      * @param int $courseid The course id.
-     * @return stdClass[]|false Array of database records, or false if none are found.
+     * @return \moodle_recordset
      */
-    protected static function getexportcourse($courseid) {
+    public static function getexportcourse($courseid) {
         global $DB;
-        $sql = "SELECT sup.id, t.name, ses.description, u.idnumber, u.username, NULL AS realname, "
-                . "u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename, c.fullname "
-                . "FROM {course} c, {tutorialbooking} t, {tutorialbooking_sessions} ses, {tutorialbooking_signups} sup, {user} u "
-                . "WHERE ses.tutorialid = t.id "
-                . "AND sup.sessionid = ses.id "
-                . "AND sup.userid = u.id "
-                . "AND sup.courseid = ? "
-                . "AND c.id = t.course "
-                . "ORDER BY realname";
+        $userdetails = get_all_user_name_fields(true, 'u');
+        $sheetfields = "t.name AS signupsheet";
+        $sesfields = "ses.description AS sessiontitle";
+        $userfields = "u.idnumber, u.username, NULL AS realname, $userdetails";
+        $coursefields = "c.fullname AS coursefullname";
+        $sql = "SELECT sup.id, $sheetfields, $sesfields, $userfields, $coursefields
+                  FROM {course} c, {tutorialbooking} t, {tutorialbooking_sessions} ses, {tutorialbooking_signups} sup, {user} u
+                 WHERE ses.tutorialid = t.id
+                   AND sup.sessionid = ses.id
+                   AND sup.userid = u.id
+                   AND sup.courseid = :courseid
+                   AND c.id = t.course";
 
-        return $DB->get_records_sql($sql, array($courseid));
+        return $DB->get_recordset_sql($sql, array('courseid' => $courseid));
     }
 }

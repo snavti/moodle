@@ -1,8 +1,8 @@
 @mod @mod_tutorialbooking @uon
-Feature: A tutorial booking can be locked to prevent students from modifying signups
+Feature: A signup sheet can be locked to prevent users from modifying signups
     In order to finalise signups
     As a teacher
-    I should be able to lock a tutorial
+    I should be able to lock a signup sheet
 
     Background:
         Given the following "users" exist:
@@ -21,30 +21,26 @@ Feature: A tutorial booking can be locked to prevent students from modifying sig
         And the following "activities" exist:
             | activity        | course | idnumber | name             | intro                           | locked |
             | tutorialbooking | C1     | tuorial1 | Tutorial booking | This is a test tutorial booking | 1      |
-        And I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And I add a new session to signup sheet with:
             | Title | Slot 1 |
-            | Max Number of Students | 1 |
-            | Position | Top of the Page |
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+            | Number of places | 1 |
+            | Position | Top of the page |
+        And I add a new session to signup sheet with:
             | Title | Slot 2 |
-            | Max Number of Students | 2 |
-            | Position | Bottom of the Page |
+            | Number of places | 2 |
+            | Position | Bottom of the page |
         And I log out
 
-    Scenario: A student cannot sign up to a slot while a tutorial booking is locked.
-        Given I log in as "student1"
-        And I am on "Course 1" course homepage
-        Then I should not be able to sign up to "Tutorial booking" tutorial booking
+    Scenario: A student cannot sign up to a session while a signup sheet is locked.
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
+        Then I should not be able to sign up to signup sheet
 
-    Scenario: A student cannot remove themselves from a slot while a tutorial booking is locked.
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And in "Slot 1" of "Tutorial booking" tutorial booking I add:
+    Scenario: A student cannot remove themselves from a session while a signup sheet is locked.
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And in "Slot 1" of signup sheet I add:
             | student1 |
         And I log out
-        Then I log in as "student1"
-        And I am on "Course 1" course homepage
-        And I should see I am signed up to "Slot 1" in "Tutorial booking" tutorial booking
-        But I should not be able to remove my sign up from "Tutorial booking" tutorial booking
+        When I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
+        Then I should see I am signed up to "Slot 1" in signup sheet
+        But I should not be able to remove my sign up from signup sheet

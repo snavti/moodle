@@ -65,6 +65,8 @@ class backup_tutorialbooking_activity_structure_step extends backup_activity_str
             array(
                 'description',
                 'descformat',
+                'summary',
+                'summaryformat',
                 'location',
                 'spaces',
                 'sequence',
@@ -77,10 +79,9 @@ class backup_tutorialbooking_activity_structure_step extends backup_activity_str
 
         // Tutorialbooking_signups.
         $signups = new backup_nested_element('signups');
-        $signup = new backup_nested_element('signup', array('id'),
+        $signup = new backup_nested_element('signup', array('id', 'sessionid'),
             array(
                 'userid',
-                'sessionid',       // Should be needed because of structure but restore has bug??
                 'signupdate',
                 'waiting',
                 'blocked',
@@ -133,6 +134,8 @@ class backup_tutorialbooking_activity_structure_step extends backup_activity_str
         $signup->annotate_ids('user', 'blockerid');
 
         // Define file annotations.
+        $tutorialbooking->annotate_files('mod_tutorialbooking', 'intro', null);
+        $session->annotate_files('mod_tutorialbooking', 'summary', 'id');
 
         // Return the root element (tutorialbooking), wrapped into standard activity structure.
         return $this->prepare_activity_structure($tutorialbooking);

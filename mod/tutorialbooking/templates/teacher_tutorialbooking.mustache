@@ -29,8 +29,6 @@
     * id
     * slots
     * editsignuplists
-    * urledittutorial
-    * urldeletetutorial
     * urladdslot
     * urllock
     * locked
@@ -40,15 +38,12 @@
     * exportall
     * urlalltutorials
     * urlexport
-    * urlexportcsv
 
     Example context (json):
     {
         "id": 42,
         "slots": [],
         "editsignuplists": true,
-        "urledittutorial": "http://example.com/",
-        "urldeletetutorial": "http://example.com/",
         "urladdslot": "http://example.com/",
         "urllock": "http://example.com/",
         "locked": false,
@@ -58,23 +53,12 @@
         "exportall": true,
         "urlalltutorials": "http://example.com/",
         "urlexport": "http://example.com/",
-        "urlexportcsv": "http://example.com/",
     }
 }}
 <div class="box tutorial">
     {{> mod_tutorialbooking/tutorialbooking_information}}
     <ul class="controls">
         {{#editsignuplists}}
-            <li class="control">
-                <a href="{{{urledittutorial}}}" class="btn btn-secondary btn-sm">
-                    {{#str}} edittutorialprompt, tutorialbooking {{/str}}
-                </a>
-            </li>
-            <li class="control">
-                <a href="{{{urldeletetutorial}}}" class="btn btn-secondary btn-sm">
-                    {{#str}} deletetutorialprompt, tutorialbooking {{/str}}
-                </a>
-            </li>
             <li class="control">
                 <a href="{{{urladdslot}}}" class="btn btn-secondary btn-sm">
                     {{#str}} newtimslotprompt, tutorialbooking {{/str}}
@@ -101,11 +85,6 @@
             <li class="control">
                 <a href="{{{urlexport}}}" class="btn btn-secondary btn-sm">
                     {{#str}} exportlistprompt, tutorialbooking {{/str}}
-                </a>
-            </li>
-            <li class="control">
-                <a href="{{{urlexportcsv}}}" class="btn btn-secondary btn-sm">
-                    {{#str}} exportcsvlistprompt, tutorialbooking {{/str}}
                 </a>
             </li>
         {{/editexport}}

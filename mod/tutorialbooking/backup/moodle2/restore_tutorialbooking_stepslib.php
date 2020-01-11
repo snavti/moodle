@@ -102,7 +102,7 @@ class restore_tutorialbooking_activity_structure_step extends restore_activity_s
 
         // Insert the entry record.
         $newitemid = $DB->insert_record('tutorialbooking_sessions', $data);
-        $this->set_mapping('session', $oldid, $newitemid);
+        $this->set_mapping('session', $oldid, $newitemid, true);
     }
 
     /**
@@ -120,7 +120,6 @@ class restore_tutorialbooking_activity_structure_step extends restore_activity_s
         $data->userid = $this->get_mappingid('user', $data->userid); // This has been annotated - user should be in enrolment.
         $data->courseid = $this->get_courseid();
         $data->tutorialid = $this->get_new_parentid('tutorialbooking');
-        // This should work but does not.
         $data->sessionid = $this->get_mappingid('session', $data->sessionid);
 
         // Due to not being able to annotate blockers - we remove any blocker information.
@@ -150,5 +149,16 @@ class restore_tutorialbooking_activity_structure_step extends restore_activity_s
         $data->sentto = serialize($sentto);
 
         $DB->insert_record('tutorialbooking_messages', $data);
+    }
+
+    /**
+     * This method will be executed after the whole structure step have been processed
+     *
+     * After execution method for code needed to be executed after the whole structure
+     * has been processed. Useful for cleaning tasks, files process and others.
+     */
+    protected function after_execute() {
+        $this->add_related_files('mod_tutorialbooking', 'intro', null);
+        $this->add_related_files('mod_tutorialbooking', 'summary', 'session');
     }
 }

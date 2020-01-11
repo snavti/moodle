@@ -20,28 +20,26 @@ Feature: Backup and restore
         And the following "activities" exist:
             | activity | course | idnumber | name | intro | section |
             | tutorialbooking | C1 | tuorial1 | Happy days | Book your happy day here | 1 |
-        And I log in as "teacher"
-        And I am on "Course 1" course homepage
-        And I add a new timeslot to "Happy days" tutorial booking with:
+        And I am on the "Happy days" "mod_tutorialbooking > Management" page logged in as "teacher"
+        And I add a new session to signup sheet with:
             | Title | Slot 1 |
-            | Max Number of Students | 1 |
-            | Position | Top of the Page |
-        And I add a new timeslot to "Happy days" tutorial booking with:
+            | Number of places | 1 |
+            | Position | Top of the page |
+        And I add a new session to signup sheet with:
             | Title | Slot 2 |
-            | Max Number of Students | 2 |
-            | Position | Bottom of the Page |
+            | Number of places | 2 |
+            | Position | Bottom of the page |
         And I log out
-        And I log in as "student"
-        And I am on "Course 1" course homepage
-        And I sign up to "Slot 2" in "Happy days" tutorial booking
+        And I am on the "Happy days" "mod_tutorialbooking > Sessions" page logged in as "student"
+        And I sign up to "Slot 2" in signup sheet
         And I log out
 
-    Scenario: Duplicate a tutorial booking activity (Covers T34 MOODLETEST-1370)
+    Scenario: Duplicate a signup sheet activity (Covers T34 MOODLETEST-1370)
         Given I log in as "teacher"
         And I am on "Course 1" course homepage with editing mode on
         When I duplicate "Happy days" activity
-        Then I should see "Happy days (copy)"
-        And I should see "Slot 1" in position "1" of "Happy days (copy)" tutorial booking
-        And I should see "Slot 2" in position "2" of "Happy days (copy)" tutorial booking
-        And there should be "1" free space of "1" total spaces available on "Slot 1" of "Happy days (copy)" tutorial booking
-        And there should be "2" free space of "2" total spaces available on "Slot 2" of "Happy days (copy)" tutorial booking
+        And I follow "Happy days (copy)"
+        Then I should see "Slot 1" in position "1" of signup sheet
+        And I should see "Slot 2" in position "2" of signup sheet
+        And there should be "1" free places of "1" total places available on "Slot 1" of signup sheet
+        And there should be "2" free places of "2" total places available on "Slot 2" of signup sheet

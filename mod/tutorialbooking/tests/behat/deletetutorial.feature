@@ -1,10 +1,10 @@
 @mod @mod_tutorialbooking @uon
-Feature: Delete tutorial booking activities
-    In order to remove tutorial booking activities
+Feature: Delete signup sheet activities
+    In order to remove signup sheet activities
     As a teacher
-    I need to be able to delete tutorial booking activities from a course.
+    I need to be able to delete signup sheet activities from a course.
 
-    Scenario: Delete a tutorial booking.
+    Scenario: Delete a signup sheet.
         Given the following "users" exist:
             | username | firstname | lastname | email            |
             | teacher1 | Teacher   | 1        | teacher1@example.com |

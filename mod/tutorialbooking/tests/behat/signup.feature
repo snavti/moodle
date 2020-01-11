@@ -1,8 +1,8 @@
 @mod @mod_tutorialbooking @uon
-Feature: Students can signup and remove themselves from tutorial booking slots.
-    In order to book onto tutorials
+Feature: Students can signup and remove themselves from signup sheet sessions.
+    In order to book onto signup sheets
     As a student
-    I need to be able to signup to, and remove myself from, time slots.
+    I need to be able to signup to, and remove myself from, sessions.
 
     Background:
         Given the following "users" exist:
@@ -21,51 +21,46 @@ Feature: Students can signup and remove themselves from tutorial booking slots.
         And the following "activities" exist:
             | activity        | course | idnumber | name             | intro                           |
             | tutorialbooking | C1     | tuorial1 | Tutorial booking | This is a test tutorial booking |
-        And I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And I add a new session to signup sheet with:
             | Title | Slot 1 |
-            | Max Number of Students | 1 |
-            | Position | Top of the Page |
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+            | Number of places | 1 |
+            | Position | Top of the page |
+        And I add a new session to signup sheet with:
             | Title | Slot 2 |
-            | Max Number of Students | 2 |
-            | Position | Bottom of the Page |
+            | Number of places | 2 |
+            | Position | Bottom of the page |
         And I log out
 
-    Scenario: A student can sign up to a slot and then remove themselves from it.
-        Given I log in as "student1"
-        And I am on "Course 1" course homepage
-        When I sign up to "Slot 2" in "Tutorial booking" tutorial booking
-        Then I should not be able to sign up to "Tutorial booking" tutorial booking
-        And I should see I am signed up to "Slot 2" in "Tutorial booking" tutorial booking
-        When I remove my sign up from "Tutorial booking" tutorial booking
-        Then I should be able to sign up to "Tutorial booking" tutorial booking
+    Scenario: A student can sign up to a session and then remove themselves from it.
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
+        When I sign up to "Slot 2" in signup sheet
+        Then I should not be able to sign up to signup sheet
+        And I should see I am signed up to "Slot 2" in signup sheet
+        When I remove my sign up from signup sheet
+        Then I should be able to sign up to signup sheet
 
-    Scenario: A student cannot sign up to a full slot, but can sign up to, and remove themselves from another slot.
-        Given I log in as "student1"
-        And I am on "Course 1" course homepage
-        And I sign up to "Slot 1" in "Tutorial booking" tutorial booking
+    Scenario: A student cannot sign up to a full session, but can sign up to, and remove themselves from another session.
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
+        And I sign up to "Slot 1" in signup sheet
         And I log out
-        And I log in as "student2"
-        And I am on "Course 1" course homepage
-        Then I should be able to sign up to "Tutorial booking" tutorial booking
-        But I should not be able to sign up to "Slot 1" in "Tutorial booking" tutorial booking
-        And I should see "student1" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
-        When I sign up to "Slot 2" in "Tutorial booking" tutorial booking
-        Then I should not be able to sign up to "Tutorial booking" tutorial booking
-        And I should see I am signed up to "Slot 2" in "Tutorial booking" tutorial booking
-        And I should see "student1" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
-        When I remove my sign up from "Tutorial booking" tutorial booking
-        Then I should be able to sign up to "Tutorial booking" tutorial booking
-        And I should see "student1" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student2"
+        Then I should be able to sign up to signup sheet
+        But I should not be able to sign up to "Slot 1" in signup sheet
+        And I should see "student1" is signed up to "Slot 1" in signup sheet
+        When I sign up to "Slot 2" in signup sheet
+        Then I should not be able to sign up to signup sheet
+        And I should see I am signed up to "Slot 2" in signup sheet
+        And I should see "student1" is signed up to "Slot 1" in signup sheet
+        When I remove my sign up from signup sheet
+        Then I should be able to sign up to signup sheet
+        And I should see "student1" is signed up to "Slot 1" in signup sheet
 
-    Scenario: A student should be able to cancel removing their signup
-        Given I log in as "student1"
-        And I am on "Course 1" course homepage
-        When I sign up to "Slot 2" in "Tutorial booking" tutorial booking
-        Then I should not be able to sign up to "Tutorial booking" tutorial booking
-        And I should see I am signed up to "Slot 2" in "Tutorial booking" tutorial booking
-        When I cancel remove my sign up from "Tutorial booking" tutorial booking
-        Then I should not be able to sign up to "Tutorial booking" tutorial booking
-        And I should see I am signed up to "Slot 2" in "Tutorial booking" tutorial booking
+    Scenario: A participant should be able to cancel removing their signup
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
+        When I sign up to "Slot 2" in signup sheet
+        Then I should not be able to sign up to signup sheet
+        And I should see I am signed up to "Slot 2" in signup sheet
+        When I cancel remove my sign up from signup sheet
+        Then I should not be able to sign up to signup sheet
+        And I should see I am signed up to "Slot 2" in signup sheet

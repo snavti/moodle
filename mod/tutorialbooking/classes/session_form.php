@@ -40,32 +40,32 @@ class mod_tutorialbooking_session_form extends moodleform {
      * Defines forms elements
      */
     public function definition() {
-
-        global $USER, $OUTPUT, $PAGE;
-
         $mform = $this->_form;
+        $current = $this->_customdata['current'];
+        $title = $this->_customdata['title'];
+        $tutorialid = $this->_customdata['tutorialid'];
+        $courseid = $this->_customdata['courseid'];
+        $summaryoptions = $this->_customdata['summaryoptions'];
 
-        $mform->addElement('html', html_writer::tag('h2', $this->_customdata['title'], array('class' => "main help")));
+        $mform->addElement('html', html_writer::tag('h2', $title, array('class' => "main help")));
 
-        if (!$this->_customdata['id']) {
+        if (!$current->id) {
             $mform->addElement('header', 'session', get_string('newsessionheading', 'tutorialbooking'));
-            $mform->addElement('static', 'sessionhelp', '', get_string('newsessionhelp', 'tutorialbooking',
-                $this->_customdata['title']));
+            $mform->addElement('static', 'sessionhelp', '', get_string('newsessionhelp', 'tutorialbooking', $title));
         } else {
             $mform->addElement('header', 'session', get_string('editsessionheading', 'tutorialbooking'));
-            $mform->addElement('static', 'sessionhelp', '', get_string('editsessionhelp', 'tutorialbooking',
-                $this->_customdata['title']));
+            $mform->addElement('static', 'sessionhelp', '', get_string('editsessionhelp', 'tutorialbooking', $title));
         }
 
-        $mform->addElement('hidden', 'id', $this->_customdata['id']);
+        $mform->addElement('hidden', 'id', $current->id);
         $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'tutorialid', $this->_customdata['tutorialid']);
+        $mform->addElement('hidden', 'tutorialid', $tutorialid);
         $mform->setType('tutorialid', PARAM_INT);
-        $mform->addElement('hidden', 'courseid', $this->_customdata['courseid']);
+        $mform->addElement('hidden', 'courseid', $courseid);
         $mform->setType('courseid', PARAM_INT);
-        $mform->addElement('hidden', 'sequence', $this->_customdata['sequence']);
+        $mform->addElement('hidden', 'sequence');
         $mform->setType('sequence', PARAM_RAW);
-        $mform->addElement('hidden', 'usercreated', $this->_customdata['usercreated']);
+        $mform->addElement('hidden', 'usercreated');
         $mform->setType('usercreated', PARAM_RAW);
         $mform->addElement('hidden', 'action', 'save');
         $mform->setType('action', PARAM_ALPHA);
@@ -73,16 +73,10 @@ class mod_tutorialbooking_session_form extends moodleform {
         // Description.
         $mform->addElement('textarea', 'description', get_string('sessiondescriptionprompt', 'tutorialbooking'));
         $mform->setType('description', PARAM_TEXT);
-        if (isset($this->_customdata['description'])) {
-            $mform->setDefault('description', $this->_customdata['description']);
-        }
 
         // A formatable summary area.
-        $mform->addElement('editor', 'summary', get_string('sessionsummaryprompt', 'tutorialbooking'));
-        $mform->setType('summary', PARAM_RAW);
-        if (isset($this->_customdata['summary'])) {
-            $mform->setDefault('summary', $this->_customdata['summary']);
-        }
+        $mform->addElement('editor', 'summary_editor', get_string('sessionsummaryprompt', 'tutorialbooking'), '', $summaryoptions);
+        $mform->setType('summary_editor', PARAM_RAW);
 
         $mform->addElement('static', 'sessiondescriptionhelp', '',
                 html_writer::tag('strong', get_string('sessiondescriptionhelp', 'tutorialbooking')));
@@ -90,13 +84,12 @@ class mod_tutorialbooking_session_form extends moodleform {
 
         // Spaces/places.
         $mform->addElement('text', 'spaces', get_string('spacesprompt', 'tutorialbooking'), array('size' => 3));
-        $mform->setDefault('spaces', $this->_customdata['spaces']); // Default set in settings.
         $mform->setType('spaces', PARAM_INT);
 
         if (count($this->_customdata['positions'])) {
             $mform->addElement('select', 'newposition', get_string('positionprompt', 'tutorialbooking'),
                 $this->_customdata['positions']);
-            $mform->setDefault('newposition', $this->_customdata['sequence']); // Really want bottom of the page to be the default.
+            $mform->setDefault('newposition', $current->sequence); // Really want bottom of the page to be the default.
             $mform->setType('newposition', PARAM_INT);
         }
 
@@ -114,5 +107,7 @@ class mod_tutorialbooking_session_form extends moodleform {
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->setType('buttonar', PARAM_RAW);
         $mform->closeHeaderBefore('buttonar');
+        // Fill in the form.
+        $this->set_data($current);
     }
 }

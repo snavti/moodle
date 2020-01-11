@@ -30,6 +30,7 @@ ul.tutorialbooking li.message .messagebody {
 }
 
 .path-mod-tutorialbooking .tutorial_session {
+    position: relative;
     margin: 0 1em;
     border-bottom: 0.2em solid #eee;
 }
@@ -46,6 +47,29 @@ ul.tutorialbooking li.message .messagebody {
 .path-mod-tutorialbooking .tutorial_session .session_attendees {
     margin-left: 1em;
     margin-bottom: 0.5em;
+}
+
+.path-mod-tutorialbooking .tutorial_session .action-menu {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+}
+
+.path-mod-tutorialbooking .tutorial_session.editing .sectionname {
+    margin-right: 3.5em;
+}
+
+@media (max-width: 600px) {
+    /* Move to the action menu to the top of it's session when the screen gets narrow. */
+    .path-mod-tutorialbooking .tutorial_session .action-menu {
+        left: 0;
+        right: inherit;
+    }
+
+    .path-mod-tutorialbooking .tutorial_session.editing .sectionname {
+        margin-right: inherit;
+        padding-top: 1.3em;
+    }
 }
 
 .path-mod-tutorialbooking .messageheader .user::before {

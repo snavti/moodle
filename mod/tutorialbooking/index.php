@@ -27,9 +27,11 @@ use mod_tutorialbooking\event\course_module_instance_list_viewed;
 
 require_once('../../config.php');
 require_once("$CFG->libdir/filelib.php");
+require_once($CFG->libdir . '/dataformatlib.php');
 
+$exportformat = 'dataformat';
 $id = required_param('id', PARAM_INT);
-$exportall = optional_param('exportall', 0, PARAM_INT);
+$dataformat = optional_param($exportformat, '', PARAM_ALPHA);
 
 // Get course details.
 $course = get_course($id);
@@ -43,9 +45,28 @@ require_course_login($course, true);
 $canexportall = has_capability('mod/tutorialbooking:exportallcoursetutorials', $context);
 
 // Check if we should export all the records.
-if ($exportall && $canexportall) {
-    mod_tutorialbooking_export::exportcourse($course->id);
-    die();
+if ($dataformat && $canexportall) {
+    // Log that the data is being exported.
+    $eventdata = [
+        'context' => $context,
+        'objectid' => $course->id,
+    ];
+    $event = \mod_tutorialbooking\event\tutorial_exported_course::create($eventdata);
+    $event->trigger();
+
+    // Do the export.
+    $data = \mod_tutorialbooking\export::getexportcourse($course->id);
+    $columns = [
+        'SignupSheet' => get_string('tutorialbooking', 'mod_tutorialbooking'),
+        'SessionTitle' => get_string('timeslottitle', 'mod_tutorialbooking'),
+        'IDNumber' => get_string('idnumber'),
+        'UserName' => get_string('username'),
+        'RealName' => get_string('fullname'),
+        'CourseFullname' => get_string('fullnamecourse'),
+    ];
+    $callback = [\mod_tutorialbooking\export::class, 'format_record'];
+    download_as_dataformat('signup_sheet_course_export', $dataformat, $columns, $data, $callback);
+    exit;
 }
 
 $PAGE->set_pagelayout('incourse');
@@ -73,8 +94,9 @@ echo $OUTPUT->header();
 
 if ($tutorials = get_all_instances_in_course('tutorialbooking', $course)) {
     if ($canexportall) {
-        $url = new moodle_url('/mod/tutorialbooking/index.php', array('id' => $id, 'exportall' => 1));
-        echo html_writer::tag('p', html_writer::link($url, get_string('exportcsvlistallprompt', 'mod_tutorialbooking')));
+        $url = new moodle_url('/mod/tutorialbooking/index.php');
+        $urlparams = ['id' => $id];
+        echo $OUTPUT->download_dataformat_selector(get_string('exportcsvlistallprompt', 'mod_tutorialbooking'), $url, $exportformat, $urlparams);
     }
 
     $usesections = course_format_uses_sections($course->format);
@@ -113,7 +135,7 @@ if ($tutorials = get_all_instances_in_course('tutorialbooking', $course)) {
         $table->data[] = array (
             $printsection,
             "<a $class href=\"view.php?id=$cm->id\">".format_string($tutorial->name)."</a>",
-            format_module_intro('tutorial', $tutorial, $cm->id));
+            format_module_intro('tutorialbooking', $tutorial, $cm->id));
     }
 
     echo html_writer::table($table);

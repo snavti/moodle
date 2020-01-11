@@ -72,10 +72,12 @@ class slot implements \renderable, \templatable {
             list($renderable->title, $titelformat) =
                 external_format_text($record->description, $record->descformat, $tutorial->context->id);
             list($renderable->summary, $summaryformat) =
-                external_format_text($record->summary, $record->summaryformat, $tutorial->context->id);
+                external_format_text($record->summary, $record->summaryformat, $tutorial->context->id, 'mod_tutorialbooking', 'summary', $record->id);
         } else {
             $renderable->title = format_text($record->description, $record->descformat, ['context' => $tutorial->context]);
-            $renderable->summary = format_text($record->summary, $record->summaryformat, ['context' => $tutorial->context]);
+            $summary = file_rewrite_pluginfile_urls($record->summary, 'pluginfile.php', $tutorial->context->id,
+                    'mod_tutorialbooking', 'summary', $record->id);
+            $renderable->summary = format_text($summary, $record->summaryformat, ['context' => $tutorial->context]);
         }
         $renderable->sequence = $record->sequence;
         $renderable->tutorial = $tutorial;
@@ -106,6 +108,47 @@ class slot implements \renderable, \templatable {
         $freespaces = abs($this->spaces - count($this->signups));
         // Students can signup only if thy are not already signed up and they have the correct capability.
         $cansignup =  !isset($this->tutorial->mysignup) && $this->tutorial->cansignup;
+
+        $menu = new \action_menu();
+        $menu->set_menu_trigger(get_string('actions'));
+
+        $editurl = new \moodle_url($adminpage, ['action' => 'edit']);
+        $deleteurl = new \moodle_url($adminpage, ['action' => 'deletesession']);
+        if ($this->tutorial->editsignuplists) {
+            $editstring = get_string('editsession', 'mod_tutorialbooking');
+            $editlink = new \action_menu_link_secondary($editurl, new \pix_icon('t/edit', ''), $editstring);
+            $menu->add($editlink);
+
+            $deletestring = get_string('deletesession', 'mod_tutorialbooking');
+            $deletelink = new \action_menu_link_secondary($deleteurl, new \pix_icon('t/delete', ''), $deletestring);
+            $menu->add($deletelink);
+        }
+
+        $addurl = new \moodle_url($adminpage, ['action' => 'addusers']);
+        if ($this->tutorial->canaddstudent) {
+            $addstring = get_string('addstudents', 'mod_tutorialbooking');
+            $addlink = new \action_menu_link_secondary($addurl, new \pix_icon('t/add', ''), $addstring);
+            $menu->add($addlink);
+        }
+
+        $registerdateurl = new \moodle_url($registerpage, ['format' => \mod_tutorialbooking_register::ORDER_DATE]);
+        if ($this->tutorial->editregisters) {
+            $registernamestring = get_string('registerprintname', 'mod_tutorialbooking');
+            $registernamelink = new \action_menu_link_secondary($registerpage, new \pix_icon('t/user', ''), $registernamestring);
+            $menu->add($registernamelink);
+
+            $registerdatestring = get_string('registerprintdate', 'mod_tutorialbooking');
+            $registerdatelink = new \action_menu_link_secondary($registerdateurl, new \pix_icon('t/user', ''), $registerdatestring);
+            $menu->add($registerdatelink);
+        }
+
+        $messageurl = new \moodle_url($adminpage, ['action' => 'emailgroup']);
+        if ($this->tutorial->editmessage) {
+            $messagestring = get_string('emailgroupprompt', 'mod_tutorialbooking');
+            $messagelink = new \action_menu_link_secondary($messageurl, new \pix_icon('t/email', ''), $messagestring);
+            $menu->add($messagelink);
+        }
+
         $slot = (object) array(
             'id' => $this->id,
             'title' => $this->title,
@@ -120,14 +163,15 @@ class slot implements \renderable, \templatable {
             'cansignup' => $cansignup && !$full,
             'urlsignup' => new \moodle_url($viewpage, ['action' => 'signup', 'sessionid' => $this->id]),
             'urlremove' => new \moodle_url($viewpage, ['action' => 'remove', 'sessionid' => $this->id]),
-            'urledit' => new \moodle_url($adminpage, ['action' => 'edit']),
-            'urldelete' => new \moodle_url($adminpage, ['action' => 'deletesession']),
-            'urladdusers' => new \moodle_url($adminpage, ['action' => 'addusers']),
+            'urledit' => $editurl,
+            'urldelete' => $deleteurl,
+            'urladdusers' => $addurl,
             'urlregistername' => $registerpage,
-            'urlregisterdate' => new \moodle_url($registerpage, ['format' => \mod_tutorialbooking_register::ORDER_DATE]),
-            'urlmessage' => new \moodle_url($adminpage, ['action' => 'emailgroup']),
+            'urlregisterdate' => $registerdateurl,
+            'urlmessage' => $messageurl,
             'urlmoveup' => new \moodle_url($adminpage, ['action' => 'moveup', 'currentpos' => $this->sequence]),
             'urlmovedown' => new \moodle_url($adminpage, ['action' => 'movedown', 'currentpos' => $this->sequence]),
+            'menu' => $menu->export_for_template($output),
         );
         $privatesignups = $this->tutorial->privacy == \mod_tutorialbooking_tutorial::PRIVACY_SHOWOWN;
         $teacher = $this->tutorial->viewadmin;

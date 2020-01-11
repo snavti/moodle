@@ -1,8 +1,8 @@
 @mod @mod_tutorialbooking @uon
-Feature: Time slots have settings that should be editable.
-    In order to have meaning time slots must be able to have editable properties
+Feature: Sessions have settings that should be editable.
+    In order to have meaning sessions must be able to have editable properties
     As a teacher
-    I need to be able to change the settings of time slots.
+    I need to be able to change the settings of sessions.
 
     Background:
         Given the following "users" exist:
@@ -21,94 +21,87 @@ Feature: Time slots have settings that should be editable.
         And the following "activities" exist:
             | activity        | course | idnumber | name             | intro                           |
             | tutorialbooking | C1     | tuorial1 | Tutorial booking | This is a test tutorial booking |
-        And I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And I add a new session to signup sheet with:
             | Title | Slot 1 |
-            | Max Number of Students | 1 |
-            | Position | Top of the Page |
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+            | Number of places | 1 |
+            | Position | Top of the page |
+        And I add a new session to signup sheet with:
             | Title | Slot 2 |
-            | Max Number of Students | 2 |
-            | Position | Bottom of the Page |
+            | Number of places | 2 |
+            | Position | Bottom of the page |
         And I log out
 
-    Scenario: I should be able to create a time slot based on an existing slot
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And I should see "Slot 1" in position "1" of "Tutorial booking" tutorial booking
-        And I should see "Slot 2" in position "2" of "Tutorial booking" tutorial booking
-        And I create new slot based on "Slot 1" in "Tutorial booking" tutorial booking with:
+    Scenario: I should be able to create a session based on an existing session
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And I should see "Slot 1" in position "1" of signup sheet
+        And I should see "Slot 2" in position "2" of signup sheet
+        And I create new session based on "Slot 1" in signup sheet with:
             | Title | New slot |
-            | Position | Top of the Page |
-        Then I should see "New slot" in position "1" of "Tutorial booking" tutorial booking
-        And there should be "1" free space of "1" total spaces available on "New slot" of "Tutorial booking" tutorial booking
-        And I should see "Slot 1" in position "2" of "Tutorial booking" tutorial booking
-        And I should see "Slot 2" in position "3" of "Tutorial booking" tutorial booking
+            | Position | Top of the page |
+        Then I should see "New slot" in position "1" of signup sheet
+        And there should be "1" free places of "1" total places available on "New slot" of signup sheet
+        And I should see "Slot 1" in position "2" of signup sheet
+        And I should see "Slot 2" in position "3" of signup sheet
 
-    Scenario: I should be able to change the details of a time slot.
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And I should see "Slot 1" in position "1" of "Tutorial booking" tutorial booking
-        And I should see "Slot 2" in position "2" of "Tutorial booking" tutorial booking
-        And there should be "1" free space of "1" total spaces available on "Slot 1" of "Tutorial booking" tutorial booking
-        When I edit "Slot 1" in "Tutorial booking" tutorial booking with:
+    Scenario: I should be able to change the details of a session.
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And I should see "Slot 1" in position "1" of signup sheet
+        And I should see "Slot 2" in position "2" of signup sheet
+        And there should be "1" free places of "1" total places available on "Slot 1" of signup sheet
+        When I edit "Slot 1" in signup sheet with:
             | Title | Modified slot 1 |
-            | Max Number of Students | 4 |
-            | Position | Bottom of the Page |
-        Then I should see "Slot 2" in position "1" of "Tutorial booking" tutorial booking
-        And I should see "Modified slot 1" in position "2" of "Tutorial booking" tutorial booking
-        And there should be "4" free space of "4" total spaces available on "Modified slot 1" of "Tutorial booking" tutorial booking
+            | Number of places | 4 |
+            | Position | Bottom of the page |
+        Then I should see "Slot 2" in position "1" of signup sheet
+        And I should see "Modified slot 1" in position "2" of signup sheet
+        And there should be "4" free places of "4" total places available on "Modified slot 1" of signup sheet
 
-    Scenario: I should be able to delete a time slot.
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And I should see "Slot 1" in position "1" of "Tutorial booking" tutorial booking
-        And I should see "Slot 2" in position "2" of "Tutorial booking" tutorial booking
-        When I delete "Slot 1" of "Tutorial booking" tutorial booking
-        Then I should see "Slot 2" in position "1" of "Tutorial booking" tutorial booking
+    Scenario: I should be able to delete a session.
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And I should see "Slot 1" in position "1" of signup sheet
+        And I should see "Slot 2" in position "2" of signup sheet
+        When I delete "Slot 1" of signup sheet
+        Then I should see "Slot 2" in position "1" of signup sheet
 
-    Scenario: It should not be possible to set the number of spaces in a timeslot to less than 1 or more than 30000.
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        When I edit "Slot 2" in "Tutorial booking" tutorial booking with:
-            | Max Number of Students | 0 |
-        Then there should be "1" free space of "1" total spaces available on "Slot 2" of "Tutorial booking" tutorial booking
-        When I edit "Slot 2" in "Tutorial booking" tutorial booking with:
-            | Max Number of Students | 30001 |
-        Then there should be "30000" free space of "30000" total spaces available on "Slot 2" of "Tutorial booking" tutorial booking
-        When I edit "Slot 2" in "Tutorial booking" tutorial booking with:
-            | Max Number of Students | 2 |
-        Then there should be "2" free space of "2" total spaces available on "Slot 2" of "Tutorial booking" tutorial booking
-        When I edit "Slot 2" in "Tutorial booking" tutorial booking with:
-            | Max Number of Students | 30000 |
-        Then there should be "30000" free space of "30000" total spaces available on "Slot 2" of "Tutorial booking" tutorial booking
-        When I edit "Slot 2" in "Tutorial booking" tutorial booking with:
-            | Max Number of Students | -1 |
-        Then there should be "1" free space of "1" total spaces available on "Slot 2" of "Tutorial booking" tutorial booking
-        When I edit "Slot 2" in "Tutorial booking" tutorial booking with:
-            | Max Number of Students | 29999 |
-        Then there should be "29999" free space of "29999" total spaces available on "Slot 2" of "Tutorial booking" tutorial booking
+    Scenario: It should not be possible to set the number of places in a session to less than 1 or more than 30000.
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        When I edit "Slot 2" in signup sheet with:
+            | Number of places | 0 |
+        Then there should be "1" free places of "1" total places available on "Slot 2" of signup sheet
+        When I edit "Slot 2" in signup sheet with:
+            | Number of places | 30001 |
+        Then there should be "30000" free places of "30000" total places available on "Slot 2" of signup sheet
+        When I edit "Slot 2" in signup sheet with:
+            | Number of places | 2 |
+        Then there should be "2" free places of "2" total places available on "Slot 2" of signup sheet
+        When I edit "Slot 2" in signup sheet with:
+            | Number of places | 30000 |
+        Then there should be "30000" free places of "30000" total places available on "Slot 2" of signup sheet
+        When I edit "Slot 2" in signup sheet with:
+            | Number of places | -1 |
+        Then there should be "1" free places of "1" total places available on "Slot 2" of signup sheet
+        When I edit "Slot 2" in signup sheet with:
+            | Number of places | 29999 |
+        Then there should be "29999" free places of "29999" total places available on "Slot 2" of signup sheet
 
-    Scenario: An editing teacher should be able to edit the number of slots to be lower than the number of signups.
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And in "Slot 2" of "Tutorial booking" tutorial booking I add:
+    Scenario: An editing teacher should be able to edit the number of places to be lower than the number of signups.
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And in "Slot 2" of signup sheet I add:
             | student1 |
             | student2 |
-        When I edit "Slot 2" in "Tutorial booking" tutorial booking with:
-            | Max Number of Students | 1 |
-        Then I should see that "Slot 2" with "1" spaces is oversubscribed by "1" in "Tutorial booking" tutorial booking
+        When I edit "Slot 2" in signup sheet with:
+            | Number of places | 1 |
+        Then I should see that "Slot 2" with "1" places is oversubscribed by "1" in signup sheet
 
-    Scenario: A user without the capability to oversubscribe should not be able to edit the number of slots to be lower than the number of signups.
+    Scenario: A user without the capability to oversubscribe should not be able to edit the number of places to be lower than the number of signups.
         Given the following "permission overrides" exist:
             | capability                        | permission | role           | contextlevel | reference |
             | mod/tutorialbooking:oversubscribe | Prevent    | editingteacher | Course       | C1        |
-        And I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And in "Slot 2" of "Tutorial booking" tutorial booking I add:
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And in "Slot 2" of signup sheet I add:
             | student1 |
             | student2 |
-        When I edit "Slot 2" in "Tutorial booking" tutorial booking with:
-            | Max Number of Students | 1 |
-        Then I should see I cannot reduce the spaces to "1" or less than "2"
+        When I edit "Slot 2" in signup sheet with:
+            | Number of places | 1 |
+        Then I should see I cannot reduce the places to "1" or less than "2"

@@ -40,7 +40,7 @@ use Behat\Behat\Context\Step\Given as Given,
  */
 class behat_mod_tutorialbooking extends behat_base {
     /**
-     * Generates the xpath reqiired to select a named slot in a page.
+     * Generates the xpath required to select a named slot in a page.
      *
      * @param string $slotname
      * @return string The xpath selector.
@@ -55,15 +55,24 @@ class behat_mod_tutorialbooking extends behat_base {
     }
 
     /**
-     * Adds a timeslot to a tutorial booking specified by its name.
+     * Generates the xpath required to select the controls for a session.
      *
-     * @Given /^I add a new timeslot to "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking with:$/
-     * @param string $tutorialname
+     * @param type $sessionname
+     * @return string The xpath selector.
+     */
+    protected function generate_xpath_session_controls($sessionname) {
+        $sessionxpath = $this->generate_xpath_slot_selector($sessionname);
+        return $sessionxpath . "//*[contains(concat(' ', normalize-space(@class), ' '), ' controls ')]";
+    }
+
+    /**
+     * Adds a session to a signup sheet specified by its name, must be used on the management page.
+     *
+     * @When /^I add a new session to signup sheet with:$/
      * @param \Behat\Gherkin\Node\TableNode $settings
      * @return void
      */
-    public function i_add_a_new_timeslot_to_tutorial_booking_with($tutorialname, TableNode $settings) {
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
+    public function i_add_a_new_timeslot_to_signup_sheet_with(TableNode $settings) {
         $this->execute('behat_general::click_link', array(get_string('newtimslotprompt', 'mod_tutorialbooking')));
         $this->execute('behat_forms::i_set_the_following_fields_to_these_values', array($settings));
         $this->execute('behat_forms::press_button', array(get_string('saveasnew', 'mod_tutorialbooking')));
@@ -71,24 +80,24 @@ class behat_mod_tutorialbooking extends behat_base {
     }
 
     /**
-     * Presses cancel on the removal confirmation form for a user with the supplied username on a named sklot of the named tutorial booking.
+     * Presses cancel on the removal confirmation form for a user with the supplied username on a named session of the named signup sheet.
      *
-     * @When /^I cancel the removal of "(?P<username_string>(?:[^"]|\\")*)" from "(?P<slot_name_string>(?:[^"]|\\")*)" of "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking with "(?P<message_string>(?:[^"]|\\")*)" as a reason$/
+     * Must be used from the management page.
+     *
+     * @When /^I cancel the removal of "(?P<username_string>(?:[^"]|\\")*)" from "(?P<session_name_string>(?:[^"]|\\")*)" of signup sheet with "(?P<message_string>(?:[^"]|\\")*)" as a reason$/
      * @global moodle_database $DB The Moodle database connection object.
      * @param string $username The user4name of a Moodle user to be removed.
      * @param string $slotname The name of a slot in the tutorial the user is in.
-     * @param string $tutorialname The name of the tutorial booking instance.
      * @param string $message The message that should be entered into the confirmtion removal form.
      * @return void
      */
-    public function i_cancel_the_removal_of_student_from_slot_of_tutorial_booking_with_reason($username, $slotname, $tutorialname, $message) {
+    public function i_cancel_the_removal_of_student_from_session_of_signup_sheet_with_reason($username, $slotname, $message) {
         global $DB;
 
         // Get the details of the user.
         $name = $DB->get_field('user', $DB->sql_concat_join("' '", array('firstname', 'lastname')), array('username' => $username));
 
         $slotselector = $this->generate_xpath_slot_selector($slotname);
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
         $this->execute('behat_general::i_click_on_in_the', array($name, 'link', $slotselector, 'xpath_element'));
         $this->execute('behat_forms::i_set_the_field_to', array('message[text]', $message));
         $this->execute('behat_general::i_click_on', array(get_string('cancel'), 'button'));
@@ -96,104 +105,114 @@ class behat_mod_tutorialbooking extends behat_base {
     }
 
     /**
-     * Create a timetable booking slot by editing a names slot in a named tutorial booking and clicking 'Save as new'
+     * Create a session by editing the session name in a named signup sheet and clicking 'Save as new'
      *
-     * @Given /^I create new slot based on "(?P<slot_name_string>(?:[^"]|\\")*)" in "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking with:$/
+     * @When /^I create new session based on "(?P<session_name_string>(?:[^"]|\\")*)" in signup sheet with:$/
      * @param string $slotname
-     * @param string $tutorialname
      * @param \Behat\Gherkin\Node\TableNode $settings
      * @return void
      */
-    public function i_create_new_slot_based_on_in_tutorial_booking_with($slotname, $tutorialname, TableNode $settings) {
-        $slotselector = $this->generate_xpath_slot_selector($slotname);
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
-        $this->execute('behat_general::i_click_on_in_the', array(get_string('editsession', 'mod_tutorialbooking'), 'link', $slotselector, 'xpath_element'));
+    public function i_create_new_session_based_on_in_signup_sheet_with($slotname, TableNode $settings) {
+        $controlsselector = $this->generate_xpath_session_controls($slotname);
+        $editstring = get_string('editsession', 'mod_tutorialbooking');
+        if ($this->running_javascript()) {
+            $this->execute('behat_action_menu::i_open_the_action_menu_in', [$controlsselector, 'xpath_element']);
+            $this->execute('behat_action_menu::i_choose_in_the_open_action_menu', [$editstring]);
+        } else {
+            $this->execute('behat_general::i_click_on_in_the', [$editstring, 'link', $controlsselector, 'xpath_element']);
+        }
         $this->execute('behat_forms::i_set_the_following_fields_to_these_values', array($settings));
         $this->execute('behat_forms::press_button', array(get_string('saveasnew', 'mod_tutorialbooking')));
         $this->execute('behat_general::i_wait_to_be_redirected', array());
     }
 
     /**
-     * Delete a named time slot from a named tutorial booking.
+     * Delete a named session from a named signup sheet. Must be used on management page.
      *
-     * @When /^I delete "(?P<slot_name_string>(?:[^"]|\\")*)" of "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
+     * @When /^I delete "(?P<session_name_string>(?:[^"]|\\")*)" of signup sheet$/
      * @param string $slotname The name of a time slot.
-     * @param string $tutorialname The name of a tutorial booking activity.
      * @return void
      */
-    public function i_delete_slot_of_tutorial_booking($slotname, $tutorialname) {
-        $slotselector = $this->generate_xpath_slot_selector($slotname);
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
-        $this->execute('behat_general::i_click_on_in_the', array(get_string('deletesession', 'mod_tutorialbooking'), 'link', $slotselector, 'xpath_element'));
+    public function i_delete_session_of_signup_sheet($slotname) {
+        $controlsselector = $this->generate_xpath_session_controls($slotname);
+        $deletestring = get_string('deletesession', 'mod_tutorialbooking');
+        if ($this->running_javascript()) {
+            $this->execute('behat_action_menu::i_open_the_action_menu_in', [$controlsselector, 'xpath_element']);
+            $this->execute('behat_action_menu::i_choose_in_the_open_action_menu', [$deletestring]);
+        } else {
+            $this->execute('behat_general::i_click_on_in_the', [$deletestring, 'link', $controlsselector, 'xpath_element']);
+        }
         $this->execute('behat_forms::press_button', array(get_string('continue')));
         $this->execute('behat_general::i_wait_to_be_redirected', array());
     }
 
     /**
-     * Change the settings of a named timeslot in a named tutorial booking activity.
+     * Change the settings of a named session in a named signup sheet activity. Must be used on management page.
      *
-     * @When /^I edit "(?P<slot_name_string>(?:[^"]|\\")*)" in "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking with:$/
+     * @When /^I edit "(?P<session_name_string>(?:[^"]|\\")*)" in signup sheet with:$/
      * @param string $slotname The name of a timeslot.
-     * @param string $tutorialname The name of a tutorial booking activity.
      * @param \Behat\Gherkin\Node\TableNode $settings The settings to be changed for the tutorial booking.
      * @return void
      */
-    public function i_edit_slot_in_tutorial_booking_with($slotname, $tutorialname, TableNode $settings) {
-        $slotselector = $this->generate_xpath_slot_selector($slotname);
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
-        $this->execute('behat_general::i_click_on_in_the', array(get_string('editsession', 'mod_tutorialbooking'), 'link', $slotselector, 'xpath_element'));
+    public function i_edit_session_in_signup_sheet_with($slotname, TableNode $settings) {
+        $controlsselector = $this->generate_xpath_session_controls($slotname);
+        $editstring = get_string('editsession', 'mod_tutorialbooking');
+        if ($this->running_javascript()) {
+            $this->execute('behat_action_menu::i_open_the_action_menu_in', [$controlsselector, 'xpath_element']);
+            $this->execute('behat_action_menu::i_choose_in_the_open_action_menu', [$editstring]);
+        } else {
+            $this->execute('behat_general::i_click_on_in_the', [$editstring, 'link', $controlsselector, 'xpath_element']);
+        }
         $this->execute('behat_forms::i_set_the_following_fields_to_these_values', array($settings));
         $this->execute('behat_forms::press_button', array(get_string('save', 'mod_tutorialbooking')));
         $this->execute('behat_general::i_wait_to_be_redirected', array());
     }
 
     /**
-     * The user will remove their sign up from the named tutorial booking activity.
+     * The user will remove the users signup. Must be used on the sessions page.
      *
-     * @When /^I remove my sign up from "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
-     * @param string $tutorialname The name of the tutorial booking the user will be removed from.
+     * @When /^I remove my sign up from signup sheet$/
      * @return void
      */
-    public function i_remove_my_sign_up_from_tutorial_booking($tutorialname) {
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
+    public function i_remove_my_sign_up_from_signup_sheet() {
         $this->execute('behat_general::i_click_on', array(get_string('removefromslot', 'mod_tutorialbooking'), 'link'));
         $this->execute('behat_general::i_click_on', array(get_string('continue'), 'button'));
         $this->execute('behat_general::i_wait_to_be_redirected', array());
     }
 
     /**
-     * Click on the remove from from slot button, but cancel the process at the confirmation screen.
+     * Click on the remove from from session button, but cancel the process at the confirmation screen.
      *
-     * @When /^I cancel remove my sign up from "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
-     * @param string $tutorialname The name of the tutorial booking the user will be removed from.
+     * Must be used from the session page.
+     *
+     * @When /^I cancel remove my sign up from signup sheet$/
      * @return void
      */
-    public function i_cancel_remove_my_sign_up_from_tutorial_booking($tutorialname) {
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
+    public function i_cancel_remove_my_sign_up_from_signup_sheet() {
         $this->execute('behat_general::i_click_on', array(get_string('removefromslot', 'mod_tutorialbooking'), 'link'));
         $this->execute('behat_general::i_click_on', array(get_string('cancel'), 'button'));
         $this->execute('behat_general::i_wait_to_be_redirected', array());
     }
 
     /**
-     * Remove a student by username from a names timeslot on a named tutorial booking sending them a message.
+     * Remove a participant by username from a named session on a signup sheet sending them a message.
      *
-     * @When /^I remove "(?P<username_string>(?:[^"]|\\")*)" from "(?P<slot_name_string>(?:[^"]|\\")*)" of "(?P<tutorial_name_string>(?:[^"]|\\")*)" tutorial booking with "(?P<message_string>(?:[^"]|\\")*)" as a reason$/
+     * Must be used on the management page of a signup sheet.
+     *
+     * @When /^I remove "(?P<username_string>(?:[^"]|\\")*)" from "(?P<session_name_string>(?:[^"]|\\")*)" of signup sheet with "(?P<message_string>(?:[^"]|\\")*)" as a reason$/
      * @global moodle_database $DB The Moodle database connection object.
      * @param string $username The username of the user to be removed.
      * @param string $slotname The name of the timeslot the user is to be removed from.
-     * @param string $tutorialname The name of a tutorial booking.
      * @param string $message The message describing why the user was removed.
      * @return void
      */
-    public function i_remove_user_from_slot_of_tutorial_booking_with_message_as_a_reason($username, $slotname, $tutorialname, $message) {
+    public function i_remove_user_from_session_of_signup_sheet_with_message_as_a_reason($username, $slotname, $message) {
         global $DB;
 
         // Get the details of the user.
         $name = $DB->get_field('user', $DB->sql_concat_join("' '", array('firstname', 'lastname')), array('username' => $username));
 
         $slotselector = $this->generate_xpath_slot_selector($slotname);
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
         $this->execute('behat_general::i_click_on_in_the', array($name, 'link', $slotselector, 'xpath_element'));
         $this->execute('behat_forms::i_set_the_field_to', array('message[text]', $message));
         $this->execute('behat_general::i_click_on', array(get_string('remove', 'mod_tutorialbooking'), 'button'));
@@ -201,91 +220,92 @@ class behat_mod_tutorialbooking extends behat_base {
     }
 
     /**
-     * Check that the user can sign up to any slot in the tutorial booking.
+     * Check that the user can sign up to any session in the signup sheet.
      *
-     * @Then /^I should be able to sign up to "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
-     * @param string $tutorialname The name of the tutorial booking activity.
+     * Must be on the sessions page of a signup sheet.
+     *
+     * @Then /^I should be able to sign up to signup sheet$/
      * @return void
      */
-    public function i_should_be_able_to_sign_up_to_tutorial_booking($tutorialname) {
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
+    public function i_should_be_able_to_sign_up_to_signup_sheet() {
         $this->execute('behat_general::assert_page_contains_text', array(get_string('signupforslot', 'mod_tutorialbooking')));
     }
 
     /**
-     * Check that the user is signed up, but cannot see a link to remove themselves from a tutorial booking activity.
+     * Check that the user is signed up, but cannot see a link to remove themselves from a signup sheet activity.
      *
-     * @Given /^I should not be able to remove my sign up from "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
+     * Must be on the session page of a signup sheet.
+     *
+     * @Then /^I should not be able to remove my sign up from signup sheet$/
      * @param string $tutorialname The name of the tutorial booking activity.
      * @return void
      */
-    public function i_should_not_be_able_to_remove_my_sign_up_from_tutorial_booking($tutorialname) {
+    public function i_should_not_be_able_to_remove_my_sign_up_from_signup_sheet() {
         $signedupstring = get_string('you', 'mod_tutorialbooking');
         $removestring = get_string('removefromslot', 'mod_tutorialbooking');
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
         $this->execute('behat_general::assert_element_contains_text', array($signedupstring, '.tutorial_sessions', 'css_element'));
         $this->execute('behat_general::assert_element_not_contains_text', array($removestring, '.tutorial_sessions', 'css_element'));
     }
 
     /**
-     * The user should not be able to see the signup lists for the tutoral booking activity.
+     * The user should not be able to see the participant lists for the signup sheet activity.
      *
-     * @Given /^I should not be able to see signups on "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
-     * @param string $tutorialname
+     * Must be on the session page of a signup sheet.
+     *
+     * @Then /^I should not be able to see signups on signup sheet$/
      * @return void
      */
-    public function i_should_not_be_able_to_see_signups_on_tutorial_booking($tutorialname) {
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
+    public function i_should_not_be_able_to_see_signups_on_signup_sheet() {
         $this->execute('behat_general::should_not_exist_in_the', array('.signedupuser', 'css_element', '.tutorial_sessions', 'css_element'));
     }
 
     /**
-     * The user should not be able to sign up to the named slot in the names tutorial booking activity.
+     * The user should not be able to sign up to the named session in the signup sheet activity.
      *
-     * @Given /^I should not be able to sign up to "(?P<slot_booking_name_string>(?:[^"]|\\")*)" in "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
+     * Must be on the session page of a signup sheet.
+     *
+     * @Then /^I should not be able to sign up to "(?P<session_name_string>(?:[^"]|\\")*)" in signup sheet$/
      * @param string $slotname The name of a tutorial booking slot to be checked.
-     * @param string $tutorialname The name of the tutorial booking activity to be checked.
      * @return void
      */
-    public function i_should_not_be_able_to_sign_up_to_slot_in_tutorial_booking($slotname, $tutorialname) {
+    public function i_should_not_be_able_to_sign_up_to_session_in_signup_sheet($slotname) {
         $slotselector = $this->generate_xpath_slot_selector($slotname);
         $signupstring = get_string('signupforslot', 'mod_tutorialbooking');
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
         $this->execute('behat_general::assert_element_not_contains_text', array($signupstring, $slotselector, 'xpath_element'));
     }
 
     /**
-     * Check that the signup link does not appear on a tutorial booking.
+     * Check that the signup link does not appear on a signup sheet.
      *
-     * @Then /^I should not be able to sign up to "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
-     * @param string $tutorialname The anme of the tutorial booking to be checked.
+     * Must be used on session page of a signup sheet.
+     *
+     * @Then /^I should not be able to sign up to signup sheet$/
      * @return void
      */
-    public function i_should_not_be_able_to_sign_up_to_tutorial_booking($tutorialname) {
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
+    public function i_should_not_be_able_to_sign_up_to_signup_sheet() {
         $this->execute('behat_general::assert_page_not_contains_text', array(get_string('signupforslot', 'mod_tutorialbooking')));
     }
 
     /**
-     * Check that a user by username is signed up to a specific slot in a tutorial booking.
+     * Check that a user by username is signed up to a specific session in a signup sheet.
      *
-     * @Given /^I should see I am signed up to "(?P<slot_name_string>(?:[^"]|\\")*)" in "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
-     * @global moodle_database $DB The Moodldatabase connection object.
-     * @param string $slotname The nmae of the timeslot.
-     * @param string $tutorialname The name of the tutorial.
+     * Must be used on a session page of a signup sheet.
+     *
+     * @Then /^I should see I am signed up to "(?P<session_name_string>(?:[^"]|\\")*)" in signup sheet$/
+     * @global moodle_database $DB The Moodle database connection object.
+     * @param string $slotname The name of the timeslot.
      * @return void
      */
-    public function i_should_see_i_am_signed_up_to_slot_in_tutorial_booking($slotname, $tutorialname) {
+    public function i_should_see_i_am_signed_up_to_session_in_signup_sheet($slotname) {
         $slotselector = $this->generate_xpath_slot_selector($slotname);
         $signedupstring = get_string('you', 'mod_tutorialbooking');
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
         $this->execute('behat_general::assert_element_contains_text', array($signedupstring, $slotselector, 'xpath_element'));
     }
 
     /**
-     * Check that the editspaces error message is displayed correctly.
+     * Check that the edit spaces error message is displayed correctly.
      *
-     * @Then /^I should see I cannot reduce the spaces to "(?P<set_to_number>\d+)" or less than "(?P<totalsignups_number>\d+)"$/
+     * @Then /^I should see I cannot reduce the places to "(?P<set_to_number>\d+)" or less than "(?P<totalsignups_number>\d+)"$/
      * @param int $setto The number of spaces the user tried to set.
      * @param int $numberofsignups The number of signups to the timeslot.
      * @return void
@@ -296,53 +316,48 @@ class behat_mod_tutorialbooking extends behat_base {
     }
 
     /**
-     * Check that a user by username is signed up to a specific slot in a tutorial booking.
+     * Check that a user by username is a participant on a specific session in a signup sheet.
      *
-     * @Given /^I should see "(?P<user_name_string>(?:[^"]|\\")*)" is signed up to "(?P<slot_name_string>(?:[^"]|\\")*)" in "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
-     * @global moodle_database $DB The Moodldatabase connection object.
+     * @Then /^I should see "(?P<user_name_string>(?:[^"]|\\")*)" is signed up to "(?P<session_name_string>(?:[^"]|\\")*)" in signup sheet$/
+     * @global moodle_database $DB The Moodle database connection object.
      * @param string $username The username of the person to find.
-     * @param string $slotname The nmae of the timeslot.
-     * @param string $tutorialname The name of the tutorial.
+     * @param string $slotname The name of the session.
      * @return void
      */
-    public function i_should_see_is_signed_up_to_slot_in_tutorial_booking($username, $slotname, $tutorialname) {
+    public function i_should_see_is_signed_up_to_slot_in_signup_sheet($username, $slotname) {
         global $DB;
         $slotselector = $this->generate_xpath_slot_selector($slotname);
         // Get the user's name from the database.
-        $name = $DB->get_field('user', $DB->sql_concat_join("' '", array('firstname', 'lastname')), array('username' => $username));
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
+        $name = $DB->get_field('user', $DB->sql_concat_join("' '", ['firstname', 'lastname']), ['username' => $username]);
         $this->execute('behat_general::assert_element_contains_text', array($name, $slotselector, 'xpath_element'));
     }
 
     /**
-     * Tests if a named slot is in the correct position of a named tutorial booking activity.
+     * Tests if a named session is in the correct position of a signup sheet activity.
      *
-     * @Given /^I should see "(?P<slot_name_string>(?:[^"]|\\")*)" in position "(?P<position_number>\d+)" of "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
+     * @Then /^I should see "(?P<session_name_string>(?:[^"]|\\")*)" in position "(?P<position_number>\d+)" of signup sheet$/
      * @param string $slotname The name of the timeslot.
      * @param int $position The position of the timeslot, starting at 1.
-     * @param string $tutorialname The name of the tutorial booking activity.
      * @return void
      */
-    public function i_should_see_slot_in_position_of_tutorial_booking($slotname, $position, $tutorialname) {
+    public function i_should_see_session_in_position_of_signup_sheet($slotname, $position) {
         $slotselector = "//*[contains(concat(' ', normalize-space(@class), ' '), ' tutorial_session ') "
                 . "and .//*[contains(concat(' ', normalize-space(@class), ' '), ' sectionname ')]]"
                 . "[".(int)$position."]";
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
         $this->execute('behat_general::assert_element_contains_text', array($this->escape($slotname), $slotselector, 'xpath_element'));
     }
 
     /**
-     * For a named slot in a named tutorial booking, check that the slot has the
-     * expected number of spaces and is oversubscribed by the given number of users.
+     * For a named session in a signup sheet, check that the session has the
+     * expected number of places and is oversubscribed by the given number of participants.
      *
-     * @Given /^I should see that "(?P<slot_name_string>(?:[^"]|\\")*)" with "(?P<totalspaces_number>\d+)" spaces is oversubscribed by "(?P<oversubscribed_number>\d+)" in "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
-     * @param string $slotname The anme of the timeslot to be checked.
+     * @Then /^I should see that "(?P<session_name_string>(?:[^"]|\\")*)" with "(?P<totalspaces_number>\d+)" places is oversubscribed by "(?P<oversubscribed_number>\d+)" in signup sheet$/
+     * @param string $slotname The name of the timeslot to be checked.
      * @param int $totalspaces The spaces the timeslot is set to have.
      * @param int $oversubscribed The number of users subscribed above the total.
-     * @param string $tutorialname The name of the tutorial booking activity to check.
      * @return void
      */
-    public function i_should_see_that_slot_is_oversubscribed_in_tutorial_booking($slotname, $totalspaces, $oversubscribed, $tutorialname) {
+    public function i_should_see_that_session_is_oversubscribed_in_signup_sheet($slotname, $totalspaces, $oversubscribed) {
         $slotselector = $this->generate_xpath_slot_selector($slotname);
         $spaces = array(
             'total' => $totalspaces,
@@ -350,38 +365,37 @@ class behat_mod_tutorialbooking extends behat_base {
             'left' => $oversubscribed
         );
         $oversubscribedtext = get_string('numbersline_oversubscribed', 'mod_tutorialbooking', $spaces);
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
         $this->execute('behat_general::assert_element_contains_text', array($oversubscribedtext, $slotselector, 'xpath_element'));
     }
 
     /**
-     * The user adds themselves to a named timeslot in a tutorial booking.
+     * The user adds themselves to a named session in a signup sheet.
      *
-     * @Given /^I sign up to "(?P<slot_name_string>(?:[^"]|\\")*)" in "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
+     * Must be on the session page of a signup sheet.
+     *
+     * @When /^I sign up to "(?P<session_name_string>(?:[^"]|\\")*)" in signup sheet$/
      * @param string $slotname The name of the slot the user should add themselves to.
-     * @param string $tutorialname The name of the tutorial booking activity.
      * @return void
      */
-    public function i_sign_up_to_slot_in_tutorial_booking($slotname, $tutorialname) {
+    public function i_sign_up_to_session_in_signup_sheet($slotname) {
         $slotselector = $this->generate_xpath_slot_selector($slotname);
         $signupstring = get_string('signupforslot', 'mod_tutorialbooking');
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
         $this->execute('behat_general::i_click_on_in_the', array($signupstring, 'link', $slotselector, 'xpath_element'));
         $this->execute('behat_general::i_wait_to_be_redirected', array());
     }
 
     /**
-     * Checks that the listed messages are visible in the named tutorial booking.
+     * Checks that the listed messages are visible in the signup sheet.
      *
-     * @When /^I view sent messages in "(?P<tutorial_string>(?:[^"]|\\")*)" tutorial booking I should see:$/
-     * @param string $tutorialname The name of the tutorial booking activity the messages should be in.
+     * Must be on the management page of a signup sheet.
+     *
+     * @When /^I view sent messages in signup sheet I should see:$/
      * @param \Behat\Gherkin\Node\TableNode $messages The messages that should be present. The following parameters are valid:
      *              * message - The text of the message body (required)
      *              * sender - The username of the sender (optional)
      * @return void
      */
-    public function i_view_sent_messages_in_tutorial_booking_i_should_see($tutorialname, TableNode $messages) {
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
+    public function i_view_sent_messages_in_signup_sheet_i_should_see(TableNode $messages) {
         $this->execute('behat_general::click_link', array(get_string('viewmessages', 'mod_tutorialbooking')));
 
         foreach ($messages->getHash() as $message) {
@@ -409,51 +423,122 @@ class behat_mod_tutorialbooking extends behat_base {
     }
 
     /**
-     * Adds users to a named slot in a named tutorial booking, using the teachers force adding functionality.
+     * Adds users to a named session in a signup sheet, using the teachers force adding functionality.
      *
-     * @Given /^in "(?P<slot_name_string>(?:[^"]|\\")*)" of "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking I add:$/
+     * Must be on the management page of a signup sheet.
+     *
+     * @When /^in "(?P<session_name_string>(?:[^"]|\\")*)" of signup sheet I add:$/
      * @global moodle_database $DB The Moodle database connection object.
      * @param string $slotname The name of the slot users should be added to.
-     * @param string $tutorialname The name of the tutorial booking activity users should be added to.
      * @param \Behat\Gherkin\Node\TableNode $users The list of users that should be added to the tutorial booking.
      * @return void
      */
-    public function in_slot_of_tutorial_booking_i_add($slotname, $tutorialname, TableNode $users) {
+    public function in_session_of_signup_sheet_i_add($slotname, TableNode $users) {
         global $DB;
 
-        $slotselector = $this->generate_xpath_slot_selector($slotname);
+        $controlsselector = $this->generate_xpath_session_controls($slotname);
 
         // Get the id's of the users we wish to add.
         $params = array();
         $insql = array();
         $identifier = 0;
         foreach ($users->getRows() as $user) {
-            $insql[] = ':user'.$identifier;
-            $params['user'.$identifier++] = $user[0];
+            $insql[] = ':user' . $identifier;
+            $params['user' . $identifier++] = $user[0];
         }
         // The users are identified by their user id on the form, so we can use that to select them.
         $insql = implode(',', $insql);
         $userids = $DB->get_fieldset_select('user', 'id', "username IN ($insql)", $params);
 
         $addstudents = get_string('addstudents', 'mod_tutorialbooking');
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
-        $this->execute('behat_general::i_click_on_in_the', array($addstudents, 'link', $slotselector, 'xpath_element'));
-        $this->execute('behat_forms::i_set_the_field_to', array('addtosession[]', implode(',', $userids)));
-        $this->execute('behat_general::i_click_on', array($addstudents, 'button'));
-        $this->execute('behat_general::i_wait_to_be_redirected', array());
+        if ($this->running_javascript()) {
+            $this->execute('behat_action_menu::i_open_the_action_menu_in', [$controlsselector, 'xpath_element']);
+            $this->execute('behat_action_menu::i_choose_in_the_open_action_menu', [$addstudents]);
+        } else {
+            $this->execute('behat_general::i_click_on_in_the', [$addstudents, 'link', $controlsselector, 'xpath_element']);
+        }
+        $this->execute('behat_forms::i_set_the_field_to', ['addtosession[]', implode(',', $userids)]);
+        $this->execute('behat_general::i_click_on', [$addstudents, 'button']);
+        $this->execute('behat_general::i_wait_to_be_redirected', []);
     }
 
     /**
-     * Test that the number of free space is reported correctly for a named timeslot on a named tutorial booking activity.
+     * Generates the url for the session management page.
      *
-     * @Given /^there should be "(?P<freespaces_number>\d+)" free space of "(?P<totalspaces_number>\d+)" total spaces available on "(?P<slot_name_string>(?:[^"]|\\")*)" of "(?P<tutorial_booking_name_string>(?:[^"]|\\")*)" tutorial booking$/
+     * @param string $identifier The tutorial booking activity name.
+     * @return \moodle_url
+     */
+    protected function resolve_management_page_url(string $identifier): moodle_url {
+        $tutorialid = $this->resolve_tutiorial_id_from_name($identifier);
+        $cm = get_coursemodule_from_instance('tutorialbooking', $tutorialid);
+        return new moodle_url('/mod/tutorialbooking/view.php', ['tutorialid' => $tutorialid, 'courseid' => $cm->course]);
+    }
+
+    /**
+     * Convert page names to URLs for steps.
+     *
+     * Recognised page names are:
+     * | Page type     | Identifier meaning | description                                     |
+     * | Sessions      | Signup sheet name  | The page students use to signup to sessions     |
+     * | Management    | Signup sheet name  | The page that is used to manage sessions        |
+     *
+     * @param string $type identifies which type of page this is, e.g. 'Attempt review'.
+     * @param string $identifier identifies the particular page, e.g. 'Test quiz > student > Attempt 1'.
+     * @return moodle_url the corresponding URL.
+     * @throws Exception with a meaningful error message if the specified page cannot be found.
+     */
+    protected function resolve_page_instance_url(string $type, string $identifier): moodle_url {
+        switch ($type) {
+            case 'Sessions':
+                return $this->resolve_session_page_url($identifier);
+            case 'Management':
+                return $this->resolve_management_page_url($identifier);
+            default:
+                throw new Exception('Unrecognised signup sheet page type "' . $type . '."');
+        }
+    }
+
+    /**
+     * Generates the url for the student session page.
+     *
+     * The URL should not redirect users who have management capabilities.
+     *
+     * @param string $identifier The tutorial booking activity name.
+     * @return \moodle_url
+     */
+    protected function resolve_session_page_url(string $identifier): moodle_url {
+        $tutorialid = $this->resolve_tutiorial_id_from_name($identifier);
+        $cm = get_coursemodule_from_instance('tutorialbooking', $tutorialid);
+        return new moodle_url('/mod/tutorialbooking/view.php', ['id' => $cm->id, 'redirect' => 0]);
+    }
+
+    /**
+     * Gets the id of a tutorial booking from the name.
+     *
+     * @global moodle_database $DB
+     * @param string $name
+     * @return int
+     * @throws Exception
+     */
+    protected function resolve_tutiorial_id_from_name(string $name): int {
+        global $DB;
+        $tutorialid = $DB->get_field('tutorialbooking', 'id', ['name' => trim($name)]);
+        if (!$tutorialid) {
+            throw new Exception("The specified signup sheet with name '$name' does not exist");
+        }
+        return $tutorialid;
+    }
+
+    /**
+     * Test that the number of free places is reported correctly for a named session on a signup sheet activity.
+     *
+     * @Then /^there should be "(?P<freeplaces_number>\d+)" free places of "(?P<totalplaces_number>\d+)" total places available on "(?P<session_name_string>(?:[^"]|\\")*)" of signup sheet$/
      * @param int $freespaces The number of free spaces expected.
      * @param int $totalspaces The total spaces on the timeslot.
      * @param string $slotname The name of the timeslot.
-     * @param string $tutorialname The name of the tutorial booking activity.
      * @return void
      */
-    public function there_should_be_free_space_of_total_spaces_available_on_slot_of_tutorial_booking($freespaces, $totalspaces, $slotname, $tutorialname) {
+    public function there_should_be_free_space_of_total_spaces_available_on_session_of_signup_sheet($freespaces, $totalspaces, $slotname) {
         $slotselector = $this->generate_xpath_slot_selector($slotname);
         $spaces = array(
             'total' => $totalspaces,
@@ -461,7 +546,6 @@ class behat_mod_tutorialbooking extends behat_base {
             'left' => $freespaces
         );
         $spacestext = get_string('numbersline', 'mod_tutorialbooking', $spaces);
-        $this->execute('behat_general::click_link', array($this->escape($tutorialname)));
         $this->execute('behat_general::assert_element_contains_text', array($spacestext, $slotselector, 'xpath_element'));
     }
 }

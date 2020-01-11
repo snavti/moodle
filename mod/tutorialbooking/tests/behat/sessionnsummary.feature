@@ -1,8 +1,8 @@
 @mod @mod_tutorialbooking @uon
-Feature: Time slots should allow me to enter some descriptive text.
-    In order convey information about the slot to students
+Feature: Sessions should allow me to enter some descriptive text.
+    In order convey information about the session to participants
     As a teacher
-    I need to be able to add well formatted information to a time slot.
+    I need to be able to add well formatted information to a session.
 
     Background:
         Given the following "users" exist:
@@ -21,18 +21,15 @@ Feature: Time slots should allow me to enter some descriptive text.
             | tutorialbooking | C1     | tuorial1 | Tutorial booking | This is a test tutorial booking |
 
     Scenario: Teacher should be able to add summary text that a student can see
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And I add a new session to signup sheet with:
             | Title | Slot 1 |
             | Details | Hello world. |
-            | Max Number of Students | 1 |
-            | Position | Top of the Page |
+            | Number of places | 1 |
+            | Position | Top of the page |
         Then I should see "Slot 1"
         And I should see "Hello world."
         When I log out
-        And I log in as "student1"
-        And I am on "Course 1" course homepage
-        And I follow "Tutorial booking"
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
         Then I should see "Slot 1"
         And I should see "Hello world."

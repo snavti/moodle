@@ -74,21 +74,6 @@ class mod_tutorialbooking_mod_form extends moodleform_mod {
         $mform->addElement('select', 'privacy', get_string('privacy', 'mod_tutorialbooking'), $privacyoptions);
         $mform->setDefault('privacy', mod_tutorialbooking_tutorial::PRIVACY_SHOWSIGNUPS);
 
-        // If this is a new instance - force a save before allowing edit of timeslots.
-        $mform->addElement('header', 'timeslot', get_string('timeslotheading', 'tutorialbooking'));
-
-        if ($tbid = $this->current->id) { // If we are editing.
-            // Display links to edit timeslots.
-            $courseid = $this->current->course;
-            $link = html_writer::link(
-                new moodle_url("/mod/tutorialbooking/tutorialbooking_sessions.php?tutorialid=$tbid&courseid=$courseid"),
-                get_string('linktomanagetext', 'tutorialbooking'));
-
-            $mform->addElement('html', html_writer::tag('p', $link));
-        } else {
-            $mform->addElement('html', '<p style="text-align: center">'.get_string('notimeslotediting', 'tutorialbooking').'</p>');
-        }
-
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
 

@@ -1,6 +1,6 @@
 @mod @mod_tutorialbooking @uon
-Feature: List all Tutorial booking activities in a course
-    In order to easily find all Tutorial booking on a course
+Feature: List all signup sheet activities in a course
+    In order to easily find all signup sheet on a course
     As a user
     I need to be able to view the index page.
 
@@ -22,10 +22,8 @@ Feature: List all Tutorial booking activities in a course
             | tutorialbooking | C2 | tuorial3 | Merry munchkins | Be merry with munchkins | 1 |
 
     Scenario: View the Tutorial booking index page (Covers T28 MOODLETEST-35)
-        Given I log in as "teacher"
-        And I am on "Course 1" course homepage
-        And I follow "Happy days"
-        When I click on "Tutorial booking index" "link_or_button"
+        Given I am on the "Happy days" "mod_tutorialbooking > Management" page logged in as "teacher"
+        When I click on "Signup sheet index" "link_or_button"
         Then I should see "Happy days"
         And I should see "Fun times"
         But I should not see "Merry munchkins"

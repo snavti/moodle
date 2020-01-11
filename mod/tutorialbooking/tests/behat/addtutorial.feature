@@ -1,10 +1,10 @@
 @mod @mod_tutorialbooking @uon
-Feature: Add a tutorial booking activity to a course and add some slots
-    In order to allow students to signup to tutorials
+Feature: Add a signup sheet activity to a course and add some sessions
+    In order to allow users to signup to sessions
     As a teacher
-    I need to be able to add tutorial booking activities to a course.
+    I need to be able to add signup sheet activities to a course.
 
-    Scenario: Add a tutorial booking activity and create two signup slots.
+    Scenario: Add a signup sheet activity and create two sessions.
         Given the following "users" exist:
             | username | firstname | lastname | email            |
             | teacher1 | Teacher   | 1        | teacher1@example.com |
@@ -18,24 +18,23 @@ Feature: Add a tutorial booking activity to a course and add some slots
             | student1 | C1     | student        |
         And I log in as "teacher1"
         And I am on "Course 1" course homepage with editing mode on
-        And I add a "Tutorial Booking" to section "1" and I fill the form with:
-            | Sign-up List Title | Tutorial booking |
-            | Sign-up List Notes | This is a tutorial booking form |
+        And I add a "Signup sheet" to section "1" and I fill the form with:
+            | Signup sheet title | Tutorial booking |
+            | Signup sheet notes | This is a tutorial booking form |
             | Locked | No |
-            | Privacy | Students can see all signups |
+            | Privacy | Users can see all signups |
             | Availability | Show on course page |
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+        And I follow "Tutorial booking"
+        And I add a new session to signup sheet with:
             | Title | Slot 1 |
-            | Max Number of Students | 10 |
-            | Position | Top of the Page |
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+            | Number of places | 10 |
+            | Position | Top of the page |
+        And I add a new session to signup sheet with:
             | Title | Slot 2 |
-            | Max Number of Students | 5 |
-            | Position | Bottom of the Page |
+            | Number of places | 5 |
+            | Position | Bottom of the page |
         And I log out
-        And I log in as "student1"
-        And I am on "Course 1" course homepage
-        When I follow "Tutorial booking"
+        When I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
         Then I should see "Slot 1"
         And I should see "Slot 2"
-        And I should see "Sign me up for this slot"
+        And I should see "Sign me up for this session"

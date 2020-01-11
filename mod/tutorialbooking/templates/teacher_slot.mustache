@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_tutorialbooking/student_slot
+    @template mod_tutorialbooking/teacher_slot
 
     Student view of the tutorial booking activity.
 
@@ -30,6 +30,7 @@
 
     Context variables required for this template:
     * id
+    * menu - Data to render an action menu
     * signups
     * title
     * urledit
@@ -43,7 +44,8 @@
 
     Example context (json):
     {
-        "id": 6
+        "id": 6,
+        "menu": {},
         "signups": [
             "<li>Bill Jukes</li>",
             "<li>You</li>",
@@ -60,56 +62,26 @@
         "urlmovedown": "http://example.com/"
     }
 }}
-<div id="slot-{{id}}" class="tutorial_session" data-name="{{{title}}}">
+<div id="slot-{{id}}" class="tutorial_session editing" data-name="{{{title}}}">
     {{> mod_tutorialbooking/slot_information}}
     {{^privatesignups}}<div>{{#str}} attendees, tutorialbooking {{/str}}</div>{{/privatesignups}}
     <ul class="session_attendees">
         {{#signups}}{{{.}}}{{/signups}}
     </ul>
-    <ul class="controls">
-        {{#editsignuplists}}
-            <li class="control">
-                <a href="{{{urledit}}}" class="btn btn-secondary btn-sm">{{#str}} editsession, tutorialbooking {{/str}}</a>
-            </li>
-            <li class="control">
-                <a href="{{{urldelete}}}" class="btn btn-secondary btn-sm">{{#str}} deletesession, tutorialbooking {{/str}}</a>
-            </li>
-        {{/editsignuplists}}
-        {{#canaddstudent}}
-            <li class="control">
-                <a href="{{{urladdusers}}}" class="btn btn-secondary btn-sm">{{#str}} addstudents, tutorialbooking {{/str}}</a>
-            </li>
-        {{/canaddstudent}}
-        {{#editregisters}}
-            <li class="control">
-                <a href="{{{urlregistername}}}" class="btn btn-secondary btn-sm" target="_blank">
-                    {{#str}} registerprintname, tutorialbooking {{/str}}
-                </a>
-            </li>
-            <li class="control">
-                <a href="{{{urlregisterdate}}}" class="btn btn-secondary btn-sm" target="_blank">
-                    {{#str}} registerprintdate, tutorialbooking {{/str}}
-                </a>
-            </li>
-        {{/editregisters}}
-        {{#editmessage}}
-            <li class="control">
-                <a href="{{{urlmessage}}}" class="btn btn-secondary btn-sm">
-                    {{#str}} emailgroupprompt, tutorialbooking {{/str}}
-                </a>
-            </li>
-        {{/editmessage}}
-        {{#editsignuplists}}
-            <li class="control moveup">
-                <a href="{{{urlmoveup}}}">
-                    {{# pix }} MoveUp, mod_tutorialbooking, {{#str}} moveupsession, tutorialbooking {{/str}} {{/ pix }}
-                </a>
-            </li>
-            <li class="control movedown">
-                <a href="{{{urlmovedown}}}">
-                    {{# pix }} MoveDown, mod_tutorialbooking, {{#str}} movedownsession, tutorialbooking {{/str}} {{/ pix }}
-                </a>
-            </li>
-        {{/editsignuplists}}
-    </ul>
+    <span class="controls">{{#menu}}{{> core/action_menu}}{{/menu}}
+        <ul>
+            {{#editsignuplists}}
+                <li class="control moveup">
+                    <a href="{{{urlmoveup}}}">
+                        {{# pix }} MoveUp, mod_tutorialbooking, {{#str}} moveupsession, tutorialbooking {{/str}} {{/ pix }}
+                    </a>
+                </li>
+                <li class="control movedown">
+                    <a href="{{{urlmovedown}}}">
+                        {{# pix }} MoveDown, mod_tutorialbooking, {{#str}} movedownsession, tutorialbooking {{/str}} {{/ pix }}
+                    </a>
+                </li>
+            {{/editsignuplists}}
+        </ul>
+    </span>
 </div>

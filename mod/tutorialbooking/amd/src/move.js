@@ -77,12 +77,17 @@ define(['jquery', 'core/log', 'core/notification', 'core/ajax', 'core/sortable_l
      * @returns {Promise}
      */
     var createHandles = function() {
-        return str.get_string('moveslot', 'mod_tutorialbooking').then(function(string) {
-            return template.render('core/drag_handle', {movetitle: string});
-        }).then(function(html) {
-            $(SELECTORS.HANDLEELEMENT).prepend($(html));
-            return;
-        }).fail(notification.exception);
+        var promises = [];
+        $(SELECTORS.HANDLEELEMENT).each(function(key, element) {
+            var promise = str.get_string('moveslot', 'mod_tutorialbooking', element.innerText).then(function(string) {
+                return template.render('core/drag_handle', {movetitle: string});
+            }).then(function(html) {
+                $(element).prepend($(html));
+                return;
+            }).fail(notification.exception);
+            promises.push(promise);
+        });
+        return $.when.apply($, promises);
     };
 
     /**

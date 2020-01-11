@@ -185,40 +185,43 @@ class mod_tutorialbooking_session_testcase extends advanced_testcase {
 
         $course = self::getDataGenerator()->create_course();
         $tutorialbooking = $generator->create_instance(array('course' => $course->id));
+        $context = context_module::instance($tutorialbooking->cmid);
         $generator->add_slot($tutorialbooking);
         $slot2 = $generator->add_slot($tutorialbooking);
         $generator->add_slot($tutorialbooking);
         $generator->add_slot($tutorialbooking);
 
         $tutorialbooking2 = $generator->create_instance(array('course' => $course->id));
+        $context2 = context_module::instance($tutorialbooking2->cmid);
         $generator->add_slot($tutorialbooking2);
         $generator->add_slot($tutorialbooking2);
         $generator->add_slot($tutorialbooking2);
 
         // Test with a slot.
-        $formdata = mod_tutorialbooking_session::generate_editsession_formdata($course->id, $tutorialbooking, $slot2->id);
+        $formdata = mod_tutorialbooking_session::generate_editsession_formdata($course->id, $tutorialbooking, $slot2->id, $context);
         $this->assertTrue(is_array($formdata));
         $formdata = (object) $formdata;
-        $this->assertAttributeEquals($slot2->id, 'id', $formdata);
+        self::assertAttributeNotEmpty('current', $formdata);
+        $this->assertAttributeEquals($slot2->id, 'id', $formdata->current);
         $this->assertAttributeEquals($tutorialbooking->id, 'tutorialid', $formdata);
         $this->assertAttributeEquals($slot2->description, 'title', $formdata);
-        $this->assertAttributeEquals(array('text' => $slot2->summary, 'format' => $slot2->summaryformat), 'summary', $formdata);
-        $this->assertAttributeEquals($slot2->usercreated, 'usercreated', $formdata);
-        $this->assertAttributeEquals($slot2->spaces, 'spaces', $formdata);
-        $this->assertAttributeEquals($slot2->sequence, 'sequence', $formdata);
+        $this->assertAttributeEquals($slot2->usercreated, 'usercreated', $formdata->current);
+        $this->assertAttributeEquals($slot2->spaces, 'spaces', $formdata->current);
+        $this->assertAttributeEquals($slot2->sequence, 'sequence', $formdata->current);
         $this->assertAttributeEquals($course->id, 'courseid', $formdata);
         $this->assertAttributeInternalType('array', 'positions', $formdata);
         $this->assertCount(4, $formdata->positions);
         $this->assertEquals(get_string('positionfirst', 'tutorialbooking'), $formdata->positions[1]);
 
         // Test for a new slot.
-        $formdata2 = mod_tutorialbooking_session::generate_editsession_formdata($course->id, $tutorialbooking2, 0);
+        $formdata2 = mod_tutorialbooking_session::generate_editsession_formdata($course->id, $tutorialbooking2, 0, $context);
         $this->assertTrue(is_array($formdata2));
         $formdata2 = (object) $formdata2;
-        $this->assertAttributeEquals(0, 'id', $formdata2);
+        self::assertAttributeNotEmpty('current', $formdata2);
+        $this->assertAttributeEquals(0, 'id', $formdata2->current);
         $this->assertAttributeEquals($tutorialbooking2->id, 'tutorialid', $formdata2);
-        $this->assertAttributeEquals(2, 'usercreated', $formdata2);
-        $this->assertAttributeEquals(get_config('tutorialbooking', 'defaultnumbers'), 'spaces', $formdata2);
+        $this->assertAttributeEquals(2, 'usercreated', $formdata2->current);
+        $this->assertAttributeEquals(get_config('tutorialbooking', 'defaultnumbers'), 'spaces', $formdata2->current);
         $this->assertAttributeEquals($course->id, 'courseid', $formdata2);
         $this->assertAttributeInternalType('array', 'positions', $formdata2);
         $this->assertCount(4, $formdata2->positions);

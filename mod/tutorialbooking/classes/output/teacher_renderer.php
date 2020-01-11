@@ -51,7 +51,7 @@ class teacher_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * Function to display a confirmation screen on deletion of a tutorial/session (signup list).
+     * Function to display a confirmation screen on deletion of a session (signup list).
      *
      * @global \moodle_page $PAGE The page object.
      * @param int $courseid The course id - always a valid value.
@@ -64,7 +64,7 @@ class teacher_renderer extends \plugin_renderer_base {
         global $PAGE;
 
         if (!$sessionid) {
-            $sessionid = 0;
+            throw new \coding_exception('Session id required for deletion');
         }
 
         $cancelaction = $PAGE->url->out();
@@ -78,11 +78,7 @@ class teacher_renderer extends \plugin_renderer_base {
             )
         );
 
-        if ($sessionid) {
-            $stats = \mod_tutorialbooking_session::getsessionstats($sessionid);
-        } else {
-            $stats = \mod_tutorialbooking_tutorial::getstatsfortutorial($tutorialid);
-        }
+        $stats = \mod_tutorialbooking_session::getsessionstats($sessionid);
 
         $statsline = \html_writer::tag('p',
             \html_writer::tag('strong', get_string('statsline', 'tutorialbooking', $stats))

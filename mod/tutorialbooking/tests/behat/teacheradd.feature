@@ -1,8 +1,8 @@
 @mod @mod_tutorialbooking @uon
-Feature: Teachers can add students to timeslots.
-    In order to assign students to a specific timeslot
+Feature: Teachers can add students to session.
+    In order to assign students to a specific session
     As a teacher
-    I need to be able to add a student to a timeslot
+    I need to be able to add a student to a session
 
     Background:
         Given the following "users" exist:
@@ -23,48 +23,42 @@ Feature: Teachers can add students to timeslots.
         And the following "activities" exist:
             | activity        | course | idnumber | name             | intro                           |
             | tutorialbooking | C1     | tuorial1 | Tutorial booking | This is a test tutorial booking |
-        And I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And I add a new session to signup sheet with:
             | Title | Slot 1 |
-            | Max Number of Students | 1 |
-            | Position | Top of the Page |
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+            | Number of places | 1 |
+            | Position | Top of the page |
+        And I add a new session to signup sheet with:
             | Title | Slot 2 |
-            | Max Number of Students | 1 |
-            | Position | Bottom of the Page |
+            | Number of places | 1 |
+            | Position | Bottom of the page |
         And I log out
 
-    Scenario: Teachers should be able to add a student to a timeslot
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And in "Slot 1" of "Tutorial booking" tutorial booking I add:
+    Scenario: Teachers should be able to add a student to a session
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And in "Slot 1" of signup sheet I add:
             | student1 |
-        Then I should see "student1" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
+        Then I should see "student1" is signed up to "Slot 1" in signup sheet
         When I log out
-        And I log in as "student1"
-        And I am on "Course 1" course homepage
-        Then I should not be able to sign up to "Tutorial booking" tutorial booking
-        And I should see I am signed up to "Slot 1" in "Tutorial booking" tutorial booking
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
+        Then I should not be able to sign up to signup sheet
+        And I should see I am signed up to "Slot 1" in signup sheet
 
-    Scenario: Editing teachers should be able to add a student to a full timeslot
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And in "Slot 1" of "Tutorial booking" tutorial booking I add:
+    Scenario: Editing teachers should be able to add a student to a full session
+        Given I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And in "Slot 1" of signup sheet I add:
             | student1 |
             | student2 |
-        Then I should see "student1" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
-        And I should see "student2" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
-        And I should see that "Slot 1" with "1" spaces is oversubscribed by "1" in "Tutorial booking" tutorial booking
+        Then I should see "student1" is signed up to "Slot 1" in signup sheet
+        And I should see "student2" is signed up to "Slot 1" in signup sheet
+        And I should see that "Slot 1" with "1" places is oversubscribed by "1" in signup sheet
         When I log out
-        And I log in as "student1"
-        And I am on "Course 1" course homepage
-        Then I should not be able to sign up to "Tutorial booking" tutorial booking
-        And I should see I am signed up to "Slot 1" in "Tutorial booking" tutorial booking
-        And I should see "student2" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
+        Then I should not be able to sign up to signup sheet
+        And I should see I am signed up to "Slot 1" in signup sheet
+        And I should see "student2" is signed up to "Slot 1" in signup sheet
         When I log out
-        And I log in as "student2"
-        And I am on "Course 1" course homepage
-        Then I should not be able to sign up to "Tutorial booking" tutorial booking
-        And I should see I am signed up to "Slot 1" in "Tutorial booking" tutorial booking
-        And I should see "student1" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student2"
+        Then I should not be able to sign up to signup sheet
+        And I should see I am signed up to "Slot 1" in signup sheet
+        And I should see "student1" is signed up to "Slot 1" in signup sheet

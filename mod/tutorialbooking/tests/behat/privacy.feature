@@ -1,8 +1,8 @@
 @mod @mod_tutorialbooking @uon
-Feature: Tutorial bookings can be set so that students cannot see who is signed up for slots.
+Feature: Signup sheets can be set so that students cannot see who is signed up for session.
     In order to allow students to sign up to sessions that may reveal a sensitive personal status about them
     As a student
-    I should not see details of other users signed up to a Tutorial booking, that is set to allow me to see only my own sign up.
+    I should not see details of participants signed up to a signup sheet, that is set to allow me to see only my own sign up.
 
     Background:
         Given the following "users" exist:
@@ -24,39 +24,36 @@ Feature: Tutorial bookings can be set so that students cannot see who is signed 
         And the following "activities" exist:
             | activity        | course | idnumber | name             | intro                           | privacy |
             | tutorialbooking | C1     | tuorial1 | Tutorial booking | This is a test tutorial booking | 2       |
-        And I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+        And I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        And I add a new session to signup sheet with:
             | Title | Slot 1 |
-            | Max Number of Students | 2 |
-            | Position | Top of the Page |
-        And I add a new timeslot to "Tutorial booking" tutorial booking with:
+            | Number of places | 2 |
+            | Position | Top of the page |
+        And I add a new session to signup sheet with:
             | Title | Slot 2 |
-            | Max Number of Students | 2 |
-            | Position | Bottom of the Page |
-        And in "Slot 1" of "Tutorial booking" tutorial booking I add:
+            | Number of places | 2 |
+            | Position | Bottom of the page |
+        And in "Slot 1" of signup sheet I add:
             | student1 |
             | student3 |
-        And in "Slot 2" of "Tutorial booking" tutorial booking I add:
+        And in "Slot 2" of signup sheet I add:
             | student2 |
         And I log out
 
     Scenario: As a student I should only be able to see my own signup, I should still be able to add and remove myself to slots.
-        Given I log in as "student2"
-        And I am on "Course 1" course homepage
-        Then I should not be able to sign up to "Tutorial booking" tutorial booking
-        And I should see I am signed up to "Slot 2" in "Tutorial booking" tutorial booking
-        When I remove my sign up from "Tutorial booking" tutorial booking
-        Then I should be able to sign up to "Tutorial booking" tutorial booking
-        And there should be "0" free space of "2" total spaces available on "Slot 1" of "Tutorial booking" tutorial booking
-        And there should be "2" free space of "2" total spaces available on "Slot 2" of "Tutorial booking" tutorial booking
-        But I should not be able to sign up to "Slot 1" in "Tutorial booking" tutorial booking
+        When I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student2"
+        Then I should not be able to sign up to signup sheet
+        And I should see I am signed up to "Slot 2" in signup sheet
+        When I remove my sign up from signup sheet
+        Then I should be able to sign up to signup sheet
+        And there should be "0" free places of "2" total places available on "Slot 1" of signup sheet
+        And there should be "2" free places of "2" total places available on "Slot 2" of signup sheet
+        But I should not be able to sign up to "Slot 1" in signup sheet
         # Because "Slot" 1 is full
-        And I should not be able to see signups on "Tutorial booking" tutorial booking
+        And I should not be able to see signups on signup sheet
 
     Scenario: As a teacher I should still be able to see everyone who is signed up.
-        Given I log in as "teacher1"
-        And I am on "Course 1" course homepage
-        Then I should see "student1" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
-        And I should see "student3" is signed up to "Slot 1" in "Tutorial booking" tutorial booking
-        And I should see "student2" is signed up to "Slot 2" in "Tutorial booking" tutorial booking
+        When I am on the "Tutorial booking" "mod_tutorialbooking > Management" page logged in as "teacher1"
+        Then I should see "student1" is signed up to "Slot 1" in signup sheet
+        And I should see "student3" is signed up to "Slot 1" in signup sheet
+        And I should see "student2" is signed up to "Slot 2" in signup sheet

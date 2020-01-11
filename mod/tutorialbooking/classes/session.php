@@ -164,27 +164,29 @@ class mod_tutorialbooking_session {
      * @param int $sessionid The is of a tutorial booking session.
      * @return mixed[] An array of data to be padded to the form.
      */
-    public static function generate_editsession_formdata($courseid, $tutorial, $sessionid) {
+    public static function generate_editsession_formdata($courseid, $tutorial, $sessionid, $context) {
         global $DB, $USER;
 
         $formdata = array();
-        $formdata['id'] = $sessionid;
-        if ($formdata['id']) {
-            $record = $DB->get_record('tutorialbooking_sessions', array('id' => $formdata['id']), '*', MUST_EXIST);
-            $formdata = (array) $record;
-            $formdata['title'] = $formdata['description'];
-            $formdata['summary'] = array('text' => $record->summary, 'format' => $record->summaryformat);
+        if ($sessionid) {
+            $current = $DB->get_record('tutorialbooking_sessions', array('id' => $sessionid), '*', MUST_EXIST);
+            $formdata['title'] = $current->description;
         } else {
-            // Set some defaults.
-            $formdata['tutorialid'] = $tutorial->id;
-            $formdata['usercreated'] = $USER->id;
+            $current = new \stdClass();
+            $current->id = null;
+            $current->tutorialid = $tutorial->id;
+            $current->usercreated = $USER->id;
+            $current->spaces = get_config('tutorialbooking', 'defaultnumbers');
+            $current->sequence = (self::get_max_sequence_value($tutorial->id)) + 1;
             $formdata['title'] = $tutorial->name;
-
-            $formdata['spaces'] = get_config('tutorialbooking', 'defaultnumbers');
-
-            // Work out where this new record will sit in the sequence.
-            $formdata['sequence'] = (self::get_max_sequence_value($tutorial->id)) + 1; // Defauly last on the list.
         }
+
+        $summaryoptions = static::summary_options($context);
+        $current = file_prepare_standard_editor($current, 'summary', $summaryoptions, $context, 'mod_tutroialbooking', 'summary', $current->id);
+        $formdata['current'] = $current;
+        $formdata['summaryoptions'] = $summaryoptions;
+
+        $formdata['tutorialid'] = $tutorial->id;
         $formdata['courseid'] = $courseid;
 
         // Sequencing.
@@ -193,14 +195,14 @@ class mod_tutorialbooking_session {
         $position = 1; // Top of the page.
         $formdata['positions'][$position] = get_string('positionfirst', 'tutorialbooking');
         foreach ($allsessions as $session) {
-            if ($session->id != $formdata['id']) {
+            if ($session->id != $sessionid) {
                 $position = $session->sequence + 1;
                 $formdata['positions'][$position] = get_string('after', 'mod_tutorialbooking',
                         array('session' => substr($session->description, 0, 30)));
             }
         }
         if ($position > 1) { // This overwrites the last option above but that's OK because that is the bottom of the page.
-            if (($formdata['id']) == $position) { // This is needed to ensure that the last slot can create a record below itself.
+            if ($sessionid == $position) { // This is needed to ensure that the last slot can create a record below itself.
                 unset($formdata['positions'][$position]);
                 $position++;
             }
@@ -371,6 +373,21 @@ class mod_tutorialbooking_session {
     }
 
     /**
+     * Returns the options used by the summary.
+     *
+     * @param context_module $context
+     * @return array
+     */
+    public static function summary_options($context) {
+        return [
+            'subdirs' => false,
+            'maxfiles' => 1,
+            'context' => $context,
+            'enable_filemanagement' => true,
+        ];
+    }
+
+    /**
      * Make changes to a tutorial booking slot, or copy an existing slot.
      *
      * @global moodle_database $DB The Moodle database connection object.
@@ -389,6 +406,9 @@ class mod_tutorialbooking_session {
         global $DB, $USER, $PAGE;
 
         $return = new stdClass(); // Stores information to be returned by the function.
+
+        $cm = get_coursemodule_from_instance('tutorialbooking', $tutorialid);
+        $context = context_module::instance($cm->id);
 
         $wmform = new mod_tutorialbooking_session_form(null, $formdata); // Use this to get the submitted data.
         $data = $wmform->get_data();
@@ -416,35 +436,40 @@ class mod_tutorialbooking_session {
         // Plain text.
         $data->descformat = FORMAT_PLAIN;
 
-        $data->summaryformat = $data->summary['format'];
-        $data->summary = $data->summary['text'];
+        // Will be updated later.
+        $data->summaryformat = FORMAT_HTML;
+        $data->summary = '';
 
         if (!$data->id) { // This is for new records.
             unset($data->id);
             $data->usercreated = $USER->id;
             $data->timecreated = time();
             $data->visible = 1;
-            $return->id = $DB->insert_record('tutorialbooking_sessions', $data);
+            $data->id = $DB->insert_record('tutorialbooking_sessions', $data);
             $return->action = self::SESSION_ADD;
         } else {
-            // Check that we are not reducing the places to less than the signups.
-            $stats = self::getsessionstats($data->id);
-            if ($stats->signedup > $data->spaces && !has_capability('mod/tutorialbooking:oversubscribe', $PAGE->context)) {
-                $stats->spaces = $data->spaces;
-                throw new mod_tutorialbooking\exception\session_exception(get_string('editspaceserror', 'tutorialbooking', $stats));
-            }
-
-            $data->timemodified = time();
-            $originalsession = $DB->get_record('tutorialbooking_sessions', array('id' => $data->id));
-            $DB->update_record('tutorialbooking_sessions', $data);
-            $return->id = $data->id;
             $return->action = self::SESSION_UPDATE;
         }
 
+        // Save summary files.
+        $summaryoptions = static::summary_options($context);
+        $data = file_postupdate_standard_editor($data, 'summary', $summaryoptions, $context, 'mod_tutorialbooking', 'summary', $data->id);
+
+        // Check that we are not reducing the places to less than the signups.
+        $stats = self::getsessionstats($data->id);
+        if ($stats->signedup > $data->spaces && !has_capability('mod/tutorialbooking:oversubscribe', $PAGE->context)) {
+            $stats->spaces = $data->spaces;
+            throw new mod_tutorialbooking\exception\session_exception(get_string('editspaceserror', 'tutorialbooking', $stats));
+        }
+
+        $data->timemodified = time();
+        $originalsession = $DB->get_record('tutorialbooking_sessions', array('id' => $data->id));
+        $DB->update_record('tutorialbooking_sessions', $data);
+        $return->id = $data->id;
+
         // Fire the appropriate event.
-        $cm = get_coursemodule_from_instance('tutorialbooking', $tutorialid);
         $eventdata = array(
-            'context' => context_module::instance($cm->id),
+            'context' => $context,
             'objectid' => $return->id,
             'other' => array(
                 'tutorialid' => $tutorialid,
