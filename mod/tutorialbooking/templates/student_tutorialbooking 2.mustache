@@ -1,0 +1,42 @@
+{{!
+    This file is part of the Tutorial Booking activity.
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_tutorialbooking/student_tutorialbooking
+
+    Student view of the tutorial booking activity.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id
+    * slots
+
+    Example context (json):
+    {
+        "id": 42,
+        "slots": []
+    }
+}}
+<div class="box tutorial">{{> mod_tutorialbooking/tutorialbooking_information}}</div>
+<div id="tutorial-{{id}}" class="tutorial_sessions">
+    {{#slots}} {{> mod_tutorialbooking/student_slot}} {{/slots}}
+    {{^slots}} <div class="alert alert-danger">{{#str}} noslots, tutorialbooking {{/str}}</div> {{/slots}}
+</div>

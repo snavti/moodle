@@ -1,0 +1,51 @@
+{{!
+    This file is part of the Tutorial Booking activity.
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_tutorialbooking/mobile_tutorialbooking
+
+    Renders a tutorialbooking for the Mobile plugin.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id
+    * summary
+    * locked
+    * cmid
+    * slots
+
+    Example context (json):
+    {
+        "id": 13,
+        "cmid": 15,
+        "summary": "<p>Pick a slot and be merry.</p>",
+        "locked": false,
+        "slots": []
+    }
+}}
+{{=<% %>=}}
+<div>
+    <core-course-module-description description="<% summary %>" component="mod_tutorialbooking" componentId="<% cmid %>"></core-course-module-description>
+    <%#locked%><ion-badge color="danger">{{ 'plugin.mod_tutorialbooking.lockedprompt' | translate }}</ion-badge><%/locked%>
+    <%#slots%><%> mod_tutorialbooking/mobile_slot%><%/slots%>
+    <!-- Call log WS when the template is loaded. -->
+    <span core-site-plugins-call-ws-on-load name="mod_tutorialbooking_view_tutorialbooking" [params]="{id: <% id %>}" [preSets]="{getFromCache: 0, saveToCache: 0}"></span>
+</div>
