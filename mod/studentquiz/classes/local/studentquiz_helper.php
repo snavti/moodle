@@ -44,4 +44,51 @@ class studentquiz_helper {
     const STATE_HIDE = 4;
     const STATE_DELETE = 5;
 
+    /**
+     * Statename offers string representation for state codes. Probably only use for translation hints.
+     */
+    public static $statename = array(
+        self::STATE_DISAPPROVED => 'disapproved',
+        self::STATE_APPROVED => 'approved',
+        self::STATE_NEW => 'new',
+        self::STATE_CHANGED => 'changed',
+        self::STATE_HIDE => 'hidden',
+        self::STATE_DELETE => 'deleted',
+    );
+
+    /**
+     * Get the total questions of StudentQuiz.
+     *
+     * @param mixed $cm Course module
+     * @param int $contextid Context id
+     * @return int Total of questions
+     */
+    public static function get_studentquiz_total_questions($cm, int $contextid): int {
+        global $DB;
+
+        if (is_null($cm)) {
+            // New instance. Return 0.
+            return 0;
+        }
+
+        $studentquiz = mod_studentquiz_load_studentquiz($cm->id, $contextid);
+
+        $sql = "SELECT COUNT(q.id)
+                  FROM {studentquiz} sq
+                  JOIN {context} con ON con.instanceid = sq.coursemodule
+                  JOIN {question_categories} qc ON qc.contextid = con.id
+                  JOIN {question} q ON q.category = qc.id
+                 WHERE q.hidden = 0
+                       AND q.parent = 0
+                       AND sq.coursemodule = :coursemodule
+                       AND qc.id = :categoryid";
+
+        $params = [
+                'coursemodule' => $studentquiz->coursemodule,
+                'categoryid' => $studentquiz->categoryid
+        ];
+
+        return $DB->count_records_sql($sql, $params);
+    }
+
 }

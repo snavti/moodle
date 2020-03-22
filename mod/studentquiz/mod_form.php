@@ -77,6 +77,24 @@ class mod_studentquiz_mod_form extends moodleform_mod {
             $this->add_intro_editor();
         }
 
+        // Field total questions.
+        $mform->addElement('hidden', 'totalquestions',
+                \mod_studentquiz\local\studentquiz_helper::get_studentquiz_total_questions($this->get_coursemodule(),
+                        $this->get_context()->id));
+        $mform->setType('totalquestions', PARAM_INT);
+
+        // Field question publishing.
+        $publishingoptions = [
+                1 => get_string('setting_question_publishing_automatic', 'studentquiz'),
+                0 => get_string('setting_question_publishing_require_approval', 'studentquiz')
+        ];
+        $mform->addElement('select', 'publishnewquestion', get_string('setting_question_publishing', 'studentquiz'),
+                $publishingoptions);
+        $mform->addHelpButton('publishnewquestion', 'setting_question_publishing', 'studentquiz');
+        $mform->setType('publishnewquestion', PARAM_INT);
+        $mform->setDefault('publishnewquestion', 1);
+        $mform->disabledIf('publishnewquestion', 'totalquestions', 'neq', 0);
+
         $mform->addElement('header', 'sectionranking', get_string('settings_section_header_ranking', 'studentquiz'));
 
         // Field anonymous Ranking.
@@ -85,12 +103,6 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         $mform->setType('anonymrank', PARAM_INT);
         $mform->addHelpButton('anonymrank', 'settings_anonymous', 'studentquiz');
         $mform->setDefault('anonymrank', 1);
-
-        // Field publish new questions.
-        $mform->addElement('checkbox', 'publishnewquestion', get_string('settings_publish_new_questions', 'studentquiz'));
-        $mform->setType('publishnewquestion', PARAM_INT);
-        $mform->addHelpButton('publishnewquestion', 'settings_publish_new_questions', 'studentquiz');
-        $mform->setDefault('publishnewquestion', 1);
 
         // Select question behaviour. Removed in v3.0.0, unless a use-case needs this option.
         // Since there's no studentquiz behavior anymore, we could offer a selection.
@@ -178,11 +190,29 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         $mform->addHelpButton('forcerating', 'settings_forcerating', 'studentquiz');
         $mform->setDefault('forcerating', get_config('studentquiz', 'forcerating'));
 
+        // Comment sections.
+        $mform->addElement('header', 'sectioncomment', get_string('settings_section_header_comment', 'studentquiz'));
+
         // Field force commenting
         $mform->addElement('checkbox', 'forcecommenting', get_string('settings_forcecommenting', 'studentquiz'));
         $mform->setType('forcecommenting', PARAM_INT);
         $mform->addHelpButton('forcecommenting', 'settings_forcecommenting', 'studentquiz');
         $mform->setDefault('forcecommenting', get_config('studentquiz', 'forcecommenting'));
+
+        // Comment deletion period.
+        $mform->addElement('select', 'commentdeletionperiod',
+                get_string('settings_commentdeletionperiod', 'studentquiz'),
+                \mod_studentquiz\commentarea\container::get_deletion_period_options()
+        );
+        $mform->setType('commentdeletionperiod', PARAM_INT);
+        $mform->addHelpButton('commentdeletionperiod', 'settings_commentdeletionperiod', 'studentquiz');
+        $mform->setDefault('commentdeletionperiod', get_config('studentquiz', 'commentdeletionperiod'));
+
+        // Email address for reporting unacceptable comment for this studentquiz, default is blank.
+        $mform->addElement('text', 'reportingemail', get_string('settings_reportingemail', 'studentquiz'), ['size' => 64]);
+        $mform->setType('reportingemail', PARAM_NOTAGS);
+        $mform->addRule('reportingemail', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addHelpButton('reportingemail', 'settings_reportingemail', 'studentquiz');
 
         // Availability.
         $mform->addElement('header', 'availability', get_string('availability', 'moodle'));
@@ -224,10 +254,11 @@ class mod_studentquiz_mod_form extends moodleform_mod {
     }
 
     /**
-     * TODO: describe this
+     * Validation of studentquiz_mod_form.
+     *
      * @param array $data
      * @param array $files
-     * @return array $errors
+     * @return array
      */
     public function validation($data, $files) {
         $errors = array();
@@ -242,6 +273,38 @@ class mod_studentquiz_mod_form extends moodleform_mod {
                 $data['openansweringfrom'] >= $data['closeansweringfrom']) {
             $errors['closeansweringfrom'] = get_string('answeringndbeforestart', 'studentquiz');
         }
+        if (!empty($data['reportingemail']) && !$this->validate_emails($data['reportingemail'])) {
+            $errors['reportingemail'] = get_string('invalidemail', 'studentquiz');
+        }
         return $errors;
+    }
+
+    /**
+     * Validate string contains validate email or multiple emails.
+     * @param string $emails - Example: test@gmail.com;test1@gmail.com.
+     * @return bool
+     */
+    private function validate_emails($emails) {
+        $list = explode(';' , $emails);
+        foreach ($list as $email) {
+            if (!validate_email($email)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @return bool|object
+     */
+    public function get_data() {
+        $data = parent::get_data();
+        // Set the reportingemail to null if empty so that they are consistency.
+        if ($data) {
+            if (empty($data->reportingemail)) {
+                $data->reportingemail = null;
+            }
+        }
+        return $data;
     }
 }

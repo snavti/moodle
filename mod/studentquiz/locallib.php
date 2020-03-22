@@ -66,10 +66,14 @@ function mod_studentquiz_load_studentquiz($cmid, $contextid) {
     global $DB;
     if ($studentquiz = $DB->get_record('studentquiz', array('coursemodule' => $cmid))) {
         if ($contextid !== false) {
-            if ($studentquiz->category = question_get_default_category($contextid)) {
-                $studentquiz->categoryid = $studentquiz->category->id;
-                return $studentquiz;
-            }
+            // It seems there are studentquiz instances missing the default category, we've not expected that case
+            // so far. The question bank page calls the function question_make_default_categories() through
+            // question_build_edit_resources() on every page view so we'd honor that behavior here as well now.
+            // The function question_make_default_categories() will return the existing category if it exists.
+            $context = \context::instance_by_id($contextid);
+            $studentquiz->category = question_make_default_categories(array($context));
+            $studentquiz->categoryid = $studentquiz->category->id;
+            return $studentquiz;
         } else {
             return $studentquiz;
         }
@@ -95,19 +99,17 @@ function mod_studentquiz_get_studenquiz_progress_class($questionid, $userid, $st
  * @param int $questionid Id of question
  * @param string $type Type of change
  * @param int $value Value of change
+ * @throws Throwable
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function mod_studentquiz_change_state_visibility($questionid, $type, $value) {
     global $DB;
-    $question = $DB->record_exists('studentquiz_question', ['questionid' => $questionid]);
-    if (!$question) {
-        // This question has no row in yet, maybe due to category move or import.
-        $DB->insert_record('studentquiz_question', (object) ['state' => true, 'questionid' => $questionid]);
+
+    if ($type == 'deleted') {
+        $DB->set_field('question', 'hidden', 1, ['id' => $questionid]);
     } else {
-        if ($type == 'deleted') {
-            $DB->set_field('question', 'hidden', 1, ['id' => $questionid]);
-        } else {
-            $DB->set_field('studentquiz_question', $type, $value, ['questionid' => $questionid]);
-        }
+        $DB->set_field('studentquiz_question', $type, $value, ['questionid' => $questionid]);
     }
 }
 
@@ -286,7 +288,7 @@ function mod_studentquiz_prepare_notify_data($question, $recepient, $actor, $cou
 
     // User who triggered the noticication.
     $data->actorname     = fullname($actor);
-    $data->actorusername = $recepient->username;
+    $data->actorusername = $actor->username;
 
     // Set to anonymous student and manager if needed.
     if ($studentquiz->anonymrank) {
@@ -446,22 +448,13 @@ function mod_studentquiz_event_notification_minecomment($event, $comment, $cours
  */
 function mod_studentquiz_send_notification($event, $recipient, $submitter, $data) {
     global $CFG;
-    // Recipient info for template.
-    $data->useridnumber = $recipient->idnumber;
-    $data->username     = fullname($recipient);
-    $data->userusername = $recipient->username;
 
     // Prepare the message.
     $eventdata = new \core\message\message();
     $eventdata->component         = 'mod_studentquiz';
     $eventdata->name              = $event;
     $eventdata->notification      = 1;
-
-    // Courseid only for moodle >= 3.2.
-    if ($CFG->version >= 2016120500) {
-        $eventdata->courseid = $data->courseid;
-    }
-
+    $eventdata->courseid          = $data->courseid;
     $eventdata->userfrom          = $submitter;
     $eventdata->userto            = $recipient;
     $eventdata->subject           = get_string('email' . $event . 'subject', 'studentquiz', $data);
@@ -649,96 +642,6 @@ function mod_studentquiz_get_comments_with_creators($questionid) {
             ORDER BY co.created ASC";
 
     return $DB->get_records_sql($sql, array( 'questionid' => $questionid));
-}
-
-
-/**
- * Generate some HTML to render comments
- *
- * @param array $comments from studentquiz_coments ordered by comment->created ASC
- * @param int $userid, viewing user id
- * @param int $cmid, course module id
- * @param bool $anonymize Display or hide other author names
- * @param bool $ismoderator True renders edit buttons to all comments false, only those for createdby userid
- * @return string HTML fragment
- * TODO: Render function should move to renderers!
- */
-function mod_studentquiz_comment_renderer($comments, $userid, $cmid, $anonymize, $ismoderator) {
-
-    $output = '';
-
-    $modname = 'studentquiz';
-
-    if (empty($comments)) {
-        return html_writer::div(get_string('no_comments', $modname));
-    }
-
-    $authorids = array();
-    $authors = array();
-
-    // Collect distinct anonymous author ids chronologically.
-    foreach ($comments as $comment) {
-        if (!in_array($comment->userid, $authorids)) {
-            $authorids[] = $comment->userid;
-            $authors[] = user_get_users_by_id(array($comment->userid))[$comment->userid];
-        }
-    }
-
-    $num = 0;
-    $showmoreafter = 10;
-    // Output comments in chronically reverse order.
-    foreach (array_reverse($comments) as $comment) {
-        $isfromcreator = $comment->userid == $userid;
-        $canedit = $ismoderator || $isfromcreator;
-        $seename = !$anonymize || $isfromcreator;
-
-        $date = userdate($comment->created, get_string('strftimedatetime', 'langconfig'));
-
-        if ($seename) {
-            $username = fullname($authors[array_search($comment->userid, $authorids)]);
-        } else {
-            $username = get_string('creator_anonym_fullname', 'studentquiz')
-                . ' #' . (1 + array_search($comment->userid, $authorids));
-        }
-
-        $editspan = '';
-        if ($canedit) {
-            $editspan = html_writer::span(get_string('remove_comment', 'studentquiz'), 'remove_action',
-                    [
-                            'data-id' => $comment->id,
-                            'data-question_id' => $comment->questionid,
-                            'tabindex' => '0',
-                            'aria-label' => get_string('remove_comment_label', 'studentquiz')
-                    ]
-            );
-        }
-
-        $output .= html_writer::div( $editspan
-            . html_writer::tag('p', $date . ' | ' . $username)
-            . format_text(
-                $comment->comment,
-                FORMAT_MOODLE,
-                array('context' => context_module::instance($cmid))
-            ),
-            (($num >= $showmoreafter) ? 'hidden' : '')
-            . (($isfromcreator) ? 'fromcreator' : '')
-        );
-        $num++;
-    }
-
-    if (count($comments) > $showmoreafter) {
-        $output .= html_writer::div(
-            html_writer::tag('button', get_string('show_more', $modname),
-                array('type' => 'button', 'class' => 'show_more btn btn-secondary')
-            )
-            . html_writer::tag('button', get_string('show_less', $modname)
-                , array('type' => 'button', 'class' => 'show_less btn btn-secondary hidden')
-            )
-            , 'button_controls'
-        );
-    }
-
-    return $output;
 }
 
 /**
@@ -1044,21 +947,66 @@ function mod_studentquiz_get_roles() {
 function mod_studentquiz_ensure_question_capabilities($context) {
     global $CFG;
 
-    $neededcapabilities = array(
-        'moodle/question:add',
-        'moodle/question:usemine',
-        'moodle/question:viewmine',
-        'moodle/question:editmine'
-    );
+    $neededcapabilities = [
+            'mod/studentquiz:view' => [
+                    'moodle/question:useall'
+            ],
+            'mod/studentquiz:submit' => [
+                    'moodle/question:add',
+                    'moodle/question:viewmine',
+                    'moodle/question:editmine'
+            ],
+            'mod/studentquiz:previewothers' => [
+                    'moodle/question:viewall',
+                    'moodle/question:editall'
+            ],
+            'mod/studentquiz:manage' => [
+                    'moodle/question:add',
+                    'moodle/question:viewall',
+                    'moodle/question:editall'
+            ]
+    ];
+
+    $studentquizcapabilities = array_keys($neededcapabilities);
+
+    $extracapabilities = [];
+    $capabiltiesneededbyeachrole = [];
     if ($CFG->version >= 2018051700) { // Moodle 3.5+.
-        $neededcapabilities[] = 'moodle/question:tagmine';
+        $extracapabilities[] = 'moodle/question:tagmine';
     }
 
-    // Get the ids of all the roles that can submit questions in this activity.
-    list($roleids) = get_roles_with_cap_in_context($context, 'mod/studentquiz:submit');
-    foreach ($roleids as $roleid) {
+    foreach ($studentquizcapabilities as $studentquizcapability) {
+        // Get the ids of all the roles that related to given capability.
+        list($roleids) = get_roles_with_cap_in_context($context, $studentquizcapability);
+        foreach ($roleids as $roleid) {
+            if (!array_key_exists($roleid, $capabiltiesneededbyeachrole)) {
+                $capabiltiesneededbyeachrole[$roleid] = $neededcapabilities[$studentquizcapability];
+            } else {
+                $capabiltiesneededbyeachrole[$roleid] =
+                        array_merge($capabiltiesneededbyeachrole[$roleid], $neededcapabilities[$studentquizcapability]);
+            }
+        }
+    }
+
+    foreach ($capabiltiesneededbyeachrole as $roleid => $questioncapabilites) {
+        $capabilitieswithall  = preg_grep('/all$/', $questioncapabilites);
+        foreach ($capabilitieswithall as $capabilitiy) {
+            $capabilitieswithmine = preg_replace('/all$/', 'mine', $capabilitiy);
+            if (in_array($capabilitieswithmine, $questioncapabilites)) {
+                // Remove the 'mine' if we have 'all' capability.
+                $deletekey = array_search($capabilitieswithmine, $capabiltiesneededbyeachrole[$roleid]);
+                unset($capabiltiesneededbyeachrole[$roleid][$deletekey]);
+            }
+        }
+    }
+
+    foreach ($capabiltiesneededbyeachrole as $roleid => $questioncapabilites) {
+        // Include the extra capabilities if needed.
+        if (!empty($extracapabilities)) {
+            $questioncapabilites = array_merge($questioncapabilites, $extracapabilities);
+        }
         // If needed, add an override for each question capability.
-        foreach ($neededcapabilities as $capability) {
+        foreach ($questioncapabilites as $capability) {
             // This function only creates an override if needed.
             role_change_permission($roleid, $context, $capability, CAP_ALLOW);
         }
@@ -1243,19 +1191,30 @@ function mod_studentquiz_migrate_old_quiz_usage($courseorigid=null) {
  *
  * @param int $id question id
  * @param int $cmid The course_module id
+ * @param bool $honorpublish Honor the setting publishnewquestions
+ * @param bool $hidden If the question should be hidden, only used if $honorpublish is false
  */
-function mod_studentquiz_ensure_studentquiz_question_record($id, $cmid) {
+function mod_studentquiz_ensure_studentquiz_question_record($id, $cmid, $honorpublish = true, $hidden = true) {
     global $DB;
+
     // Check if record exist.
     if (!$DB->count_records('studentquiz_question', array('questionid' => $id)) ) {
         $studentquiz = $DB->get_record('studentquiz', ['coursemodule' => $cmid]);
         $params = [
-                'questionid' => $id,
-                'state' => studentquiz_helper::STATE_NEW
+            'questionid' => $id,
+            'state' => studentquiz_helper::STATE_NEW
         ];
-        if (isset($studentquiz->publishnewquestion) && !$studentquiz->publishnewquestion) {
-            $params['hidden'] = 1;
+
+        if ($honorpublish) {
+            if (isset($studentquiz->publishnewquestion) && !$studentquiz->publishnewquestion) {
+                $params['hidden'] = 1;
+            }
+        } else {
+            if ($hidden) {
+                $params['hidden'] = 1;
+            }
         }
+
         $DB->insert_record('studentquiz_question', (object) $params);
     }
 }
@@ -1442,53 +1401,14 @@ function mod_studentquiz_save_rate($data) {
 }
 
 /**
- * Saves question comment.
- *
- * // TODO:
- * @param  stdClass $data requires userid, questionid, comment
- * @param $course
- * @param $module
- */
-function mod_studentquiz_save_comment($data, $course, $module) {
-    global $DB;
-
-    $data->created = usertime(time(), usertimezone());
-    $DB->insert_record('studentquiz_comment', $data);
-    mod_studentquiz_notify_comment_added($data, $course, $module);
-}
-
-/**
- * Deletes question comment.
- *
- * // TODO:
- * @param  stdClass $data requires commentid
- * @param $course
- * @param $module
- * @return bool success
- */
-function mod_studentquiz_delete_comment($commentid, $course, $module) {
-    global $DB, $USER;
-
-    $success = false;
-    $comment = $DB->get_record('studentquiz_comment', array('id' => $commentid));
-    // The manager is allowed to delete any comment and additionally sends a notification.
-    if (mod_studentquiz_check_created_permission($module->id)) {
-        $success = $DB->delete_records('studentquiz_comment', array('id' => $commentid));
-        mod_studentquiz_notify_comment_deleted($comment, $course, $module);
-    } else {
-        // Only the student can delete his own comment.
-        $success = $DB->delete_records('studentquiz_comment', array('id' => $commentid, 'userid' => $USER->id));
-    }
-    return $success;
-}
-
-/**
  * Compare and create new record for studentquiz_questions table if need. Only for Moodle version smaller than 3.7
  *
  * @param object $studentquiz StudentQuiz object
+ * @param bool $honorpublish Honor the setting publishnewquestions
+ * @param bool $hidden If the question should be hidden, only used if $honorpublish is false
  * @throws dml_exception
  */
-function mod_studentquiz_compare_questions_data($studentquiz) {
+function mod_studentquiz_compare_questions_data($studentquiz, $honorpublish = true, $hidden = true) {
     global $DB, $CFG;
     if ($CFG->branch >= 37) {
         return;
@@ -1512,7 +1432,46 @@ function mod_studentquiz_compare_questions_data($studentquiz) {
     $missingquestions = $DB->get_records_sql($sql, $params);
     if ($missingquestions) {
         foreach ($missingquestions as $missingquestion) {
-            mod_studentquiz_ensure_studentquiz_question_record($missingquestion->id, $studentquiz->coursemodule);
+            mod_studentquiz_ensure_studentquiz_question_record(
+                $missingquestion->id, $studentquiz->coursemodule, $honorpublish, $hidden
+            );
         }
+    }
+}
+
+/**
+ * Adds the default state to questions for restores since there's a bug in the moodle code.
+ * ref: https://tracker.moodle.org/browse/MDL-67406
+ *
+ * Finds all the questions missing the state information and writes the default state for imports
+ * into the database.
+ *
+ * @throws Throwable
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws dml_transaction_exception
+ * @param int|null $courseorigid
+ */
+function mod_studentquiz_fix_all_missing_question_state_after_restore($courseorigid=null) {
+    global $DB;
+
+    $params = array();
+    if (!empty($courseorigid)) {
+        $params['course'] = $courseorigid;
+    }
+    $studentquizes = $DB->get_records('studentquiz', $params);
+
+    $transaction = $DB->start_delegated_transaction();
+
+    try {
+        foreach ($studentquizes as $studentquiz) {
+            $context = \context_module::instance($studentquiz->coursemodule);
+            $studentquiz = mod_studentquiz_load_studentquiz($studentquiz->coursemodule, $context->id);
+            mod_studentquiz_compare_questions_data($studentquiz, false, false);
+        }
+        $DB->commit_delegated_transaction($transaction);
+    } catch (Exception $e) {
+        $DB->rollback_delegated_transaction($transaction, $e);
+        throw new Exception($e->getMessage());
     }
 }

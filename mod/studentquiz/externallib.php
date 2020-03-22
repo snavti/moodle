@@ -23,6 +23,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_studentquiz\local\studentquiz_helper;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/studentquiz/locallib.php');
@@ -54,17 +56,25 @@ class mod_studentquiz_external extends external_api {
      */
     public static function change_question_state($courseid, $cmid, $questionid, $state) {
         global $PAGE;
-        if ($state == 4) {
+
+        if ($state == studentquiz_helper::STATE_HIDE) {
             $type = 'hidden';
             $value = 1;
-        } else if ($state == 5) {
+        } else if ($state == studentquiz_helper::STATE_DELETE) {
             $type = 'deleted';
             $value = 1;
         } else {
             $type = 'state';
             $value = $state;
         }
+
         mod_studentquiz_change_state_visibility($questionid, $type, $value);
+
+        // Additionally always unhide the question when it got approved
+        if ($state == studentquiz_helper::STATE_APPROVED) {
+            mod_studentquiz_change_state_visibility($questionid, 'hidden', 0);
+        }
+
         $course = get_course($courseid);
         $cm = get_coursemodule_from_id('studentquiz', $cmid);
         $context = context_module::instance($cmid);
