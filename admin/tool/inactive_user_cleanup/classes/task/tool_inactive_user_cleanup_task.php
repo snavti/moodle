@@ -13,39 +13,38 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Privacy Subsystem implementation for tool_heartbeat.
+ * Inactive user cleanup library
  *
- * @package    tool_heartbeat
- * @copyright  2018 Olivier SECRET <olivier.secret@catalyst-au.net>
+ * @package    tool_inactive_user_cleanup
+ * @copyright  2014 dualcube {@link https://dualcube.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace tool_heartbeat\privacy;
-
 defined('MOODLE_INTERNAL') || die();
-
-use core_privacy\local\request\context;
-
+/*
+ * tool_inactive_user_cleanup is standard cron function
+ */
+namespace tool_inactive_user_cleanup\task;
 /**
- * @copyright  2018 Olivier SECRET <olivier.secret@catalyst-au.net>
+ * Scheduled task for Inactive user cleanup.
+ *
+ * @copyright  2014 dualcube {@link https://dualcube.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements
-    \core_privacy\local\metadata\null_provider {
-
-    use \core_privacy\local\legacy_polyfill;
-
+class tool_inactive_user_cleanup_task extends \core\task\scheduled_task {
     /**
-     * Get the language string identifier with the component's language
-     * file to explain why this plugin stores no data.
+     * Get a descriptive name for this task (shown to admins).
      *
-     * This function is compatible with old php version. (Diff is the underscore '_' in the beginning)
-     * But the get_reason is still available because of the trait legacy_polyfill.
-     *
-     * @return  string
+     * @return string
      */
-    public static function _get_reason() {
-        return 'privacy:no_data_reason';
+    public function get_name() {
+        return get_string('pluginname', 'tool_inactive_user_cleanup');
     }
-}
+    /**
+     * Execute.
+     */
+    public function execute() {
+
+    }//end of function execute()
+}// End of class

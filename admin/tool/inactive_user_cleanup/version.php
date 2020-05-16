@@ -15,35 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Performs a compression test
+ * Plugin version info
  *
- * @package    tool_heartbeat
- * @copyright  2017 Rossco Hellmans <rossco@catalyst-au.net>
+ * @package    tool_inactive_user_cleanup
+ * @copyright  2014 dualcube {@link https://dualcube.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require(__DIR__ . '/../../../config.php');
+defined('MOODLE_INTERNAL') || die();
 
-$syscontext = context_system::instance();
-$PAGE->set_url('/admin/tool/heartbeat/compresscheck.php');
-$PAGE->set_context($syscontext);
-$PAGE->set_cacheable(false);
+$plugin->version   = 2019112600; // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2012112900;  // Requires this Moodle version.
+$plugin->component = 'tool_inactive_user_cleanup'; // Full name of the plugin (used for diagnostics).
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release = '2.4 (Build: 2014080501)';
 
-$ttfb = optional_param('ttfb', 1, PARAM_INT);
-// Default fixed size is 50KB.
-$fixedsize = optional_param('fixedsize', 51200, PARAM_INT);
 
-// Max fixed size is 500KB in case of a ddos vector.
-if ($fixedsize > 512000) {
-    $fixedsize = 512000;
-}
-
-sleep($ttfb);
-
-$string = '';
-
-for ($i = 0; $i < $fixedsize; $i++) {
-    $string .= '.';
-}
-
-echo $string;

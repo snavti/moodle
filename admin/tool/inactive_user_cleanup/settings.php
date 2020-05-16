@@ -15,18 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Link to inactive user cleanup
  *
- * @package    tool_heartbeat
- * @copyright  2017 Brendan Heywood <brendan@catalyst-au.net>
+ * @package    tool_inactive_user_cleanup
+ * @copyright  2014 dualcube {@link https://dualcube.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2019082200;
-$plugin->release   = 2019082200; // Match release exactly to version.
-$plugin->requires  = 2012120311; // Deep support going back to 2.4
-$plugin->component = 'tool_heartbeat';
-$plugin->maturity  = MATURITY_STABLE;
+defined('MOODLE_INTERNAL') || die;
+if ($hassiteconfig) {
+    $ADMIN->add('reports',
+        new admin_externalpage('toolinactive_user_cleanup', get_string('pluginname', 'tool_inactive_user_cleanup'),
+        "$CFG->wwwroot/$CFG->admin/tool/inactive_user_cleanup/index.php", 'moodle/site:config'));
+}
 

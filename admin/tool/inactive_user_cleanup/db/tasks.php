@@ -13,29 +13,21 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-
 /**
- * Set a random integer in session and redirect to check if persists.
- *
- * @package    tool_heartbeat
- * @copyright  2019 Tom Dickman <tomdickman@catalyst-au.net>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * installation tool_inactive_user_cleanup tool caps.
+ * @author Sandipa Mukherjee <sandipa@dualcube.com>
+ * @copyright DUALCUBE {@link https://dualcube.com/}
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once('../../../config.php');
-
-global $SESSION;
-
-$testnumber = rand();
-$testtimemicro = microtime(true);
-$hostname = gethostname();
-
-$SESSION->testnumber = $testnumber;
-
-$params = array(
-    'testnumber' => $testnumber,
-    'reqtime' => $testtimemicro,
-    'host' => $hostname);
-$url = new moodle_url('/admin/tool/heartbeat/sessiontwo.php', $params);
-
-redirect($url);
+defined('MOODLE_INTERNAL') || die();
+$tasks = array(
+    array(
+        'classname' => 'tool_inactive_user_cleanup\task\tool_inactive_user_cleanup_task',
+        'blocking' => 0,
+        'minute' => '59',
+        'hour' => '23',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    )
+);
