@@ -19,7 +19,7 @@
  * Built on: Essential by Julian Ridden
  *
  * @package   theme_lambda
- * @copyright 2019 redPIthemes
+ * @copyright 2020 redPIthemes
  *
  */
 

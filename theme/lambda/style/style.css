@@ -93,14 +93,14 @@ img.iconsmall {
 .span12#move {
     margin-top: -30px;
 }
-.mform fieldset.collapsible legend a.fheader {
-	margin-left:0;
-}
 .form-item .form-label, .mform .fitem div.fitemtitle, .userprofile dl.list dt, .form-horizontal .control-label {
 width:180px;
 }
 .form-item .form-setting, .form-item .form-description, .mform .fitem .felement, #page-mod-forum-search .c1, .mform .fdescription.required, .userprofile dl.list dd, .form-horizontal .controls {
     margin-left: 200px;
+}
+.form-item, .mform .fitem {
+    margin-bottom: 0;
 }
 textarea[cols], input[size] {
     width: 95%;
@@ -184,7 +184,8 @@ Header
 	background: [[setting:headercolor]] [[setting:header_bg]];
 }
 #page-header > .container-fluid > .row-fluid {
-	display:flex;
+	display: flex;
+	align-items: center;
 }
 h2.main,
 #pageheading {
@@ -232,8 +233,12 @@ h2#subtitle {
 .breadcrumb-button input[type="submit"]:hover {
 	background: [[setting:mainhovercolor]];
 }
-.breadcrumb-button a{
+.breadcrumb-button a {
     color: #fff;
+}
+.breadcrumb-button > a {
+    color: #555;
+    vertical-align: text-top;
 }
 .login-header {
     display: flex !important;
@@ -270,6 +275,7 @@ h2#subtitle {
     margin: 0;
     padding: 0 2px 0 40px;
     width: 160px;
+	filter: none;
 }
 #submit{
     border-radius: 0;
@@ -697,7 +703,7 @@ Moodle gear menus and admin tabs
     display: inline-block !important;
     background: [[setting:maincolor]];
     margin-left: 12px;
-    padding: 5px 14px 2px 8px;
+    padding: 5px 6px 2px 14px;
     border-radius: 2px;
     box-shadow: 0 -1px 0 rgba(0,0,0,.1) inset;
 }
@@ -922,11 +928,19 @@ margin-left: 0px;
 .mod-indent-outer .mediaplugin.mediaplugin_videojs {
     display: block;
     margin: 20px 0;
+    width: auto;
+}
+.box.py-3.generalbox.folderbuttons {
+    display: flex;
 }
 
 /*================================================== * 
 course formats
 =====================================================*/
+.course-content ul.topics, .course-content ul.weeks {
+    margin: 0;
+    list-style: none;
+}
 .course-content ul.gridicons li .image_holder {
     cursor: pointer;
     overflow: hidden;
@@ -1251,6 +1265,9 @@ body#page-mod-assign-grader {
 .path-mod-assign [data-region="user-selector"] .alignment {
     margin-top: 0;
 }
+.path-mod-assign [data-region="user-selector"] [data-action="next-user"] {
+    margin-left: 0;
+}
 @media (max-width: 767px) {
 .path-mod-assign [data-region="user-info"] {display: block !important; padding-left: 10px;}
 .path-mod-assign [data-region="grading-navigation-panel"] {line-height: 20px;}
@@ -1275,7 +1292,7 @@ body#page-mod-assign-grader, body#page-mod-assign-grader #page {padding:0;}
 .initialbar .letter {
     line-height: 20px;
 }
-.btn.btn-link {
+.btn.btn-link, .btn.btn-link > a {
     color: #555 !important;
 }
 .btn.btn-link:hover, .btn.btn-link:active, .btn.btn-link:focus, a.btn.btn-link.p-0:hover {
@@ -1521,7 +1538,7 @@ body.sidebar-open #sidebar .block-region {
 #sidebar-btn span:nth-child(3) {
   width: 50%;
 }
-.sidebar-enabled #region-main.span8 {
+.sidebar-enabled #region-main.span8, .empty-region-side-pre.used-region-side-post #region-main {
 	width: 100% !important;
 }
 @media(max-width:767px){
@@ -1620,6 +1637,9 @@ Frontpage & Dashboard
 #region-main .block.block_course_overview .content .welcome_area {
     border-bottom: 3px dashed [[setting:maincolor]];
     margin-bottom: 20px;
+}
+#region-main .block-region > .block > .card-body {
+    padding: 0 !important;
 }
 
 /* =========================================================== *
@@ -2029,8 +2049,7 @@ Quiz
 #page-mod-quiz-edit div.question div.content .questionname, #categoryquestions .questionname {
     max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: break-spaces;
 }
 #categoryquestions .questiontext p {
     overflow: hidden;
@@ -2050,9 +2069,6 @@ Quiz
     text-align: left;
     width: 20px;
 }
-.que {
-    max-width:95%;
-}
 .que .info {
     background-color: #f2f2f2;
     border: 1px solid #ddd;
@@ -2068,6 +2084,9 @@ Quiz
     background: #fff none repeat scroll 0 0;
     border: medium none;
     border-radius: 0;
+    color: #555;
+    padding: 10px;
+    text-shadow: none;
 }
 .que .formulation .qtext {
     font-size: 1.1em;
@@ -2104,6 +2123,38 @@ Quiz
     border-width: 2px;
     border-color: #8BC33D;
 }
+#page-mod-quiz-edit div.question div.content .questionname, #categoryquestions .questionname {
+    display: inline-block;
+    vertical-align: middle;
+}
+.questionbankwindow.boxwidthwide.boxaligncenter {
+    width: 95%;
+}
+.path-question-type #fgroup_id_updatebuttonar > .col-md-9.form-inline > .form-group.fitem + a {
+    margin-bottom: 25px;
+    padding-left: 10px;
+}
+#page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
+    float: none;
+    margin: 0;
+    padding-right: 5px;
+    vertical-align: baseline;
+    display: inline;
+}
+.path-question-type .fcontainer .form-control-feedback.invalid-feedback {
+    border: none !important;
+    padding: 0 !important;
+}
+.path-question-type .fcontainer .col-form-label.sr-only, .path-question-type .fcontainer label.accesshide {
+    position: static;
+    display: inline;
+    font-size: 1rem;
+    padding: 0 4px 0 12px;
+    vertical-align: middle;
+}
+.path-question-type .fcontainer .form-inline > div, .path-question-type .fcontainer .form-inline > label {
+    margin: 0 !important;
+}
 
 /* =========================================================== *
 group Tabs
@@ -2128,6 +2179,17 @@ group Tabs
 /*================================================== * 
 Atto editor
 =====================================================*/
+.atto_form .form-inline .form-control {
+    width: auto;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+.atto_form #id_summary_editor_atto_h5p_url, .atto_form textarea.fullwidth {
+    width: 98%;
+}
+.atto_form input.fullwidth {
+    width: auto;
+}
 .yui3-skin-sam .yui3-tab-label {
     background: #f2f2f2 none repeat scroll 0 0;
 }
@@ -2149,9 +2211,6 @@ Atto editor
     border-radius: 2px;
     margin: 5px 0 0 0;
     font-size: 14px;
-}
-.atto_form .input-group.w-100 > input {
-    width: 100%;
 }
 .atto_recordrtc, .atto_recordrtc div {
     max-width: 250px;
@@ -2189,6 +2248,88 @@ Atto editor
 .editor_atto_toolbar button:hover, .editor_atto_toolbar button:active, .editor_atto_toolbar button:focus {
     background-image: radial-gradient(ellipse at center,#fff 60%,#dfdfdf 100%);
     background-color: #ebebeb;
+}
+.moodle-dialogue button.yui3-button.closebutton {
+    height: 0;
+    padding: 0;
+}
+.moodle-dialogue .yui3-button.closebutton::before {
+    content: "";
+    background-image:url([[pix:theme|sprite]]);
+    display: block;
+    width: 25px;
+    height: 15px;
+}
+.moodle-dialogue-base .moodle-dialogue .moodle-dialogue-content .moodle-dialogue-ft {
+    margin: 0 1em;
+}
+.emoji-picker {
+    width: 350px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    word-wrap: break-word;
+}
+.emoji-picker .card-header {
+    padding: 0 !important;
+}
+.emoji-picker .card-header > button:hover, .emoji-picker .card-header > button.selected {
+    background: rgba(50,50,50,0.1) !important;
+	border-bottom: 2px solid #aaa;
+}
+.emoji-picker .card-header > button {
+    background: transparent;
+    box-shadow: none;
+    padding: 4px 8px;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+}
+.emoji-picker .card-header > button img.icon {
+    padding: 0;
+}
+.emoji-picker .card-body {
+    overflow: hidden;
+}
+.emoji-picker .card-body .input-group.mb-1.flex-shrink-0 {
+    display: flex;
+}
+.emoji-picker .card-body .input-group > .input-group-prepend {
+    padding: 4px 5px;
+    line-height: 20px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    margin: 0 -1px 0 0;
+}
+.emoji-picker .card-body .input-group > .form-control {
+    margin-bottom: 0;
+}
+.emoji-picker .emojis-container {
+    overflow: auto !important;
+}
+.emoji-picker .picker-row .emoji-button {
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+    font-size: 20px;
+    overflow: hidden;
+}
+.emoji-picker .card-footer {
+    flex-shrink: 0;
+    padding: .75rem 1.25rem;
+    background-color: rgba(0,0,0,.03);
+	border-top: 1px solid rgba(0,0,0,.125);
+    height: 24px;
+}
+.message-app .emoji-picker-container {
+    position: absolute;
+    top: -5px;
+    right: 5px;
+    transform: translateY(-100%);
+}
+.input-group-append > .btn.btn-secondary {
+    font-size: 1rem;
+    height: 30px;
 }
 
 /* =========================================================== *
@@ -2364,6 +2505,9 @@ Moodle dialogue and modals
 .modal-container .modal legend {
     border: none;
 }
+.moodle-dialogue-base .moodle-dialogue-wrap {
+    border-radius: 2px;
+}
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd, .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd.yui3-widget-hd {
     background: none repeat scroll 0 0 #F2F2F2;
     border-bottom: 1px solid #ddd;
@@ -2373,6 +2517,9 @@ Moodle dialogue and modals
 }
 .moodle-dialogue-base .moodle-dialogue-wrap {
     border-radius: 4px;
+}
+.moodle-dialogue .mform label {
+    display: block;
 }
 .modal-body {
     position: relative;
@@ -2786,17 +2933,27 @@ Moodle 3.7 User Preferences
 }
 
 /*================================================== * 
-Moodle 3.7
+Moodle 3.8
 =====================================================*/
 .alert {
     text-shadow: none;
     position: relative;
     padding: .75rem 1.25rem;
+	border-radius: 2px;
 }
-.alert-danger, #page-admin-index .adminerror {
-    background-color: #f7dddc;
-    border-color: #f4cfce;
-    color: #712b29;
+.alert-warning, #page-admin-index .releasenoteslink, #page-admin-index .adminwarning, #page-admin-index .adminerror {
+    background-color: #fcefdc;
+    border: 1px solid #fbe8cd;
+    color: #7d5a29;
+}
+#page-admin-index .releasenoteslink, #page-admin-index .adminwarning, #page-admin-index .adminerror {
+    margin: 0 auto;
+    padding: 8px 35px 8px 14px;
+    text-shadow: none;
+    border-radius: 2px;
+    width: 80%;
+    min-width: 220px;
+    margin-bottom: 15px;
 }
 #loggedin-user .usermenu .dropdown {
     margin-top: 10px;
@@ -2899,8 +3056,8 @@ Moodle 3.7
     filter: brightness(2);
 }
 @media (min-width: 768px) {
-	.path-login div[role="main"] {display: flex;}
-	.path-login .row.justify-content-center {width: 46%; margin: 0 2% !important;}
+	#page-login-index .path-login div[role="main"] {display: flex;}
+	#page-login-index .path-login .row.justify-content-center {width: 46%; margin: 0 2% !important;}
 }
 #page-login-change_password.path-login div[role="main"] {
     display: block;
@@ -2999,6 +3156,15 @@ Moodle 3.7
 .path-login.login_lambda.column-1 .logo-header {
     text-align: center;
 }
+#page-login-index.login_lambda.column-2 .row.justify-content-center {
+    width: 50%;
+    position: relative;
+    float: left;
+    margin: 0 !important;
+}
+@media (max-width: 767px) {
+	#page-login-index.login_lambda.column-2 .row.justify-content-center {width: 100%;}
+}
 .form-inline {
     display: flex;
     flex-flow: row wrap;
@@ -3014,15 +3180,12 @@ Moodle 3.7
 .actions > div {
     margin-right: 10px !important;
 }
-.form-inline .form-control {
-    width: 95%;
-}
 .form-group.row.fitem {
     border-bottom: 1px solid #f2f2f2;
     padding-bottom: 20px;
     margin-bottom: 15px;
 }
-#fgroup_id_purgeselectedoptions .form-inline {
+#fgroup_id_purgeselectedoptions .form-inline, #fgroup_id_purgeselectedoptions .form-inline .d-flex {
     margin-left: 0;
     display: block !important;
 }
@@ -3249,6 +3412,7 @@ a[data-toggle="popover"] > img.icon {
 	box-shadow: inset 0 0 0 1px rgba(230,37,66,0.25);
 }
 .invalid-feedback {
+	display: none;
     width: 100%;
     margin-top: .25rem;
     font-size: 90%;
@@ -3265,8 +3429,10 @@ a[data-toggle="popover"] > img.icon {
     width: 100%;
     margin: 1rem 0;
 }
-.progress {
-    width: 100%;
+.progress .progress-bar {
+    background-color: [[setting:maincolor]];
+    height: 100%;
+    opacity: 0.85;
 }
 .path-backup .wibbler {
     display: none;
@@ -3331,6 +3497,19 @@ body.modal-open {
     width: auto;
     display: inline-block !important;
     float: right;
+}
+.form-check-inline, .form-inline.felement > .fitem {
+    margin-right: 8px;
+}
+.form-inline.felement[data-fieldtype="group"] .d-flex.flex-wrap label.form-check {
+    width: 100%;
+    margin-bottom: 10px;
+}
+a[data-toggle="popover"] > img.icon {
+	vertical-align: text-top;
+}
+.form-check-inline + span + a[data-toggle="popover"] > img.icon {
+    margin-top: -3px;
 }
 body #region-main .mform:not(.unresponsive) .femptylabel .form-inline.felement {
     display: flex;
@@ -3474,6 +3653,9 @@ body #region-main .mform:not(.unresponsive) .femptylabel .form-inline.felement >
 .mt-2.mb-1.activity-navigation select {
     max-width: 200px;
 }
+.buttons > .singlebutton {
+    margin-bottom: 10px;
+}
 .generalbox.submissionaction .singlebutton {
     display: inline-block;
 }
@@ -3537,10 +3719,14 @@ body #region-main .mform:not(.unresponsive) .femptylabel .form-inline.felement >
 .d-flex.align-self-center {
     align-self: center;
 }
-
-/*================================================== * 
-Moodle 3.8
-=====================================================*/
+.fitem .col-md-3 {
+    float: left;
+	margin-right: 5px;
+}
+#page-message-notificationpreferences .col-xs-6 {
+    width: 50%;
+    float: left;
+}
 .collapse.p-b-1 {
     padding-bottom: 0 !important;
 }
@@ -3552,6 +3738,24 @@ Moodle 3.8
 }
 .atto_h5p_button > img.icon {
     opacity: 0.55;
+}
+.singlebutton.enrolusersbutton.enrol_manual_plugin > form > div, .singlebutton.enrolusersbutton.enrol_manual_plugin > form > div > input {
+    margin-left: 0;
+}
+.btn-group > .btn:first-child {
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
+.btn-group > .btn:last-child, .btn-group > .dropdown-toggle {
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+.form-autocomplete-downarrow {
+    color: #999;
+    left: calc(100% - 1.5em);
+}
+#fitem_id_userlist .col-form-label.d-inline {
+    vertical-align: bottom;
 }
 
 /*================================================== * 
@@ -3577,6 +3781,10 @@ Moodle 3.8 Messaging App
 .drawer.hidden[data-region="right-hand-drawer"] {
     display: block;
     right: -320px;
+}
+.drawer[data-region="right-hand-drawer"] .footer-container textarea.form-control.bg-light {
+	width: 95%;
+	margin-bottom: 0;
 }
 #page-message-index #region-main div[role="main"] .message-app.main {
     height: 100%;
@@ -3640,7 +3848,7 @@ Moodle 3.8 Messaging App
 .message-app .container-fluid .header-container [data-region="favourite-icon-container"] img {
     display: none;
 }
-.message-app .container-fluid .btn.btn-link.btn-icon img {
+.message-app .btn.btn-link.btn-icon img {
     margin-left: -8px;
 }
 .message-app .container-fluid .btn.btn-link.btn-icon:hover {
@@ -3699,6 +3907,34 @@ Moodle 3.8 Messaging App
 }
 #view-overview-messages-target {
     background-color: #fff;
+}
+#page-message-index #region-main .message-app textarea {
+    width: 100%;
+    margin-bottom: 0;
+    min-height: 75px;
+}
+.view-conversation .position-absolute[data-region="confirm-dialogue-container"] {
+    position: relative !important;
+    padding: 15px !important;
+    width: calc(100% - 30px);
+}
+.panel-header-container > div > div > .input-prepend.d-flex.flex-grow.m-0 {
+    width: 100%;
+}
+.message-app .overview-section-toggle .expanded-icon-container {
+    display: block;
+}
+.message-app .overview-section-toggle .collapsed-icon-container {
+    display: none;
+}
+.message-app .overview-section-toggle.collapsed .expanded-icon-container {
+    display: none;
+}
+.message-app .overview-section-toggle.collapsed .collapsed-icon-container {
+    display: block;
+}
+.message-app [data-region="loading-placeholder"] .icon-size-4 {
+    background-image: none;
 }
 
 /*================================================== * 
@@ -4367,11 +4603,3 @@ aside.block {
 .jsenabled .block.hidden .content {
     display: inherit;
 }
-
-[[setting:fontface]]
-[[setting:logo_res]]
-[[setting:pagewidth_wide]]
-[[setting:category_layout]]
-[[setting:block_icons]]
-[[setting:hide_category_background]]
-[[setting:customcss]]

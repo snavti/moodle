@@ -8,11 +8,21 @@ Header
 #block-login div, #submit {
     font-size: 1.15em;
 }
+.profileblock .usermenu .caret {
+    display: none;
+}
+.profileblock .usermenu .userbutton::after {
+    content: "\f0d7";
+    font-family: "Font Awesome 5 Free";
+    font-size: 13px;
+    font-weight: 900;
+    color: #999;
+}
 
 /* =========================================================== *
 Navbar
 ============================================================== */
-ul.breadcrumb li:after { 
+ul.breadcrumb li:after, .breadcrumb-button > a::before, #page-admin-search .adminpagepath li + li::before {
 	content: "\f105";
 	font-family: "Font Awesome 5 Free";
 	font-size: 1.1em;
@@ -31,14 +41,6 @@ Moodle gear menus and admin tabs
 	font-weight: 900;
     color: #fff;
     padding-right: 5px;
-}
-.jsenabled .breadcrumb-button .moodle-actionmenu[data-enhance] a.dropdown-toggle:after {
-    content: "\f0d7";
-    font-family: "Font Awesome 5 Free";
-    font-size: 13px;
-	font-weight: 900;
-    color: #fff;
-	position: absolute;
 }
 
 /*================================================== * 
