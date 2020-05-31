@@ -64,8 +64,9 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                 CONTAINER_REPLIES: '.studentquiz-container-replies',
                 COMMENT_REPLIES_CONTAINER: '.studentquiz-comment-replies',
                 COMMENT_COUNT: '.studentquiz-comment-postcount',
-                COMMENT_TEXT: '.studentquiz-comment-text',
-                COMMENT_REPLIES_TEXT: '.studentquiz-comment-replies .studentquiz-comment-text',
+                COMMENT_TEXT: '.studentquiz-comment-text-inside',
+                COMMENT_HISTORY: '.studentquiz-comment-history',
+                COMMENT_REPLIES_TEXT: '.studentquiz-comment-replies .studentquiz-comment-text .studentquiz-comment-text-inside',
                 LOADING_ICON: '.studentquiz-comment-loading',
                 COMMENT_AREA_FORM: 'div.comment-area-form',
                 FORM_SELECTOR: '.studentquiz-comment-postform > div.comment-area-form',
@@ -99,7 +100,8 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                 COMMENT_FILTER_NAME: '.studentquiz-comment-filter-name',
                 COMMENT_FILTER_TYPE: '.studentquiz-comment-filter-type',
                 BTN_EDIT: '.studentquiz-comment-btnedit',
-                BTN_EDIT_REPLY: '.studentquiz-comment-btneditreply'
+                BTN_EDIT_REPLY: '.studentquiz-comment-btneditreply',
+                ATTO_HTML_BUTTON: 'button.atto_html_button'
             },
             get: function() {
                 return {
@@ -356,6 +358,10 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                                     // Clear form data.
                                     formSelector.trigger('reset');
                                     // Clear atto editor data.
+                                    if (!formSelector.find('#id_editor_question_' + unique + 'editable').is(':visible')) {
+                                        // HTML mode. Switch back to normal mode.
+                                        $(t.SELECTOR.ATTO_HTML_BUTTON).trigger('click');
+                                    }
                                     formSelector.find('#id_editor_question_' + unique + 'editable').empty();
                                     formSelector.find(t.SELECTOR.TEXTAREA).trigger('change');
                                     M.util.js_complete(t.ACTION_CLEAR_FORM);
@@ -1231,14 +1237,16 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                                             commentSelector.replaceWith(el);
                                             el.find(t.SELECTOR.COMMENT_REPLIES_CONTAINER).replaceWith(oldReplies);
 
-                                            if (self.deleteTarget.root) {
-                                                self.bindCommentEvent(data);
-                                            } else {
-                                                self.bindReplyEvent(data, el.parent());
-                                            }
-                                            self.changeWorkingState(false);
+                                            setTimeout(function() {
+                                                if (self.deleteTarget.root) {
+                                                    self.bindCommentEvent(data);
+                                                } else {
+                                                    self.bindReplyEvent(data, el.parent());
+                                                }
+                                                self.changeWorkingState(false);
 
-                                            M.util.js_complete(t.ACTION_DELETE);
+                                                M.util.js_complete(t.ACTION_DELETE);
+                                            }, 200);
                                         });
                                         modal.hide();
                                         return true;
@@ -1309,12 +1317,14 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
 
                         var attoEditableId = textareaSelector.attr('id') + 'editable';
                         var attoEditable = document.getElementById(attoEditableId);
+                        var attoEditableEle = $('#' + attoEditableId);
                         var observation = new MutationObserver(function(mutationsList) {
                             mutationsList.forEach(function(mutation) {
                                 if (mutation.type === 'attributes' &&
                                     (mutation.attributeName === 'style' || mutation.attributeName === 'hidden')) {
                                     M.util.js_pending(key);
-                                    if (t.EMPTY_CONTENT.indexOf($('#' + attoEditableId).html()) > -1) {
+                                    if (t.EMPTY_CONTENT.indexOf(attoEditableEle.html()) > -1 ||
+                                        attoEditableEle.text().trim().length < 1) {
                                         self.triggerAttoNoContent(formSelector);
                                     } else {
                                         self.triggerAttoHasContent(formSelector);
@@ -1326,7 +1336,8 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                         observation.observe(attoEditable, {attributes: true, childList: true, subtree: true});
                         textareaSelector.change(function() {
                             M.util.js_pending(key);
-                            if (t.EMPTY_CONTENT.indexOf($('#' + attoEditableId).html()) > -1) {
+                            if (t.EMPTY_CONTENT.indexOf(attoEditableEle.html()) > -1 ||
+                                attoEditableEle.text().trim().length < 1) {
                                 self.triggerAttoNoContent(formSelector);
                             } else {
                                 self.triggerAttoHasContent(formSelector);
@@ -1584,7 +1595,11 @@ define(['jquery', 'core/str', 'core/ajax', 'core/modal_factory', 'core/templates
                             }
                             // Assign new content.
                             item.shortcontent = response.shortcontent;
-                            el.find(t.SELECTOR.COMMENT_TEXT).first().html(response.content);
+                            Templates.render(t.TEMPLATE_COMMENT, response).done(function(html) {
+                                var el = $(html);
+                                var commentTextSelector = t.SELECTOR.COMMENT_ID + response.id + ' ' + t.SELECTOR.COMMENT_TEXT;
+                                $(commentTextSelector).parent().html(el.find(t.SELECTOR.COMMENT_TEXT).parent().html());
+                            });
                             container.empty();
                             self.changeWorkingState(false);
                             M.util.js_complete(t.ACTION_EDIT);
