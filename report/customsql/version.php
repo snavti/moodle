@@ -15,20 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tool for deleting old quiz and question attempts.
+ * version.php file for the Custom SQL admin report.
  *
- * @package    local_deleteoldquizattempts
- * @copyright  2019 Vadim Dvorovenko <Vadimon@mail.ru>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   report_customsql
+ * @copyright 2015 The Open University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_deleteoldquizattempts';
-$plugin->version   = 2020060600;
-$plugin->release = '2.2';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->requires  = 2014051200; // Moodle 2.7.
-$plugin->dependencies = array(
-    'mod_quiz' => 2014051200,
-);
+$plugin->version   = 2019111101;
+$plugin->requires  = 2018051700;
+$plugin->component = 'report_customsql';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = '3.8 for Moodle 3.5+';
+
+$plugin->outestssufficient = true;

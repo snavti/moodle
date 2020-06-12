@@ -15,20 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tool for deleting old quiz and question attempts.
+ * Defines message providers (types of message sent) for the customsql report.
  *
- * @package    local_deleteoldquizattempts
- * @copyright  2019 Vadim Dvorovenko <Vadimon@mail.ru>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package report_customsql
+ * @copyright 2012 The Open University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_deleteoldquizattempts';
-$plugin->version   = 2020060600;
-$plugin->release = '2.2';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->requires  = 2014051200; // Moodle 2.7.
-$plugin->dependencies = array(
-    'mod_quiz' => 2014051200,
+$messageproviders = array(
+    // Messages informing users that a certain report has run, for reports set to do that.
+    'notification' => array(
+        'capability' => 'report/customsql:view',
+    ),
 );

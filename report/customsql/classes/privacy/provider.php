@@ -13,22 +13,32 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Tool for deleting old quiz and question attempts.
+ * Privacy Subsystem implementation for report_customsql.
  *
- * @package    local_deleteoldquizattempts
- * @copyright  2019 Vadim Dvorovenko <Vadimon@mail.ru>
+ * @package    report_customsql
+ * @copyright  2018 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace report_customsql\privacy;
 defined('MOODLE_INTERNAL') || die();
+/**
+ * Privacy Subsystem for report_customsql implementing null_provider.
+ *
+ * @copyright  2018 The Open University
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
 
-$plugin->component = 'local_deleteoldquizattempts';
-$plugin->version   = 2020060600;
-$plugin->release = '2.2';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->requires  = 2014051200; // Moodle 2.7.
-$plugin->dependencies = array(
-    'mod_quiz' => 2014051200,
-);
+    use \core_privacy\local\legacy_polyfill;
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function _get_reason() {
+        return 'privacy:metadata';
+    }
+}
