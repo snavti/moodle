@@ -82,7 +82,7 @@ $renderer->init_question_table_wanted_columns();
 $view = new mod_studentquiz_view($course, $context, $cm, $studentquiz, $USER->id, $report);
 
 // Since this page has 2 forms interacting with each other, all params must be passed in GET, thus
-// $PAGE->url will be as it has recieved the request
+// $PAGE->url will be as it has recieved the request.
 $PAGE->set_url($view->get_pageurl());
 $PAGE->set_title($view->get_title());
 $PAGE->set_heading($COURSE->fullname);
@@ -101,6 +101,7 @@ echo $renderer->render_overview($view);
 
 $PAGE->requires->js_init_code($renderer->render_bar_javascript_snippet(), true);
 $PAGE->requires->js_call_amd('mod_studentquiz/studentquiz', 'setFocus');
+$PAGE->requires->js_call_amd('mod_studentquiz/studentquiz', 'selectAllQuestions');
 $PAGE->requires->js_call_amd('mod_studentquiz/toggle_filter_checkbox', 'init');
 
 echo $OUTPUT->footer();

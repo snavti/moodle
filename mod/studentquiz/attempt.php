@@ -110,12 +110,15 @@ if (data_submitted()) {
     } else if (optional_param('finish', null, PARAM_BOOL)) {
         redirect($stopurl);
     } else {
-        // On every submission save the attempt.
-        $questionusage->process_all_actions();
+        $qa = $questionusage->get_question_attempt($slot);
+        $sequencecheck = $qa->get_submitted_var($qa->get_control_field_name('sequencecheck'), PARAM_INT);
+        if ($sequencecheck == $qa->get_sequence_check_count()) {
+            // On every submission save the attempt.
+            $questionusage->process_all_actions();
+        }
         // We save the attempts always to db, as there is no finish/submission step expected for the user.
         question_engine::save_questions_usage_by_activity($questionusage);
 
-        $qa = $questionusage->get_question_attempt($slot);
         $q = $questionusage->get_question($slot);
 
         $studentquizprogress = $DB->get_record('studentquiz_progress', array('questionid' => $q->id,
@@ -197,6 +200,13 @@ $title = format_string($question->name);
 $PAGE->set_title($cm->name);
 $PAGE->set_heading($cm->name);
 $PAGE->set_context($context);
+
+// Render nav bar.
+$navinfo = new stdClass();
+$navinfo->current = $slot;
+$navinfo->total = $questionscount;
+$PAGE->navbar->add(get_string('nav_question_no', 'studentquiz', $navinfo));
+
 echo $OUTPUT->header();
 
 $info = new stdClass();

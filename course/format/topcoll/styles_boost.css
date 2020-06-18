@@ -6,7 +6,8 @@
  * Toggles are persistent on a per browser session per course basis but can be made to persist longer by a small
  * code change. Full installation instructions, code adaptions and credits are included in the 'Readme.txt' file.
  *
- * @package    format_topcoll
+ * @package    course/format
+ * @subpackage topcoll
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2017-onwards G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - gjbarnard at gmail dot com and {@link http://moodle.org/user/profile.php?id=442195}
@@ -32,19 +33,11 @@ ul.ctopics .content .section ul {
     margin: 0 0 10px 10px;
 }
 
-ul.ctopics :target::before {
-    height: auto;
-    margin-top: 0;
-    pointer-events: none;
-    width: 0;
-}
-
-.course-content ul.ctopics .current::before {
-    height: auto;
-    left: 0;
-    margin-top: 0;
+ul.ctopics :target {
+    margin-top: 0!important;
+    padding-top: 0!important;
 }
 
 .format-topcoll.path-course-view.editing #region-main > .card-block {
-    overflow-x: visible;
+    overflow-x: visible; /* CONTRIB-7056 */
 }

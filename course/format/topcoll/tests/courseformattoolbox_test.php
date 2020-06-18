@@ -17,7 +17,8 @@
 /**
  * Collapsed Topics course format.
  *
- * @package    format_topcoll
+ * @package    course/format
+ * @subpackage topcoll
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2017-onwards G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://moodle.org/user/profile.php?id=442195}
@@ -35,7 +36,7 @@ class format_topcoll_courseformattoolbox_testcase extends advanced_testcase {
     protected function setUp() {
         $this->resetAfterTest(true);
 
-        set_config('theme', 'boost');
+        set_config('theme', 'clean');
     }
 
     public function test_hex2rgba() {

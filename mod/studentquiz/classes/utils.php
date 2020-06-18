@@ -52,6 +52,13 @@ class utils {
     /** @var int Weekly digest type */
     const WEEKLY_DIGEST_TYPE = 2;
 
+    /** @var string - Atto Toolbar define. */
+    const ATTO_TOOLBAR = 'style1 = bold, italic
+style2 = link, unlink
+style3 = superscript, subscript
+style4 = unorderedlist, orderedlist
+style5 = html';
+
     /**
      * Get Comment Area web service comment reply structure.
      *
@@ -93,7 +100,7 @@ class utils {
     /**
      * Truncate text.
      *
-     * @param $text - Full text.
+     * @param string $text - Full text.
      * @param int $length - Max length of text.
      * @return string
      */
@@ -113,8 +120,8 @@ class utils {
     /**
      * Get data need for comment area.
      *
-     * @param $questionid - Question ID.
-     * @param $cmid - Course Module ID.
+     * @param int $questionid - Question ID.
+     * @param int $cmid - Course Module ID.
      * @return array
      */
     public static function get_data_for_comment_area($questionid, $cmid) {
