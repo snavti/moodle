@@ -455,7 +455,7 @@ class block_base {
         if ($this->hide_header()) {
             $attributes['class'] .= ' no-header';
         }
-        if ($this->instance_can_be_docked() && get_user_preferences('docked_block_instance_' . $this->instance->id, 1)) {
+        if ($this->instance_can_be_docked() && get_user_preferences('docked_block_instance_' . $this->instance->id, 0)) {
             $attributes['class'] .= ' dock_on_load';
         }
         return $attributes;
