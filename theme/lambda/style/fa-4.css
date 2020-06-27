@@ -523,13 +523,16 @@ Moodle 3.8
 .grader-grading-panel .fa-bell-o::before {
     content: "\f0a2";
 }
-.grader-grading-panel .grader-grading-panel-display:before {
+.grader-grading-panel .grader-grading-panel-display > h4:before {
     display: inline;
     font-family: "FontAwesome";
 	font-size: 1em;
 	font-weight: 900;
 	content: "\f046";
 	padding-left: 5px;
+}
+.grader-grading-panel .grader-grading-panel-display > h4#send-student-notifications-setting::before {
+    content: "\f0a2";
 }
 .grader-grading-panel .grader-grading-panel-display > h4 > img {
 	display: none;
@@ -548,4 +551,15 @@ Moodle 3.8
 	line-height: 3.25rem;
 	margin: 20px auto;
 	background: [[setting:maincolor]];
+}
+
+/*================================================== * 
+Moodle 3.9
+=====================================================*/
+.modchooser .optionactions .btn.btn-icon[data-favourited="true"]::before {
+    content: "\f005";
+    font-family: "FontAwesome";
+    font-size: 16px;
+    font-weight: 900;
+    color: #999;
 }

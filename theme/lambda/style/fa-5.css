@@ -533,6 +533,9 @@ Moodle 3.8
 	font-weight: 400;
 	content: "\f14a";
 }
+.grader-grading-panel .grader-grading-panel-display > h4#send-student-notifications-setting::before {
+    content: "\f0f3";
+}
 .grader-grading-panel .grader-grading-panel-display > h4 > img {
 	display: none;
 }
@@ -550,4 +553,15 @@ Moodle 3.8
 	line-height: 3.25rem;
 	margin: 20px auto;
 	background: [[setting:maincolor]];
+}
+
+/*================================================== * 
+Moodle 3.9
+=====================================================*/
+.modchooser .optionactions .btn.btn-icon[data-favourited="true"]::before {
+    content: "\f005";
+    font-family: "Font Awesome 5 Free";
+    font-size: 16px;
+    font-weight: 900;
+    color: #999;
 }

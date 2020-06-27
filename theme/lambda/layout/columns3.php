@@ -38,7 +38,7 @@ if ($PAGE->theme->settings->block_layout == 1) {$standardlayout = TRUE;}
 $sidebar = FALSE;
 if ($PAGE->theme->settings->block_layout == 2) {$sidebar = TRUE;}
 if (($sidebar) && ($PAGE->blocks->region_has_content('side-pre', $OUTPUT) == FALSE) && (strpos($OUTPUT->body_attributes(), 'editing') == FALSE)) {$sidebar = FALSE;}
-if ($sidebar) {theme_lambda_init_sidebar($PAGE); $sidebar_stat = theme_lambda_get_sidebar_stat(); $lambda_body_attributes .= ' sidebar-enabled ';}
+if ($sidebar) {theme_lambda_init_sidebar($PAGE); $sidebar_stat = theme_lambda_get_sidebar_stat(); $lambda_body_attributes .= ' sidebar-enabled '.$sidebar_stat;}
 
 if (right_to_left()) {
     $regionbsid = 'region-bs-main-and-post';
