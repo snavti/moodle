@@ -1,4 +1,0 @@
-Design
-======
-
-Some text here.

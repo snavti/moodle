@@ -1,4 +1,0 @@
-Restore
-=======
-
-Some text here.
