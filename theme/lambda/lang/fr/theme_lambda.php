@@ -37,7 +37,7 @@ $string['choosereadme'] = '
 </div>
 <h4>Résumé du thème</h4>
 <div style="color: #888; text-transform: uppercase; margin-bottom:20px;">
-<p>Compatibilité: Moodle 2.5 - 3.9<br />Version du thème : 1.98.9<br />Parent theme: Bootstrapbase by Bas Brands<br />Built on: Essential by Julian Ridden</p>
+<p>Compatibilité: Moodle 2.5 - 3.9<br />Version du thème : 1.98.11<br />Parent theme: Bootstrapbase by Bas Brands<br />Built on: Essential by Julian Ridden</p>
 </div>
 <hr />
 <p style="text-align:center;"><img class="img-polaroid" src="lambda/pix/redPIthemes.jpg" /></p>';
@@ -48,6 +48,8 @@ $string['logo'] = 'Logo';
 $string['logodesc'] = 'Veuillez téléverser votre logo personnalisé ici. Si vous téléversez un logo, il apparaîtra dans l\'entête de la page.';
 $string['logo_res'] = 'Dimensions standards du logo';
 $string['logo_res_desc'] = 'Fixez la hauteur de votre logo à 90px au maximum. Activer cette option permet à votre logo de s\'adapter aux résolutions des différents écrans, vous pouvez aussi utiliser une version @2 pour les écrans en haute-résolution.';
+$string['favicon'] = 'Favivon';
+$string['favicon_desc'] = 'Modifiez le favicon de Lambda. Les images avec un fond transparent et une hauteur de 32 pixels fonctionneront mieux. Types autorisés: PNG, JPG, ICO';
 $string['pagewidth'] = 'Largeur de la page';
 $string['pagewidthdesc'] = 'Sélectionnez dans la liste la présentation souhaitée.';
 $string['boxed_wide'] = 'Encadré - largeur fixe';

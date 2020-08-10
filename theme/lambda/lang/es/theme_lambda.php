@@ -37,7 +37,7 @@ $string['choosereadme'] = '
 </div>
 <h4>Caracter&iacute;sticas del tema</h4>
 <div style="color: #888; text-transform: uppercase; margin-bottom:20px;">
-<p>Compatibilidad: Moodle 2.5 - 3.9<br />Versi&oacute;n del tema: 1.98.9<br />Tema matriz: Bootstrapbase de Bas Brands<br />Basado en: Essential de Julian Ridden</p>
+<p>Compatibilidad: Moodle 2.5 - 3.9<br />Versi&oacute;n del tema: 1.98.11<br />Tema matriz: Bootstrapbase de Bas Brands<br />Basado en: Essential de Julian Ridden</p>
 </div>
 <hr />
 <p style="text-align:center;"><img class="img-polaroid" src="lambda/pix/redPIthemes.jpg" /></p>';
@@ -46,6 +46,10 @@ $string['choosereadme'] = '
 $string['settings_general'] = 'General';
 $string['logo'] = 'Logo';
 $string['logodesc'] = 'Personaliza aqu&iacute; tu logo. El logo que subas se mostrar&aacute; en el encabezado.';
+$string['logo_res'] = 'Dimensión estándar del logotipo';
+$string['logo_res_desc'] = 'Establece la dimensión de su logo a una altura máxima de 90px. Con esta configuración, su logo se adaptará a diferentes resoluciones de pantalla y también puede usar una versión @2x para pantallas de alta resolución.';
+$string['favicon'] = 'Favivon';
+$string['favicon_desc'] = 'Cambia el favicon por Lambda. Las imágenes con un fondo transparente y una altura de 32 píxeles funcionarán mejor. Tipos permitidos: PNG, JPG, ICO';
 $string['pagewidth'] = 'Ancho de p&aacute;gina';
 $string['pagewidthdesc'] = 'Seleccionar de la lista de dise&ntilde;os de p&aacute;gina disponibles.';
 $string['boxed_wide'] = 'Caja - ancho fijo amplio';

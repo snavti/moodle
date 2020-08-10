@@ -37,7 +37,7 @@ $string['choosereadme'] = '
 </div>
 <h4>Theme Summary</h4>
 <div style="color: #888; text-transform: uppercase; margin-bottom:20px;">
-<p>Compatibility: Moodle 2.5 - 3.9<br />Theme Version: 1.98.9<br />Parent theme: Bootstrapbase by Bas Brands<br />Built on: Essential by Julian Ridden</p>
+<p>Compatibility: Moodle 2.5 - 3.9<br />Theme Version: 1.98.11<br />Parent theme: Bootstrapbase by Bas Brands<br />Built on: Essential by Julian Ridden</p>
 </div>
 <hr />
 <p style="text-align:center;"><img class="img-polaroid" src="lambda/pix/redPIthemes.jpg" /></p>';
@@ -48,6 +48,8 @@ $string['logo'] = 'Logo';
 $string['logodesc'] = 'Please upload your custom logo here. If you upload a logo it will appear in the header.';
 $string['logo_res'] = 'Standard logo dimension';
 $string['logo_res_desc'] = 'Sets the dimension of your logo to a maximum height of 90px. Using this setting, your logo will adapt to different screen resolutions and you can also use a @2x version for high-res screens.';
+$string['favicon'] = 'Favivon';
+$string['favicon_desc'] = 'Change the favicon for Lambda. Images with a transparent background and 32px height will work best. Allowed types: PNG, JPG, ICO';
 $string['pagewidth'] = 'Set Page Width';
 $string['pagewidthdesc'] = 'Choose from the list of availble page layouts.';
 $string['boxed_wide'] = 'Boxed - fixed width wide';

@@ -936,12 +936,21 @@ Bootstrap
 .carousel-inner ul.thumbnails {
     list-style: none !important;
 }
-.carousel-control {
+.carousel .carousel-control {
+    top: 40% !important;
+    margin-top: -20px !important;
     width: 40px !important;
     text-align: center !important;
     padding: 0 !important;
     line-height: 26px !important;
 	color: #fff !important;
+}
+.carousel .carousel-control.right {
+    right: 15px !important;
+}
+.carousel .carousel-inner .item {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
 }
 .carousel-caption {
 	color: #fefefe;

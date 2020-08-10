@@ -72,12 +72,6 @@ a:hover {
 	padding-bottom: 10px;
 	background: #fff;
 }
-img.iconsmall {
-    height: inherit;
-	margin: 0;
-    vertical-align: inherit;
-    width: inherit;
-}
 .bor {
     height: 20px;
     margin: 0px;
@@ -183,6 +177,9 @@ Header
     padding: 12px 0;
 	background: [[setting:headercolor]] [[setting:header_bg]];
 }
+#page-content #page-header {
+    background: #fff;
+}
 #page-header > .container-fluid > .row-fluid {
 	display: flex;
 	align-items: center;
@@ -241,9 +238,7 @@ h2#subtitle {
     vertical-align: text-top;
 }
 .login-header {
-    display: flex !important;
-    flex-direction: column;
-    justify-content: center;
+    display: block;
 }
 #block-login {
     padding: 15px 0 2px;
@@ -303,6 +298,7 @@ input{padding-left:40px;}
 }
 #loggedin-user {
 	float:right;
+	display: flex;
 }
 .jsenabled .usermenu .moodle-actionmenu .toggle-display.textmenu {
     padding-left: 0;
@@ -354,9 +350,6 @@ input{padding-left:40px;}
 }
 .jsenabled .usermenu .moodle-actionmenu.show {
     background-color: initial;
-}
-.profileblock {
-    padding: 5px 0;
 }
 .profileblock .usermenu {
     float: left;
@@ -425,6 +418,14 @@ Header - centered logo
 	margin-top: 8px;
 	min-width: 260px;
 	padding: 15px 15px 0 15px !important;
+}
+.dropdown-menu-right {
+    right: -10px;
+    left: auto;
+}
+.usermenu .dropdown-menu-right {
+    right: auto;
+    left: 0;
 }
 #top-login #block-login div#user, #top-login #block-login div#pass {
 	display: block !important;
@@ -811,6 +812,21 @@ Course
 table.flexible, .generaltable {
     display: table;
     overflow-x: auto;
+}
+@media (min-width: 768px) {
+	#groupeditform .col-md-6.mb-1 {width: calc(50% - 20px); float: left; margin-right: 10px;}
+}
+#addmembersform .groupmanagementtable td, #assignform .generaltable td {
+    vertical-align: top;
+}
+#removeselect_searchtext, #addselect_searchtext {
+    width: auto;
+}
+#removeselect_clearbutton, #addselect_clearbutton {
+    margin-bottom: 0;
+}
+#addcontrols input, #removecontrols input {
+    padding: 6px 4px;
 }
 #plugins-control-panel.generaltable, #serverstatus.generaltable {
     display: block;
@@ -1292,7 +1308,7 @@ body#page-mod-assign-grader, body#page-mod-assign-grader #page {padding:0;}
 .initialbar .letter {
     line-height: 20px;
 }
-.btn.btn-link, .btn.btn-link > a {
+.btn.btn-link, .btn.btn-link > a, input.btn.btn-link {
     color: #555 !important;
 }
 .btn.btn-link:hover, .btn.btn-link:active, .btn.btn-link:focus, a.btn.btn-link.p-0:hover {
@@ -1310,15 +1326,16 @@ a.btn.btn-link:hover {
     text-decoration: underline;
 	margin: 5px 0;
 }
-[data-toggle="dropdown"] + .dropdown-menu > .dropdown-item {
-    display: block;
-    white-space: nowrap;
-}
 [data-toggle="dropdown"] + .dropdown-menu > .dropdown-item.hidden {
     display: none;
 }
-a#prev-activity-link, a#next-activity-link {
-    color: #555 !important;
+.activity-navigation #next-activity-link, .activity-navigation #prev-activity-link {
+    background: #ffae00 !important;
+    color: #fff !important;
+}
+.activity-navigation #prev-activity-link:hover, .activity-navigation #next-activity-link:hover {
+    background: #f88011 !important;
+    text-decoration: none;
 }
 #comment_chooser ul {
     list-style: none;
@@ -1346,6 +1363,9 @@ a#prev-activity-link, a#next-activity-link {
 }
 .btn-toolbar.collapse-buttons .btn {
     background: #e2e2e2;
+}
+.path-mod-assign [data-region="input-field"] .d-md-inline-block {
+    display: inline-block !important;
 }
 
 /* =========================================================== *
@@ -1564,7 +1584,16 @@ body.sidebar-open #sidebar .block-region {
 .block.block_html.blank .content {
     padding: 6px 0;
 }
-
+.block.block_timeline .paged-content-page-container h5 {
+    font-size: 1rem;
+    margin-top: 0 !important;
+}
+.block.block_timeline .paged-content-page-container .media-body h6.text-truncate {
+    white-space: normal;
+    font-weight: 400 !important;
+    text-transform: none;
+    font-size: 1rem;
+}
 
 /* =========================================================== *
 Frontpage & Dashboard
@@ -1708,6 +1737,10 @@ Moodle 3.6 Dashboard
 	.block-myoverview.block-cards .course-summaryitem {position: relative;}
 	.block-myoverview.block-cards .course-summaryitem .ml-auto.dropdown {top: 0; position: absolute; right: 0;}
 	.block-myoverview.block-cards .course-summaryitem .d-flex {display: block !important;}
+}
+.dashboard-card-deck.one-row {
+    flex-flow: row wrap;
+    overflow-x: auto;
 }
 .block-myoverview.block-cards .dashboard-card-deck .card-footer.dashboard-card-footer.border-0.bg-white {
     position: absolute;
@@ -1960,7 +1993,7 @@ Footer
 }
 #page-footer .row-fluid .span4 {
 	padding: 0 30px;
-	min-height: 0;
+	min-height: 1px;
 }
 #page-footer .row-fluid .span4 .block {
 	padding-top: 20px;
@@ -2154,6 +2187,19 @@ Quiz
 }
 .path-question-type .fcontainer .form-inline > div, .path-question-type .fcontainer .form-inline > label {
     margin: 0 !important;
+}
+.modal-footer .btn {
+    margin-bottom: 0;
+}
+.btn-toolbar .selectmultiplecommandbuttons button {
+    font-size: 14px;
+    margin-left: 0;
+}
+#page-mod-quiz-edit ul.slots li.section li.activity > div {
+    overflow: hidden;
+}
+.mod_quiz-edit-action-buttons #repaginatecommand {
+    margin-bottom: 0;
 }
 
 /* =========================================================== *
@@ -2526,6 +2572,9 @@ Moodle dialogue and modals
     overflow-y: visible;
 	max-height: initial;
 }
+.moodle-dialogue-base .moodle-dialogue {
+    top: 10% !important;
+}
 
 /* =========================================================== *
 Moodle User Tours
@@ -2685,7 +2734,7 @@ body#page-mod-feedback-print #page {
 	#wrapper {width: 100%;max-width: inherit;}
 	#page {padding: 0 10px;}
 	#page-header > .container-fluid > .row-fluid {display: block;}
-	.login-header {flex-direction: row;}
+	.login-header {display: flex !important; flex-direction: row; justify-content: center;}
 	.logo-header {text-align: center;}
 	a.logo img {margin-bottom: 10px;}
 	.form-item .form-setting, .form-item .form-description, .mform .fitem .felement, #page-mod-forum-search .c1 {margin-left: 0;}
@@ -2935,6 +2984,15 @@ Moodle 3.7 User Preferences
 /*================================================== * 
 Moodle 3.8
 =====================================================*/
+.overflow-auto {
+    overflow: auto !important; 
+}
+.justify-content-between {
+    justify-content: space-between;
+}
+.justify-content-around {
+    justify-content: space-around;
+}
 .alert {
     text-shadow: none;
     position: relative;
@@ -2956,7 +3014,7 @@ Moodle 3.8
     margin-bottom: 15px;
 }
 #loggedin-user .usermenu .dropdown {
-    margin-top: 10px;
+    margin-top: 5px;
 }
 .dropdown-menu {
     padding: 5px;
@@ -2970,6 +3028,9 @@ Moodle 3.8
     display: block;
 	padding: 1px 3px;
 	white-space: nowrap;
+}
+.breadcrumb-button .moodle-actionmenu .dropdown-item {
+    white-space: normal;
 }
 .moodle-actionmenu .dropdown-item.hidden {
     height: 0;
@@ -3164,6 +3225,7 @@ Moodle 3.8
 }
 @media (max-width: 767px) {
 	#page-login-index.login_lambda.column-2 .row.justify-content-center {width: 100%;}
+	.hidden-desktop {display: none;}
 }
 .form-inline {
     display: flex;
@@ -3240,6 +3302,12 @@ Moodle 3.8
     margin: 0;
     border-radius: 0;
     padding: 5px 14px;
+}
+.path-backup .form-inline.felement .fdefaultcustom {
+    display: flex;
+}
+.path-backup .form-inline.felement .fdate_time_selector {
+    flex-wrap: nowrap;
 }
 .path-backup .mform .include_setting, .path-backup .mform .normal_setting {
     width: 50%;
@@ -3568,10 +3636,11 @@ body #region-main .mform:not(.unresponsive) .femptylabel .form-inline.felement >
 #tag-search-box textarea[cols], input[size] {
     width: auto;
 }
-#loggedin-user .usertext .meta.viewingas {
+#loggedin-user .usertext .meta {
     font-size: 0.75em;
     font-weight: 300;
     display: block;
+	line-height: 0.75em;
 }
 #page-admin-tool-customlang-edit #id_filtersettings {
     max-width: 700px;
@@ -3655,6 +3724,9 @@ body #region-main .mform:not(.unresponsive) .femptylabel .form-inline.felement >
 }
 .buttons > .singlebutton {
     margin-bottom: 10px;
+}
+.singlebutton + .continuebutton {
+    margin-top: 10px;
 }
 .generalbox.submissionaction .singlebutton {
     display: inline-block;
@@ -3780,6 +3852,19 @@ body #region-main .mform:not(.unresponsive) .femptylabel .form-inline.felement >
 }
 #rubric-rubric.gradingform_rubric .options {
     margin-top: 20px;
+}
+.filemanager .fp-iconview .fp-folder.fp-hascontextmenu .fp-contextmenu {
+    background: none !important;
+    box-shadow: none;
+}
+.filemanager .fp-iconview .fp-folder.fp-hascontextmenu .fp-contextmenu img.icon {
+    padding: 8px !important;
+    background: rgba(255,255,255,.8);
+    border-radius: 50%;
+    border: rgba(33,33,33,0.33) 1px solid;
+}
+[class^="icon-size-"] {
+    background-image: none;
 }
 
 /*================================================== * 
@@ -3956,9 +4041,6 @@ Moodle 3.8 Messaging App
 }
 .message-app .overview-section-toggle.collapsed .collapsed-icon-container {
     display: block;
-}
-.message-app [data-region="loading-placeholder"] .icon-size-4 {
-    background-image: none;
 }
 
 /*================================================== * 
@@ -4784,6 +4866,12 @@ Moodle 3.9 h5p content bank
     overflow-y: auto;
     width: 260px;
 }
+.content-bank-container .dropdown-menu-right {
+    right: auto;
+}
+.cb-toolbar-container button.icon-no-margin img.icon {
+    filter: brightness(2);
+}
 .cb-toolbar-container .dropdown-header {
     text-transform: none;
 }
@@ -4982,13 +5070,22 @@ aside.block {
 .block #settingsnav {
     padding-top: 0 !important;
 }
+.block_search_forums .searchform .input-group, .block_settings .adminsearchform  .form-group {
+    flex: 1 1 auto;
+    display: flex;
+}
+.block_search_forums #searchform_search, .block_settings #adminsearchquery {
+    width: 100%;
+    max-width: 100%;
+}
 .block_settings #adminsearchquery {
-    max-width: 92%;
-    width: 92%;
     margin-bottom: 10px;
 }
-.block .adminsearchform.form-inline {
-    text-align: center;
+.block_settings .adminsearchform.form-inline {
+    width: 100%;
+}
+.block_settings .footer {
+	display: flex;
 }
 .editing .block .header .commands {
     padding: 5px 0 5px 5px;
@@ -5010,4 +5107,8 @@ aside.block {
 }
 .jsenabled .block.hidden .content {
     display: inherit;
+}
+.block.block_timeline .paged-content-page-container .icon-size-4 {
+    width: 24px !important;
+    height: 24px !important;
 }

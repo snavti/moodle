@@ -54,6 +54,13 @@
         return $output;
     }
 	
+    public function favicon() {
+        if (!empty($this->page->theme->settings->favicon)) {
+            return $this->page->theme->setting_file_url('favicon', 'favicon');
+        }
+        return parent::favicon();
+    }
+	
 	    /*
      * This renders the navbar.
      * Uses bootstrap compatible html.
