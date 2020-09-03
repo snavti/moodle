@@ -158,13 +158,7 @@ class questions_form extends \moodleform {
             $spacer = $questionnaire->renderer->image_url('spacer');
 
             if (!$this->moveq) {
-                if ($dependencies) {
-                    // Begin div qn-container with indent if questionnaire has child.
-                    $mform->addElement('html', '<div class="qn-container qn-indent">');
-                } else {
-                    $mform->addElement('html', '<div class="qn-container">'); // Begin div qn-container.
-                }
-
+                $mform->addElement('html', '<div class="qn-container">'); // Begin div qn-container.
                 $mextra = array('value' => $question->id,
                                 'alt' => $strmove,
                                 'title' => $strmove);

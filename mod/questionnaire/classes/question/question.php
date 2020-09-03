@@ -297,9 +297,9 @@ abstract class question {
                 if (!empty($contents->modname)) {
                     $choice->content = $contents->modname;
                 } else if (!empty($contents->title)) { // Must be an image; use its title for the dropdown list.
-                    $choice->content = format_string($contents->title);
+                    $choice->content = $contents->title;
                 } else {
-                    $choice->content = format_string($contents->text);
+                    $choice->content = $contents->text;
                 }
                 $options[$this->id . ',' . $key] = $this->name . '->' . $choice->content;
             }

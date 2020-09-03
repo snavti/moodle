@@ -499,12 +499,7 @@ switch ($action) {
         // Check if email report was selected.
         $emailreport = optional_param('emailreport', '', PARAM_ALPHA);
         if (empty($emailreport)) {
-            // In 3.9 forward, download_as_dataformat is replaced by \core\dataformat::download_data.
-            if (method_exists('\\core\\dataformat', 'download_data')) {
-                \core\dataformat::download_data($name, $dataformat, $columns, $output);
-            } else {
-                download_as_dataformat($name, $dataformat, $columns, $output);
-            }
+            download_as_dataformat($name, $dataformat, $columns, $output);
         } else {
             // Emailreport button selected.
             if (get_config('questionnaire', 'allowemailreporting') && (!empty($emailroles) || !empty($emailextra))) {

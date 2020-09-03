@@ -87,10 +87,11 @@ $string['checkbreaksremoved'] = 'Removed {$a} extra Page break(s).';
 $string['checknotstarted'] = 'Select not started';
 $string['checkstarted'] = 'Select started';
 $string['clicktoswitch'] = '(click to switch)';
-$string['closebeforeopen'] = 'You have specified a close date before the open date.';
 $string['closed'] = 'The questionnaire was closed on {$a}. Thanks.';
-$string['closedate'] = 'Allow responses until';
+$string['closedate'] = 'Use Close Date';
 $string['closeson'] = 'Questionnaire closes on {$a}';
+$string['closedate_help'] = 'You can specify a date to close the questionnaire here. Check the check box, and select the date and time you want.
+ Users will not be able to fill out the questionnaire after that date. If this is not selected, it will never be closed.';
 $string['completionsubmit'] = 'Student must submit this questionnaire to complete it';
 $string['condition'] = 'Condition';
 $string['confalts'] = '- OR - <br />Confirmation page';
@@ -123,7 +124,7 @@ $string['date_link'] = 'mod/questionnaire/questions#Date';
 $string['dateformatting'] = 'Use the year-month-day format, e.g. for March 4th, 1945:&nbsp; <strong>1945-03-04</strong>';
 // Prior to release 3.6.0, you could specify an input date format in the above string. Now, the format must be as below. This
 // string is used now in case sites modified the above string.
-$string['strictdateformatting'] = 'Enter the date using the date picker below, or by using the \'YYYY-MM-DD\' format.';
+$string['strictdateformatting'] = 'Use the year-month-day format, e.g. for March 4th, 1945:&nbsp; <strong>1945-03-04</strong>';
 $string['deleteallresponses'] = 'Delete ALL Responses';
 $string['deletecurrentquestion'] = 'Delete question {$a}';
 $string['deletedallgroupresp'] = 'Deleted ALL Responses in group {$a}';
@@ -352,8 +353,9 @@ $string['numberscaleitems_help'] = 'Nb of scale items is the *number of items* t
 $string['numeric'] = 'Numeric';
 $string['numeric_help'] = 'Use this question type if you expect the response to be a correctly formatted number.';
 $string['of'] = 'of';
-$string['openafterclose'] = 'You have specified an open date after the close date';
-$string['opendate'] = 'Allow responses from';
+$string['opendate'] = 'Use Open Date';
+$string['opendate_help'] = 'You can specify a date to open the questionnaire here. Check the check box, and select the date and time you want.
+ Users will not be able to fill out the questionnaire before that date. If this is not selected, it will be open immediately.';
 $string['option'] = 'option {$a}';
 $string['optional'] = 'Optional - At least one of this dependencies has to be fulfilled.';
 $string['optionalname'] = 'Question Name';
@@ -450,10 +452,6 @@ $string['privacy:metadata:questionnaire_resp_single:question_id'] = 'The ID of t
 $string['privacy:metadata:questionnaire_resp_single:choice_id'] = 'The ID of the choice record for this response.';
 
 $string['private'] = 'Private';
-$string['progressbar'] = 'Show progress bar';
-$string['progresshelp'] = 'Progress Bar';
-$string['progresshelp_help'] = 'Move on to the next page to fill up the progress bar';
-$string['progressbar_info'] = 'Questionnaire {$a} complete.';
 $string['public'] = 'Public';
 $string['publiccopy'] = 'Copy:';
 $string['publicoriginal'] = 'Original:';

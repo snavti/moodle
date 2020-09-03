@@ -30,7 +30,7 @@ $addons = [
             'questionsview' => [
                 'displaydata' => [
                     'icon' => $CFG->wwwroot . '/mod/questionnaire/pix/icon.svg',
-                    'class' => 'core-course-module-questionnaire-handler',
+                    'class' => '',
                 ],
                 'delegate' => 'CoreCourseModuleDelegate',
                 'method' => 'mobile_view_activity',
