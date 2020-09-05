@@ -89,13 +89,13 @@
         </ion-item>
         <%/locked%>
         <%/signedup%>
-        <%#cansignup%>
+        <%#cansignup%><%^locked%>
         <ion-item>
             <button ion-button icon-start core-site-plugins-call-ws name="mod_tutorialbooking_signup" [params]="{slotid: <% id %>}" [preSets]="{getFromCache: 0, saveToCache: 0}" refreshOnSuccess="true">
                 <ion-icon name="add-circle"></ion-icon>
                 {{ 'plugin.mod_tutorialbooking.signupforslot' | translate }}
             </button>
         </ion-item>
-        <%/cansignup%>
+        <%/locked%><%/cansignup%>
     </ion-list>
 </ion-card>

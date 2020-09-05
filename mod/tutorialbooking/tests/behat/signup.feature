@@ -40,6 +40,19 @@ Feature: Students can signup and remove themselves from signup sheet sessions.
         When I remove my sign up from signup sheet
         Then I should be able to sign up to signup sheet
 
+    @app @javascript
+    Scenario: A student can sign up to a session and then remove themselves from it in the app
+        Given I enter the app
+        And I log in as "student1"
+        And I press "Course 1" near "Course overview" in the app
+        And I press "Tutorial booking" in the app
+        When I press "Sign me up for this session" near "Slot 2" in the app
+        Then I should see "You are signed up to this session"
+        But I should not see "Sign me up for this session"
+        When I press "Remove my signup" near "Slot 2" in the app
+        Then I should see "Sign me up for this session"
+        But I should not see "You are signed up to this session"
+
     Scenario: A student cannot sign up to a full session, but can sign up to, and remove themselves from another session.
         Given I am on the "Tutorial booking" "mod_tutorialbooking > Sessions" page logged in as "student1"
         And I sign up to "Slot 1" in signup sheet

@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 $plugin->component = 'mod_tutorialbooking';
-$plugin->version = 2019121100;
+$plugin->version = 2020032600;
 $plugin->requires = 2019111800;
-$plugin->release = '4.9.0 (2019-12-11)';
+$plugin->release = '4.9.1 (2020-03-26)';
 $plugin->maturity = MATURITY_STABLE;
