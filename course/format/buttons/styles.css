@@ -19,7 +19,7 @@
  *
  * @package    format_buttons
  * @author     Rodrigo Brandão <https://www.linkedin.com/in/brandaorodrigo>
- * @copyright  2020 Rodrigo Brandão <rodrigo.brandao.contato@gmail.com>
+ * @copyright  2019 Rodrigo Brandão <brandrod@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 .course-content ul.buttons {
@@ -74,14 +74,14 @@
     color: #7a8188;
     display: inline-block;
     text-align: center;
-    width: 48px;
-    line-height: 48px;
-    height: 48px;
+    width: 52px;
+    line-height: 52px;
+    height: 52px;
     overflow: hidden;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 22px;
     padding: 0;
-    font-weight: 700;
+    font-weight: bold;
     margin: 0 5px 10px 5px;
     vertical-align: top;
 }

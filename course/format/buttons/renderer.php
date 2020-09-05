@@ -19,7 +19,7 @@
  *
  * @package    format_buttons
  * @author     Rodrigo Brandão <https://www.linkedin.com/in/brandaorodrigo>
- * @copyright  2020 Rodrigo Brandão <rodrigo.brandao.contato@gmail.com>
+ * @copyright  2019 Rodrigo Brandão <brandrod@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,24 +28,25 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/format/topics/renderer.php');
 
 /**
- * Format_buttons_renderer
+ * format_buttons_renderer
  *
  * @package    format_buttons
  * @author     Rodrigo Brandão <https://www.linkedin.com/in/brandaorodrigo>
- * @copyright  2020 Rodrigo Brandão <rodrigo.brandao.contato@gmail.com>
+ * @copyright  2019 Rodrigo Brandão <brandrod@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_buttons_renderer extends format_topics_renderer
 {
 
     /**
-     * Get_button_section
+     * get_button_section
      *
      * @param stdclass $course
      * @param string $name
      * @return string
      */
-    protected function get_color_config($course, $name) {
+    protected function get_color_config($course, $name)
+    {
         $return = false;
         if (isset($course->{$name})) {
             $color = str_replace('#', '', $course->{$name});
@@ -58,12 +59,13 @@ class format_buttons_renderer extends format_topics_renderer
     }
 
     /**
-     * Number_to_roman
+     * number_to_roman
      *
      * @param integer $number
      * @return string
      */
-    protected function number_to_roman($number) {
+    protected function number_to_roman($number)
+    {
         $number = intval($number);
         $return = '';
         $romanarray = [
@@ -90,12 +92,13 @@ class format_buttons_renderer extends format_topics_renderer
     }
 
     /**
-     * Number_to_alphabet
+     * number_to_alphabet
      *
      * @param integer $number
      * @return string
      */
-    protected function number_to_alphabet($number) {
+    protected function number_to_alphabet($number)
+    {
         $number = $number - 1;
         $alphabet = range("A", "Z");
         if ($number <= 25) {
@@ -113,13 +116,14 @@ class format_buttons_renderer extends format_topics_renderer
     }
 
     /**
-     * Get_button_section
+     * get_button_section
      *
      * @param stdclass $course
      * @param string $sectionvisible
      * @return string
      */
-    protected function get_button_section($course, $sectionvisible) {
+    protected function get_button_section($course, $sectionvisible)
+    {
         global $PAGE;
         $html = '';
         $css = '';
@@ -227,16 +231,17 @@ class format_buttons_renderer extends format_topics_renderer
     }
 
     /**
-     * Start_section_list
+     * start_section_list
      *
      * @return string
      */
-    protected function start_section_list() {
+    protected function start_section_list()
+    {
         return html_writer::start_tag('ul', ['class' => 'buttons']);
     }
 
     /**
-     * Section_header
+     * section_header
      *
      * @param stdclass $section
      * @param stdclass $course
@@ -244,7 +249,8 @@ class format_buttons_renderer extends format_topics_renderer
      * @param int $sectionreturn
      * @return string
      */
-    protected function section_header($section, $course, $onsectionpage, $sectionreturn = null) {
+    protected function section_header($section, $course, $onsectionpage, $sectionreturn=null)
+    {
         global $PAGE;
 
         $o = '';
@@ -287,11 +293,11 @@ class format_buttons_renderer extends format_topics_renderer
         }
         $sectionname = html_writer::tag('span', $this->section_title($section, $course));
 
-        // Button format - ini
+        // button format - ini
         if ($course->showdefaultsectionname) {
             $o.= $this->output->heading($sectionname, 3, 'sectionname' . $classes);
         }
-        // Button format - end
+        // button format - end
 
         $o .= $this->section_availability($section);
 
@@ -308,7 +314,7 @@ class format_buttons_renderer extends format_topics_renderer
     }
 
     /**
-     * Print_multiple_section_page
+     * print_multiple_section_page
      *
      * @param stdclass $course
      * @param array $sections (argument not used)
@@ -316,7 +322,8 @@ class format_buttons_renderer extends format_topics_renderer
      * @param array $modnames (argument not used)
      * @param array $modnamesused (argument not used)
      */
-    public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused) {
+    public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused)
+    {
         global $PAGE;
 
         $modinfo = get_fast_modinfo($course);
@@ -344,7 +351,7 @@ class format_buttons_renderer extends format_topics_renderer
             if ($section > $course->numsections) {
                 continue;
             }
-            /* If is not editing verify the rules to display the sections */
+            /* if is not editing verify the rules to display the sections */
             if (!$PAGE->user_is_editing()) {
                 if ($course->hiddensections && !(int)$thissection->visible) {
                     continue;
@@ -419,6 +426,6 @@ class format_buttons_renderer extends format_topics_renderer
         if (!$PAGE->user_is_editing()) {
             $PAGE->requires->js_init_call('M.format_buttons.init', [$course->numsections, $sectionvisible, $course->id]);
         }
-        // Button format - end
+        // button format - end
     }
 }
