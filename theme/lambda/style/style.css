@@ -72,15 +72,6 @@ a:hover {
 	padding-bottom: 10px;
 	background: #fff;
 }
-.bor {
-    height: 20px;
-    margin: 0px;
-    margin-bottom: 20px;
-}
-.topbor {
-    height: 20px;
-    margin-bottom: 10px;
-}
 .side-pre {
     border: 1px solid #333;
 }
@@ -109,6 +100,9 @@ textarea[cols], input[size] {
 }
 .form-inline .form-control {
     width: 95%;
+    max-width: 500px;
+}
+.form-inline .d-md-inline-block.mr-md-2.position-relative {
     max-width: 500px;
 }
 .form-inline .editor_atto .form-control {
@@ -708,6 +702,9 @@ Moodle gear menus and admin tabs
     border-radius: 2px;
     box-shadow: 0 -1px 0 rgba(0,0,0,.1) inset;
 }
+.path-mod .action-menu.moodle-actionmenu .icon.navicon {
+    display: none;
+}
 .breadcrumb-button .moodle-actionmenu a.dropdown-toggle {
 	min-width: 30px;
 }
@@ -948,6 +945,30 @@ margin-left: 0px;
 }
 .box.py-3.generalbox.folderbuttons {
     display: flex;
+}
+
+/*================================================== * 
+course competencies
+=====================================================*/
+.user-competency-course-navigation .d-md-inline-block {
+    display: inline-block;
+}
+#page-admin-tool-lp-coursecompetencies .alert {
+    margin-top: 20px;
+}
+.path-admin-tool-lp .moodle-dialogue-bd .form-group {
+    width: 100%;
+    margin-bottom: 20px;
+}
+.path-admin-tool-lp [data-region="filtercompetencies"] input {
+    width: calc(100% - 90px);
+}
+.path-admin-tool-lp [data-region="filtercompetencies"] .btn.btn-secondary {
+    margin: 0;
+}
+.path-admin-tool-lp [data-region="filtercompetencies"] .btn.btn-secondary img.icon {
+    filter: brightness(2);
+    padding: 0;
 }
 
 /*================================================== * 
@@ -1330,11 +1351,11 @@ a.btn.btn-link:hover {
     display: none;
 }
 .activity-navigation #next-activity-link, .activity-navigation #prev-activity-link {
-    background: #ffae00 !important;
+    background: [[setting:maincolor]] !important;
     color: #fff !important;
 }
 .activity-navigation #prev-activity-link:hover, .activity-navigation #next-activity-link:hover {
-    background: #f88011 !important;
+    background: [[setting:mainhovercolor]] !important;
     text-decoration: none;
 }
 #comment_chooser ul {
@@ -1949,6 +1970,16 @@ abbr[title], abbr[data-original-title] {
     line-height: 1rem;
     margin: 8px 0;
 }
+.calendar_event_other, .badge.badge-circle.calendar_event_other, .block .minicalendar td.duration_other.duration_finish {
+    background-color: #ced4da;
+}
+.path-calendar .maincalendar .calendar_event_other {
+	border-color:#ced4da;
+}
+.minicalendar td.duration_other {
+	border-top:1px solid #ced4da;
+	border-bottom:1px solid #ced4da;
+}
 
 /* =========================================================== *
 Footer
@@ -2236,6 +2267,9 @@ Atto editor
 .atto_form input.fullwidth {
     width: auto;
 }
+.atto_form .atto_media_name_entry, .atto_form .atto_media_title_entry {
+    display: block;
+}
 .yui3-skin-sam .yui3-tab-label {
     background: #f2f2f2 none repeat scroll 0 0;
 }
@@ -2259,7 +2293,6 @@ Atto editor
     font-size: 14px;
 }
 .atto_recordrtc, .atto_recordrtc div {
-    max-width: 250px;
     margin: 0 auto;
 }
 .moodle-dialogue .container {
@@ -2564,16 +2597,10 @@ Moodle dialogue and modals
 .moodle-dialogue-base .moodle-dialogue-wrap {
     border-radius: 4px;
 }
-.moodle-dialogue .mform label {
-    display: block;
-}
 .modal-body {
     position: relative;
     overflow-y: visible;
 	max-height: initial;
-}
-.moodle-dialogue-base .moodle-dialogue {
-    top: 10% !important;
 }
 
 /* =========================================================== *
@@ -3451,6 +3478,9 @@ Moodle 3.8
 #course-category-listings #menumovecoursesto, #course-category-listings #menumovecategoriesto {
     margin: 0;
 }
+#course-category-listings .listing-actions .moodle-actionmenu:not([data-enhanced]) > .menubar a {
+    display: block;
+}
 #page-mod-quiz-mod #id_reviewoptionshdr .form-group, #page-mod-quiz-mod #id_reviewoptionshdr .form-buttons, #page-mod-quiz-mod #id_reviewoptionshdr .path-admin .buttons, .path-admin #page-mod-quiz-mod #id_reviewoptionshdr .buttons, #page-mod-quiz-mod #id_reviewoptionshdr .fp-content-center form + div, .fp-content-center #page-mod-quiz-mod #id_reviewoptionshdr form + div, #page-mod-quiz-mod #id_reviewoptionshdr div.backup-section + form {
     float: left;
     width: 100%;
@@ -3492,6 +3522,9 @@ a[data-toggle="popover"] > img.icon {
     margin: 0;
     padding: 0;
     border: none;
+}
+#fgroup_id_buttonar .btn {
+    margin-bottom: 0;
 }
 .progress {
     width: 100%;
@@ -3734,9 +3767,9 @@ body #region-main .mform:not(.unresponsive) .femptylabel .form-inline.felement >
 [hidden] {
     display: none !important;
 }
-
 .activity-navigation {
 	margin-top: 3rem;
+	padding: 0;
 }
 .activity-navigation .row {
 	display: flex;
@@ -3757,6 +3790,12 @@ body #region-main .mform:not(.unresponsive) .femptylabel .form-inline.felement >
 }
 .activity-navigation .row .float-right {
     float: right !important;
+}
+.activity-navigation #prev-activity-link {
+    margin-right: 15px;
+}
+.activity-navigation #next-activity-link {
+    margin-left: 15px;
 }
 .table.discussion-list .discussion [data-type="favorite-toggle"] {
 	margin-top: 3px;
@@ -3824,7 +3863,7 @@ body #region-main .mform:not(.unresponsive) .femptylabel .form-inline.felement >
 }
 .form-autocomplete-downarrow {
     color: #999;
-    left: calc(100% - 1.5em);
+    left: calc(95% - 1em);
 }
 #fitem_id_userlist .col-form-label.d-inline {
     vertical-align: bottom;
@@ -4823,7 +4862,7 @@ Moodle 3.9 participants-filter
 /*================================================== * 
 Moodle 3.9 h5p content bank
 =====================================================*/
-#page-contenbank .cb-toolbar-container .btn.btn-secondary {
+#page-contentbank .cb-toolbar-container .btn.btn-secondary {
     background-image: none;
     height: 32px;
     line-height: 32px;
@@ -4831,15 +4870,15 @@ Moodle 3.9 h5p content bank
     padding: 0 8px;
     margin: 0 4px !important;
 } 
-#page-contenbank .cb-toolbar-container .btn.btn-secondary img.icon {
+#page-contentbank .cb-toolbar-container .btn.btn-secondary img.icon {
     display: inline;
     vertical-align: sub;
     padding-left: 4px;
 }
-#page-contenbank .cb-toolbar-container a.btn.btn-secondary img.icon {
+#page-contentbank .cb-toolbar-container a.btn.btn-secondary img.icon {
     filter: brightness(2);
 }
-#page-contenbank .content-bank {
+#page-contentbank .content-bank {
     border: 1px solid #ddd;
 }
 .content-bank-container.view-grid .cb-heading, .content-bank-container.view-grid .cb-date, .content-bank-container.view-grid .cb-size, .content-bank-container.view-grid .cb-type {
@@ -4961,6 +5000,18 @@ Moodle 3.9 h5p content bank
 }
 @media (max-width: 767px) {
 	.content-bank-container.view-grid .cb-listitem {flex-basis: 50%;}
+}
+.lambda_h5p_header {
+    position: relative;
+}
+.lambda_h5p_header .page-context-header .page-header-headings {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+.lambda_h5p_header .header-actions-container {
+    position: absolute;
+    right: 0;
+    top: 15px;
 }
 
 /*================================================== * 

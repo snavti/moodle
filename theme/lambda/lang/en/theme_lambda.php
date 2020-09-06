@@ -32,12 +32,10 @@ $string['choosereadme'] = '
 <p style="text-align:center;"><img class="img-polaroid" src="lambda/pix/screenshot.jpg" /></p>
 </div>
 <hr />
-<div class="prom-box prom-box-default shadow2" style="margin-bottom:20px;">
-<h2>Theme Lambda - Responsive Theme for Moodle</h2>
-</div>
-<h4>Theme Summary</h4>
+<h2>Lambda - Responsive Moodle Theme</h2>
+<div class="divider line-01"></div>
 <div style="color: #888; text-transform: uppercase; margin-bottom:20px;">
-<p>Compatibility: Moodle 2.5 - 3.9<br />Theme Version: 1.98.11<br />Parent theme: Bootstrapbase by Bas Brands<br />Built on: Essential by Julian Ridden</p>
+<p>created by RedPiThemes<br />Online documentation: <a href="http://redpithemes.com/Documentation/assets/index.html" target="_blank">http://redpithemes.com/Documentation/assets/index.html</a><br />Support is provided via ticket at the support forum: <a href="https://redpithemes.ticksy.com" target="_blank">https://redpithemes.ticksy.com</a></p>
 </div>
 <hr />
 <p style="text-align:center;"><img class="img-polaroid" src="lambda/pix/redPIthemes.jpg" /></p>';
