@@ -1980,6 +1980,35 @@ abbr[title], abbr[data-original-title] {
 	border-top:1px solid #ced4da;
 	border-bottom:1px solid #ced4da;
 }
+.popover.fade {
+    opacity: 1 !important;
+    padding: 10px;
+}
+.popover .popover-header {
+    font-size: 1.35rem;
+    line-height: 2.5rem;
+    margin: 0 0 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+.path-calendar .maincalendar .eventlist .event .card.rounded {
+    border-radius: 0;
+}
+.path-calendar .maincalendar .eventlist .event .description {
+    padding: 10px;
+}
+.path-calendar .maincalendar .box.card-header {
+    background: #f2f2f2;
+    border-left-width: 10px;
+    border-left-style: solid;
+    border-bottom: 1px solid #e3e3e3;
+}
+.path-calendar .maincalendar .box.card-header h3.name {
+    line-height: 1rem;
+    margin: 0;
+}
+.path-calendar .maincalendar .box.card-header img.icon {
+    display: block;
+}
 
 /* =========================================================== *
 Footer

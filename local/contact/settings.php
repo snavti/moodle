@@ -18,7 +18,7 @@
  * This plugin for Moodle is used to send emails through a web form.
  *
  * @package    local_contact
- * @copyright  2016-2019 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2016-2020 TNG Consulting Inc. - www.tngconsulting.ca
  * @author     Michael Milette
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,12 +30,29 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage('local_contact', get_string('pluginname', 'local_contact'));
     $ADMIN->add('localplugins', $settings);
 
+    // Custom sender (from) email address.
+    $default = '';
+    $name = 'local_contact/senderaddress';
+    $title = get_string('senderaddress', 'local_contact');
+    $description = get_string('senderaddress_description', 'local_contact');
+    $setting = new admin_setting_configtext($name, $title, $description, $default, PARAM_RAW);
+    $setting->set_updatedcallback('theme_reset_all_caches');
+    $settings->add($setting);
+
     // List of tags and recipient email addresses.
     $default = '';
     $name = 'local_contact/recipient_list';
     $title = get_string('recipient_list', 'local_contact');
     $description = get_string('recipient_list_description', 'local_contact');
     $setting = new admin_setting_configtextarea($name, $title, $description, $default);
+    $settings->add($setting);
+
+    // Don't use reply-to.
+    $default = 0;
+    $name = 'local_contact/noreplyto';
+    $title = get_string('noreplyto', 'local_contact');
+    $description = get_string('noreplyto_description', 'local_contact');
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
     $settings->add($setting);
 
     // Require the user to be logged-in in order to send the form.

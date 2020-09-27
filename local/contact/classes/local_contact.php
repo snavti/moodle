@@ -18,7 +18,7 @@
  * This plugin for Moodle is used to send emails through a web form.
  *
  * @package    local_contact
- * @copyright  2016-2019 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2016-2020 TNG Consulting Inc. - www.tngconsulting.ca
  * @author     Michael Milette
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * local_contact class. Handles processing of information submitted from a web form.
- * @copyright  2016-2019 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2016-2020 TNG Consulting Inc. - www.tngconsulting.ca
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_contact {
@@ -44,15 +44,24 @@ class local_contact {
         if (isloggedin() && !isguestuser()) {
             // If logged-in as non guest, use their registered fullname and email address.
             global $USER;
-            $this->fromname = $USER->firstname.' '.$USER->lastname;
+            $this->fromname = $USER->firstname . ' ' . $USER->lastname;
             $this->fromemail = $USER->email;
+             // Insert name and email address at first position in $_POST array.
+            if (!empty($_POST['email'])) {
+                unset($_POST['email']);
+            }
+            if (!empty($_POST['name'])) {
+                unset($_POST['name']);
+            }
+            $_POST = array_merge(array('email' => $this->fromemail), $_POST);
+            $_POST = array_merge(array('name' => $this->fromname), $_POST);
         } else {
             // If not logged-in as a user or logged in a guest, the name and email fields are required.
             if (empty($this->fromname  = trim(optional_param(get_string('field-name', 'local_contact'), '', PARAM_TEXT)))) {
-                $this->fromname  = required_param('name', PARAM_TEXT);
+                $this->fromname = required_param('name', PARAM_TEXT);
             }
             if (empty($this->fromemail = trim(optional_param(get_string('field-email', 'local_contact'), '', PARAM_EMAIL)))) {
-                $this->fromemail  = required_param('email', PARAM_TEXT);
+                $this->fromemail = required_param('email', PARAM_TEXT);
             }
         }
         $this->fromname = trim($this->fromname);
@@ -239,7 +248,8 @@ class local_contact {
         $subject = '';
         if (empty(get_config('local_contact', 'nosubjectsitename'))) { // Not checked.
             // Include site name in subject field.
-            $subject .= '[' . $SITE->shortname . '] ';
+            $systemcontext = context_system::instance();
+            $subject .= '[' . format_text($SITE->shortname, FORMAT_HTML, ['context' => $systemcontext]) . '] ';
         }
         $subject .= optional_param(get_string('field-subject', 'local_contact'),
                 get_string('defaultsubject', 'local_contact'), PARAM_TEXT);
@@ -250,6 +260,7 @@ class local_contact {
         $fieldmessage = get_string('field-message', 'local_contact');
 
         $htmlmessage = '';
+
         foreach ($_POST as $key => $value) {
 
             // Only process key conforming to valid form field ID/Name token specifications.
@@ -286,7 +297,7 @@ class local_contact {
                         default:            // All other fields.
                             // Join array of values. Example: <select multiple>.
                             if (is_array($value)) {
-                                $value = join($value, ", ");
+                                $value = join(', ', $value);
                             }
                             // Sanitize the text.
                             $value = format_text($value, FORMAT_PLAIN, array('trusted' => false));
@@ -314,9 +325,20 @@ class local_contact {
         $footmessage = format_text($footmessage, FORMAT_HTML, array('trusted' => true, 'noclean' => true, 'para' => false));
         $htmlmessage .= str_replace($tags, $info, $footmessage);
 
+        // Override "from" email address if one was specified in the plugin's settings.
+        $noreplyaddress = $CFG->noreplyaddress;
+        if (!empty($customfrom = get_config('local_contact', 'senderaddress'))) {
+            $CFG->noreplyaddress = $customfrom;
+        }
+
         // Send email message to recipient and set replyto to the sender's email address and name.
-        $status = email_to_user($to, $from, $subject, html_to_text($htmlmessage), $htmlmessage, '', '', true,
-                $from->email, $from->firstname);
+        if (empty(get_config('local_contact', 'noreplyto'))) { // Not checked.
+            $status = email_to_user($to, $from, $subject, html_to_text($htmlmessage), $htmlmessage, '', '', true,
+                    $from->email, $from->firstname);
+        } else { // Checked.
+            $status = email_to_user($to, $from, $subject, html_to_text($htmlmessage), $htmlmessage, '', '', true);
+        }
+        $CFG->noreplyaddress = $noreplyaddress;
 
         // If successful and a confirmation email is desired, send it the original sender.
         if ($status && $sendconfirmationemail) {
@@ -344,13 +366,13 @@ class local_contact {
      * @return     string  Contains what we know about the Moodle user including whether they are logged in or out.
      */
     private function moodleuserstatus($emailaddress) {
-        if (isloggedin()) {
+        if (isloggedin() && !isguestuser()) {
             global $USER;
             $info = $USER->firstname . ' ' . $USER->lastname . ' / ' . $USER->email . ' (' . $USER->username .
                     ' / ' . get_string('eventuserloggedin', 'auth') . ')';
         } else {
             global $DB;
-            $usercount = $DB->count_records('user', array('email' => $emailaddress));
+            $usercount = $DB->count_records('user', ['email' => $emailaddress, 'deleted' => 0]);
             switch ($usercount) {
                 case 0:  // We don't know this email address.
                     $info = get_string('emailnotfound');

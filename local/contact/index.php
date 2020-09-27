@@ -18,7 +18,7 @@
  * This plugin for Moodle is used to send emails through a web form.
  *
  * @package    local_contact
- * @copyright  2016-2019 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2016-2020 TNG Consulting Inc. - www.tngconsulting.ca
  * @author     Michael Milette
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -46,7 +46,7 @@ $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_heading($SITE->fullname);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title(get_string('pluginname', 'local_contact'));
+$PAGE->set_title(get_string('confirmationpage', 'local_contact'));
 $PAGE->navbar->add('');
 
 $contact = new local_contact();
@@ -108,7 +108,7 @@ if (!isloggedin() || isguestuser()) {
             // For reCAPTCHA 2.0.
             require_once($CFG->libdir . '/recaptchalib_v2.php');
             $response = recaptcha_check_response(RECAPTCHA_VERIFY_URL, $CFG->recaptchaprivatekey,
-                   getremoteaddr(), optional_param('g-recaptcha-response', '' , PARAM_TEXT));
+                   getremoteaddr(), optional_param('g-recaptcha-response', '', PARAM_TEXT));
             $resp = new stdClass();
             $resp->is_valid = $response['isvalid'];
             if (!$resp->is_valid) {
@@ -117,8 +117,8 @@ if (!isloggedin() || isguestuser()) {
         } else {
             // For reCAPTCHA 1.0.
             $resp = recaptcha_check_answer($CFG->recaptchaprivatekey, $_SERVER["REMOTE_ADDR"],
-                    optional_param('recaptcha_challenge_field', '' , PARAM_TEXT),
-                    optional_param('recaptcha_response_field', '' , PARAM_TEXT));
+                    optional_param('recaptcha_challenge_field', '', PARAM_TEXT),
+                    optional_param('recaptcha_response_field', '', PARAM_TEXT));
         }
 
         if (!$resp->is_valid) {

@@ -2,8 +2,8 @@
 
 Local Contact Form plugin for Moodle
 ====================================
-![PHP](https://img.shields.io/badge/PHP-v5.6%20%2F%20v7.0%20%2F%20v7.1%20%2F%207.2-blue.svg)
-![Moodle](https://img.shields.io/badge/Moodle-v3.0%20to%20v3.8.x-orange.svg)
+![PHP](https://img.shields.io/badge/PHP-v5.6%20%2F%20v7.0%20%2F%20v7.1%20%2F%207.2%20%2F%207.3-blue.svg)
+![Moodle](https://img.shields.io/badge/Moodle-v3.0%20to%20v3.9.x-orange.svg)
 [![GitHub Issues](https://img.shields.io/github/issues/michael-milette/moodle-local_contact.svg)](https://github.com/michael-milette/moodle-local_contact/issues)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-green.svg)](#contributing)
 [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](#license)
@@ -37,6 +37,16 @@ Examples uses for this plugin include:
 * Information request form;
 * Lead generation form;
 * Membership application form.
+* Quiz question issue report form.
+
+Several pre-configured templates are available when used with the FilterCodes plugin. They include:
+* {formquickquestion}
+* {formcontactus}
+* {formcourserequest}
+* {formsupport}
+* {formcheckin}
+
+See [The Quick and Easy method](#the-quick-and-easy-method) for details.
 
 [(Back to top)](#table-of-contents)
 
@@ -77,19 +87,15 @@ Before getting started:
 
 ## Creating a new form
 
-### Quick method
+### The Quick and Easy method
 
-The quickest way to get started by far is to use the [FilterCodes](https://moodle.org/plugins/filter_filtercodes/ Moodle plugin. As of version 1.3.0, it includes several plain text tags that you can easily copy and paste into any Atto editor. The {tags} include:
+By far, The quickest way to get started is to use the [FilterCodes](https://moodle.org/plugins/filter_filtercodes/ Moodle plugin. As of version 1.3.0, it includes several plain text tags that you can easily copy and paste into any Atto editor. The {tags} include:
 
-{formquickquestion} : Adds a "quick question" form to your course. Form only includes a Subject and Message field. Note: User must be logged in or the form will not be displayed.
-
-{formcontactus} : Adds a "Contact Us" form to your site (example: in a page). Form includes Name, Email address, Subject and Message fields.
-
-{formcourserequest} : Adds a "Course Request" form to your site (example: in a page). Unlike Moodle's request-a-course feature where you can request to create your own course, this tag allows users to request that a course they are interested in be created. Could also be used to request to take a course. Form includes Name, Email address, Course name, Course Description.
-
-{formsupport} : Adds a "Support Request" form to your site (example: in a page). Form includes Name, Email address, pre-determined Subject, specific Subject, URL and Message fields.
-
-{formcheckin} : Adds a "I'm here!" button to your to your course. Form does not include any other fields. Note: User must be logged in or the button will not be displayed.
+* {formquickquestion} : Adds a "quick question" form to your course. Form only includes a Subject and Message field. Note: User must be logged in or the form will not be displayed.
+* {formcontactus} : Adds a "Contact Us" form to your site (example: in a page). Form includes Name, Email address, Subject and Message fields.
+* {formcourserequest} : Adds a "Course Request" form to your site (example: in a page). Unlike Moodle's request-a-course feature where you can request to create your own course, this tag allows users to request that a course they are interested in be created. Could also be used to request to take a course. Form includes Name, Email address, Course name, Course Description.
+* {formsupport} : Adds a "Support Request" form to your site (example: in a page). Form includes Name, Email address, pre-determined Subject, specific Subject, URL and Message fields.
+* {formcheckin} : Adds a "I'm here!" button to your to your course. Form does not include any other fields. Note: User must be logged in or the button will not be displayed.
 
 ### Custom method
 
@@ -213,6 +219,10 @@ Note that, in the future, the email message will be configurable from within the
 Contact Form for Moodle includes the following settings. These are available on the plugin's `Settings` page by going to:
 
 Site administration > Plugins > Local plugins > Contact Form
+
+### Override the sender's (FROM) email address
+
+You can optionally specify an emails address from which emails will be sent. If this field is blank, by default emails will be delivered from the no-reply email address.
 
 ### Configuring the List of Recipients
 
@@ -363,12 +373,22 @@ There is no support file attachments type fields or form-data encoded as "multip
 
 This plugin includes support for the English language. Additional languages including French are supported if you've installed one or more additional Moodle language packs.
 
-If you need a language that is not yet supported, please contribute translations using the Moodle AMOS Translation Toolkit for Moodle at
+Some core fields will be different if a language pack is available for your language. On a French Moodle site, for example (fielname on English site => fieldname on French site):
+
+* email => courriel
+* message => message
+* name => nom
+* subject => objet
+
+So on a French site, you would need to use the French versions of the field names or Contact Form will not recognize them. For more information, see the section called [Customizing the form](#customizing-the-form).
+
+Pro tip: Creating a multi-language Moodle site? Use the [FilterCodes](https://moodle.org/plugins/filter_filtercodes) {getstring} tag to populate the correct field name. Example:
+
+Note: If no language pack is available for your language, the plugin will default to the English language pack. However, if you need a language that is not yet supported, please contribute translations using the Moodle AMOS Translation Toolkit for Moodle at:
+
 https://lang.moodle.org/
 
-This plugin has not been tested for right-to-left (RTL) language support.
-If you want to use this plugin with a RTL language and it doesn't work as-is,
-feel free to prepare a pull request and submit it to the project page at:
+This plugin has not been tested for right-to-left (RTL) language support. If you want to use this plugin with a RTL language and it doesn't work as-is, feel free to prepare a pull request and submit it to the project page at:
 
 https://github.com/michael-milette/moodle-local_contact
 
@@ -380,13 +400,51 @@ https://github.com/michael-milette/moodle-local_contact
 
 ### How do I make this form available to everyone, even if they are not logged in?
 
-Add a page or block to your Moodle Frontpage. Edit the content and paste in your HTML form source code. Make sure that the WYSIWYG editor is in HTML mode.
+Assuming you have not enabled "Force users to log in" in Moodle settings, the easiest way is to add a page or block to your Moodle Frontpage (also known as Home page).
+
+1. Login as a Moodle administrator.
+2. Go to your Front Page.
+3. Turn editing on.
+4. Add a **Page** type activity/resource.
+5. Insert your HTML form or related FilterCode (if you are using it) into the content field and save. If pasting HTML code, make sure that the WYSIWYG editor is in HTML mode.
 
 Since you don't need to be logged into your Moodle Frontpage to see it, your form will also be accessible to visitors to your site who are logged-out, logged-in as a guest as well as to regular logged-in users. If this option is not available to you, the process is a little more complicated as it involves making a course available to guests and having Moodle automatically logged them in as guests.
 
+### Why isn't my form working?
+
+The quick and easy way to create webforms in Moodle is to simply install [FilterCodes](https://moodle.org/plugins/filter_filtercodes/) and use its tags. Be sure to set the filter to **On** in Moodle's Manage Filter settings and set it to filter **Content and headings**. Built-in forms include {formquickquestion}, {formcontactus}, {formcourserequest}, {formsupport}, {formcheckin}. [More information for FilterCodes method](#the-quick-and-easy-method).
+
+ If you are not using FilterCodes, be sure to replace any reference to tags that look like {tagname} that might be found in your HTML form. [More informaiton on HTML method](#custom-method). For example, if your form contains {wwwroot} and the webroot your Moodle site is https://example.com, then replace {wwwroot}/local/contact/ with https://example.com/local/contact/ . Look through your form as there may be others depending on the sample code upon which you based your form.
+
+Anytime your form doesn't work, be sure to try it in a Moodle page or block using the Boost theme with the current language set to English. If it works there, chances are that it is the theme or plugin you are using that is causing the issue, not FilterCodes or Contact for Moodle. As with the Static Pages plugin (see below), you may find that there is a setting that needs to be changed. If not, contact the author/maintainer of the plugin and ask them to add support for filtering in their theme or plugin.
+
+If the form works in English and not in your preferred language, you may need to translate the names of some of your fields. This is required if you want the field names to appear in your language in the email. [More infomation on Language support](#language-support)
+
+#### Static Pages plugin compatibility
+
+The recommended way of using Contact for Moodle is to create your webmail form in a page or block. However, there may be use cases where you might prefer to use the [local_staticpage plugin](https://moodle.org/plugins/local_staticpage). In order for this to work, you will need to configure a couple of its settings:
+
+* Enable the Static Pages plugin's **Process Filters** (processfilters) setting to enable processing of FilterCodes.
+* Disable its **Clean HTML code** (cleanhtml) setting to prevent StaticPage from deleting or filtering out some of the required HTML code in your form.
+
+This demonstrates how to use FilterCode Contact Form templates with the Static Pages to create a quick Contact Us form. Start by copying the following code into a text file called contact.html and saving it:
+
+    <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Contact Us</title>
+    </head>
+    <body>
+        <h1>Contact Us</h1>
+        {formcontactus}
+    </body>
+    </html>
+
+Next, simply upload the contact.html file into Static Pages in order to make it available on your Moodle site.
+
 ### All I see is the word "Forbidden" or a blank screen after submitting a form. What should I do?
 
-Although this plugin is still in BETA, it has been extensively tested. If you are getting this error, it is likely that you will need to fix your form and/or enable Moodle debugging. Alternatively you can try the form logged in as a Moodle administrator. This will enable the display of additional diagnostic information.
+This plugin has been extensively tested. If you are still getting this error, it is likely that you will need to fix your form and/or enable Moodle debugging. Alternatively you can try the form logged in as a Moodle administrator. This will enable the display of additional diagnostic information.
 
 ### Where do emails go when they are submitted on my Moodle website?
 
@@ -477,6 +535,19 @@ Additional information:
 
 ANSWER 2: If you are having problems specifically with the StaticPages plugin, go into its configuration options and set the Clean HTML code to "No, don't clean HTML code". Otherwise the plugin will filter out HTML tags including all your form tags. (thanks to Alex Ferrer for this solution)
 
+### Can I add a form to the Moodle login page?
+
+It is definitely possible. Here is what you need to do:
+
+1. Go to Site administration > Plugins > Authentication > Manage authentication.
+2. Scroll down to the Instructions field.
+3. Insert your form in this field.
+4. Click Save Changes at the bottom of the page.
+
+That's it! Your form will now appear in the section of the page called "Is this your first time here?" on the Moodle login page.
+
+With that said, if what you really want is to have the ability to approve any registration requests on your site, you might be interested in taking a look at the "Email-based self-registration with admin confirmation" plugin. New users complete would then complete the self-registration process. However, before they can gain access to the site, a Moodle Administrator will receive an email and need to approve. You can find the plugin by going to https://moodle.org/plugins/auth_emailadmin
+
 ### Are there any security considerations?
 
 There are no known security considerations at this time.
@@ -535,7 +606,7 @@ https://github.com/michael-milette/moodle-local_contact
 
 # License
 
-Copyright © 2016-2019 TNG Consulting Inc. - https://www.tngconsulting.ca/
+Copyright © 2016-2020 TNG Consulting Inc. - https://www.tngconsulting.ca/
 
 This file is part of the Contact Form plugin for Moodle - https://moodle.org/plugins/local_contact/
 

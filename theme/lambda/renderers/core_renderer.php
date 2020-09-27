@@ -428,7 +428,6 @@
 
         $showcoursemenu = false;
         $showusermenu = false;
-		$participantsmenu = false;
 
         // We are on the course home page.
         if (($context->contextlevel == CONTEXT_COURSE) &&
@@ -489,14 +488,6 @@
         } else {
 			$items = $this->page->navbar->get_items();
             $navbarnode = end($items);
-			if ($navbarnode && ($navbarnode->key === 'participants')) {
-				$participantsmenu = true;
-                $node = $this->page->settingsnav->find('users', navigation_node::TYPE_CONTAINER);
-                if ($node) {
-                    // Build an action menu based on the visible nodes from this navigation tree.
-                    $this->build_action_menu_from_navigation($menu, $node);
-                }
-			}
 		}
         return $this->render($menu);
     }
