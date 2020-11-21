@@ -93,11 +93,6 @@ textarea[cols], input[size] {
 .form.form-inline input {
     margin-bottom: 10px;
 }
-.inline-req img {
-    height: 12px;
-    width: 8px;
-    float: right;
-}
 .form-inline .form-control {
     width: 95%;
     max-width: 500px;
@@ -126,9 +121,6 @@ textarea[cols], input[size] {
 }
 #page-navbar .breadcrumb-button .forumsearch #search {
 	width: 150px;
-}
-fieldset.coursesearchbox {
-    display: none;
 }
 #page-mod-forum-discuss .discussioncontrols {
     margin: 5px;
@@ -702,7 +694,7 @@ Moodle gear menus and admin tabs
     border-radius: 2px;
     box-shadow: 0 -1px 0 rgba(0,0,0,.1) inset;
 }
-.path-mod .action-menu.moodle-actionmenu .icon.navicon {
+.path-mod .action-menu.moodle-actionmenu .icon.navicon, .breadcrumb-button .action-menu.moodle-actionmenu .icon.navicon {
     display: none;
 }
 .breadcrumb-button .moodle-actionmenu a.dropdown-toggle {
@@ -1177,7 +1169,6 @@ course category
     height: 80px;
     padding: 30px 15px;
     border-bottom: 1px solid #e2e2e2;
-	margin-top: -1em;
     background-size: cover;
 }
 .course_category_tree .collapsible-actions .collapseexpand {
@@ -1339,23 +1330,23 @@ a.btn.btn-link {
     color: [[setting:linkcolor]] !important;
 	background: transparent !important;
     text-decoration: none;
-	margin: 5px 0;
+	margin: 1px 0;
 }
 a.btn.btn-link:hover {
     color: #222 !important;
 	background: transparent !important;
     text-decoration: underline;
-	margin: 5px 0;
 }
 [data-toggle="dropdown"] + .dropdown-menu > .dropdown-item.hidden {
     display: none;
 }
 .activity-navigation #next-activity-link, .activity-navigation #prev-activity-link {
-    background: [[setting:maincolor]] !important;
-    color: #fff !important;
+    background: #f2f2f2 !important;
+    color: #555 !important;
+    box-shadow: 0 -1px 0 rgba(0,0,0,.1) inset;
 }
-.activity-navigation #prev-activity-link:hover, .activity-navigation #next-activity-link:hover {
-    background: [[setting:mainhovercolor]] !important;
+.activity-navigation #next-activity-link:hover, .activity-navigation #prev-activity-link:hover {
+    background: #e2e2e2 !important;
     text-decoration: none;
 }
 #comment_chooser ul {
@@ -3321,10 +3312,6 @@ Moodle 3.8
 .submitbutton.btn.btn-primary {
     color: #fff !important;
 }
-.mform abbr.text-danger img.icon {
-    width: 8px;
-    height: 12px;
-}
 .course-content ul.collapsibletopics .content .sectiontoggle ~ .section-summary-activities {
     display: block !important;
 }
@@ -4738,6 +4725,57 @@ a.action.btn.btn-lg:active {
     box-shadow: none;
     background-image: none;
 }
+.simplesearchform.rcs-search.mb-3 {
+    display: flex;
+    margin: 15px 0 !important;
+}
+.simplesearchform.rcs-search input[type="text"] {
+    margin-bottom: 0 !important;
+}
+#page-admin-search #region-main .simplesearchform, #page-admin-search #region-main h2 + form {
+    display: none;
+}
+.coursecat-management-header + .simplesearchform, .path-course-index #region-main .simplesearchform, .path-course-index #region-main #coursesearch {
+    display: none !important;
+}
+#collapseAddForm.collapse {
+    margin: 15px 0 !important;
+    padding: 0 !important;
+}
+.badge.badge-info {
+    cursor: default;
+}
+#site-news-forum > div > .p-t-1.p-b-1, #site-news-forum > div > .py-3 {
+    padding: 0 !important;
+}
+.forumpost .header .mb-3 {
+    margin-bottom: 0 !important;
+}
+.col-form-label {
+    align-items: baseline;
+}
+.col-form-label > span img.icon {
+    margin-left: 5px;
+}
+.col-form-label a[data-toggle="popover"] > img.icon {
+    vertical-align: middle;
+}
+.mform .fdescription.required > .icon {
+    width: 16px;
+    height: 16px;
+}
+.fitem .float-sm-right.text-nowrap {
+    float: right;
+    margin-left: 5px;
+}
+#admin-maxsizeperdownloadcoursefile .form-filesize .form-inline {
+    display: flex;
+    flex-flow: row;
+    width: max-content;
+}
+#admin-maxsizeperdownloadcoursefile .form-filesize .form-inline > input {
+    margin-right: 0.5rem;
+}
 
 /*================================================== * 
 Moodle 3.9 modchooser
@@ -5150,12 +5188,17 @@ aside.block {
 .block #settingsnav {
     padding-top: 0 !important;
 }
-.block_search_forums .searchform .input-group, .block_settings .adminsearchform  .form-group {
+.block_search_forums .searchform .input-group, .block_settings .adminsearchform  .form-group, .block_settings .simplesearchform .input-group, .simplesearchform.rcs-search .input-group {
     flex: 1 1 auto;
     display: flex;
+    align-items: center;
 }
 .block_search_forums #searchform_search, .block_settings #adminsearchquery {
     width: 100%;
+    max-width: 100%;
+}
+.block_settings .simplesearchform, .block_settings .simplesearchform .input-group {
+    width: calc(100% - 32px);
     max-width: 100%;
 }
 .block_settings #adminsearchquery {
@@ -5163,6 +5206,11 @@ aside.block {
 }
 .block_settings .adminsearchform.form-inline {
     width: 100%;
+}
+.block_settings .simplesearchform .search-icon img.icon, .simplesearchform.rcs-search .input-group .search-icon img.icon {
+    filter: brightness(2);
+    vertical-align: sub;
+    padding-right: 1px;
 }
 .block_settings .footer {
 	display: flex;

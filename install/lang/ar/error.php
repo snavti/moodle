@@ -30,12 +30,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['cannotcreatedboninstall'] = '<p> لا يمكن إنشاء قاعدة البيانات. </p>
-<p> لا وجود لقاعدة البيانات المحددة والمستخدم المُعين ليس لديه إذن لإنشاء قاعدة البيانات. </ p>
-<p> المسؤول عن الموقع يجب أن يتحقق من إعدادات قاعدة بيانات. </p>';
+$string['cannotcreatedboninstall'] = '<p>لا يمكن إنشاء قاعدة البيانات.</p>
+<p>لا وجود لقاعدة البيانات المحددة والمستخدم المُعطى ليس لديه صلاحية إنشاء قاعدة البيانات.</p>
+<p>مسؤول الموقع يجب أن يتحقق من إعدادات قاعدة البيانات.</p>';
 $string['cannotcreatelangdir'] = 'لا يمكن إنشاء مجلد اللغة';
 $string['cannotcreatetempdir'] = 'لا يمكن إنشاء المجلد المؤقت';
-$string['cannotdownloadcomponents'] = 'لم يتم تحميل العناصر';
+$string['cannotdownloadcomponents'] = 'تعذر تنزيل المُكونات';
 $string['cannotdownloadzipfile'] = 'لم يتم تحميل الملف المضغوط';
 $string['cannotfindcomponent'] = 'لم يتم العثور على المكون';
 $string['cannotsavemd5file'] = 'لم يتم حفظ ملف  md5';

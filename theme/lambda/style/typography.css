@@ -1183,3 +1183,15 @@ tr.success > td, .table > thead > tr.success > th, .table > tbody > tr.success >
 tr.active > td, .table > thead > tr.active > th, .table > tbody > tr.active > th, .table > tfoot > tr.active > th {
     background-color: #f5f5f5;
 }
+.badge.badge-success {
+    color: #fff;
+    background-color: #28a745;
+}
+.badge.badge-danger {
+    color: #fff;
+    background-color: #dc3545;
+}
+.badge.badge-warning {
+    color: #fff;
+	background-color: #eb9710;
+}

@@ -17,8 +17,7 @@
 /**
  * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
  *
- * @package    course/format
- * @subpackage grid
+ * @package    format_grid
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2012 G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://about.me/gjbarnard} and
@@ -27,24 +26,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['alttext'] = 'Image alt text';
+$string['alttext_help'] = 'This text will be set as the image alt attribute';
 $string['display_summary'] = 'Move out of grid';
 $string['display_summary_alt'] = 'Move this section out of the grid';
 $string['editimage'] = 'Change image';
 $string['editimage_alt'] = 'Set or change image';
-$string['formatgrid'] = 'Grid format'; // Name to display for format.
-$string['general_information'] = 'General Information';  // No longer used kept for legacy versions.
 $string['hidden_topic'] = 'This section has been hidden';
 $string['hide_summary'] = 'Move section into grid';
 $string['hide_summary_alt'] = 'Move this section into the grid';
-$string['namegrid'] = 'Grid view';
-$string['title'] = 'Section title';
 $string['topic'] = 'Section';
 $string['topic0'] = 'General';
-$string['topicoutline'] = 'Section';  // No longer used kept for legacy versions.
 
 // Moodle 2.0 Enhancement - Moodle Tracker MDL-15252, MDL-21693 & MDL-22056 - http://docs.moodle.org/en/Development:Languages.
 $string['sectionname'] = 'Section';
-$string['pluginname'] = 'Grid format';
+$string['pluginname'] = 'Grid';
 $string['section0name'] = 'General';
 
 // WAI-ARIA - http://www.w3.org/TR/wai-aria/roles.
@@ -77,18 +73,31 @@ $string['newsectionname'] = 'New name for section {$a}';
 $string['numbersections'] = 'Number of sections';
 
 // Exception messages.
-$string['imagecannotbeused'] = 'Image cannot be used, must be a PNG, JPG or GIF and the GD PHP extension must be installed.';
 $string['cannotfinduploadedimage'] = 'Cannot find the uploaded original image.  Please report error details and the information contained in the php.log file to developer.  Refresh the page and upload a fresh copy of the image.';
 $string['cannotconvertuploadedimagetodisplayedimage'] = 'Cannot convert uploaded image to displayed image.  Please report error details and the information contained in the php.log file to developer.';
+$string['cannotgetimagelock'] = 'Cannot get image lock.  Please report error details to developer.';
 $string['cannotgetimagesforcourse'] = 'Cannot get images for course.  Please report error details to developer.';
+$string['cannotgetsummarylock'] = 'Cannot get summary lock.  Please report error details to developer.';
+$string['formatnotsupported'] = 'Format is not supported at this server, please fix the system configuration to have the GD PHP extension installed - {$a}.';
+$string['functionfailed'] = 'Function failed on image - {$a}.';
+$string['imagecannotbeused'] = 'Image cannot be used, must be a PNG, JPG or GIF and the GD PHP extension must be installed.';
+$string['invalidiconrecordid'] = 'Could not create image container.  Grid format database is not ready.  An admin must visit the notifications section.';
+$string['invalidsummaryrecordid'] = 'Could not set summary status.  Grid format database is not ready.  An admin must visit the notifications section.';
+$string['mimetypenotsupported'] = 'Mime type is not supported as an image format in the Grid format - {$a}.';
+$string['originalheightempty'] = 'Original height is empty - {$a}.';
+$string['originalwidthempty'] = 'Original width is empty - {$a}.';
+$string['noimageinformation'] = 'Image information is empty - {$a}.';
+$string['reporterror'] = 'Please report error details and the information contained in the php.log file to developer';
 
 // CONTRIB-4099 Image container size change improvement.
 $string['off'] = 'Off';
 $string['on'] = 'On';
 $string['scale'] = 'Scale';
 $string['crop'] = 'Crop';
+$string['original'] = 'Original';
+$string['webp'] = 'WebP';
 $string['imagefile'] = 'Upload an image';
-$string['imagefile_help'] = 'Upload an image of type PNG, JPG or GIF.';
+$string['imagefile_help'] = 'Upload an image of type PNG, JPG or GIF.  WEBP needs Moodle core support.';
 $string['deleteimage'] = 'Delete image';
 $string['deleteimage_help'] = "Delete the image for the section being edited.  If you've uploaded an image then it will not replace the deleted image.";
 $string['gfreset'] = 'Grid reset options';
@@ -107,6 +116,8 @@ $string['defaultborderradius'] = 'Default border radius';
 $string['defaultborderradius_desc'] = 'The default border radius on / off.';
 $string['defaultborderwidth'] = 'Default border width';
 $string['defaultborderwidth_desc'] = 'The default border width.';
+$string['defaultdisplayedimagefiletype'] = 'Displayed image type';
+$string['defaultdisplayedimagefiletype_desc'] = 'Set the displayed image type.';
 $string['defaultimagecontainerbackgroundcolour'] = 'Default image container background colour';
 $string['defaultimagecontainerbackgroundcolour_desc'] = 'The default image container background colour.';
 $string['defaultcurrentselectedsectioncolour'] = 'Default current selected section colour';
@@ -115,9 +126,6 @@ $string['defaultcurrentselectedimagecontainertextcolour'] = 'Default current sel
 $string['defaultcurrentselectedimagecontainertextcolour_desc'] = 'The default current selected image container text colour.';
 $string['defaultcurrentselectedimagecontainercolour'] = 'Default current selected image container colour';
 $string['defaultcurrentselectedimagecontainercolour_desc'] = 'The default current selected image container colour.';
-
-$string['defaultcoursedisplay'] = 'Course display default';
-$string['defaultcoursedisplay_desc'] = "Either show all the sections on a single page or section zero and the chosen section on page.";
 
 $string['defaultfitsectioncontainertowindow'] = 'Fit section container to window by default';
 $string['defaultfitsectioncontainertowindow_desc'] = 'The default setting for \'Fit section container to window\'.';

@@ -17,8 +17,7 @@
 /**
  * Grid Format - A topics based format that uses a grid of user selectable images to popup a light box of the section.
  *
- * @package    course/format
- * @subpackage grid
+ * @package    format_grid
  * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2012 G J Barnard in respect to modifications of standard topics format.
  * @author     G J Barnard - {@link http://about.me/gjbarnard} and
@@ -39,6 +38,7 @@ class format_grid_renderer extends format_section_renderer_base {
     private $settings; // Settings array.
     private $shadeboxshownarray = array(); // Value of 1 = not shown, value of 2 = shown - to reduce ambiguity in JS.
     private $portable = 0; // 1 = mobile, 2 = tablet.
+    protected $initialsection = -1;
 
     /**
      * Constructor method, calls the parent constructor - MDL-21097
@@ -204,9 +204,10 @@ class format_grid_renderer extends format_section_renderer_base {
      *
      * @param stdClass $section The course_section entry from DB
      * @param stdClass $course The course entry from DB
+     * @param int $sectionreturn The section to return to after an action
      * @return string HTML to output.
      */
-    protected function section_header_onsectionpage_topic0notattop($section, $course) {
+    protected function section_header_onsectionpage_topic0notattop($section, $course, $sectionreturn = null) {
         $o = '';
         $sectionstyle = '';
 
@@ -219,9 +220,15 @@ class format_grid_renderer extends format_section_renderer_base {
             }
         }
 
-        $o .= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
-            'class' => 'section main clearfix'.$sectionstyle, 'role' => 'region',
-            'aria-label' => get_section_name($course, $section)));
+        $o .= html_writer::start_tag('li', array(
+            'id' => 'section-'.$section->section,
+            'class' => 'section main clearfix'.$sectionstyle,
+            'role' => 'region',
+            'aria-labelledby' => "sectionid-{$section->id}-title",
+            'data-sectionid' => $section->section,
+            'data-sectionreturnid' => $sectionreturn
+            )
+        );
 
         // Create a span that contains the section title to be used to create the keyboard section move menu.
         $o .= html_writer::tag('span', get_section_name($course, $section), array('class' => 'hidden sectionname'));
@@ -234,7 +241,7 @@ class format_grid_renderer extends format_section_renderer_base {
         $o .= html_writer::start_tag('div', array('class' => 'content'));
 
         $sectionname = html_writer::tag('span', $this->section_title($section, $course));
-        $o .= $this->output->heading($sectionname, 3, 'sectionname accesshide');
+        $o .= $this->output->heading($sectionname, 3, 'sectionname', "sectionid-{$section->id}-title");
 
         $o .= html_writer::start_tag('div', array('class' => 'summary'));
         $o .= $this->format_summary_text($section);
@@ -246,7 +253,7 @@ class format_grid_renderer extends format_section_renderer_base {
     }
 
     /**
-     * Output the html for a single section page .
+     * Output the html for a single section page.
      *
      * @param stdClass $course The course entry from DB
      * @param array $sections (argument not used)
@@ -308,10 +315,12 @@ class format_grid_renderer extends format_section_renderer_base {
             // Now the list of sections..
             echo $this->start_section_list();
 
-            echo $this->section_header_onsectionpage_topic0notattop($thissection, $course);
-            // Show completion help icon.
-            $completioninfo = new completion_info($course);
-            echo $completioninfo->display_help_icon();
+            echo $this->section_header_onsectionpage_topic0notattop($thissection, $course, $displaysection);
+            if ($course->enablecompletion) {
+                // Show completion help icon.
+                $completioninfo = new completion_info($course);
+                echo $completioninfo->display_help_icon();
+            }
 
             echo $this->courserenderer->course_section_cm_list($course, $thissection, $displaysection);
             echo $this->courserenderer->course_section_add_cm_control($course, $displaysection, $displaysection);
@@ -369,7 +378,7 @@ class format_grid_renderer extends format_section_renderer_base {
 
         // Start at 1 to skip the summary block or include the summary block if it's in the grid display.
         if ($this->section0attop) {
-            $this->section0attop = $this->make_block_topic0($course, $sections, $modinfo, $editing, $urlpicedit,
+            $this->section0attop = $this->make_block_topic0($course, $sections[0], $editing, $urlpicedit,
                     $streditsummary, false);
             // For the purpose of the grid shade box shown array topic 0 is not shown.
             $this->shadeboxshownarray[0] = 1;
@@ -388,7 +397,7 @@ class format_grid_renderer extends format_section_renderer_base {
 
         echo html_writer::start_tag('ul', array('class' => $gridiconsclass));
         // Print all of the image containers.
-        $this->make_block_icon_topics($coursecontext->id, $modinfo, $course, $editing, $hascapvishidsect, $urlpicedit);
+        $shownsections = $this->make_block_icon_topics($coursecontext->id, $sections, $course, $editing, $hascapvishidsect, $urlpicedit);
         echo html_writer::end_tag('ul');
 
         echo html_writer::end_tag('div');
@@ -491,11 +500,11 @@ class format_grid_renderer extends format_section_renderer_base {
 
             // Print Section 0 with general activities.
             if (!$this->section0attop) {
-                $this->make_block_topic0($course, $sections, $modinfo, $editing, $urlpicedit, $streditsummary, false);
+                $this->make_block_topic0($course, $sections[0], $editing, $urlpicedit, $streditsummary, false);
             }
 
-            // Now all the normal modules by topic.
-            // Everything below uses "section" terminology - each "section" is a topic/module.
+            /* Now all the normal modules by topic.
+               Everything below uses "section" terminology - each "section" is a topic/module. */
             $this->make_block_topics($course, $sections, $modinfo, $editing, $hascapvishidsect, $streditsummary,
                 $urlpicedit, false);
 
@@ -511,16 +520,19 @@ class format_grid_renderer extends format_section_renderer_base {
             $sectionredirect = $this->courseformat->get_view_url(null)->out(true);
         }
 
-        // Initialise the shade box functionality:...
-        $PAGE->requires->js_init_call('M.format_grid.init', array(
-            $PAGE->user_is_editing(),
-            $sectionredirect,
-            $coursenumsections,
-            json_encode($this->shadeboxshownarray)));
-        if (!$PAGE->user_is_editing()) {
-            // Initialise the key control functionality...
-            $PAGE->requires->yui_module('moodle-format_grid-gridkeys', 'M.format_grid.gridkeys.init',
-                array(array('rtl' => $rtl)), null, true);
+        if ($shownsections) {
+            // Initialise the shade box functionality:...
+            $PAGE->requires->js_init_call('M.format_grid.init', array(
+                $PAGE->user_is_editing(),
+                $sectionredirect,
+                count($this->shadeboxshownarray),
+                $this->initialsection,
+                json_encode($this->shadeboxshownarray)));
+            if (!$PAGE->user_is_editing()) {
+                // Initialise the key control functionality...
+                $PAGE->requires->yui_module('moodle-format_grid-gridkeys', 'M.format_grid.gridkeys.init',
+                    array(array('rtl' => $rtl)), null, true);
+            }
         }
     }
 
@@ -551,22 +563,20 @@ class format_grid_renderer extends format_section_renderer_base {
         if ($section->section && has_capability('moodle/course:setcurrentsection', $coursecontext)) {
             if ($course->marker == $section->section) {  // Show the "light globe" on/off.
                 $url->param('marker', 0);
-                $markedthissection = get_string('markedthissection', 'format_grid');
                 $highlightoff = get_string('highlightoff');
                 $controls['highlight'] = array('url' => $url, "icon" => 'i/marked',
                                                'name' => $highlightoff,
-                                               'pixattr' => array('class' => '', 'alt' => $markedthissection),
-                                               'attr' => array('class' => 'editing_highlight', 'title' => $markedthissection,
+                                               'pixattr' => array('class' => ''),
+                                               'attr' => array('class' => 'editing_highlight',
                                                'data-action' => 'removemarker'));
                 $url->param('marker', 0);
             } else {
                 $url->param('marker', $section->section);
-                $markthissection = get_string('markthissection', 'format_grid');
                 $highlight = get_string('highlight');
                 $controls['highlight'] = array('url' => $url, "icon" => 'i/marker',
                                                'name' => $highlight,
-                                               'pixattr' => array('class' => '', 'alt' => $markthissection),
-                                               'attr' => array('class' => 'editing_highlight', 'title' => $markthissection,
+                                               'pixattr' => array('class' => ''),
+                                               'attr' => array('class' => 'editing_highlight',
                                                'data-action' => 'setmarker'));
             }
         }
@@ -596,23 +606,14 @@ class format_grid_renderer extends format_section_renderer_base {
     /**
      * Makes section zero.
      */
-    private function make_block_topic0($course, $sections, $modinfo, $editing, $urlpicedit, $streditsummary,
+    private function make_block_topic0($course, $sectionzero, $editing, $urlpicedit, $streditsummary,
             $onsectionpage) {
-        $section = 0;
-        if (!array_key_exists($section, $sections)) {
-            return false;
-        }
-
-        $thissection = $modinfo->get_section_info($section);
-        if (!is_object($thissection)) {
-            return false;
-        }
 
         if ($this->section0attop) {
             echo html_writer::start_tag('ul', array('class' => 'gtopics-0'));
         }
 
-        $sectionname = $this->courseformat->get_section_name($thissection);
+        $sectionname = $this->courseformat->get_section_name($sectionzero);
         echo html_writer::start_tag('li', array(
             'id' => 'section-0',
             'class' => 'section main' . ($this->section0attop ? '' : ' grid_section hide_section'),
@@ -628,11 +629,11 @@ class format_grid_renderer extends format_section_renderer_base {
 
         echo html_writer::start_tag('div', array('class' => 'summary'));
 
-        echo $this->format_summary_text($thissection);
+        echo $this->format_summary_text($sectionzero);
 
         if ($editing) {
             echo html_writer::link(
-                            new moodle_url('editsection.php', array('id' => $thissection->id)),
+                            new moodle_url('editsection.php', array('id' => $sectionzero->id)),
                                 html_writer::empty_tag('img', array('src' => $urlpicedit,
                                                                      'alt' => $streditsummary,
                                                                      'class' => 'iconsmall edit')),
@@ -640,10 +641,10 @@ class format_grid_renderer extends format_section_renderer_base {
         }
         echo html_writer::end_tag('div');
 
-        echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
+        echo $this->courserenderer->course_section_cm_list($course, $sectionzero, 0);
 
         if ($editing) {
-            echo $this->courserenderer->course_section_add_cm_control($course, $thissection->section, 0, 0);
+            echo $this->courserenderer->course_section_add_cm_control($course, $sectionzero->section, 0, 0);
 
             if ($this->section0attop) {
                 $strhidesummary = get_string('hide_summary', 'format_grid');
@@ -707,8 +708,10 @@ class format_grid_renderer extends format_section_renderer_base {
 
     /**
      * Makes the grid image containers.
+     *
+     * @return int Number of shown sections.
      */
-    private function make_block_icon_topics($contextid, $modinfo, $course, $editing, $hascapvishidsect,
+    private function make_block_icon_topics($contextid, $sections, $course, $editing, $hascapvishidsect,
             $urlpicedit) {
         global $CFG;
 
@@ -739,9 +742,15 @@ class format_grid_renderer extends format_section_renderer_base {
 
         // Start at 1 to skip the summary block or include the summary block if it's in the grid display.
         $coursenumsections = $this->courseformat->get_last_section_number();
-        $sections = $modinfo->get_section_info_all();
-        for ($section = $this->section0attop ? 1 : 0; $section <= $coursenumsections; $section++) {
-            $thissection = $sections[$section];
+
+        // Are we using WebP for the displayed image?
+        $iswebp = (get_config('format_grid', 'defaultdisplayedimagefiletype') == 2);
+
+        $shownsections = 0;
+        foreach ($sections as $section => $thissection) {
+            if ((($this->section0attop) && ($section == 0)) || ($section > $coursenumsections)) {
+                continue;  // Section 0 at the top and not in the grid / orphaned section.
+            }
 
             // Check if section is visible to user.
             $showsection = $thissection->uservisible ||
@@ -755,6 +764,7 @@ class format_grid_renderer extends format_section_renderer_base {
             }
 
             if ($showsection || $sectiongreyedout) {
+                $shownsections++;
                 // We now know the value for the grid shade box shown array.
                 $this->shadeboxshownarray[$section] = 2;
 
@@ -789,11 +799,17 @@ class format_grid_renderer extends format_section_renderer_base {
                         }
                     }
                     if ($canshow) {
-                        $sectiontitleclass .= ' content_inside';
-                        if ($this->settings['sectiontitleboxinsideposition'] == 2) {
-                            $sectiontitleclass .= ' middle';
-                        } else if ($this->settings['sectiontitleboxinsideposition'] == 3) {
-                            $sectiontitleclass .= ' bottom';
+                        $sectiontitleclass .= ' content_inside ';
+                        switch ($this->settings['sectiontitleboxinsideposition']) {
+                            case 1:
+                                $sectiontitleclass .= 'top';
+                                break;
+                            case 2:
+                                $sectiontitleclass .= 'middle';
+                                break;
+                            case 3:
+                                $sectiontitleclass .= 'bottom';
+                                break;
                         }
                     }
                 }
@@ -812,6 +828,7 @@ class format_grid_renderer extends format_section_renderer_base {
                         }
                         $sectiontitleattribues['title'] = $summary;
                         $sectiontitleattribues['data-toggle'] = 'gridtooltip';
+                        $sectiontitleattribues['data-container'] = '#gridbox-'.$thissection->section;
                         $sectiontitleattribues['data-placement'] = $this->courseformat->get_set_show_section_title_summary_position();
                     }
                 }
@@ -822,6 +839,7 @@ class format_grid_renderer extends format_section_renderer_base {
                    'div' to a 'nav' tag (www.w3.org/TR/2010/WD-html5-20100624/sections.html#the-nav-element) when I'm
                    that all browsers support it against the browser requirements of Moodle. */
                 $liattributes = array(
+                    'id' => 'gridbox-'.$thissection->section,
                     'role' => 'region',
                     'aria-labelledby' => 'gridsectionname-'.$thissection->section
                 );
@@ -841,13 +859,14 @@ class format_grid_renderer extends format_section_renderer_base {
                     $sectionimage = $sectionimages[$thissection->id];
                 }
 
-                // If the image is set then check that displayedimageindex is greater than 0 otherwise create the displayed image.
-                // This is a catch-all for existing courses.
+                /* If the image is set then check that displayedimageindex is greater than 0 otherwise create the displayed image.
+                   This is a catch-all for existing courses. */
                 if (isset($sectionimage->image) && ($sectionimage->displayedimageindex < 1)) {
                     // Set up the displayed image:...
                     $sectionimage->newimage = $sectionimage->image;
+                    $icbc = $this->courseformat->hex2rgb($this->settings['imagecontainerbackgroundcolour']);
                     $sectionimage = $this->courseformat->setup_displayed_image($sectionimage, $contextid,
-                        $this->settings);
+                        $this->settings, $icbc);
                 }
 
                 if ($course->coursedisplay != COURSE_DISPLAY_MULTIPAGE) {
@@ -889,7 +908,8 @@ class format_grid_renderer extends format_section_renderer_base {
                             'hidden' => true, 'aria-label' => $summary));
                     }
 
-                    echo $this->output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath);
+                    echo $this->courseformat->output_section_image(
+                        $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output, $iswebp);
 
                     echo html_writer::end_tag('div');
                     echo html_writer::end_tag('a');
@@ -926,7 +946,8 @@ class format_grid_renderer extends format_section_renderer_base {
                             'hidden' => true, 'aria-label' => $summary));
                     }
 
-                    $content .= $this->output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath);
+                    $content .= $this->courseformat->output_section_image(
+                        $section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath, $this->output, $iswebp);
 
                     $content .= html_writer::end_tag('div');
 
@@ -963,29 +984,8 @@ class format_grid_renderer extends format_section_renderer_base {
                 $this->shadeboxshownarray[$section] = 1;
             }
         }
-    }
 
-    protected function output_section_image($section, $sectionname, $sectionimage, $contextid, $thissection, $gridimagepath) {
-        $content = '';
-        if (is_object($sectionimage) && ($sectionimage->displayedimageindex > 0)) {
-            $imgurl = moodle_url::make_pluginfile_url(
-            $contextid, 'course', 'section', $thissection->id, $gridimagepath,
-            $sectionimage->displayedimageindex . '_' . $sectionimage->image);
-            $content = html_writer::empty_tag('img', array(
-                'src' => $imgurl,
-                'alt' => $sectionname,
-                'role' => 'img',
-                'aria-label' => $sectionname));
-        } else if ($section == 0) {
-            $imgurl = $this->output->image_url('info', 'format_grid');
-            $content = html_writer::empty_tag('img', array(
-                'src' => $imgurl,
-                'alt' => $sectionname,
-                'class' => 'info',
-                'role' => 'img',
-                'aria-label' => $sectionname));
-        }
-        return $content;
+        return $shownsections;
     }
 
     private function make_block_icon_topics_editing($thissection, $contextid, $urlpicedit) {
@@ -1002,11 +1002,7 @@ class format_grid_renderer extends format_section_renderer_base {
                 'role' => 'link',
                 'aria-label' => $streditimagealt)
             ),
-            html_writer::empty_tag('img', array(
-                'src' => $urlpicedit,
-                'alt' => $streditimagealt,
-                'role' => 'img',
-                'aria-label' => $streditimagealt)).'&nbsp;'.$streditimage,
+            $this->output->pix_icon('t/edit', $streditimagealt).'&nbsp;'.$streditimage,
             array('title' => $streditimagealt)
         );
     }
@@ -1062,11 +1058,13 @@ class format_grid_renderer extends format_section_renderer_base {
 
         $coursenumsections = $this->courseformat->get_last_section_number();
 
-        for ($section = 1; $section <= $coursenumsections; $section++) {
-            $thissection = $modinfo->get_section_info($section);
-
+        foreach ($sections as $section => $thissection) {
             if (!$hascapvishidsect && !$thissection->visible && $course->hiddensections) {
                 unset($sections[$section]);
+                continue;
+            }
+            if ($section > $coursenumsections) {
+                // Orphaned section.
                 continue;
             }
 
@@ -1089,7 +1087,9 @@ class format_grid_renderer extends format_section_renderer_base {
                 'id' => 'section-' . $section,
                 'class' => $sectionstyle,
                 'role' => 'region',
-                'aria-label' => $sectionname)
+                'aria-label' => $sectionname,
+                'data-sectionid' => $section
+                )
             );
 
             if ($editing) {
@@ -1248,5 +1248,9 @@ class format_grid_renderer extends format_section_renderer_base {
 
     public function set_portable($portable) {
         $this->portable = $portable;
+    }
+
+    public function set_initialsection($initialsection) {
+        $this->initialsection = $initialsection;
     }
 }

@@ -1,5 +1,77 @@
 History
 =============
+Version 3.9.1.0 - 14/11/2020
+  1. Fix summary tooltip dismissing itself when floating over the section name.  If you find it is still an issue, then
+     consider using the 'sectiontitlesummarymaxlength' setting.
+
+Version 3.9.0.1 - 19/7/2020
+  1. Apply MDL-65539.
+  2. Apply MDL-68231.
+  3. Apply MDL-68235.
+  4. Apply MDL-69065.
+  5. Apply 'Add index to courseid format_grid_icon could improve performance' - #122,
+     thanks to John (https://github.com/yao9394) for the patch.
+
+Version 3.8.0.2 - TDB
+  1. Fix 'Same color setting for "set or change img" as currentselectedimagecontainertextcolor in editing on' - #106.
+  2. Fix scroll bar in main region when editing in Boost.
+  3. Remove redundant 'defaultcoursedisplay' setting - #119.
+  4. Tidy up old strings.
+
+Version 3.8.0.1 - 17/11/2019
+  1. Fix section one not shown - #105.
+  2. Moodle 3.8 version based on V3.7.1.1.
+
+Version 3.7.1.0
+  1. Reduced size of Tooltip JS - #94.
+  2. Attempted fix for "found more than one record" for format_grid_summary table - #97.
+  3. Use a shown section count for the number of grid boxes.
+
+Version 3.7.0.2
+  1. Remove old redundant tests.
+  2. Add missing Moodle defined.
+  3. Styles tidy up.
+  4. Removed old convert_legacy_image.php script as was only needed for conversion from M1.9 grid courses - #93.
+  5. Fix cannot change image tiles when importing a grid format course - #66.
+  6. Fix 2-3 image ratio.
+
+Version 3.7.0.1
+  1. Beta version for Moodle 3.7 based on 3.6.0.5.
+
+Version 3.6.0.5
+  1. Apply MDL-64819 - #91.
+  2. Fix "Editing section summary and changing summary text breaks grid image" - #92.
+  3. Fix summary tooltip opacity and not hiding when inside the grid box.
+  4. Fix incorrect capability being checked in reset_grid_setting().
+  5. Fix section name box does not fill image container when inside with the Boost and Foundation themes.
+
+Version 3.6.0.4.1
+  1. Fix existing courses have an incorrect number of courses when upgrading to 3.6.0.4 - #90.
+     Note: If on a version prior to 3.6.0.4 then bypass and install 3.6.0.4.1 or above.
+
+Version 3.6.0.4
+  1. Put back 'numsections'.  Thanks to "King's College London" for funding this enhancement.
+
+Version 3.6.0.3
+  1. New: WebP displayed image support.
+
+Version 3.6.0.2
+  1. Cope with 'sectionid' url parameter.
+
+Version 3.6.0.1
+  1. Beta version for Moodle 3.6.
+
+Version 3.5.0.3
+  1. New: French 'New activity image', thanks to Momar -> https://github.com/Momardiakhate.
+  2. Fix PHPUnit test with 'defaultsectiontitlesummarybackgroundopacity' failure.
+
+Version 3.5.0.2
+  1. Fix CONTRIB-7270 - Popovers not working as expected in Grid reset options section of settings - Boost theme.
+  2. Foundation theme support.
+  3. Fix: Boost theme shadebox adjustment.
+  4. Fix: Convert displayed image to original mime type instead of only png patch when section zero in the grid.
+  5. Fix: Cope with non-sequential section numbers.
+
 Version 3.5.0.1
   1. M3.5 version based on V3.4.0.4
 
