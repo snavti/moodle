@@ -308,6 +308,10 @@ class local_contact {
             }
         }
 
+        // Sanitize user agent and referer.
+        $httpuseragent = format_text($_SERVER['HTTP_USER_AGENT'], FORMAT_PLAIN, array('trusted' => false));
+        $httpreferer = format_text($_SERVER['HTTP_REFERER'], FORMAT_PLAIN, array('trusted' => false));
+
         // Prepare arrays to handle substitution of embedded tags in the footer.
         $tags = array('[fromname]', '[fromemail]', '[supportname]', '[supportemail]',
                 '[lang]', '[userip]', '[userstatus]',
@@ -316,8 +320,8 @@ class local_contact {
         );
         $info = array($from->firstname, $from->email, $CFG->supportname, $CFG->supportemail,
                 current_language(), getremoteaddr(), $this->moodleuserstatus($from->email),
-                $SITE->fullname, $SITE->shortname, $CFG->wwwroot,
-                $_SERVER['HTTP_USER_AGENT'], $_SERVER['HTTP_REFERER']
+                $SITE->fullname . ': ', $SITE->shortname, $CFG->wwwroot,
+                $httpuseragent, $httpreferer
         );
 
         // Create the footer - Add some system information.
