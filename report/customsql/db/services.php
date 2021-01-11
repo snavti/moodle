@@ -15,18 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Web service declarations.
  *
- * @package format_onetopic
- * @copyright 2015 David Herney Bernal - cirano
+ * @package   report_customsql
+ * @copyright 2020 the Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2020122700;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2020060900;        // Requires this Moodle version.
-$plugin->component = 'format_onetopic';    // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'la almeria';
-$plugin->dependencies = array('format_topics' => 2020061500);
+$functions = [
+    'report_customsql_get_users' => [
+        'classname' => 'report_customsql\external\get_users',
+        'methodname' => 'execute',
+        'classpath' => '',
+        'description' => 'Use by form autocomplete for selecting users to receive emails.',
+        'capabilities' => 'report/customsql:definequeries',
+        'type' => 'read',
+        'ajax' => true,
+    ],
+];
