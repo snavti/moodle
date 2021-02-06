@@ -104,7 +104,7 @@ function lambda_set_pagewidth1($css, $pagewidth) {
 function lambda_set_pagewidth2($css, $pagewidth) {
     $tag = '[[setting:pagewidth_wide]]';
     if ($pagewidth == "100") {
-        $replacement = 'body {background:none repeat scroll 0 0 #fff;padding-top:0;} @media(max-width:767px){body {padding-left: 0; padding-right: 0;} #page {padding: 10px 0;}} #wrapper {max-width:100%;width:100%;} #page-header {margin:0 auto;max-width:100%;} @media(min-width: 768px) {#page-header > .container-fluid {max-width: 90%;}} .container-fluid {padding: 0; max-width:100%} .navbar {background: none repeat scroll 0 0 [[setting:menufirstlevelcolor]];padding: 0;} .navbar-inner {margin: 0 auto; max-width: 90%;} .navbar .brand {margin-left:0;} .navbar #search {margin-right:0;} .pagelayout-frontpage header.navbar + .container-fluid > img.lambda-shadow {display: none;} #page {margin: 0 auto; max-width: 90%;} #page-footer .row-fluid {margin: 0 auto; max-width: 90%;} .spotlight-full {margin-left: -5.75% !important; margin-right: -5.75% !important;} .socials-header .social_icons.pull-right {padding-right:10%;} .socials-header .social_contact {padding-left:10%;}';
+        $replacement = 'body {background:none repeat scroll 0 0 #fff;padding-top:0;} @media(max-width:767px){body {padding-left: 0; padding-right: 0;} #page {padding: 10px 0;}} #wrapper {max-width:100%;width:100%;} #page-header {margin:0 auto;max-width:100%;} @media(min-width: 768px) {#page-header > .container-fluid {max-width: 90%;}} .container-fluid {padding: 0; max-width:100%} .navbar {background: none repeat scroll 0 0 [[setting:menufirstlevelcolor]];padding: 0;} .navbar-inner {margin: 0 auto; max-width: 90%;} .navbar .brand {margin-left:0;} .navbar #search {margin-right:0;} .pagelayout-frontpage header.navbar + .container-fluid > img.lambda-shadow {display: none;} #page {margin: 0 auto; max-width: 90%;} #page-footer .row-fluid {margin: 0 auto; max-width: 90%;} .spotlight-full {margin-left: -5.75% !important; margin-right: -5.75% !important;} .socials-header .social_icons.pull-right {padding-right:10%;} .socials-header .social_contact {padding-left:10%;} .path-login.login_lambda .logo-header {padding-top: 25px;}';
 		$css = str_replace($tag, $replacement, $css);
 	}
 	else { 
@@ -610,7 +610,12 @@ function theme_lambda_process_css($css, $theme) {
     	$css = theme_lambda_set_background_repeat($css, $repeat, $size);
 	}
 	
-	$csslambda = file_get_contents($CFG->dirroot . '/theme/lambda/bootstrapbase/moodle.css');
+	if (!empty($CFG->themedir)) {
+		$csslambda = file_get_contents($CFG->themedir . '/lambda/bootstrapbase/moodle.css');
+		}
+	else {
+		$csslambda = file_get_contents($CFG->dirroot . '/theme/lambda/bootstrapbase/moodle.css');
+	}
 	$csslambda .= "\n" . $css;
 	
     return $csslambda;

@@ -162,11 +162,28 @@
         }
     }
 	
-	public function custom_menu($custommenuitems = '') {
-        global $CFG;
+    public function custom_menu($custommenuitems = '') {
+        global $CFG, $PAGE;
 
+        // Don't apply auto-linking filters.
+        $filtermanager = filter_manager::instance();
+        $filteroptions = array('originalformat' => FORMAT_HTML, 'noclean' => true);
+        $skipfilters = array('activitynames', 'data', 'glossary', 'sectionnames', 'bookchapters');
+
+        // Filter custom user menu.
+        // Don't filter custom user menu on the theme settings page. Otherwise it ends up
+        // filtering the edit field itself resulting in a loss of tags.
+        if ($PAGE->pagetype != 'admin-setting-themesettings' && stripos($CFG->customusermenuitems, '{') !== false) {
+            $CFG->customusermenuitems = $filtermanager->filter_text($CFG->customusermenuitems, $PAGE->context,
+                    $filteroptions, $skipfilters);
+        }
+
+        // Filter custom menu.
         if (empty($custommenuitems) && !empty($CFG->custommenuitems)) {
             $custommenuitems = $CFG->custommenuitems;
+        }
+        if (stripos($custommenuitems, '{') !== false) {
+            $custommenuitems = $filtermanager->filter_text($custommenuitems, $PAGE->context, $filteroptions, $skipfilters);
         }
         $custommenu = new custom_menu($custommenuitems, current_language());
         return $this->render_custom_menu($custommenu);
@@ -196,15 +213,13 @@
 					} else {
 						$current_menu_item = $mycourse->shortname;
 					}
-					$current_menu_item = format_text($current_menu_item, FORMAT_HTML);
-					$current_menu_item_title = format_text($mycourse->fullname, FORMAT_HTML);
+					$current_menu_item = format_string($current_menu_item, true, ['context' => context_course::instance(SITEID), "escape" => false]);
+					$current_menu_item_title = format_string($mycourse->fullname, true, ['context' => context_course::instance(SITEID), "escape" => false]);
                 	$branch->add($current_menu_item, new moodle_url('/course/view.php', array('id' => $mycourse->id)), $current_menu_item_title);
             	}
 			}
 			else {
-				$hometext = get_string('myhome');
-            	$homelabel = $hometext;
-            	$branch->add($homelabel, new moodle_url('/my/index.php'), $hometext);
+            	$branch->add(get_string('myhome'), new moodle_url('/my/index.php'), get_string('myhome'));
 			}
         }
 
@@ -346,11 +361,15 @@
 		if (theme_lambda_get_setting('slideshow_imgfx')!='') {$imgfx=theme_lambda_get_setting('slideshow_imgfx');}
 		
 		$slideshow_height='auto';
-		if(theme_lambda_get_setting('slideshow_height')=='responsive') {
+		if(theme_lambda_get_setting('slideshow_height')=='responsive') {			
 			if (!empty(theme_lambda_get_setting('slide1image'))) {
-				$slide_img_src = $theme->setting_file_url('slide1image', 'slide1image');
-				if (!empty($_SERVER['HTTPS'])) {$slide_img_src = 'https:'.$slide_img_src;} else {$slide_img_src = 'http:'.$slide_img_src;}
-				list($width, $height) = theme_lambda_getslidesize($slide_img_src);
+				$context = context_system::instance();
+				$filename = $theme->settings->slide1image;
+				$fs = get_file_storage();
+				$file = $fs->get_file($context->id, 'theme_lambda', 'slide1image', 0, '/', $filename);
+				$imageinfo = $file->get_imageinfo();
+				$height = $imageinfo['height'];
+				$width = $imageinfo['width'];
 				$relative = $height/$width*100;
 				$relative .= '%';
 				$slideshow_height=$relative;
