@@ -6318,8 +6318,10 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
             // The absolute (real) path is also fetched to ensure that comparisons to allowed paths are compared equally.
             $attachpath = str_replace('\\', '/', realpath($attachment));
 
-            // Add allowed paths to an array (also check if it's not empty).
-            $allowedpaths = array_filter([
+            // Build an array of all filepaths from which attachments can be added (normalised slashes, absolute/real path).
+            $allowedpaths = array_map(function(string $path): string {
+                return str_replace('\\', '/', realpath($path));
+            }, [
                 $CFG->cachedir,
                 $CFG->dataroot,
                 $CFG->dirroot,
@@ -6327,12 +6329,12 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
                 $CFG->tempdir,
                 $CFG->localrequestdir,
             ]);
+
             // Set addpath to true.
             $addpath = true;
+
             // Check if attachment includes one of the allowed paths.
-            foreach ($allowedpaths as $allowedpath) {
-                // Make sure both variables are normalised before comparing.
-                $allowedpath = str_replace('\\', '/', realpath($allowedpath));
+            foreach (array_filter($allowedpaths) as $allowedpath) {
                 // Set addpath to false if the attachment includes one of the allowed paths.
                 if (strpos($attachpath, $allowedpath) === 0) {
                     $addpath = false;
@@ -8375,10 +8377,27 @@ function moodle_setlocale($locale='') {
  * Words are defined as things between whitespace.
  *
  * @category string
- * @param string $string The text to be searched for words.
+ * @param string $string The text to be searched for words. May be HTML.
  * @return int The count of words in the specified string
  */
 function count_words($string) {
+    // Before stripping tags, add a space after the close tag of anything that is not obviously inline.
+    // Also, br is a special case because it definitely delimits a word, but has no close tag.
+    $string = preg_replace('~
+            (                                   # Capture the tag we match.
+                </                              # Start of close tag.
+                (?!                             # Do not match any of these specific close tag names.
+                    a> | b> | del> | em> | i> |
+                    ins> | s> | small> |
+                    strong> | sub> | sup> | u>
+                )
+                \w+                             # But, apart from those execptions, match any tag name.
+                >                               # End of close tag.
+            |
+                <br> | <br\s*/>                 # Special cases that are not close tags.
+            )
+            ~x', '$1 ', $string); // Add a space after the close tag.
+    // Now remove HTML tags.
     $string = strip_tags($string);
     // Decode HTML entities.
     $string = html_entity_decode($string);
@@ -8398,11 +8417,12 @@ function count_words($string) {
  * Letters are defined as chars not in tags and different from whitespace.
  *
  * @category string
- * @param string $string The text to be searched for letters.
+ * @param string $string The text to be searched for letters. May be HTML.
  * @return int The count of letters in the specified text.
  */
 function count_letters($string) {
     $string = strip_tags($string); // Tags are out now.
+    $string = html_entity_decode($string);
     $string = preg_replace('/[[:space:]]*/', '', $string); // Whitespace are out now.
 
     return core_text::strlen($string);
