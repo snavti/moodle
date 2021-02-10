@@ -34,16 +34,16 @@ if ($hassiteconfig) {
             0,
             array(
                 0 => new lang_string('donotdeleteonschedule', 'local_deleteoldquizattempts'),
-                10 => new lang_string('numdays', '', 10),
-                9 => new lang_string('numdays', '', 9),
-                8 => new lang_string('numdays', '', 8),
-                7 => new lang_string('numdays', '', 7),
-                6 => new lang_string('numdays', '', 6),
-                5 => new lang_string('numdays', '', 5),
-                4 => new lang_string('numdays', '', 4),
-                3 => new lang_string('numdays', '', 3),
-                2 => new lang_string('numdays', '', 2),
-                1 => new lang_string('numdays', '', 1)
+                365 * 5 => new lang_string('numyears', '', 5),
+                365 * 3 => new lang_string('numyears', '', 3),
+                365 * 2 => new lang_string('numyears', '', 2),
+                365 => new lang_string('numyears', '', 1),
+                180 => new lang_string('numdays', '', 180),
+                150 => new lang_string('numdays', '', 150),
+                120 => new lang_string('numdays', '', 120),
+                90 => new lang_string('numdays', '', 90),
+                60 => new lang_string('numdays', '', 60),
+                30 => new lang_string('numdays', '', 30)
             )
         )
     );
