@@ -1,0 +1,464 @@
+.jazzquiz-box {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    margin: 0;
+    padding: 20px;
+}
+
+.jazzquiz-box .row {
+    margin: 5px;
+}
+
+.jazzquiz-box .inline-block {
+    display: inline-block;
+}
+
+.jazzquiz-box .span6 {
+    vertical-align: top;
+    width: 49.5%;
+}
+
+.jazzquiz-box .row .span6 {
+    padding: 5px;
+}
+
+.jazzquiz-save-question {
+    height: 30px;
+}
+
+@media (min-width: 480px) {
+    .jazzquiz-save-question {
+        margin-left: 8em;
+    }
+}
+
+#jazzquiz_loading {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 30%;
+}
+
+#jazzquiz_responses_container,
+#jazzquiz_responded_container,
+#jazzquiz_info_container {
+    border: 1px solid #eee;
+    border-radius: 0;
+    margin: 0;
+    padding: 6px 16px;
+}
+
+#jazzquiz_side_container {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #eee;
+}
+
+#jazzquiz_question_timer {
+    font-size: 1.5rem;
+}
+
+#jazzquiz_responses_container {
+    padding: 0;
+}
+
+#jazzquiz_side_container > div {
+    display: inline-block;
+    border: none;
+    padding: 6px 16px;
+}
+
+.jazzquiz-box .submit {
+    display: none;
+}
+
+#jazzquiz .hidden {
+    display: none;
+    visibility: hidden;
+}
+
+.jazzquiz-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: 9000;
+    padding: 20px;
+    background: #fafafa;
+    overflow-y: scroll;
+}
+
+.jazzquiz-fullscreen #jazzquiz_control_separator {
+    display: none;
+}
+
+.jazzquiz-responses-overview {
+    width: 100%;
+}
+
+.jazzquiz-responses-overview tr td p {
+    margin: 0;
+    padding: 0;
+}
+
+.jazzquiz-responses-overview tr td {
+    border-top: 2px solid #eee;
+    border-bottom: 2px solid #eee;
+    padding: 8px 0;
+    word-break: break-all;
+}
+
+.jazzquiz-responses-overview tr td.bar {
+    padding-left: 16px;
+    padding-right: 16px;
+    cursor: pointer;
+}
+
+.jazzquiz-responses-overview tr td:first-child {
+    cursor: pointer;
+    width: 256px;
+    text-align: center;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.jazzquiz-responses-overview tr td.bar div {
+    background: #29f;
+    border-radius: 1.5rem;
+    text-align: right;
+}
+
+.jazzquiz-responses-overview tr td.bar div span {
+    color: white;
+    text-shadow: 0 0 10px white;
+    font-size: 1.6rem;
+    margin-right: 1.6rem;
+}
+
+.jazzquiz-responses-overview tr:first-child td {
+    border-top: none;
+}
+
+.jazzquiz-responses-overview tr:last-child td {
+    border-bottom: none;
+}
+
+.jazzquiz-responses-overview tr {
+    opacity: 0.3;
+}
+
+.jazzquiz-responses-overview tr.selected-vote-option {
+    opacity: 1;
+}
+
+.jazzquiz-responses-overview tr td:first-child .filter_mathjaxloader_equation .MathJax:focus {
+    outline: none;
+}
+
+.jazzquiz-responses-overview tr td.options {
+    width: 48px;
+}
+
+.jazzquiz-responses-overview tr.outside .bar div span {
+    margin-right: -2.5rem;
+    color: #444;
+    text-shadow: 0 0 10px #999;
+}
+
+.jazzquiz-vote label {
+    display: block;
+    padding: 10px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.jazzquiz-vote label:hover {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.jazzquiz-vote label > span p {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+#jazzquiz_controls_box {
+    border-radius: 0;
+    padding: 0;
+    border: 0;
+    margin: 0;
+}
+
+#jazzquiz_controls {
+    display: block;
+    background: #f9f9f9;
+}
+
+#jazzquiz_state {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    font-size: 1vw;
+    color: #888;
+    vertical-align: middle;
+    cursor: default;
+    user-select: none;
+    font-style: italic;
+}
+
+#jazzquiz_controls .btn {
+    text-align: left;
+    border: none;
+    outline: none;
+    border-radius: 0;
+    background: #f9f9f9;
+}
+
+.jazzquiz-fullscreen #jazzquiz_controls .btn {
+    font-size: 1.4vw;
+    padding: 0.6vw 1.2vw;
+}
+
+#jazzquiz_controls .btn:hover,
+#jazzquiz_controls .btn.active {
+    background: #29f;
+    color: white;
+    transition: none;
+}
+
+@media all and (min-width: 1152px) {
+    .jazzquiz-fullscreen #jazzquiz_controls .btn {
+        font-size: 1.1rem;
+    }
+    .jazzquiz-fullscreen #jazzquiz_controls_state {
+        font-size: 1rem;
+    }
+}
+
+.start-question-menu {
+    position: absolute;
+    display: none;
+}
+
+.start-question-menu.active {
+    display: block;
+    z-index: 100;
+}
+
+.start-question-menu .btn {
+    display: block;
+    width: 100%;
+}
+
+#jazzquiz_control_quit,
+#jazzquiz_control_responses,
+#jazzquiz_control_answer {
+    float: right;
+}
+
+.merge-from {
+    background: #eee;
+    cursor: pointer;
+}
+
+.merge-into {
+    cursor: pointer;
+}
+
+.jazzquiz-responses-overview tr .bar {
+    transition: 0.6s ease padding-left;
+}
+
+.jazzquiz-responses-overview .merge-into .bar {
+    padding-left: 64px;
+    transition: 0.3s ease padding-left;
+}
+
+.jazzquiz-responses-overview tr .bar div {
+    transition: 1s ease width;
+}
+
+.merge-into .bar div {
+    opacity: 0.7;
+}
+
+.merge-into:hover .bar div {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    opacity: 1;
+}
+
+#jazzquiz_question_box .que,
+#jazzquiz_correct_answer_container .que,
+#jazzquiz_question_box .que .content,
+#jazzquiz_correct_answer_container .que .content {
+    margin: 0;
+}
+
+#jazzquiz_question_box .que .formulation,
+#jazzquiz_correct_answer_container .que .formulation {
+    border: none;
+    background: #fafafa;
+    margin: 0;
+}
+
+#jazzquiz_question_box .que .info {
+    display: none;
+}
+
+#jazzquiz_correct_answer_container .que .info {
+    display: none;
+}
+
+#jazzquiz_info_container {
+    padding: 32px;
+    font-size: 1.2rem;
+    background: #eee;
+    border: 1px solid #ddd;
+}
+
+#jazzquiz_info_container table tr td {
+    padding: 16px 8px;
+}
+
+#jazzquiz_info_container table tr td:first-child {
+    width: 256px;
+}
+
+#jazzquiz_info_container table tr:nth-child(odd) td {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.formulation .questiontestslink {
+    display: none;
+}
+
+#jazzquiz_response_info_container h4 {
+    font-size: 1.2rem;
+    vertical-align: middle;
+}
+
+#jazzquiz_response_info_container .btn.btn-primary,
+#report_overview_controls .btn.btn-primary {
+    margin-left: 16px;
+}
+
+.jazzquiz-box .questionlist .dragquestion {
+    width: 10%;
+    cursor: move;
+}
+
+.jazzquiz-box .questionlist .icon {
+    vertical-align: middle;
+    height: auto;
+}
+
+.jazzquiz-box .questionlist .name {
+    width: calc(100% - 256px);
+    vertical-align: middle;
+}
+
+.jazzquiz-box .questionlist .name p {
+    margin: 0;
+}
+
+.jazzquiz-box .questionlist .controls {
+    width: 100%;
+    vertical-align: middle;
+}
+
+.jazzquiz-box .questionlist li {
+    min-height: 30px;
+    margin: 4px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: #eee;
+}
+
+.jazzquiz-box .questionlist li div {
+    display: inline-block;
+}
+
+.jazzquiz-box .questionlist li:hover {
+    background: #ddd;
+}
+
+.jazzquiz-box .questionlist li a {
+    color: black;
+}
+
+.jazzquiz-box .questionlist li a:hover i.icon {
+    color: #29f;
+}
+
+#categoryquestions thead {
+    background: #eee;
+}
+
+#report_overview_controls a {
+    margin-left: 32px;
+}
+
+#report_overview_responded table tr {
+    border-bottom: 1px solid #aaa;
+}
+
+#report_overview_responded table tr td,
+#report_overview_responded table tr th {
+    padding: 8px 16px;
+    font-size: 1.2rem;
+}
+
+.jazzquiz-box.instructor {
+    width: 100%;
+}
+
+.edit-question-action {
+    cursor: pointer;
+}
+
+#jazzquiz_response_info_container .btn.btn-primary,
+#report_overview_controls .btn.btn-primary,
+#jazzquiz_undo_merge,
+#jazzquiz_control_startquiz,
+#jazzquiz_control_exit {
+    background: #eee;
+    color: #444;
+    border-radius: 0;
+    border: 1px solid #aaa;
+    outline: none;
+}
+
+#jazzquiz_control_startquiz {
+    font-size: 2rem;
+    padding: 16px 32px;
+    margin: 16px;
+}
+
+#jazzquiz_control_startquiz:hover,
+#jazzquiz_control_exit:hover,
+#jazzquiz_undo_merge:hover,
+#report_overview_controls .btn.btn-primary:hover,
+#jazzquiz_response_info_container .btn.btn-primary:hover {
+    background: #29f;
+    color: #fff;
+    transition: none;
+}
+
+#jazzquiz_control_exit {
+    float: right;
+    margin: 16px;
+    font-size: 1.2rem;
+}
+
+.jazzquiz-add-selected-questions {
+    margin: 4px;
+}
+
+.start-question-menu .MathJax_Display,
+.questionlist li .controls .name .MathJax_Display {
+    text-align: left !important;
+    margin: 0 !important;
+}
