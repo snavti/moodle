@@ -57,6 +57,10 @@
     position: relative;
 }
 
+.format-topcoll.path-course-view .completionprogress {
+    z-index: 1;
+}
+
 .course-content ul.ctopics.bsnewgrid li.section.main,
 .course-content ul.ctopics.bsnewgrid li.tcsection {
     margin: 0;
@@ -858,6 +862,19 @@ body.jsenabled #toggle-all {
 .format-topcoll .ct-activity-mod-engagement .icon,
 .format-topcoll .ct-activity-mod-feedback .icon {
     font-size: 1.1em;
+}
+
+/* Colour picker */
+.tccolourpopupbox {
+    border: 1px solid black;
+    cursor: pointer;
+    margin: 0 0 0 2px;
+    padding: 0 8px;
+}
+
+.tccolourpopupsel {
+    position: absolute;
+    z-index: 500;
 }
 
 /* Print styles. */

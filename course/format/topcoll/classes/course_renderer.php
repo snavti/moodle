@@ -218,14 +218,18 @@ class format_topcoll_course_renderer extends \core_course_renderer {
         $output .= $this->course_section_cm_availability($mod, $displayoptions);
 
         // Get further information.
-        $settingname = 'coursesectionactivityfurtherinformation'.$mod->modname;
-        $setting = get_config('format_topcoll', $settingname);
-        if (!empty($setting) && ($setting == 2)) {
-            $cmmetaoutput = $this->course_section_cm_get_meta($mod);
-            if (!empty($cmmetaoutput)) {
-                $output .= html_writer::start_tag('div', array('class' => 'ct-activity-meta-container'));
-                $output .= $cmmetaoutput;
-                $output .= html_writer::end_tag('div');
+        $courseformat = course_get_format($course);
+        $tcsettings = $courseformat->get_settings();
+        if ((!empty($tcsettings['showadditionalmoddata'])) && ($tcsettings['showadditionalmoddata'] == 2)) {
+            $settingname = 'coursesectionactivityfurtherinformation'.$mod->modname;
+            $setting = get_config('format_topcoll', $settingname);
+            if ((!empty($setting)) && ($setting == 2)) {
+                $cmmetaoutput = $this->course_section_cm_get_meta($mod);
+                if (!empty($cmmetaoutput)) {
+                    $output .= html_writer::start_tag('div', array('class' => 'ct-activity-meta-container'));
+                    $output .= $cmmetaoutput;
+                    $output .= html_writer::end_tag('div');
+                }
             }
         }
 
@@ -432,6 +436,12 @@ class format_topcoll_course_renderer extends \core_course_renderer {
                     $warningicon = 't/unlocked';
                 } else if ($meta->draft) {
                     $warningstr = $meta->draftstr;
+                    $warningicon = 'i/warning';
+                } else if ($meta->notopen) {
+                    $warningstr = $meta->notopenstr;
+                    $warningicon = 'i/warning';
+                } else if ($meta->notattempted) {
+                    $warningstr = get_string('notattempted', 'format_topcoll');
                     $warningicon = 'i/warning';
                 } else {
                     $warningstr = $meta->notsubmittedstr;
