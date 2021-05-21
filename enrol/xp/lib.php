@@ -15,21 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Enrol class.
+ * Block XP lib.
  *
- * @package    enrol_xp
- * @copyright  2017 Frédéric Massart <fred@branchup.tech>
+ * @package    block_xp
+ * @copyright  2014 Frédéric Massart - FMCorz.net
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Enrol plugin class.
+ * File serving.
  *
- * @package    enrol_xp
- * @copyright  2017 Frédéric Massart <fred@branchup.tech>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @param stdClass $course The course object.
+ * @param stdClass $bi Block instance record.
+ * @param context $context The context object.
+ * @param string $filearea The file area.
+ * @param array $args List of arguments.
+ * @param bool $forcedownload Whether or not to force the download of the file.
+ * @param array $options Array of options.
+ * @return void|false
  */
-class enrol_xp_plugin extends \enrol_xp\plugin {
+function block_xp_pluginfile($course, $bi, $context, $filearea, $args, $forcedownload, array $options = array()) {
+    $fs = \block_xp\di::get('file_server');
+    if ($fs instanceof \block_xp\local\file\block_file_server) {
+        $fs->serve_block_file($course, $bi, $context, $filearea, $args, $forcedownload, $options);
+    }
 }

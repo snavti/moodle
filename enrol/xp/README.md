@@ -1,54 +1,77 @@
-Enrol level
-===========
+Level up! (block_xp) ![GitHub tag](https://img.shields.io/github/tag/FMCorz/moodle-block_xp.svg) ![Travis branch](https://img.shields.io/travis/FMCorz/moodle-block_xp/master.svg)
+====================
 
-Enrol users in courses when a certain level from [Level up!](https://moodle.org/plugins/block_xp) is attained.
+Engage your students! A Moodle plugin to gamify your students' learning experience by allowing them to _level up_ in their courses.
+
+Features
+--------
+
+- Automatically captures and attributes experience points to students' actions
+- Block that displays current level and progress towards next level
+- Report for teachers to get an overview of their students' levels
+- Notifications to congratulate students as they level up
+- A ladder to display the ranking of the students
+- Ability to set the number of levels and the experience required to get to them
+- Images can be uploaded to customise for the appearance of the levels
+- The amount of experience points earned per event is customizable
+- Page to display the list of levels and a description
+- Experience points are earned per course
+- An event is fired when a student levels up (for developers)
+
+### Additional features
+
+Purchasing the _Level up! Plus_ add-on unlocks additional features. [Click here for more details](https://levelup.plus?ref=readme).
 
 Requirements
 ------------
 
-- Level Up! 3.1 or greater.
-- Moodle 2.7 or greater.
-
-How to use
-----------
-
-Navigate to a course, and go the enrolment methods. The link to the enrolment methods can be found in the administration block under _Course administation > Users_ and sometimes in the participants page in the _cog menu_.
-
-From that page, add the method _Level enrolment_ by selecting it in the dropdown menu, and configure it as per your requirements.
-
-When are users enrolled?
-------------------------
-
-Enrolment occurs two different ways:
-
-- Automatically, when a user reaches the required level.
-- Manually, when triggered from the enrolment methods screen.
-
-The manual method is useful to enrol all users who already attained the level. Note that this requires cron to be enabled.
+Moodle 3.1 or greater.
 
 Installation
 ------------
 
-### Zip upload
+Simply install the plugin and add the block to a course page. More details are available here: [Level up! documentation](https://levelup.plus/docs/topic/installation?ref=readme)
 
-If you have configured Moodle to allow plugin installation from the user interface, and you received a zip of the plugin, follow the following steps. If not, refer to the manual process.
+The plugin can also be installed using [composer](https://getcomposer.org/) at [fmcorz/moodle-block_xp](https://packagist.org/packages/fmcorz/moodle-block_xp).
 
-1. Visit the _Install plugins_ admin page (Site administration > Plugins > Install plugins)
-2. Drag & drop the plugin in the _Zip package_ area
-3. Click _Install plugin from the ZIP file_ and follow the process
+How are experience points calculated?
+-------------------------------------
 
-That's it!
+Have a look at this [documentation page](https://levelup.plus/docs/article/how-are-experience-points-calculated?ref=readme).
 
-### Manual process
+Restricting access based on students' levels
+--------------------------------------------
 
-1. Place the content of this plugin in the folder `enrol/xp`.
-2. Visit your admin's _Notifications_ page (Site administration > Notifications)
-3. Follow the upgrade process
+Have a look at this availability plugin [Level](https://github.com/FMCorz/moodle-availability_xp).
 
-That's it!
+Level-based enrolment
+---------------------
+
+Have a look at this enrolment plugin [Level](https://github.com/branchup/moodle-enrol_xp).
+
+Shortcodes
+----------
+
+_What are those? Shortcodes can be used in editors throughout Moodle to include or modify the content. The plugin [Shortcodes](https://github.com/branchup/moodle-filter_shortcodes) must be installed to enable them._
+
+Check the [list of supported shortcodes](https://levelup.plus/docs/article/using-shortcodes?ref=readme).
+
+How to use one block for all courses
+------------------------------------
+
+In order to gather experience points from all the courses a student is participating in, you have to set the admin setting _Where are experience points used?_ to 'For the whole site'. This setting is located under "Site administration > Plugins > Blocks > Level up!". Once set, any block newly or previously added will display the total experience points of your student.
+
+Todo
+----
+
+- Awarding a badge when a student reaches a level (blocked by [MDL-39864](https://tracker.moodle.org/browse/MDL-39864))
+
+Provided by
+-----------
+
+[![Branch Up](https://branchup.tech/branch-up-logo-x30.svg)](https://branchup.tech?ref=levelup_readme)
 
 License
 -------
 
 Licensed under the [GNU GPL License](http://www.gnu.org/copyleft/gpl.html).
-

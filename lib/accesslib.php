@@ -3923,7 +3923,8 @@ function get_role_users($roleid, context $context, $parent = false, $fields = ''
     global $DB;
 
     if (empty($fields)) {
-        $allnames = get_all_user_name_fields(true, 'u');
+        $userfieldsapi = \core_user\fields::for_name();
+        $allnames = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
         $fields = 'u.id, u.confirmed, u.username, '. $allnames . ', ' .
                   'u.maildisplay, u.mailformat, u.maildigest, u.email, u.emailstop, u.city, '.
                   'u.country, u.picture, u.idnumber, u.department, u.institution, '.
@@ -4873,6 +4874,9 @@ function role_change_permission($roleid, $context, $capname, $permission) {
  */
 abstract class context extends stdClass implements IteratorAggregate {
 
+    /** @var string Default sorting of capabilities in {@see get_capabilities} */
+    protected const DEFAULT_CAPABILITY_SORT = 'contextlevel, component, name';
+
     /**
      * The context id
      * Can be accessed publicly through $context->id
@@ -5525,9 +5529,11 @@ abstract class context extends stdClass implements IteratorAggregate {
      *      type of context, e.g. User, Course, Forum, etc.
      * @param boolean $short whether to use the short name of the thing. Only applies
      *      to course contexts
+     * @param boolean $escape Whether the returned name of the thing is to be
+     *      HTML escaped or not.
      * @return string the human readable context name.
      */
-    public function get_context_name($withprefix = true, $short = false) {
+    public function get_context_name($withprefix = true, $short = false, $escape = true) {
         // must be implemented in all context levels
         throw new coding_exception('can not get name of abstract context');
     }
@@ -5559,9 +5565,10 @@ abstract class context extends stdClass implements IteratorAggregate {
     /**
      * Returns array of relevant context capability records.
      *
+     * @param string $sort SQL order by snippet for sorting returned capabilities sensibly for display
      * @return array
      */
-    public abstract function get_capabilities();
+    public abstract function get_capabilities(string $sort = self::DEFAULT_CAPABILITY_SORT);
 
     /**
      * Recursive function which, given a context, find all its children context ids.
@@ -6186,8 +6193,10 @@ class context_helper extends context {
 
     /**
      * not used
+     *
+     * @param string $sort
      */
-    public function get_capabilities() {
+    public function get_capabilities(string $sort = self::DEFAULT_CAPABILITY_SORT) {
     }
 }
 
@@ -6229,9 +6238,10 @@ class context_system extends context {
      *
      * @param boolean $withprefix does not apply to system context
      * @param boolean $short does not apply to system context
+     * @param boolean $escape does not apply to system context
      * @return string the human readable context name.
      */
-    public function get_context_name($withprefix = true, $short = false) {
+    public function get_context_name($withprefix = true, $short = false, $escape = true) {
         return self::get_level_name();
     }
 
@@ -6247,18 +6257,13 @@ class context_system extends context {
     /**
      * Returns array of relevant context capability records.
      *
+     * @param string $sort
      * @return array
      */
-    public function get_capabilities() {
+    public function get_capabilities(string $sort = self::DEFAULT_CAPABILITY_SORT) {
         global $DB;
 
-        $sort = 'ORDER BY contextlevel,component,name';   // To group them sensibly for display
-
-        $params = array();
-        $sql = "SELECT *
-                  FROM {capabilities}";
-
-        return $DB->get_records_sql($sql.' '.$sort, $params);
+        return $DB->get_records('capabilities', [], $sort);
     }
 
     /**
@@ -6488,9 +6493,10 @@ class context_user extends context {
      *
      * @param boolean $withprefix whether to prefix the name of the context with User
      * @param boolean $short does not apply to user context
+     * @param boolean $escape does not apply to user context
      * @return string the human readable context name.
      */
-    public function get_context_name($withprefix = true, $short = false) {
+    public function get_context_name($withprefix = true, $short = false, $escape = true) {
         global $DB;
 
         $name = '';
@@ -6522,21 +6528,17 @@ class context_user extends context {
     /**
      * Returns array of relevant context capability records.
      *
+     * @param string $sort
      * @return array
      */
-    public function get_capabilities() {
+    public function get_capabilities(string $sort = self::DEFAULT_CAPABILITY_SORT) {
         global $DB;
-
-        $sort = 'ORDER BY contextlevel,component,name';   // To group them sensibly for display
 
         $extracaps = array('moodle/grade:viewall');
         list($extra, $params) = $DB->get_in_or_equal($extracaps, SQL_PARAMS_NAMED, 'cap');
-        $sql = "SELECT *
-                  FROM {capabilities}
-                 WHERE contextlevel = ".CONTEXT_USER."
-                       OR name $extra";
 
-        return $records = $DB->get_records_sql($sql.' '.$sort, $params);
+        return $DB->get_records_select('capabilities', "contextlevel = :level OR name {$extra}",
+            $params + ['level' => CONTEXT_USER], $sort);
     }
 
     /**
@@ -6675,9 +6677,10 @@ class context_coursecat extends context {
      *
      * @param boolean $withprefix whether to prefix the name of the context with Category
      * @param boolean $short does not apply to course categories
+     * @param boolean $escape Whether the returned name of the context is to be HTML escaped or not.
      * @return string the human readable context name.
      */
-    public function get_context_name($withprefix = true, $short = false) {
+    public function get_context_name($withprefix = true, $short = false, $escape = true) {
         global $DB;
 
         $name = '';
@@ -6685,7 +6688,11 @@ class context_coursecat extends context {
             if ($withprefix){
                 $name = get_string('category').': ';
             }
-            $name .= format_string($category->name, true, array('context' => $this));
+            if (!$escape) {
+                $name .= format_string($category->name, true, array('context' => $this, 'escape' => false));
+            } else {
+                $name .= format_string($category->name, true, array('context' => $this));
+            }
         }
         return $name;
     }
@@ -6702,19 +6709,18 @@ class context_coursecat extends context {
     /**
      * Returns array of relevant context capability records.
      *
+     * @param string $sort
      * @return array
      */
-    public function get_capabilities() {
+    public function get_capabilities(string $sort = self::DEFAULT_CAPABILITY_SORT) {
         global $DB;
 
-        $sort = 'ORDER BY contextlevel,component,name';   // To group them sensibly for display
-
-        $params = array();
-        $sql = "SELECT *
-                  FROM {capabilities}
-                 WHERE contextlevel IN (".CONTEXT_COURSECAT.",".CONTEXT_COURSE.",".CONTEXT_MODULE.",".CONTEXT_BLOCK.")";
-
-        return $DB->get_records_sql($sql.' '.$sort, $params);
+        return $DB->get_records_list('capabilities', 'contextlevel', [
+            CONTEXT_COURSECAT,
+            CONTEXT_COURSE,
+            CONTEXT_MODULE,
+            CONTEXT_BLOCK,
+        ], $sort);
     }
 
     /**
@@ -6907,9 +6913,10 @@ class context_course extends context {
      *
      * @param boolean $withprefix whether to prefix the name of the context with Course
      * @param boolean $short whether to use the short name of the thing.
+     * @param bool $escape Whether the returned category name is to be HTML escaped or not.
      * @return string the human readable context name.
      */
-    public function get_context_name($withprefix = true, $short = false) {
+    public function get_context_name($withprefix = true, $short = false, $escape = true) {
         global $DB;
 
         $name = '';
@@ -6921,9 +6928,18 @@ class context_course extends context {
                     $name = get_string('course').': ';
                 }
                 if ($short){
-                    $name .= format_string($course->shortname, true, array('context' => $this));
+                    if (!$escape) {
+                        $name .= format_string($course->shortname, true, array('context' => $this, 'escape' => false));
+                    } else {
+                        $name .= format_string($course->shortname, true, array('context' => $this));
+                    }
                 } else {
-                    $name .= format_string(get_course_display_name_for_list($course));
+                    if (!$escape) {
+                        $name .= format_string(get_course_display_name_for_list($course), true, array('context' => $this,
+                            'escape' => false));
+                    } else {
+                        $name .= format_string(get_course_display_name_for_list($course), true, array('context' => $this));
+                    }
                }
             }
         }
@@ -6946,19 +6962,17 @@ class context_course extends context {
     /**
      * Returns array of relevant context capability records.
      *
+     * @param string $sort
      * @return array
      */
-    public function get_capabilities() {
+    public function get_capabilities(string $sort = self::DEFAULT_CAPABILITY_SORT) {
         global $DB;
 
-        $sort = 'ORDER BY contextlevel,component,name';   // To group them sensibly for display
-
-        $params = array();
-        $sql = "SELECT *
-                  FROM {capabilities}
-                 WHERE contextlevel IN (".CONTEXT_COURSE.",".CONTEXT_MODULE.",".CONTEXT_BLOCK.")";
-
-        return $DB->get_records_sql($sql.' '.$sort, $params);
+        return $DB->get_records_list('capabilities', 'contextlevel', [
+            CONTEXT_COURSE,
+            CONTEXT_MODULE,
+            CONTEXT_BLOCK,
+        ], $sort);
     }
 
     /**
@@ -7130,9 +7144,10 @@ class context_module extends context {
      * @param boolean $withprefix whether to prefix the name of the context with the
      *      module name, e.g. Forum, Glossary, etc.
      * @param boolean $short does not apply to module context
+     * @param boolean $escape Whether the returned name of the context is to be HTML escaped or not.
      * @return string the human readable context name.
      */
-    public function get_context_name($withprefix = true, $short = false) {
+    public function get_context_name($withprefix = true, $short = false, $escape = true) {
         global $DB;
 
         $name = '';
@@ -7144,7 +7159,11 @@ class context_module extends context {
                     if ($withprefix){
                         $name = get_string('modulename', $cm->modname).': ';
                     }
-                    $name .= format_string($mod->name, true, array('context' => $this));
+                    if (!$escape) {
+                        $name .= format_string($mod->name, true, array('context' => $this, 'escape' => false));
+                    } else {
+                        $name .= format_string($mod->name, true, array('context' => $this));
+                    }
                 }
             }
         return $name;
@@ -7171,12 +7190,11 @@ class context_module extends context {
     /**
      * Returns array of relevant context capability records.
      *
+     * @param string $sort
      * @return array
      */
-    public function get_capabilities() {
+    public function get_capabilities(string $sort = self::DEFAULT_CAPABILITY_SORT) {
         global $DB, $CFG;
-
-        $sort = 'ORDER BY contextlevel,component,name';   // To group them sensibly for display
 
         $cm = $DB->get_record('course_modules', array('id'=>$this->_instanceid));
         $module = $DB->get_record('modules', array('id'=>$cm->module));
@@ -7251,9 +7269,10 @@ class context_module extends context {
                  WHERE (contextlevel = ".CONTEXT_MODULE."
                    AND component {$notcompsql}
                    AND {$notlikesql})
-                       $extra";
+                       $extra
+              ORDER BY $sort";
 
-        return $DB->get_records_sql($sql.' '.$sort, $params);
+        return $DB->get_records_sql($sql, $params);
     }
 
     /**
@@ -7405,9 +7424,10 @@ class context_block extends context {
      *
      * @param boolean $withprefix whether to prefix the name of the context with Block
      * @param boolean $short does not apply to block context
+     * @param boolean $escape does not apply to block context
      * @return string the human readable context name.
      */
-    public function get_context_name($withprefix = true, $short = false) {
+    public function get_context_name($withprefix = true, $short = false, $escape = true) {
         global $DB, $CFG;
 
         $name = '';
@@ -7440,31 +7460,28 @@ class context_block extends context {
     /**
      * Returns array of relevant context capability records.
      *
+     * @param string $sort
      * @return array
      */
-    public function get_capabilities() {
+    public function get_capabilities(string $sort = self::DEFAULT_CAPABILITY_SORT) {
         global $DB;
 
-        $sort = 'ORDER BY contextlevel,component,name';   // To group them sensibly for display
-
-        $params = array();
         $bi = $DB->get_record('block_instances', array('id' => $this->_instanceid));
 
-        $extra = '';
+        $select = '(contextlevel = :level AND component = :component)';
+        $params = [
+            'level' => CONTEXT_BLOCK,
+            'component' => 'block_' . $bi->blockname,
+        ];
+
         $extracaps = block_method_result($bi->blockname, 'get_extra_capabilities');
         if ($extracaps) {
-            list($extra, $params) = $DB->get_in_or_equal($extracaps, SQL_PARAMS_NAMED, 'cap');
-            $extra = "OR name $extra";
+            list($extra, $extraparams) = $DB->get_in_or_equal($extracaps, SQL_PARAMS_NAMED, 'cap');
+            $select .= " OR name $extra";
+            $params = array_merge($params, $extraparams);
         }
 
-        $sql = "SELECT *
-                  FROM {capabilities}
-                 WHERE (contextlevel = ".CONTEXT_BLOCK."
-                       AND component = :component)
-                       $extra";
-        $params['component'] = 'block_' . $bi->blockname;
-
-        return $DB->get_records_sql($sql.' '.$sort, $params);
+        return $DB->get_records_select('capabilities', $select, $params, $sort);
     }
 
     /**

@@ -17,18 +17,15 @@
 /**
  * Version file.
  *
- * @package    enrol_xp
- * @copyright  2017 Frédéric Massart <fred@branchup.tech>
+ * @package    block_xp
+ * @copyright  2014 Frédéric Massart
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version      = 2020042901;
-$plugin->requires     = 2016052300;   // Moodle 3.1.0.
-$plugin->component    = 'enrol_xp';
-$plugin->maturity     = MATURITY_STABLE;
-$plugin->release      = '1.0.2';
-$plugin->dependencies = [
-    'block_xp' => 2017091000
-];
+$plugin->version    = 2021042802;
+$plugin->requires   = 2016052300;   // Moodle 3.1.0.
+$plugin->component  = 'block_xp';
+$plugin->maturity   = MATURITY_STABLE;
+$plugin->release    = '3.11.2';

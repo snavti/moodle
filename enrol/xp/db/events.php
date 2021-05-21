@@ -15,18 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file.
+ * Observers.
  *
- * @package    enrol_xp
- * @copyright  2017 Frédéric Massart <fred@branchup.tech>
+ * @package    block_xp
+ * @copyright  2014 Frédéric Massart
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$observers = [
-    [
-        'eventname' => '\\block_xp\\event\\user_leveledup',
-        'callback' => 'enrol_xp\\observer::user_leveledup'
-    ]
-];
+$rulemaker = \block_xp\di::get('observer_rules_maker');
+$observers = $rulemaker->get_observer_rules();
+unset($rulemaker);
