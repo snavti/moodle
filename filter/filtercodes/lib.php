@@ -18,7 +18,7 @@
  * Library of functions for filtercodes.
  *
  * @package   filter_filtercodes
- * @copyright 2016-2020 TNG Consulting Inc. (https://tngconsulting.ca)
+ * @copyright 2016-2021 TNG Consulting Inc. (https://tngconsulting.ca)
  * @author    Michael Milette
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -40,8 +40,8 @@ function filter_filtercodes_render_navbar_output() {
 
             // Don't apply auto-linking filters.
             $filtermanager = filter_manager::instance();
-            $filteroptions = array('originalformat' => FORMAT_HTML, 'noclean' => true);
-            $skipfilters = array('activitynames', 'data', 'glossary', 'sectionnames', 'bookchapters');
+            $filteroptions = ['originalformat' => FORMAT_HTML, 'noclean' => true];
+            $skipfilters = ['activitynames', 'data', 'glossary', 'sectionnames', 'bookchapters'];
 
             // Filter Custom Menu.
             $CFG->custommenuitems = $filtermanager->filter_text($CFG->custommenuitems,
