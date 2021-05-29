@@ -4,7 +4,6 @@ sudo: false
 
 addons:
   firefox: "47.0.1"
-  postgresql: "9.3"
 
 cache:
   directories:
@@ -17,14 +16,18 @@ php:
 
 env:
  global:
-  - MOODLE_BRANCH=master
- matrix:
-  - DB=pgsql
   - DB=mysqli
+ matrix:
+  - MOODLE_BRANCH=master
+  - MOODLE_BRANCH=MOODLE_35_STABLE
+  - MOODLE_BRANCH=MOODLE_34_STABLE
+  - MOODLE_BRANCH=MOODLE_33_STABLE
+  - MOODLE_BRANCH=MOODLE_32_STABLE
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - nvm install node
+  - nvm install 8.9
+  - nvm use 8.9
   - cd ../..
   - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"

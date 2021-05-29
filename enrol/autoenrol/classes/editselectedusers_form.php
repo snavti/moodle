@@ -15,16 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Auto enrol plugin installation script
+ * The form to collect required information when bulk editing users enrolments.
  *
- * @package    enrol_auto
- * @author     Eugene Venter <eugene@catalyst.net.nz>
- * @copyright  2013 onwards Catalyst IT
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package enrol_autoenrol
+ * @copyright 2018 Roberto Pinna based on Farhan Karmali code
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_enrol_auto_install() {
-    global $CFG, $DB;
+require_once("$CFG->dirroot/enrol/bulkchange_forms.php");
 
+/**
+ * The form to collect required information when bulk editing users enrolments.
+ *
+ * @package enrol_autoenrol
+ * @copyright 2018 Roberto Pinna based on Farhan Karmali code
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class enrol_autoenrol_editselectedusers_form extends enrol_bulk_enrolment_change_form {
 }

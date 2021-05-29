@@ -15,18 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Auto enrolment plugin version specification.
+ * autoenrol enrolment plugin.
  *
- * @package     enrol_auto
- * @author      Eugene Venter <eugene@catalyst.net.nz>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * This plugin automatically enrols a user onto a course the first time they try to access it.
+ *
+ * @package    enrol_autoenrol
+ * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @copyright  2017 onwards Roberto Pinna
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018032501;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016120500;        // Requires this Moodle version
-$plugin->component = 'enrol_auto';      // Full name of the plugin (used for diagnostics)
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release = 'melodie-r1';
-
+$plugin->version = 2019111800;
+$plugin->requires = 2013111800.00;      // Requires this Moodle version (2.6).
+$plugin->release = '2.1.1';             // Plugin release.
+$plugin->component = 'enrol_autoenrol'; // Full name of the plugin (used for diagnostics).
+$plugin->maturity = MATURITY_STABLE;    // The moodle.org release.

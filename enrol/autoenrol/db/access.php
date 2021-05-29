@@ -15,11 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Capabilities for auto enrolment plugin.
+ * autoenrol enrolment plugin.
  *
- * @package    enrol_auto
- * @author     Eugene Venter <eugene@catalyst.net.nz>
- * @copyright  2013 onwards Catalyst IT
+ * This plugin automatically enrols a user onto a course the first time they try to access it.
+ *
+ * @package    enrol_autoenrol
+ * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,42 +28,49 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    /* Add or edit enrol-auto instance in course. */
-    'enrol/auto:config' => array(
-        'captype' => 'write',
+    'enrol/autoenrol:config'      => array(
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
+        'archetypes'   => array(
+            'manager'        => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
         )
     ),
 
-    /* Manage user auto-enrolments. */
-    'enrol/auto:manage' => array(
-        'captype' => 'write',
+    'enrol/autoenrol:manage'      => array(
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
+        'archetypes'   => array(
+            'manager'        => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'enrol/autoenrol:config'
+    ),
+
+    'enrol/autoenrol:unenrol'     => array(
+        'captype'      => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes'   => array(
+            'manager'        => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
         )
     ),
 
-    /* Voluntarily unenrol auto from course - watch out for data loss. */
-    'enrol/auto:unenrolself' => array(
-        'captype' => 'write',
+    'enrol/autoenrol:unenrolself' => array(
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
+        'archetypes'   => array(
             'student' => CAP_ALLOW,
         )
     ),
 
-    /* Unenrol anybody from course (including self) -  watch out for data loss. */
-    'enrol/auto:unenrol' => array(
-        'captype' => 'write',
+    'enrol/autoenrol:method'      => array(
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
+        'archetypes'   => array(
+            'manager'        => CAP_ALLOW
         )
     ),
+
 );
+

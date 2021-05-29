@@ -15,19 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file keeps track of upgrades to the auto enrolment plugin
+ * The form to confirm the intention to bulk delete users enrolments.
  *
- * @package     enrol_auto
- * @author      Eugene Venter <eugene@catalyst.net.nz>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package enrol_autoenrol
+ * @copyright 2018 Roberto Pinna based on Farhan Karmali code
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_enrol_auto_upgrade($oldversion) {
-    global $CFG, $DB, $OUTPUT;
+require_once("$CFG->dirroot/enrol/bulkchange_forms.php");
 
-    $dbman = $DB->get_manager();
-
-    return true;
+/**
+ * The form to confirm the intention to bulk delete users enrolments.
+ *
+ * @package enrol_autoenrol
+ * @copyright 2018 Roberto Pinna based on Farhan Karmali code
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class enrol_autoenrol_deleteselectedusers_form extends enrol_bulk_enrolment_confirm_form {
 }
