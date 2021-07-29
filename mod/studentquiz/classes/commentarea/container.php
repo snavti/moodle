@@ -66,7 +66,7 @@ class container {
     private $studentquiz;
 
     /** @var string - Basic order to get comments. */
-    private $basicorder = 'c.created ASC';
+    private $basicorder = 'c.created DESC';
 
     /** @var object|stdClass - Current user of Moodle. Only call it once when __construct */
     private $user;
@@ -372,20 +372,7 @@ class container {
             $join = 'JOIN {user} u ON u.id = c.userid';
         }
 
-        $userpreferencesort = $this->get_sort();
-
-        // If have limit, always get latest.
-        if ($haslimit) {
-            $order = 'c.created DESC';
-            if ($this->is_user_table_sort()) {
-                $order = $userpreferencesort . ', ' . $order;
-            }
-        } else {
-            $order = $this->get_sort();
-            if ($this->is_user_table_sort()) {
-                $order = $userpreferencesort . ', ' . $this->basicorder;
-            }
-        }
+        $order = $this->get_sort() . ', ' . $this->basicorder;
 
         // Build a where string a = :a AND b = :b.
         $where = '';
@@ -411,9 +398,6 @@ class container {
 
         $data = [];
         if (!empty($roots)) {
-            if ($haslimit) {
-                $roots = $this->resort($roots);
-            }
             list($ids, $listids) = $DB->get_in_or_equal(array_column($roots, 'id'));
             $query = "SELECT *
                         FROM {studentquiz_comment}
@@ -533,7 +517,14 @@ class container {
         // Retrieve users from db.
         if (!empty($userids)) {
             list($idsql, $params) = $DB->get_in_or_equal($userids);
-            $fields = get_all_user_name_fields(true);
+
+            $fields = "";
+            if (utils::moodle_version_is(">=", "311")) {
+                $fields = implode(',', \core_user\fields::get_name_fields());
+            } else {
+                $fields = get_all_user_name_fields(true);
+            }
+
             $query = "SELECT id, $fields
                         FROM {user}
                        WHERE id $idsql";
@@ -848,38 +839,6 @@ class container {
             ];
         }
         return $data;
-    }
-
-    /**
-     * Re-sort data when get limit (limit always get latest).
-     *
-     * @param array $data
-     * @return array
-     */
-    private function resort($data) {
-        // If sort by date desc, do not need re-sort.
-        if ($this->sortfeature === self::SORT_DATE_DESC) {
-            return $data;
-        }
-        // If sort by user name, keep name as it is. But sort time created DESC => ASC.
-        if ($this->is_user_table_sort()) {
-            $orders = [];
-            foreach ($data as $k => $v) {
-                $orders[$v->userid][] = $k;
-            }
-            foreach ($orders as $k => $v) {
-                $orders[$k] = array_reverse($v);
-            }
-            $res = [];
-            foreach ($orders as $v) {
-                foreach ($v as $commentid) {
-                    $res["$commentid"] = $data[$commentid];
-                }
-            }
-            return $res;
-        }
-        // Otherwise just reverse data.
-        return array_reverse($data, true);
     }
 
     /**
