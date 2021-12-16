@@ -1,3 +1,20 @@
+=== 4.0.1 ===
+20210516 Hot Question_695 - Invalid get_string() identifier: 'hotquestion:rate'.
+    Added the missing string.
+20210516 Hot Question_723 - Invalid get_string() identifier: 'hotquestion:comment'.
+    Added the missing string.
+20210823 Hot Question_751 - user_picture::fields() is deprecated. Please use the
+    \core_user\fields API instead. For compatibility, added an if check to use the new
+    code for Moodle > 3.0 the old code for 3.0 and below.
+20211001 Hot Question_752 - need to format_text of the submit directions. Changed the
+    code to include format_text, in mod_form.php down around line 236.
+
+=== 4.0.0 ===
+20210321 Hot Question_561 See about using editor text area to allow for formatting
+    and emoji's. Got it working in just a couple of hours, mostly looking for the
+    best place to add the code. Does not support audio and video recording. Will do
+    that, hopefully, in a later release.
+
 === 3.9.2 ===
 20210215 HotQuestion_669, Need round indicator between the round nav icons. Completed
     development. Needs further testing and cleanup. Added string, xofn = " of ". Code

@@ -1,7 +1,7 @@
 moodle-local_staticpage
 =======================
 
-[![Build Status](https://travis-ci.com/moodleuulm/moodle-local_staticpage.svg?branch=master)](https://travis-ci.com/moodleuulm/moodle-local_staticpage)
+[![Moodle Plugin CI](https://github.com/moodleuulm/moodle-local_staticpage/workflows/Moodle%20Plugin%20CI/badge.svg?branch=master)](https://github.com/moodleuulm/moodle-local_staticpage/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3Amaster)
 
 Moodle plugin which displays static information pages which exist outside any course, imprint or faq pages for example, complete with Moodle navigation and theme
 
@@ -9,7 +9,7 @@ Moodle plugin which displays static information pages which exist outside any co
 Requirements
 ------------
 
-This plugin requires Moodle 3.10+
+This plugin requires Moodle 3.11+
 
 
 Motivation for this plugin
@@ -91,6 +91,17 @@ On this page, there is a list which shows all static pages which have been uploa
 Additionally, the page list checks each static page if a browser is actually able to download and view it. If this isn't possible, the static page is marked with an error message in the page list.
 
 
+Capabilities
+------------
+This plugin also introduces a new capability:
+
+### local/staticpage:managedocuments
+
+By default, Moodle administrators and Moodle users with the moodle/site:config capability are allowed to manage static page documents and the static page plugin settings.
+
+As administrator, you can selectively grant users the ability to manage static page documents (but not to manage the static page plugin settings) by adding the local/staticpage:managedocuments capability in conjunction with the moodle/site:configview capability to an appropriate Moodle role.
+
+
 Creating static page documents
 ------------------------------
 
@@ -117,6 +128,8 @@ Styling static pages
 --------------------
 
 If you want to style your static page with CSS in any special way, you can include a `<style>` tag into the `<head>` section of your HTML document. The content of this style tag will be inserted into Moodle's HTML head.
+
+Additionally, there is a CSS class in the `<body>` which contains the page name of the static page shown, for example `<body class="local-staticpage-imprint [...]">`. With this CSS class, you can style static pages individually in your theme's global CSS code.
 
 
 Adding images to static pages
@@ -309,9 +322,17 @@ PHP7 Support
 Since Moodle 3.4 core, PHP7 is mandatory. We are developing and testing this plugin for PHP7 only.
 
 
+Maintainers
+-----------
+
+Ulm University\
+Communication and Information Centre (kiz)\
+Alexander Bias
+
+
 Copyright
 ---------
 
-Ulm University
-Communication and Information Centre (kiz)
+Ulm University\
+Communication and Information Centre (kiz)\
 Alexander Bias

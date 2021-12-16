@@ -223,5 +223,43 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2021063000, 'enrol', 'autoenrol');
     }
 
+    if ($oldversion < 2021101300) {
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'roleid' => null));
+        if (!empty($instances)) {
+            $query = array('plugin' => 'enrol_autoenrol', 'name' => 'defaultrole');
+            $roleid = $DB->get_field('config_plugins', 'value', $query);
+            foreach ($instances as $instance) {
+                $context = context_course::instance($instance->courseid);
+                $instance->roleid = $roleid;
+                $DB->update_record('enrol', $instance);
+                if ($enrolments = $DB->get_records('user_enrolments', array('enrolid' => $instance->id))) {
+                    foreach ($enrolments as $enrolment) {
+                        role_assign($roleid, $enrolment->userid, $context->id, 'enrol_'.$instance->enrol, $instance->id);
+                    }
+                }
+            }
+        }
+        upgrade_plugin_savepoint(true, 2021101300, 'enrol', 'autoenrol');
+    }
+
+    if ($oldversion < 2021101800) {
+        upgrade_plugin_savepoint(true, 2021101800, 'enrol', 'autoenrol');
+    }
+
+    if ($oldversion < 2021112600) {
+        $instances = $DB->get_records_select('enrol', 'enrol = \'autoenrol\' AND enrolperiod > 0');
+        if (!empty($instances)) {
+            foreach ($instances as $instance) {
+                if ($enrolments = $DB->get_records('user_enrolments', array('enrolid' => $instance->id))) {
+                    foreach ($enrolments as $enrolment) {
+                        $enrolment->timeend = $enrolment->timestart + $instance->enrolperiod;
+                        $DB->update_record('user_enrolments', $enrolment);
+                    }
+                }
+            }
+        }
+        upgrade_plugin_savepoint(true, 2021112600, 'enrol', 'autoenrol');
+    }
+
     return true;
 }

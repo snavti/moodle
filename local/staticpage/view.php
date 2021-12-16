@@ -72,7 +72,7 @@ $file = $fs->get_file($context->id, 'local_staticpage', 'documents', 0, '/', $fi
 
 // If no file is found, quit with error message.
 if (!$file) {
-    print_error('pagenotfound', 'local_staticpage');
+    throw new \moodle_exception('pagenotfound', 'local_staticpage');
 }
 
 // Get file content.
@@ -96,6 +96,8 @@ $PAGE->set_context(context_system::instance());
 // Set page layout.
 $PAGE->set_pagelayout('standard');
 
+// Add page name as body class.
+$PAGE->add_body_class('local-staticpage-'.$page);
 
 // Extract page's first h1 (if present).
 if (!empty($staticdoc->getElementsByTagName('h1')->item(0)->nodeValue)) {

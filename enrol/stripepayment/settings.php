@@ -23,7 +23,8 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
+require_once($CFG->dirroot.'/enrol/stripepayment/lib.php');
 if (is_siteadmin()) {
 
     $settings->add(new admin_setting_heading('enrol_stripepayment_settings',
@@ -44,6 +45,8 @@ if (is_siteadmin()) {
     $settings->add(new admin_setting_configcheckbox('enrol_stripepayment/mailadmins',
     get_string('mailadmins', 'enrol_stripepayment'), '', 0));
 
+    $settings->add(new admin_setting_configcheckbox('enrol_stripepayment/enable_coupon_section', get_string('enable_coupon_section', 'enrol_stripepayment'), '', 0));
+
     // Note: let's reuse the ext sync constants and strings here, internally it is very similar,
     // it describes what should happen when users are not supposed to be enrolled any more.
     $options = array(
@@ -54,6 +57,12 @@ if (is_siteadmin()) {
     $settings->add(new admin_setting_configselect('enrol_stripepayment/expiredaction',
     get_string('expiredaction', 'enrol_stripepayment'), get_string('expiredaction_help', 'enrol_stripepayment'),
     ENROL_EXT_REMOVED_SUSPENDNOROLES, $options));
+    // webservice token
+    $rest_web_link = $CFG->wwwroot.'/admin/settings.php?section=webserviceprotocols';
+    $create_token = $CFG->wwwroot.'/admin/webservice/tokens.php';
+    $settings->add(new admin_enrol_stripepayment_configtext('enrol_stripepayment/webservice_token',
+        get_string('webservice_token_string', 'enrol_stripepayment'),  get_string('create_user_token', 'enrol_stripepayment') . '<a href="' . $rest_web_link . '" target="_blank"> ' . get_string('from_here', 'enrol_stripepayment') .'</a> . '. get_string('enabled_rest_protocol', 'enrol_stripepayment') . '<a href="' . $create_token . '" target="_blank"> ' . get_string('from_here', 'enrol_stripepayment') . '</a>
+        ', PARAM_TEXT));
 
     // Enrol instance defaults.
     $settings->add(new admin_setting_heading('enrol_stripepayment_defaults',

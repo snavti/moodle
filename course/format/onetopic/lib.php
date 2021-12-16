@@ -45,11 +45,23 @@ class format_onetopic extends format_base {
     /** @var int The summary is a template, list the resources that are not referenced */
     const TEMPLATETOPIC_LIST = 2;
 
+    /** @var int Default tabs view */
+    const TABSVIEW_DEFAULT = 0;
+
+    /** @var int Vertical view */
+    const TABSVIEW_VERTICAL = 1;
+
+    /** @var int One line view */
+    const TABSVIEW_ONELINE = 2;
+
     /** @var bool If the class was previously instanced, in one execution cycle */
     private static $loaded = false;
 
     /** @var string Temporal message when tried to charge a hidden tab */
     private static $byhiddenmsg = null;
+
+    /** @var stdClass Onetopic-specific extra section information */
+    private $parentsections = null;
 
     /**
      * Creates a new instance of class
@@ -74,7 +86,6 @@ class format_onetopic extends format_base {
 
             if ($sectionid <= 0) {
                 $section = optional_param('section', -1, PARAM_INT);
-
             }
 
             $numsections = (int)$DB->get_field('course_sections', 'MAX(section)', array('course' => $courseid), MUST_EXIST);
@@ -264,6 +275,9 @@ class format_onetopic extends format_base {
     public function extend_course_navigation($navigation, navigation_node $node) {
         global $PAGE, $COURSE, $USER;
 
+        // Set the section number for the course node.
+        $node->action->param('section', 0);
+
         // If section is specified in course/view.php, make sure it is expanded in navigation.
         if ($navigation->includesectionnum === false) {
             $selectedsection = optional_param('section', null, PARAM_INT);
@@ -363,6 +377,10 @@ class format_onetopic extends format_base {
                 'templatetopic_icons' => array(
                     'default' => 0,
                     'type' => PARAM_INT
+                ),
+                'tabsview' => array(
+                    'default' => 0,
+                    'type' => PARAM_INT
                 )
             );
         }
@@ -429,6 +447,19 @@ class format_onetopic extends format_base {
                             1 => new lang_string('yes')
                         )
                     ),
+                ),
+                'tabsview' => array(
+                    'label' => new lang_string('tabsview', 'format_onetopic'),
+                    'element_type' => 'select',
+                    'element_attributes' => array(
+                        array(
+                            self::TABSVIEW_DEFAULT => new lang_string('tabsview_default', 'format_onetopic'),
+                            self::TABSVIEW_VERTICAL => new lang_string('tabsview_vertical', 'format_onetopic'),
+                            self::TABSVIEW_ONELINE => new lang_string('tabsview_oneline', 'format_onetopic')
+                        )
+                    ),
+                    'help' => 'tabsview',
+                    'help_component' => 'format_onetopic',
                 )
             );
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
@@ -496,6 +527,8 @@ class format_onetopic extends format_base {
                         $data['templatetopic'] = self::TEMPLATETOPIC_NOT;
                     } else if ($key === 'templatetopic_icons') {
                         $data['templatetopic_icons'] = 0;
+                    } else if ($key === 'tabsview') {
+                        $data['tabsview'] = self::TABSVIEW_DEFAULT;
                     }
                 }
             }
@@ -714,6 +747,63 @@ class format_onetopic extends format_base {
         return self::$byhiddenmsg;
     }
 
+    /**
+     * Return Onetopic-specific extra section information.
+     *
+     * @return bool
+     */
+    public function fot_get_sections_extra() {
+
+        if (isset($this->parentsections)) {
+            return $this->parentsections;
+        }
+
+        $course = $this->get_course();
+        $realcoursedisplay = property_exists($course, 'coursedisplay') ? $course->coursedisplay : false;
+        $firstsection = ($realcoursedisplay == COURSE_DISPLAY_MULTIPAGE) ? 1 : 0;
+        $sections = $this->get_sections();
+        $parentsections = [];
+        $level0section = null;
+        foreach ($sections as $section) {
+
+            if ($section->section <= $firstsection || $section->level <= 0) {
+                $parent = null;
+                $level0section = $section;
+            } else {
+                $parent = $level0section;
+            }
+            $parentsections[$section->section] = $parent;
+        }
+        $this->parentsections = $parentsections;
+        return $parentsections;
+    }
+
+    /**
+     * Allows to specify for modinfo that section is not available even when it is visible and conditionally available.
+     *
+     * @param section_info $section
+     * @param bool $available the 'available' propery of the section_info as it was evaluated by conditional availability.
+     * @param string $availableinfo the 'availableinfo' propery of the section_info as it was evaluated by conditional availability.
+     */
+    public function section_get_available_hook(section_info $section, &$available, &$availableinfo) {
+
+        // Only check childs tabs visibility.
+        if ($section->level == 0) {
+            return;
+        }
+
+        // The tab visibility depend of parent visibility.
+        $parentsections = $this->fot_get_sections_extra();
+        $parent = $parentsections[$section->section];
+        if ($parent) {
+            if (!($parent->visible && $parent->available)) {
+                $available = false;
+                if (!$parent->uservisible) {
+                    $availableinfo = '';
+                }
+            }
+        }
+    }
 }
 
 /**

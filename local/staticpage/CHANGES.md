@@ -4,6 +4,18 @@ moodle-local_staticpage
 Changes
 -------
 
+### v3.11-r1
+
+* 2021-12-08 - Prepare compatibility for Moodle 3.11.
+
+### v3.10-r2
+
+* 2021-08-28 - Feature: Add a body class which contains the page name of the static page shown
+* 2021-08-28 - Bugfix: Fix incorrect setting defaults when installing the plugin - Thanks to Davo Smith
+* 2021-08-28 - Replace the deprecated print_error() function with a Moodle exception
+* 2021-08-28 - Feature: Allow non-admins to manage static page documents by introducing the local/staticpage:managedocuments capability
+* 2021-02-05 - Move Moodle Plugin CI from Travis CI to Github actions
+
 ### v3.10-r1
 
 * 2021-01-09 - Change Bootstrap labels to badges to comply with Bootstrap 4 standards
