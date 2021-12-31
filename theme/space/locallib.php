@@ -16,9 +16,9 @@
 /**
  * Theme Space - Locallib file inspired by Theme Boost Campus
  *
- * @package   theme_space
- * @copyright 2020 - Rosea Themes
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    theme_space
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();

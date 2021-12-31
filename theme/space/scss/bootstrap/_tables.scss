@@ -463,10 +463,6 @@ table {
     #page-course-view-topics {
 
       @include media-breakpoint-only(sm) {
-        #region-main-settings-menu {
-          overflow: auto;
-        }
-
         .userlist {
           .no-overflow {
             overflow-x: initial;

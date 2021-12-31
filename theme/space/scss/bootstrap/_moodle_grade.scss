@@ -839,3 +839,25 @@ div.singleselect  {
     min-height: 90px!important;
   }
 }
+
+.criterion {
+  font-size: $font-size-sm;
+}
+
+.overflow-auto {
+  overflow-y: auto;
+}
+
+
+.path-mod-assign [data-region="review-panel"].collapsed+[data-region="grade-panel"] [data-region="grade"],
+.path-mod-assign [data-region="grade-panel"].fullwidth [data-region="grade"] {
+  max-width: calc(100% - 50px); /* increasing the width of the screen*/
+  margin-left: auto;
+  margin-right: auto;
+}
+.gradingform_rubric .criteria {
+  min-width: auto; /*allows the table to auto-fit on the screen rather than a horizontal scroll to appear*/
+}
+.path-mod-assign [data-region="grade-panel"] .gradingform_rubric .criterion .description {
+  width: 20%; /* reduces the size of the criterion description from 50% to 20%*/
+}

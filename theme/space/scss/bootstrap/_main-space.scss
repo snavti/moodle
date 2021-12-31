@@ -13,7 +13,9 @@ dd,
 .tab-pane .col-3,
 [role="tabpanel"] h4,
 #page-user-preferences .card-body,
-.recipename {
+.recipename,
+.c-top-text
+{
   a {
     position: relative;
 
@@ -130,6 +132,11 @@ a.btn
 
   &.s-top--sidebar {
     width: 100%;
+
+    .drawer-open-left &,
+    .drawer-open-right & {
+      width: $sticky-topbar;
+    }
   }
 
   .logo {
@@ -137,7 +144,7 @@ a.btn
   }
 
   @include media-breakpoint-up(md) {
-    position: relative;
+    position: absolute;
     top: 0;
     left: auto;
 
@@ -260,6 +267,7 @@ a.btn
   .badge-guest {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
 
     padding: .55rem 0.85rem;
     margin-right: 33px;
@@ -313,6 +321,10 @@ a.btn
 
   @include media-breakpoint-between(sm, md) {
     width: 100%;
+  }
+
+  &:not(:empty) {
+    display: none;
   }
 
   .c-lang-menu {
@@ -510,16 +522,21 @@ a.btn
         max-width: 100%;
       }
     }
-
-    .drawer-open-left & {
-      width: $sticky-topbar!important;
-    }
   }
+
+  #page-rapper {
+    padding-top: 64px;
+  }
+
 }
 
 .settings-menu {
   width: auto;
   z-index: 5;
+
+  &:empty {
+    display: none;
+  }
 
   #page-course-view-etask {
     @include media-breakpoint-up(sm) {
@@ -531,6 +548,10 @@ a.btn
     margin-top: 0;
     margin-bottom: 0;
     margin-left: 5px;
+
+    @include media-breakpoint-only(sm) {
+    margin-left: 0;
+    }
   }
 
   @include media-breakpoint-up(md) {
@@ -573,6 +594,7 @@ a.btn
     position: absolute;
     top: 70px;
     right: 20px;
+    flex-wrap: wrap;
     }
   }
 
@@ -590,6 +612,7 @@ a.btn
   }
 
   @include media-breakpoint-only(sm) {
+    flex-wrap: wrap;
     width: 100%;
     margin: 10px auto 30px;
 
@@ -1437,6 +1460,14 @@ a.btn
     i {
       margin-right: 0.5rem;
     }
+
+    a {
+      color: $body-color;
+
+      &:hover {
+        color: $link-hover-color;
+      }
+    }
 }
 
 /* mod for links - admin/tool/httpsreplace */
@@ -2282,7 +2313,7 @@ a.btn
 
   .c-hero-container--video {
     position: relative;
-    z-index: -1!important;
+    z-index: 0!important;
   }
 
   .c-hero-container {
@@ -2455,6 +2486,7 @@ a.btn
 
       @include media-breakpoint-only(sm) {
       margin-bottom: 10px;
+      width: 100%;
       }
     }
   }
@@ -3028,7 +3060,16 @@ a.btn
       h2 + a:first-of-type,
       form > a:first-of-type {
         display: block;
-        @extend .alert;
+
+        /*Alert Class UI*/
+        position: relative;
+        padding: $alert-padding-y 3.5rem $alert-padding-y $alert-padding-x;
+        margin: 0 0 1rem 0;
+        border: $alert-border-width solid transparent;
+
+        font-size: $font-size-sm;
+        text-align: left;
+
         @extend .alert-warning;
       }
 
@@ -3423,8 +3464,8 @@ a.btn
   }
 
 }
-
 .brick { /* Masonry bricks or child elements */
+
   display: inline-block;
   margin: 0 0 30px;
   width: 100%;
@@ -3504,7 +3545,15 @@ a.btn
 }
 
 [data-region="participant-count"] {
-  @extend .badge;
+  display: inline-flex;
+  align-items: center;
+
+  padding: $badge-padding-y $badge-padding-x;
+  font-size: $badge-font-size;
+  font-weight: $badge-font-weight;
+  vertical-align: baseline;
+  border-radius: $badge-border-radius;
+  transition: $general-transition;
   @extend .badge-success;
 
   margin-bottom: 2rem;
@@ -3516,11 +3565,14 @@ a.btn
 
 //Course Index Page
 .course-sections {
+
   .course-card {
     padding: 1rem 1.5rem;
     background-color: $body-bg;
     box-shadow: $box-shadow-special;
     border-radius: $border-radius;
+
+    transition: $general-transition;
 
     h4 {
       margin-bottom: 0;
@@ -3533,6 +3585,14 @@ a.btn
         display: none;
       }
     }
+  }
+
+  .course-card-link {
+    color: inherit;
+  }
+
+  .course-card-link:hover .course-card {
+    box-shadow: $box-shadow-lg;
   }
 }
 

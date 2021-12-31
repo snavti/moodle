@@ -18,8 +18,8 @@
  * Renderers to align Moodle's HTML with that expected by Bootstrap
  *
  * @package    theme_space
- * @copyright   2018 Bas Brands
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 namespace theme_space\output\core_course\management;

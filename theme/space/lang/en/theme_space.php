@@ -17,9 +17,9 @@
 /**
  * Language file.
  *
- * @package   theme_alpha
- * @copyright 2018 - 2021 Marcin Czaja - Rosea Themes
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    theme_space
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -212,9 +212,9 @@ $siteurl = $CFG->wwwroot;
     <strong>Go to:</strong> Dashboard → Site administration → Development → Purge all cache</div>
 	<a class="my-2 btn btn-secondary" href="https://docs.space.rosea.io" target="_blank"><i class="fas fa-book mr-2"></i>  Documentation</a> <a class="my-2 mx-md-2 btn btn-secondary" href="https://themeforest.net/item/space-moodle-template/22579922/support" target="_blank"><i class="far fa-life-ring mr-2"></i>  Theme Support</a>';
     $string['currentinparentheses'] = '(current)';
-    $string['configtitle'] = 'Space (1.12.14)';
+    $string['configtitle'] = 'Space (1.13.5)';
     $string['nobootswatch'] = 'None';
-    $string['pluginname'] = 'Space (1.12.14)';
+    $string['pluginname'] = 'Space (1.13.5)';
 
 
     $string['block1settings'] = 'Block #1';
@@ -501,6 +501,15 @@ $siteurl = $CFG->wwwroot;
     $string['customlogosidebar'] = '✓ Custom sidebar logo';
     $string['customlogosidebar_desc'] = 'Upload custom sidebar logo.<br><strong>Recommendation:</strong> SVG files or png files with transparent background.<br><strong>Logo width:</strong> 216px or double (432px) or triple (648px) of 216px for retina displays.';
 
+    $string['removesidebar'] = 'Remove sidebar';
+    $string['removesidebar_desc'] = '';
+
+    $string['notremovesidebarcp'] = 'Don\'t remove the sidebar on the course page';
+    $string['notremovesidebarcp_desc'] = '';
+
+    $string['removesidebarnav'] = 'Remove sidebar navigation';
+    $string['removesidebarnav_desc'] = '';
+
     $string['showsidebarlogo'] = '✓ Show logo on the sidebar';
     $string['showsidebarlogo_desc'] = '';
 
@@ -611,26 +620,47 @@ $siteurl = $CFG->wwwroot;
     $string['herovideocontent'] = '<small>Hero</small><br />Video Content';
     $string['herovideocontent_desc'] = '';
 
-    $string['HeroHeading'] = '<small>Hero</small><br />Title';
-    $string['HeroHeading_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h1, .c-hero-video .h1, .c-heroimg .h1</div>';
+    $string['HeroVideoHeading'] = '<small>Hero</small><br />Title';
+    $string['HeroVideoHeading_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h1, .c-hero-video .h1, .c-heroimg .h1</div>';
 
-    $string['HeroText'] = '<small>Hero</small><br />Description';
-    $string['HeroText_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h3, .c-hero-video .h3, .c-heroimg .h3</div>';
+    $string['HeroVideoText'] = '<small>Hero</small><br />Description';
+    $string['HeroVideoText_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h3, .c-hero-video .h3, .c-heroimg .h3</div>';
 
-    $string['HeroText2'] = '<small>Hero</small><br />Additional Heading';
-    $string['HeroText2_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h5, .c-hero-video .h5, .c-heroimg .h5</div>';
+    $string['HeroVideoText2'] = '<small>Hero</small><br />Additional Heading';
+    $string['HeroVideoText2_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h5, .c-hero-video .h5, .c-heroimg .h5</div>';
 
-    $string['HeroLabel'] = '<small>Hero</small><br />Button #1 <br />Label';
-    $string['HeroLabel_desc'] = '';
+    $string['HeroVideoLabel'] = '<small>Hero</small><br />Button #1 <br />Label';
+    $string['HeroVideoLabel_desc'] = '';
 
-    $string['HeroURL'] = '<small>Hero</small><br />Button #1<br />URL';
-    $string['HeroURL_desc'] = '';
+    $string['HeroVideoURL'] = '<small>Hero</small><br />Button #1<br />URL';
+    $string['HeroVideoURL_desc'] = '';
 
-    $string['HeroLabel2'] = '<small>Hero</small><br />Button #2<br />Label';
-    $string['HeroLabel2_desc'] = '';
+    $string['HeroVideoLabel2'] = '<small>Hero</small><br />Button #2<br />Label';
+    $string['HeroVideoLabel2_desc'] = '';
 
-    $string['HeroURL2'] = '<small>Hero</small><br />Button #2<br />URL';
-    $string['HeroURL2_desc'] = '';
+    $string['HeroVideoURL2'] = '<small>Hero</small><br />Button #2<br />URL';
+    $string['HeroVideoURL2_desc'] = '';
+
+    $string['HeroVideoHeading'] = '<small>Hero</small><br />Title';
+    $string['HeroVideoHeading_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h1, .c-hero-video .h1, .c-heroimg .h1</div>';
+
+    $string['HeroVideoText'] = '<small>Hero</small><br />Description';
+    $string['HeroVideoText_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h3, .c-hero-video .h3, .c-heroimg .h3</div>';
+
+    $string['HeroVideoText2'] = '<small>Hero</small><br />Additional Heading';
+    $string['HeroVideoText2_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h5, .c-hero-video .h5, .c-heroimg .h5</div>';
+
+    $string['HeroVideoLabel'] = '<small>Hero</small><br />Button #1 <br />Label';
+    $string['HeroVideoLabel_desc'] = '';
+
+    $string['HeroVideoURL'] = '<small>Hero</small><br />Button #1<br />URL';
+    $string['HeroVideoURL_desc'] = '';
+
+    $string['HeroVideoLabel2'] = '<small>Hero</small><br />Button #2<br />Label';
+    $string['HeroVideoLabel2_desc'] = '';
+
+    $string['HeroVideoURL2'] = '<small>Hero</small><br />Button #2<br />URL';
+    $string['HeroVideoURL2_desc'] = '';
 
     $string['herocolor'] = '<small>Hero/Slider</small><br />Text Color';
     $string['herocolor_desc'] = '';
@@ -662,6 +692,47 @@ $siteurl = $CFG->wwwroot;
     $string['heroimageheightsm'] = '<small>Hero Image Height</small><br />Mobile View';
     $string['heroimageheightsm_desc'] = '';
 
+    $string['HeroHeading'] = '<small>Hero</small><br />Title';
+    $string['HeroHeading_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h1, .c-hero-video .h1, .c-heroimg .h1</div>';
+
+    $string['HeroText'] = '<small>Hero</small><br />Description';
+    $string['HeroText_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h3, .c-hero-video .h3, .c-heroimg .h3</div>';
+
+    $string['HeroText2'] = '<small>Hero</small><br />Additional Heading';
+    $string['HeroText2_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h5, .c-hero-video .h5, .c-heroimg .h5</div>';
+
+    $string['HeroLabel'] = '<small>Hero</small><br />Button #1 <br />Label';
+    $string['HeroLabel_desc'] = '';
+
+    $string['HeroURL'] = '<small>Hero</small><br />Button #1<br />URL';
+    $string['HeroURL_desc'] = '';
+
+    $string['HeroLabel2'] = '<small>Hero</small><br />Button #2<br />Label';
+    $string['HeroLabel2_desc'] = '';
+
+    $string['HeroURL2'] = '<small>Hero</small><br />Button #2<br />URL';
+    $string['HeroURL2_desc'] = '';
+
+    $string['HeroHeading'] = '<small>Hero</small><br />Title';
+    $string['HeroHeading_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h1, .c-hero-video .h1, .c-heroimg .h1</div>';
+
+    $string['HeroText'] = '<small>Hero</small><br />Description';
+    $string['HeroText_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h3, .c-hero-video .h3, .c-heroimg .h3</div>';
+
+    $string['HeroText2'] = '<small>Hero</small><br />Additional Heading';
+    $string['HeroText2_desc'] = 'CSS Class: <br /><div class="badge badge-light">.c-hero .h5, .c-hero-video .h5, .c-heroimg .h5</div>';
+
+    $string['HeroLabel'] = '<small>Hero</small><br />Button #1 <br />Label';
+    $string['HeroLabel_desc'] = '';
+
+    $string['HeroURL'] = '<small>Hero</small><br />Button #1<br />URL';
+    $string['HeroURL_desc'] = '';
+
+    $string['HeroLabel2'] = '<small>Hero</small><br />Button #2<br />Label';
+    $string['HeroLabel2_desc'] = '';
+
+    $string['HeroURL2'] = '<small>Hero</small><br />Button #2<br />URL';
+    $string['HeroURL2_desc'] = '';
 
     /***
     *
@@ -1333,7 +1404,7 @@ $siteurl = $CFG->wwwroot;
     $string['showfpblock12hr'] = 'Show Testimonials<br />Bottom separator';
     $string['showfpblock12hr_desc'] = '';
 
-    $string['hintro'] = '<div class="d-block text-center"><br /><br />Space Moodle Theme<br /><small>by Rosea Themes</small><br /><div class="badge badge-info">version 1.12.14</div>';
+    $string['hintro'] = '<div class="d-block text-center"><br /><br />Space Moodle Theme<br /><small>by Rosea Themes</small><br /><div class="badge badge-info">version 1.13.5</div>';
     $string['hintro_desc'] = '<div class="col-sm-12 col-md-8 my-sm-2 my-md-5 mx-auto"><a class="btn btn-secondary mb-1" href="https://docs.space.rosea.io" target="_blank"><i class="fas fa-book mr-2"></i>  Documentation</a>
     <a class="mx-2 mb-1 btn btn-secondary" href="https://themeforest.net/item/space-moodle-template/22579922/support" target="_blank"><i class="far fa-life-ring mr-2"></i>  Theme Support</a></div><hr /></div>';
 
@@ -1669,6 +1740,15 @@ $siteurl = $CFG->wwwroot;
 
     $string['coursecarddescheight'] = 'Course Card<br />Description<br />Content Height';
     $string['coursecarddescheight_desc'] = '<span class="badge badge-secondary"><strong>Example:</strong> 160px</span>';
+
+    $string['showcoursecarddescheight'] = 'Show Card Descirption Scrollbar';
+    $string['showcoursecarddescheight_desc'] = '';
+
+    $string['cccdlimit'] = 'Customize Course Card<br />Description';
+    $string['cccdlimit_desc'] = '';
+
+    $string['coursecarddesclimit'] = 'Course Card<br />Description<br />Limit';
+    $string['coursecarddesclimit_desc'] = '<span class="badge badge-secondary"><strong>Example (length):</strong> 120</span>';
 
     $string['borderradius'] = '<small>Global</small><br />UI Elements Radius';
     $string['borderradius_desc'] = '<span class="badge badge-secondary"><strong>Example:</strong> 5px</span>';

@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   theme_space
- * @copyright 2018 - 2021 Marcin Czaja - Rosea Themes
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    theme_space
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -142,13 +142,38 @@ if ($ADMIN->fulltree) {
             $setting->set_updatedcallback('theme_reset_all_caches');
             $page->add($setting);
 
+            // Show/hide
+            $name = 'theme_space/showcoursecarddescheight';
+            $title = get_string('showcoursecarddescheight', 'theme_space');
+            $description = get_string('showcoursecarddescheight_desc', 'theme_space');
+            $default = 1;
+            $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+            $page->add($setting);
+
             $name = 'theme_space/coursecarddescheight';
             $title = get_string('coursecarddescheight', 'theme_space');
             $description = get_string('coursecarddescheight_desc', 'theme_space');
             $setting = new admin_setting_configtext($name, $title, $description,'');
             $setting->set_updatedcallback('theme_reset_all_caches');
             $page->add($setting);
+            $settings->hide_if('theme_space/coursecarddescheight',
+            'theme_space/showcoursecarddescheight', 'notchecked');
 
+            $name = 'theme_space/cccdlimit';
+            $title = get_string('cccdlimit', 'theme_space');
+            $description = get_string('cccdlimit_desc', 'theme_space');
+            $default = 0;
+            $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+            $page->add($setting);
+
+            $name = 'theme_space/coursecarddesclimit';
+            $title = get_string('coursecarddesclimit', 'theme_space');
+            $description = get_string('coursecarddesclimit_desc', 'theme_space');
+            $setting = new admin_setting_configtext($name, $title, $description,'120');
+            $setting->set_updatedcallback('theme_reset_all_caches');
+            $page->add($setting);
+            $settings->hide_if('theme_space/coursecarddesclimit',
+            'theme_space/cccdlimit', 'notchecked');
 
             //HR
             $name = 'theme_space/HR52';
@@ -1353,6 +1378,8 @@ if ($ADMIN->fulltree) {
 				$setting = new admin_setting_configstoredfile($name, $title, $description, 'loginbg', 0, $opts);
 				$setting->set_updatedcallback('theme_reset_all_caches');
 				$page->add($setting);
+        $settings->hide_if('theme_space/loginbg',
+        'theme_space/showlbg', 'notchecked');
 
         $name = 'theme_space/hideforgotpassword';
 				$title = get_string('hideforgotpassword', 'theme_space');
@@ -1654,6 +1681,55 @@ if ($ADMIN->fulltree) {
               $setting = new admin_setting_configtextarea($name, $title, $description, $default);
               $page->add($setting);
 
+              $name = 'theme_space/HeroVideoHeading';
+              $title = get_string('HeroVideoHeading', 'theme_space');
+              $description = get_string('HeroVideoHeading_desc', 'theme_space');
+              $default = '';
+              $setting = new admin_setting_configtext($name, $title, $description, $default);
+              $page->add($setting);
+
+              $name = 'theme_space/HeroVideoText';
+              $title = get_string('HeroVideoText', 'theme_space');
+              $description = get_string('HeroVideoText_desc', 'theme_space');
+              $default = '';
+              $setting = new admin_setting_configtextarea($name, $title, $description, $default);
+              $page->add($setting);
+
+              $name = 'theme_space/HeroVideoText2';
+              $title = get_string('HeroVideoText2', 'theme_space');
+              $description = get_string('HeroVideoText2_desc', 'theme_space');
+              $default = '';
+              $setting = new admin_setting_configtext($name, $title, $description, $default);
+              $page->add($setting);
+
+              $name = 'theme_space/HeroVideoLabel';
+              $title = get_string('HeroVideoLabel', 'theme_space');
+              $description = get_string('HeroVideoLabel_desc', 'theme_space');
+              $default = '';
+              $setting = new admin_setting_configtext($name, $title, $description, $default);
+              $page->add($setting);
+
+              $name = 'theme_space/HeroVideoURL';
+              $title = get_string('HeroVideoURL', 'theme_space');
+              $description = get_string('HeroVideoURL_desc', 'theme_space');
+              $default = '';
+              $setting = new admin_setting_configtext($name, $title, $description, $default);
+              $page->add($setting);
+
+              $name = 'theme_space/HeroVideoLabel2';
+              $title = get_string('HeroVideoLabel2', 'theme_space');
+              $description = get_string('HeroVideoLabel2_desc', 'theme_space');
+              $default = '';
+              $setting = new admin_setting_configtext($name, $title, $description, $default);
+              $page->add($setting);
+
+              $name = 'theme_space/HeroVideoURL2';
+              $title = get_string('HeroVideoURL2', 'theme_space');
+              $description = get_string('HeroVideoURL2_desc', 'theme_space');
+              $default = '';
+              $setting = new admin_setting_configtext($name, $title, $description, $default);
+              $page->add($setting);
+
               $name = 'theme_space/herovideomp4';
               $title = get_string('herovideomp4', 'theme_space');
               $description = get_string('herovideomp4_desc', 'theme_space');
@@ -1709,6 +1785,8 @@ if ($ADMIN->fulltree) {
           		$default = '6000';
           		$setting = new admin_setting_configtext($name, $title, $description, $default);
           		$page->add($setting);
+              $settings->hide_if('theme_space/sliderinterval',
+              'theme_space/sliderintervalenabled', 'notchecked');
 
               $name = 'theme_space/sliderclickable';
           		$title = get_string('sliderclickable', 'theme_space');
@@ -3115,6 +3193,28 @@ if ($ADMIN->fulltree) {
     ***/
     $page = new admin_settingpage('theme_space_sidebar', get_string('sidebarsettings', 'theme_space'));
 
+          $name = 'theme_space/removesidebarnav';
+          $title = get_string('removesidebarnav', 'theme_space');
+          $description = get_string('removesidebarnav_desc', 'theme_space');
+          $default = 0;
+          $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+          $page->add($setting);
+
+          $name = 'theme_space/removesidebar';
+          $title = get_string('removesidebar', 'theme_space');
+          $description = get_string('removesidebar_desc', 'theme_space');
+          $default = 0;
+          $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+          $page->add($setting);
+
+          $name = 'theme_space/notremovesidebarcp';
+          $title = get_string('notremovesidebarcp', 'theme_space');
+          $description = get_string('notremovesidebarcp_desc', 'theme_space');
+          $default = 0;
+          $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+          $page->add($setting);
+          $settings->hide_if('theme_space/notremovesidebarcp',
+          'theme_space/removesidebar', 'notchecked');
 
           // Show/hide logo
           $name = 'theme_space/showsidebarlogo';
@@ -3875,6 +3975,8 @@ if ($ADMIN->fulltree) {
         $setting = new admin_setting_configtext($name, $title, $description, $default);
         $setting->set_updatedcallback('theme_reset_all_caches');
         $page->add($setting);
+        $settings->hide_if('theme_space/customfontlightname',
+        'theme_space/CustomWebFontSH', 'notchecked');
 
         $name = 'theme_space/customfontlighteot';
         $title = get_string('customfontlighteot', 'theme_space');

@@ -334,7 +334,6 @@
 .card-img {
   width: 100%; // Required because we use flexbox and this inherently applies align-self: stretch
   height: $card-img-height;
-  @include border-radius($card-inner-border-radius);
 
   background-position: center;
   background-size: cover;
@@ -507,7 +506,16 @@
 .que .history,
 .groupinfobox
 {
-    @extend .card;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-clip: border-box;
+
+  background-color: $card-bg;
+
+  border-radius: $border-radius;
 }
 
 /* mod */
@@ -554,10 +562,19 @@
   }
 
   .coursecat {
-    margin-top: 1rem;
+    margin-top: 20px;
 
     a {
-      @extend .badge;
+      display: inline-flex;
+      align-items: center;
+
+      padding: $badge-padding-y $badge-padding-x;
+      font-size: $badge-font-size;
+      font-weight: $badge-font-weight;
+      vertical-align: baseline;
+      border-radius: $badge-border-radius;
+      transition: $general-transition;
+
       @extend .badge-link;
       @extend .badge-secondary;
     }
@@ -589,6 +606,24 @@
       padding: 2rem;
     }
 
+    .course-categoryname {
+      margin: .5rem 0;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-sm-bold;
+      color: $body-color-light;
+
+      .icon {
+        margin-right: .35rem;
+        font-size: $font-size-xs;
+      }
+    }
+
+    .course-shortname {
+      margin-top: .5rem;
+      font-size: $font-size-xs;
+      color: $body-color-light;
+    }
+
     #page-enrol-index & {
       padding-bottom: 2rem;
     }
@@ -611,18 +646,8 @@
     }
   }
 
-  .courses-view-course-item-footer {
-    margin: 1rem 0 -0.5rem;
-    padding: 0!important;
 
-    #page-enrol-index & {
-      display: none;
-    }
 
-    &:empty {
-      display: none;
-    }
-  }
 
   .coursename {
     text-decoration: none;
@@ -676,7 +701,6 @@
 
     .s-courses & {
       margin-bottom: 1rem;
-      max-height: $course-card-desc-height;
     }
 
     .no-overflow {
@@ -686,15 +710,36 @@
 
   .os-content {
     .course-box-desc {
+      max-height: $course-card-desc-height;
       padding-right: 30px!important;
     }
   }
 
 }
 
+.s-courses {
+  .courses-view-course-item-footer {
+    position: absolute;
+    width: calc(100% - 40px);
+    bottom: 20px;
+    left: 20px;
+
+    #page-enrol-index & {
+      display: none;
+    }
+
+    &:empty {
+      display: none;
+    }
+  }
+}
+
   [data-region="favourite-icon"] {
     .icon {
-      display: block!important;
+      display: flex!important;
+      align-items: center;
+      justify-content: center;
+
       position: absolute;
       top: 18px;
       left: 20px;
@@ -705,9 +750,9 @@
       margin: 0!important;
 
       background-color: rgba(0, 0, 0, 0.45);
-      border-radius: $border-radius;
+      border-radius: 32px;
 
-      font-size: $font-size-xs!important;
+      font-size: 14px!important;
       color: $yellow-700!important;
       line-height: 2.6!important;
       text-align: center;
@@ -820,12 +865,6 @@
     height: 100%;
 
     align-self: stretch;
-  }
-}
-
-.block-starredcourses {
-  .c-course-box {
-    margin-bottom: 1rem;
   }
 }
 
@@ -999,12 +1038,13 @@
 }
 
 [data-region="recentlyaccessedcourses-view"] {
-  .coursename { margin-top: 0!important; font-size: $font-size-xs; }
   .text-muted { font-size: $font-size-xs; }
 
   .card-img {
     height: 140px;
   }
+
+  .card-title { margin-top: 5px; }
 
 }
 
@@ -1016,9 +1056,6 @@
   .card-title { margin-top: 1rem; }
 }
 
-[data-region="recentlyaccessedcourses-view"] {
-  .card-title { margin-top: 5px; }
-}
 
 .block_myoverview, [data-region="recentlyaccessedcourses-view"] {
 

@@ -1,6 +1,53 @@
 CHANGELOG
 Space Moodle Theme
 - - - -
+## [1.13.5] December 12, 2021
++ Minor bug fixes
+
+## [1.13.4] December 8, 2021
++ Added support for Local Pages 1.9 https://moodle.org/plugins/local_pages
++ Fixed: 
+  + Custom Logo on the Login Page
+  + Glossary Module - Few UI bugs
+  + Secure Layout UI
+  + Minor bug fixes
+
+## [1.13.3] September 25, 2021
++ Fixed: Bugs on course page - Tiles format
++ Minor bug fixes (e.g Quiz Dark mode UI)
+
+## [1.13.2] September 3, 2021
++ Improved: Hidden sidebar
++ Added: Sticky “Save button”
++ Fixed: "Custom Navigation Submenu" bug on mobile
++ Fixed: Floating edit button is back
++ Fixed: Content bank - upload button bug
++ Minor Bug fixes (Rubrics in Assignment, Course Index - Activity name)
+
+## [1.13.1] August 18, 2021
++ Minor Bug Fixes (Quiz - Review options)
+
+## [1.13] July 21, 2021
++ New: Improved moodle 3.11 Course UI (like moodle 3.10)
++ New: Testimonials Front-page block - Masonry grid
++ New Wooclap activity icon
++ New: Course Card UI Improvements
++ Added: "Hidden for students" badge for Course overview block
++ Added: Hero Video content styling like Hero Image Block
++ Added: Hero Video more options like Hero Image
++ Added: Remove Sidebar (optional)
++ Added: Remove Sidebar without course page (optional)
++ Added: Remove sidebar navigation (optional)
++ Added: Sticky table header - Activity completion table
++ Update: FontAwesome 5.15.3
++ Fixed: Sidebar on mobile devices bug fixes
++ Fixed: Top bar flickering and cannot reach page bottom
++ Minor Bug Fixes
+
+## [1.12.14] May 19, 2021
++ Fixed: Messages for moodle 3.11
++ RWD improvements
+
 ## [1.12.13] May 15, 2021
 + Improvements: RWD File Picker
 + Improvements: Quiz Table Overflow

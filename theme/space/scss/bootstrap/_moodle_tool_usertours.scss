@@ -7,7 +7,7 @@
  *   --- step container
  *   --- step target background
  */
-$flexitour-base-zindex: 1040;
+$flexitour-base-zindex: 10000;
 
 // The backdrop is the backdrop used in 'modal' step display.
 div[data-flexitour="backdrop"] {

@@ -957,9 +957,21 @@ body.format-tiles.jsenabled .course-content .headerabovetiles {
   display: flex;
 }
 
+.format-tiles #page .course-content ul li.section.main {
+  background-color: transparent;
+}
+
+.format-tiles .course-content .section .activity:hover {
+  background-color: rgba($black, 0.1);
+}
+
 .format-tiles #page .course-content ul li.section.main,
 .format-tiles ul.tiles .tile.selected {
   z-index: 1!important;
+}
+
+.format-tiles ul.tiles .tile.selected {
+  background-color: rgba($black, 0.1)!important;
 }
 
 .format-tiles .modal-backdrop {
@@ -2086,7 +2098,14 @@ button {
 
 // Download Center Plugin
 .path-local-downloadcenter form .warningmessage {
-  @extend .alert;
+  /*Alert Class UI*/
+  position: relative;
+  padding: $alert-padding-y 3.5rem $alert-padding-y $alert-padding-x;
+  margin: 0 0 1rem 0;
+  border: $alert-border-width solid transparent;
+
+  font-size: $font-size-sm;
+  text-align: left;
   @extend .alert-warning;
 }
 
@@ -2424,4 +2443,10 @@ div#gridmiddle-column>ul {
 .course-content ul.collapsibleweeks a.sectiontoggle .sectionname:hover,
 .course-content ul.collapsibleweeks a.sectiontoggle:hover {
   text-decoration: none;
+}
+
+// Custom Certificates
+#page-mod-customcert-edit .addpage {
+  margin-top: 1rem;
+  padding-top: 1rem;
 }

@@ -110,7 +110,7 @@
                 </div>
                 {{/location}}
                 {{#iscourseevent}}
-                    <div><a href="{{url}}" class="badge badge-link badge-special">{{course.fullname}} <i class="fas fa-caret-right ml-1"></i></a></div>
+                    <div><a href="{{url}}" class="badge badge-link badge-special">{{{course.fullname}}} <i class="fas fa-caret-right ml-1"></i></a></div>
                 {{/iscourseevent}}
                 {{> core_calendar/event_subscription}}
                 {{#isactionevent}}
@@ -119,7 +119,7 @@
                 {{#groupname}}
                     <div><a href="{{url}}" class="badge badge-link badge-light">{{{course.fullname}}}</a></div>
                     <div>{{{groupname}}}</div>
-                {{/groupname}}           
+                {{/groupname}}
             </div>
 
 

@@ -26,7 +26,7 @@
       display: none;
     }
   }
-  
+
 // The dropdown menu
 .dropdown-author {
   max-width: 200px;
@@ -45,7 +45,7 @@
     display: block;
     }
   }
-  
+
   @include media-breakpoint-only(sm) {
     max-width: 100%;
   }
@@ -83,18 +83,18 @@
     &:before {
       @extend %fa-icon;
       @extend .fas;
-  
+
       content: fa-content($fa-var-exclamation-triangle);
-  
+
       font-size: 14px;
       color: $yellow-800;
       opacity: 0.6;
-  
+
       position: absolute;
       top: calc(50% - 7px);
       left: 14px;
     }
-  }  
+  }
 }
 
 .dropdown-menu {
@@ -147,17 +147,27 @@
       }
 
       &:hover {
-        background-color: $dropdown-link-hover-bg;
+        background-color: $dropdown-link-hover-bg!important;
         border-radius: $border-radius;
-        color: $dropdown-link-hover-color;
+        color: $dropdown-link-hover-color!important;
         text-decoration: none;
+
+        .icon {
+          color: $dropdown-link-hover-color!important;
+          opacity: 0.8;
+        }
       }
 
       &.active {
         background-color: $dropdown-link-active-bg;
         border-radius: $border-radius;
-        color: $dropdown-link-hover-color;
+        color: $dropdown-link-active-color;
         text-decoration: none;
+
+        .icon {
+          color: $dropdown-link-active-color;
+          opacity: 0.8;
+        }
       }
 
       &:focus {
@@ -173,13 +183,6 @@
         color: $dropdown-text;
         font-size: $font-size-sm;
         opacity: 0.6;
-      }
-
-      &:hover, &.active {
-        .icon {
-          color: $dropdown-text;
-          opacity: 0.8;
-        }
       }
 
     }
@@ -204,7 +207,6 @@
     max-width: 100%;
     }
 
-    &.active,
     &:hover {
       color: $dropdown-link-hover-color!important; // force styles for tables
 
@@ -240,10 +242,10 @@
     .active-dropdown {
       color: $dropdown-link-hover-color!important; // force styles for tables
       @include gradient-bg($dropdown-link-hover-bg);
-      
+
       .icon {
         color: $dropdown-link-hover-color;
-      }  
+      }
     }
 
     // Top menu - sub menus
@@ -254,7 +256,7 @@
 
       border-radius: $border-radius;
       background-color: $dropdown-light-bg;
-    
+
       box-shadow: $dropdown-light-box-shadow;
 
       .dropdown-divider {

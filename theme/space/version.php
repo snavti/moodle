@@ -18,14 +18,14 @@
  * space.
  *
  * @package    theme_space
- * @copyright  2018 - 2021 Marcin Czaja - Rosea Themes
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021051802; // YYYYMMDDVV.
+$plugin->version = 2021121202; // YYYYMMDDVV.
 $plugin->maturity = MATURITY_STABLE;
 $plugin->requires  = 2021051100;// 3.11
 $plugin->component = 'theme_space';
-$plugin->release = '1.12.13 (Build: 2021051802)';
+$plugin->release = '1.13.5 (Build: 2021121202)';

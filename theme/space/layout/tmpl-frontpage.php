@@ -17,9 +17,9 @@
 /**
  * A two column layout for the space theme.
  *
- * @package   theme_space
- * @copyright 2018 - 2021 Marcin Czaja
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    theme_space
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,19 +32,26 @@ require_once($CFG->dirroot . '/theme/space/locallib.php');
 
 $extraclasses = [];
 $frontpagenavdrawer = theme_space_get_setting('displaynavdrawerfp');
+$device = core_useragent::get_device_type();
 
-if ($frontpagenavdrawer == 0) {
-    $navdraweropen = false;
-    $extraclasses[] = 'drawer-open-hidden';
-} else {
-    if (isloggedin()) {
-        $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
-    } else {
+$removesidebar= theme_space_get_setting('removesidebar');
+if (!$removesidebar) {
+    if ($frontpagenavdrawer == 0) {
         $navdraweropen = false;
+        $extraclasses[] = 'drawer-open-hidden';
+    } else {
+        if (isloggedin()) {
+            if ($device == 'mobile' ) {
+                $navdraweropen = false;
+            } else {
+                $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+            }
+        } else {
+            $navdraweropen = false;
+        }
     }
-    if ($navdraweropen) {
-        $extraclasses[] = 'drawer-open-left';
-    }
+} else {
+    $navdraweropen = false;
 }
 
 $teammember = theme_space_get_setting('teammemberno');

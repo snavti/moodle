@@ -486,8 +486,7 @@ td.day {
         width: 100%;
 
         @include media-breakpoint-only(sm) {
-          display: block;
-          text-align: center;
+        .arrow_text { display: none;}
         }
 
         .previous {
@@ -495,6 +494,11 @@ td.day {
             text-align: left;
 
             position: relative;
+
+            @include media-breakpoint-only(sm) {
+              padding: 20px;
+              width: 40px;
+            }
 
             &:after {
               @extend %fa-icon;
@@ -524,6 +528,11 @@ td.day {
             text-align: right;
 
             position: relative;
+
+            @include media-breakpoint-only(sm) {
+            padding: 20px;
+            width: 40px;
+            }
 
             &:after {
               @extend %fa-icon;
@@ -568,6 +577,22 @@ td.day {
           .btn {
             width: 100%;
           }
+          }
+        }
+
+        @include media-breakpoint-only(sm) {
+          .header {
+            padding: 0!important;
+
+            [data-region="view-selector"] {
+              width: 100%;
+            }
+
+            .btn,
+            select {
+              margin: 5px 0!important;
+              width: 100%;
+            }
           }
         }
 

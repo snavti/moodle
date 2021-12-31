@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A two column layout for the space theme.
+ * Course layout for the space theme.
  *
- * @package   theme_space
- * @copyright 2018 - 2021 Marcin Czaja
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    theme_space
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,16 +32,36 @@ require_once($CFG->dirroot . '/theme/space/locallib.php');
 
 $bodyattributes = $OUTPUT->body_attributes([]);
 $siteurl = $CFG->wwwroot;
+$extraclasses = [];
 
-if (isloggedin()) {
-    $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+//for mobile view
+$device = core_useragent::get_device_type();
+
+$removesidebar = theme_space_get_setting('removesidebar');
+// don't remove sidebar on the course page and in-course page
+$dscourse = theme_space_get_setting('notremovesidebarcp');
+if(!$dscourse) {
+    $displayremovesidebarcp = false;
 } else {
-    $navdraweropen = true;
+    $displayremovesidebarcp = true;
 }
 
-$extraclasses = [];
-if ($navdraweropen) {
-    $extraclasses[] = 'drawer-open-left';
+if (!$removesidebar) {
+    if (isloggedin()) {
+        if ($device == 'mobile' ) {
+            $navdraweropen = false;
+        } else {
+            $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+        }
+    } else {
+        $navdraweropen = false;
+    }
+
+    if ($navdraweropen) {
+        $extraclasses[] = 'drawer-open-left';
+    }
+} else {
+    $navdraweropen = false;
 }
 
 //Top bar style
@@ -92,6 +112,7 @@ $templatecontext = [
     'hassidebarblocks' => !empty($blockshtml2),
     'hassidebartopblocks' => !empty($blockshtml5),
     'navdraweropen' => $navdraweropen,
+    'navdrawercp' => $displayremovesidebarcp,
     'bodyattributes' => $bodyattributes,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
@@ -124,4 +145,4 @@ $templatecontext = array_merge($templatecontext, $themesettings->top_bar_custom_
 $templatecontext = array_merge($templatecontext, $themesettings->fonts());
 
 
-echo $OUTPUT->render_from_template('theme_space/columns2', $templatecontext);
+echo $OUTPUT->render_from_template('theme_space/tmpl-course', $templatecontext);

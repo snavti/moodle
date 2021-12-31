@@ -32,14 +32,14 @@
         </div>
     </div>
     <div class="hidden" data-region="view-content">
+        {{< core_course/coursecards }}
+            {{$classes}}one-row fixed-width-cards justify-content-center overflow-hidden row justify-content-start m-0{{/classes}}
+        {{/ core_course/coursecards }}
         {{#pagingbar}}
             <div class="d-flex paging-bar-container" data-region="paging-bar-container">
                 {{> core/paged_content_paging_bar }}
             </div>
         {{/pagingbar}}
-        {{< core_course/coursecards }}
-            {{$classes}}one-row fixed-width-cards justify-content-center overflow-hidden row justify-content-start m-0{{/classes}}
-        {{/ core_course/coursecards }}
     </div>
     <div class="hidden text-xs-center text-center mt-3" data-region="empty-message">
         <p class="text-muted mt-3 pb-4">{{#str}} nocourses, block_recentlyaccessedcourses {{/str}}</p>

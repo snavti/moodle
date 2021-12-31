@@ -18,8 +18,8 @@
  * Mustache helper to load a theme configuration.
  *
  * @package    theme_space
- * @copyright  2018 - 2021 Marcin Czaja - Rosea Themes
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 namespace theme_space\util;
@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * Helper to load a theme configuration.
  *
  * @package    theme_space
- * @copyright 2018 - 2021 Marcin Czaja - Rosea Themes
+ * @copyright Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class theme_settings {
@@ -47,7 +47,7 @@ class theme_settings {
 
       $templatecontext = [];
       $sidebaritems = [
-        'SidebarCustomBox', 'SidebarCustomNav', 'showmycourses', 'hiddensidebar', 'showsidebarlogo', 'SidebarCustomHTML', 'customrooturl'
+        'SidebarCustomBox', 'SidebarCustomNav', 'showmycourses', 'hiddensidebar', 'showsidebarlogo', 'removesidebar', 'removesidebarnav', 'SidebarCustomHTML', 'customrooturl'
       ];
 
       foreach ($sidebaritems as $setting) {
@@ -333,7 +333,7 @@ class theme_settings {
 
     $templatecontext = [];
     $hero = [
-      'herofwenabled', 'herovideofwenabled', 'heroshadow', 'heroboxshadow', 'herovideoenabled', 'showherologo', 'heroimgenabled', 'heroimgonly', 'HeroURL', 'HeroURL2'
+      'herofwenabled', 'herovideofwenabled', 'heroshadow', 'heroboxshadow', 'herovideoenabled', 'showherologo', 'heroimgenabled', 'heroimgonly', 'HeroURL', 'HeroURL2', 'HeroVideoURL', 'HeroVideoURL2'
     ];
 
     foreach ($hero as $setting) {
@@ -343,7 +343,7 @@ class theme_settings {
     }
 
     $herohtml = [
-      'HeroHeading', 'HeroText', 'HeroText2', 'HeroLabel', 'HeroLabel2', 'herovideocontent'
+      'HeroHeading', 'HeroText', 'HeroText2', 'HeroLabel', 'HeroLabel2', 'HeroVideoHeading', 'HeroVideoText', 'HeroVideoText2', 'HeroVideoLabel', 'HeroVideoLabel2', 'herovideocontent'
     ];
 
     foreach ($herohtml as $setting) {
@@ -747,7 +747,7 @@ public function block12() {
 
       $templatecontext = [];
       $block12 = [
-        'fpblock12', 'showfpblock12intro', 'fpblock12introclass', 'fpblock12slidesperrow', 'fpblock12grid'
+        'fpblock12', 'showfpblock12intro', 'fpblock12introclass', 'fpblock12slidesperrow'
       ];
 
       foreach ($block12 as $setting) {
@@ -900,7 +900,7 @@ public function block12() {
 
       $footersettings = [
           'showsociallist', 'facebook', 'twitter', 'googleplus', 'linkedin', 'youtube', 'instagram',
-          'cwebsiteurl', 'website', 'mobile', 'mail', 'customsocialicon', 'CustomAlert', 'additionalfooterhtml', 'CustomModal', 'CustomModalContentHTML'
+          'cwebsiteurl', 'mobile', 'mail', 'customsocialicon', 'showcoursecarddescheight'
       ];
 
       foreach ($footersettings as $setting) {
@@ -910,7 +910,7 @@ public function block12() {
       }
 
       $footersettingshtml = [
-        'footercustomnav', 'CustomFooterText', 'copyrightText', 'CustomAlertContent', 'CustomAlertButton', 'CustomModalContent'
+        'website', 'footercustomnav', 'CustomFooterText', 'copyrightText', 'CustomAlertContent', 'CustomAlertButton', 'CustomModalContent', 'CustomAlert', 'additionalfooterhtml', 'CustomModal', 'CustomModalContentHTML'
       ];
 
       foreach ($footersettingshtml as $setting) {

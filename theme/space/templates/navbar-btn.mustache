@@ -17,7 +17,7 @@
 {{!
     Page header.
 }}
-
+{{^removesidebar}}
     <div data-region="drawer-toggle" class="d-sm-none d-lg-inline">
         <button id="sidebarBtn" type="button" class="sidebar-btn ml-md-0 mr-md-3" aria-expanded="{{#navdraweropen}}true{{/navdraweropen}}{{^navdraweropen}}false{{/navdraweropen}}" aria-controls="nav-drawer" data-action="toggle-drawer" data-side="left" data-preference="drawer-open-nav">
           {{#SidebarButtonIconOpen}}
@@ -32,3 +32,20 @@
           {{/SidebarButtonIconOpen}}
         </button>
     </div>
+{{/removesidebar}}
+{{#navdrawercp}}
+    <div data-region="drawer-toggle" class="d-sm-none d-lg-inline">
+        <button id="sidebarBtn" type="button" class="sidebar-btn ml-md-0 mr-md-3" aria-expanded="{{#navdraweropen}}true{{/navdraweropen}}{{^navdraweropen}}false{{/navdraweropen}}" aria-controls="nav-drawer" data-action="toggle-drawer" data-side="left" data-preference="drawer-open-nav">
+          {{#SidebarButtonIconOpen}}
+          {{{SidebarButtonIconOpen}}}
+          {{^SidebarButtonIconClose}}<i class="fas fa-arrow-left closed"></i>{{/SidebarButtonIconClose}}
+          {{#SidebarButtonIconClose}}{{{SidebarButtonIconClose}}}{{/SidebarButtonIconClose}}
+          {{/SidebarButtonIconOpen}}
+
+          {{^SidebarButtonIconOpen}}
+          <i class="fas fa-equals opened"></i>
+          <i class="fas fa-arrow-left closed"></i>
+          {{/SidebarButtonIconOpen}}
+        </button>
+    </div>
+{{/navdrawercp}}

@@ -54,7 +54,94 @@
   }
 }
 
-.btn,
+.btn {
+  display: inline-block;
+  text-align: center;
+
+  vertical-align: middle;
+
+  border-radius: $btn-border-radius;
+
+  padding: $btn-padding-y $btn-padding-x;
+
+  font-size: $btn-font-size;
+  font-weight: $btn-font-weight;
+  line-height: 180%;
+
+  text-decoration: none;
+  @include transition($btn-transition);
+  -webkit-appearance: none;
+
+  @include media-breakpoint-only(sm) {
+  word-break: break-word;
+  }
+
+  .icon {
+    margin-right: 0.25rem;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  .tag {
+    background-color: $theme-color-3;
+  }
+
+  .icon {
+    font-size: 1rem;
+    line-height: 1;
+    margin: 0;
+
+    &.fa-cog {
+      margin: 0;
+    }
+
+    &.fa-search-plus {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .icon + .d-sm-inline-block,
+  .icon + .header-button-title,
+  .icon + span {
+    margin-left: 0.5rem;
+  }
+
+  // Share hover and focus styles
+  @include hover-focus {
+    text-decoration: none;
+  }
+
+  &:focus,
+  &.focus {
+    outline: 0;
+    box-shadow: inset 0 0 0 2px rgba($theme-color-3,.25);
+  }
+
+  // Disabled comes first so active can properly restyle
+  &.disabled,
+  &:disabled {
+    opacity: $btn-disabled-opacity;
+    @include box-shadow(none);
+    cursor: not-allowed;
+  }
+
+  // Opinionated: add "hand" cursor to non-disabled .btn elements
+  &:not(:disabled):not(.disabled) {
+    cursor: pointer;
+  }
+
+  &:not(:disabled):not(.disabled):active,
+  &:not(:disabled):not(.disabled).active {
+    @include box-shadow($btn-active-box-shadow);
+
+    &:focus {
+      box-shadow: inset 0 0 0 2px rgba($theme-color-3,.25);
+    }
+  }
+}
+
 #page-grade-grading-manage .actions .action,
 .fdescription a,
 .moodle-dialogue-bd [data-cancel-button],
@@ -139,7 +226,7 @@ input.form-submit,
 .checkforupdates [type="submit"],
 .continuebutton [type="submit"],
 #page-mod-quiz-report .toggleincludeauto a,
-.paging-morelink,
+.paging-morelink a,
 .userpicture a:not(:first-child),
 #page-user-profile .node_category .viewmore a, .path-user .node_category .viewmore a,
 #enabletemplateeditor,
@@ -178,7 +265,9 @@ input.form-submit,
 .postratingmenusubmit,
 #page-mod-forum-index .subscription .helplink a,
 .yui3-widget-buttons .yui3-button:not(.closebutton),
-#scorm_toc_toggle_btn
+#scorm_toc_toggle_btn,
+#page-mod-customcert-edit .addpage a,
+#page-mod-customcert-edit .deletebutton a
 {
   display: inline-block;
   text-align: center;
@@ -209,65 +298,7 @@ input.form-submit,
   }
 }
 
-  .btn {
 
-      .tag {
-        background-color: $theme-color-3;
-      }
-
-      .icon {
-        font-size: 1rem;
-        line-height: 1;
-        margin: 0;
-
-        &.fa-cog {
-          margin: 0;
-        }
-
-        &.fa-search-plus {
-          margin-right: 0.5rem;
-        }
-      }
-
-      .icon + .d-sm-inline-block,
-      .icon + .header-button-title,
-      .icon + span {
-        margin-left: 0.5rem;
-      }
-
-      // Share hover and focus styles
-      @include hover-focus {
-        text-decoration: none;
-      }
-
-      &:focus,
-      &.focus {
-        outline: 0;
-        box-shadow: inset 0 0 0 2px rgba($theme-color-3,.25);
-      }
-
-      // Disabled comes first so active can properly restyle
-      &.disabled,
-      &:disabled {
-        opacity: $btn-disabled-opacity;
-        @include box-shadow(none);
-        cursor: not-allowed;
-      }
-
-      // Opinionated: add "hand" cursor to non-disabled .btn elements
-      &:not(:disabled):not(.disabled) {
-        cursor: pointer;
-      }
-
-      &:not(:disabled):not(.disabled):active,
-      &:not(:disabled):not(.disabled).active {
-        @include box-shadow($btn-active-box-shadow);
-
-        &:focus {
-          box-shadow: inset 0 0 0 2px rgba($theme-color-3,.25);
-        }
-      }
-  }
 
 .btn-primary,
 .btn-default,
@@ -290,7 +321,6 @@ input.form-submit, #id_addidnumbers,
 .checkforupdates [type="submit"],
 .continuebutton [type="submit"],
 .bookexit,
-#newentryform .btn-secondary,
 #page-mod-quiz-summary .submitbtns [type="submit"],
 .path-mod-quiz .othernav a.mod_quiz-next-nav,
 #enabletemplateeditor,
@@ -310,7 +340,8 @@ input.form-submit, #id_addidnumbers,
 .questionflag.editable,
 .custompages-add,
 .postratingmenusubmit,
-#buttonscell input[type="submit"]
+#buttonscell input[type="submit"],
+#page-mod-customcert-edit .addpage a
 {
   color: $btn-primary-text!important;
 
@@ -397,7 +428,8 @@ input.form-submit, #id_addidnumbers,
 .fp-file-delete,
 .tagdeleteselected,
 [data-action="cancel-review-request"],
-.unassignrolelink
+.unassignrolelink,
+#page-mod-customcert-edit .deletebutton a
 {
   color: $btn-reset-text!important;
 
@@ -576,7 +608,7 @@ td .commands a,
 .edit_pages_box .addlinks a,
 .book_toc_numbered .action-list a,
 #page-mod-quiz-report .toggleincludeauto a,
-.paging-morelink,
+.paging-morelink a,
 .userpicture a:not(:first-child),
 table .btn,
 #page-user-profile .node_category .viewmore a,
@@ -759,6 +791,10 @@ table .btn,
 
     }
 
+
+    #page-mod-glossary-view .glossarycontrol {
+      float: none;
+    }
 
             @include media-breakpoint-between(sm,md) {
               .glossarycontrol {
@@ -1520,4 +1556,31 @@ table {
             width: 100%;
           }
         }
+      }
+
+
+      .btn--activity-manual {
+        background-color: transparent;
+        border: none;
+
+        padding: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 40px;
+        height: 40px;
+      }
+
+      .btn--disabled {
+        opacity: .5;
+      }
+
+
+      [data-groupname="buttonar"],
+      .rui-sticky-btns {
+        position: sticky;
+        bottom: 20px;
+        z-index: 999;
       }

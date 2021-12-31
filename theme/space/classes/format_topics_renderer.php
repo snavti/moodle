@@ -18,8 +18,8 @@
  * Overriden course topics format renderer.
  *
  * @package    theme_space
- * @copyright  20
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -320,16 +320,10 @@ class theme_space_format_topics_renderer extends format_topics_renderer {
         $output .= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
             'class' => $classattr, 'role' => 'region', 'aria-label' => $title));
 
+        $output .= html_writer::start_tag('a', array('href' => course_get_url($course, $section->section), 'class' => 'course-card-link'));
         $output .= html_writer::start_tag('div', array('class' => 'course-card'));
         $output .= html_writer::start_tag('div', array('class' => 'course-card-content'));
-        $output .= html_writer::tag('div', '', array('class' => 'left side'));
-        $output .= html_writer::tag('div', '', array('class' => 'right side'));
         $output .= html_writer::start_tag('div', array('class' => 'content'));
-
-        if ($section->uservisible) {
-            $title = html_writer::tag('a', $title,
-                array('href' => course_get_url($course, $section->section), 'class' => $linkclasses));
-        }
 
         $output .= $this->output->heading($title, 4, 'section-title');
 
@@ -345,6 +339,7 @@ class theme_space_format_topics_renderer extends format_topics_renderer {
         $output .= html_writer::end_tag('div'); // Content.
         $output .= html_writer::end_tag('div'); // Col-md-9.
         $output .= html_writer::end_tag('div'); // course-card-content.
+        $output .= html_writer::end_tag('a');
         $output .= html_writer::end_tag('li');
 
         return $output;

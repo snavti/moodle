@@ -99,7 +99,7 @@
   text-align: left;
 
   @include border-radius($alert-border-radius);
-  
+
   @extend .alert-info;
 
   td { padding: 10px; }
@@ -175,13 +175,29 @@
                     display: inline-flex;
 
                     a:first-of-type {
-                        @extend .badge;
+                        display: inline-flex;
+                        align-items: center;
+
+                        padding: $badge-padding-y $badge-padding-x;
+                        font-size: $badge-font-size;
+                        font-weight: $badge-font-weight;
+                        vertical-align: baseline;
+                        border-radius: $badge-border-radius;
+                        transition: $general-transition;
                         @extend .badge-link;
                         @extend .badge-secondary;
                     }
 
                     a:last-of-type {
-                        @extend .badge;
+                        display: inline-flex;
+                        align-items: center;
+
+                        padding: $badge-padding-y $badge-padding-x;
+                        font-size: $badge-font-size;
+                        font-weight: $badge-font-weight;
+                        vertical-align: baseline;
+                        border-radius: $badge-border-radius;
+                        transition: $general-transition;
                         @extend .badge-link;
                         @extend .badge-danger;
                     }

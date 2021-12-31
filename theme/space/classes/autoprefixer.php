@@ -55,8 +55,8 @@ use Sabberworm\CSS\Value\ValueList;
  * Very basic implementation covering simple needs for Bootstrap 4.
  *
  * @package    theme_space
- * @copyright  2016 Frédéric Massart - FMCorz.net
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes (oryginal 2016 Frédéric Massart - FMCorz.net)
+ * @license    Commercial https://themeforest.net/licenses
  */
 class autoprefixer {
 
@@ -81,17 +81,13 @@ class autoprefixer {
         'animation' => ['-webkit-'],
         'appearance' => ['-webkit-', '-moz-'],
         'backface-visibility' => ['-webkit-'],
-        'box-sizing' => ['-webkit-'],
-        'box-shadow' => ['-webkit-'],
         'background-clip' => ['-webkit-'],
         'background-size' => ['-webkit-'],
-        'box-shadow' => ['-webkit-'],
         'column-count' => ['-webkit-', '-moz-'],
         'column-gap' => ['-webkit-', '-moz-'],
         'perspective' => ['-webkit-'],
         'touch-action' => ['-ms-'],
-        'transform' => ['-webkit-', '-moz-', '-ms-', '-o-'],
-        'transition' => ['-webkit-', '-o-'],
+        'transform' => ['-webkit-', '-moz-', '-ms-'],
         'transition-timing-function' => ['-webkit-', '-o-'],
         'transition-duration' => ['-webkit-', '-o-'],
         'transition-property' => ['-webkit-', '-o-'],

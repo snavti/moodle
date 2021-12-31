@@ -48,6 +48,8 @@
 
             <div class="c-course-content align-self-start d-flex flex-column w-100 {{#isfavourite}}course-list-item--favourite{{/isfavourite}}">
                 <div>
+                    {{^visible}}<div class="d-block"><span class="tag tag-danger mb-2">{{#str}} hiddenfromstudents {{/str}}</span></div>{{/visible}}
+
                     {{$coursecategory}}
                         {{#showcoursecategory}}
                             <span class="categoryname small text-muted mt-0 mb-2 d-block">

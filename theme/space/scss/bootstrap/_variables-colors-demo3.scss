@@ -150,10 +150,10 @@ $dropdown-text:                     #fff !default;
 $dropdown-divider-bg:               #282828 !default;
 $dropdown-box-shadow:               #000 !default;
 $dropdown-link-color:               #fff !default;
-$dropdown-link-hover-color:         #6D56FB !default;
-$dropdown-link-hover-bg:            #3B00AF !default;
-$dropdown-link-active-color:        #0d0d0d !default;
-$dropdown-link-active-bg:           $theme-color-3 !default;
+$dropdown-link-hover-color:         $theme-color-6 !default;
+$dropdown-link-hover-bg:            $theme-color-1 !default;
+$dropdown-link-active-color:        $theme-color-6!default;
+$dropdown-link-active-bg:           $theme-color-1 !default;
 $dropdown-link-disabled-color:      $gray-600 !default;
 $dropdown-header-color:             #828282 !default;
 

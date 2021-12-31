@@ -23,6 +23,21 @@
       {{{herovideocontent}}}
       </div>
       {{/herovideocontent}}
+
+      {{^herovideocontent}}
+      <div class="c-hero-content col-sm-11 col-lg-7 text-center">
+
+        {{#HeroVideoText2}}<h5 class="h5">{{{HeroVideoText2}}}</h5>{{/HeroVideoText2}}
+        {{#HeroVideoHeading}}<h1 class="h1">{{{HeroVideoHeading}}}</h1>{{/HeroVideoHeading}}
+        {{#HeroVideoText}}<h3 class="h3">{{{HeroVideoText}}}</h3>{{/HeroVideoText}}
+
+        <div class="row mt-5 justify-content-center">
+          {{#HeroVideoURL}}<a href="{{HeroVideoURL}}" class="my-2 mr-2 ml-2 btn btn-cta btn-cta--primary">{{{HeroVideoLabel}}}</a>{{/HeroVideoURL}}
+          {{#HeroVideoURL2}}<a href="{{HeroVideoURL2}}" class="my-2 mr-2 ml-2 btn btn-cta btn-cta--secondary">{{{HeroVideoLabel2}}}</a>{{/HeroVideoURL2}}
+        </div>
+
+      </div>
+      {{/herovideocontent}}
   </div>
 </div>
 {{/herovideoenabled}}

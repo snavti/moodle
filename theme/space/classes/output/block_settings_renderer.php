@@ -18,8 +18,8 @@
  * Overriden block settings renderer.
  *
  * @package    theme_space
- * @copyright  2016 Frédéric Massart - FMCorz.net
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 namespace theme_space\output;

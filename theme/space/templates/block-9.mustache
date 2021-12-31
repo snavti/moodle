@@ -16,8 +16,8 @@
 }}
 
 {{#heroimgenabled}}
-<div id="heroimg" class="c-hero-container {{^herofwenabled}}{{#heroshadow}}c-hero-container-shadow {{heroshadowstyle}}{{/heroshadow}}{{/herofwenabled}} {{#heroboxshadow}}c-hero-box-shadow {{heroshadowstyle}}{{/heroboxshadow}}">
-  <div class="c-hero {{#herofwenabled}}c-hero--fw{{/herofwenabled}} {{#heroimgonly}}c-hero-img{{/heroimgonly}} {{^herofwenabled}}l-container{{/herofwenabled}} row no-gutters justify-content-center align-items-center" {{^heroimgonly}}style="background-image: url({{{ heroimg }}});"{{/heroimgonly}}>
+<div id="heroimg" class="c-hero-container {{#herofwenabled}}rounded-0{{/herofwenabled}} {{^herofwenabled}}{{#heroshadow}}c-hero-container-shadow {{heroshadowstyle}}{{/heroshadow}}{{/herofwenabled}} {{#heroboxshadow}}c-hero-box-shadow {{heroshadowstyle}}{{/heroboxshadow}}">
+  <div class="c-hero {{#herofwenabled}}c-hero--fw {{/herofwenabled}} {{#heroimgonly}}c-hero-img{{/heroimgonly}} {{^herofwenabled}}l-container{{/herofwenabled}} row no-gutters justify-content-center align-items-center" {{^heroimgonly}}style="background-image: url({{{ heroimg }}});"{{/heroimgonly}}>
     {{^heroimgonly}}
       {{^herohtml}}
       <div class="c-hero-content col-sm-11 col-lg-7 text-center">

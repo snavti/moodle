@@ -17,9 +17,9 @@
 /**
  * A two column layout for the space theme.
  *
- * @package   theme_space
- * @copyright 2018 - 2021 Marcin Czaja
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    theme_space
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,17 +32,49 @@ require_once($CFG->dirroot . '/theme/space/locallib.php');
 
 $bodyattributes = $OUTPUT->body_attributes([]);
 $siteurl = $CFG->wwwroot;
-
-if (isloggedin()) {
-    $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
-} else {
-    $navdraweropen = true;
-}
-
 $extraclasses = [];
-if ($navdraweropen) {
-    $extraclasses[] = 'drawer-open-left';
+
+//for mobile view
+$device = core_useragent::get_device_type();
+
+$removesidebar = theme_space_get_setting('removesidebar');
+// don't remove sidebar on the course page and in-course page
+$dscourse = theme_space_get_setting('notremovesidebarcp');
+if(!$dscourse) {
+    $displayremovesidebarcp = false;
+} else {
+    $displayremovesidebarcp = true;
 }
+
+if (!$removesidebar) {
+    if (isloggedin()) {
+        if ($device == 'mobile' ) {
+            $navdraweropen = false;
+        } else {
+            $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+        }
+    } else {
+        $navdraweropen = false;
+    }
+
+    if ($navdraweropen) {
+        $extraclasses[] = 'drawer-open-left';
+    }
+} else {
+    $navdraweropen = false;
+}
+
+//Top bar style
+$topbarstyle = theme_space_get_setting('topbarstyle');
+$pluginsettings = get_config("theme_space");
+if( $topbarstyle == "topbarstyle-1") { $topbarstyle1 = $topbarstyle; } else { $topbarstyle1 = false; }
+if( $topbarstyle == "topbarstyle-2") { $topbarstyle2 = $topbarstyle; } else { $topbarstyle2 = false; }
+if( $topbarstyle == "topbarstyle-3") { $topbarstyle3 = $topbarstyle; } else { $topbarstyle3 = false; }
+if( $topbarstyle == "topbarstyle-4") { $topbarstyle4 = $topbarstyle; } else { $topbarstyle4 = false; }
+if( $topbarstyle == "topbarstyle-5") { $topbarstyle5 = $topbarstyle; } else { $topbarstyle5 = false; }
+if( $topbarstyle == "topbarstyle-6") { $topbarstyle6 = $topbarstyle; } else { $topbarstyle6 = false; }
+if( $topbarstyle == "topbarstyle-7") { $topbarstyle7 = $topbarstyle; } else { $topbarstyle7 = false; }
+//end
 
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $blockshtml = $OUTPUT->blocks('side-pre');
@@ -81,6 +113,7 @@ $templatecontext = [
     'hassidebartopblocks' => !empty($blockshtml5),
     'navdraweropen' => $navdraweropen,
     'bodyattributes' => $bodyattributes,
+    'navdrawercp' => $displayremovesidebarcp,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'siteurl' => $siteurl
@@ -110,6 +143,4 @@ $templatecontext = array_merge($templatecontext, $themesettings->customnav());
 $templatecontext = array_merge($templatecontext, $themesettings->sidebar_custom_block());
 $templatecontext = array_merge($templatecontext, $themesettings->top_bar_custom_block());
 $templatecontext = array_merge($templatecontext, $themesettings->fonts());
-
-
 echo $OUTPUT->render_from_template('theme_space/columns2', $templatecontext);

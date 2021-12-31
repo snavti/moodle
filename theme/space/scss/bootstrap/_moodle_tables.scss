@@ -137,7 +137,11 @@
 
 
       .no-overflow {
-        overflow-x: auto;
+        overflow-x: inherit;
+
+        .path-mod-page & {
+          overflow-x: inherit;
+        }
 
         table {
           min-width: max-content;
@@ -156,6 +160,7 @@
 #page-grade-report-singleview-index {
   .generaltable th .icon {
     width: auto;
+    max-width: 40px;
     margin-right: 1rem!important;
   }
 }
@@ -189,6 +194,70 @@
       min-width: max-content;
     }
   }
+}
+
+#completion-progress {
+  .icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  th[scope="row"],
+  .completion-sortchoice {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 3;
+  }
+}
+
+#page-report-progress-index #completion-progress th,
+#page-report-progress-index #completion-progress td {
+  vertical-align: top!important;
+  min-width: 120px;
+  width: 120px;
+
+  a {
+    display: block;
+  }
+}
+
+#page-report-progress-index .rotated-text {
+  display: block;
+  font-size: $font-size-xs;
+  transform: none;
+  white-space: normal;
+}
+
+#page-report-progress-index .rotated-text-container {
+  display: block;
+  width: 100px;
+}
+
+.completion-header {
+  min-width: 100px;
+  max-width: 100px;
+
+  a {
+    display: flow-root;
+  }
+}
+
+#completion-progress-wrapper {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+#page-report-progress-index .modicon {
+  .icon {
+    margin: 0;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.completion-expired .completion-expected {
+  margin-top: 15px;
 }
 
 #page-mod-assign-grading {
@@ -441,7 +510,15 @@
 
   .tool_policy-user_agreement-actions {
     a {
-      @extend .badge;
+      display: inline-flex;
+      align-items: center;
+
+      padding: $badge-padding-y $badge-padding-x;
+      font-size: $badge-font-size;
+      font-weight: $badge-font-weight;
+      vertical-align: baseline;
+      border-radius: $badge-border-radius;
+      transition: $general-transition;
       @extend .badge-link;
       @extend .badge-light
     }

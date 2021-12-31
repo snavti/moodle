@@ -256,6 +256,7 @@ fieldset.coursesearchbox {
   }
 
   label {
+    display: block;
     margin-right: 0.25rem;
 
     #page-site-index & {
@@ -286,10 +287,6 @@ fieldset.coursesearchbox {
       margin: 0!important;
       padding: 0;
     }
-  }
-
-  label {
-      display: inline;
   }
 
   .input-group-btn {
@@ -1299,6 +1296,10 @@ textarea[data-auto-rows] {
 
     .text {
       max-width: calc(100% - 60px);
+
+      @include media-breakpoint-between(sm,md) {
+      min-width: 180px;
+      }
     }
 
 		.ios-switch-control-input{

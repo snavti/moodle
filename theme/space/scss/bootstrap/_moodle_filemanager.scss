@@ -45,11 +45,20 @@
     .fp-repo-items {
       padding: 10px;
       margin-top: 0.25rem;
-      overflow-x: auto;
+
+      border-radius: $border-radius;
 
       background-color: $gray-100;
+
+      height: 380px;
     }
+
 }
+
+        .repository_contentbank .fp-repo-items,
+        .repository_local .fp-repo-items {
+            height: 328px!important;
+        }
 
 /* The javascript is adding a style="height: 0px;" to this element - we need to set the min-height so the height is ignored. */
 .filepicker .moodle-dialogue-bd {
@@ -228,7 +237,7 @@
     }
 
     @include media-breakpoint-between(sm,md) {
-      width: calc(25% - 10px);
+      width: calc(50% - 10px);
     }
 
     .fp-thumbnail {
@@ -691,6 +700,7 @@ a.ygtvspacer:hover {
       max-height: inherit!important;
       height: auto!important;
       width: 70%!important;
+      font-size: 8px;
    }
 
 .fp-select .fp-thumbnail img {
@@ -812,15 +822,11 @@ a.ygtvspacer:hover {
 
 .filepicker-filelist,
 .filemanager-container {
-    min-height: 120px;
+    min-height: 60px;
     border-top: 0;
 
     background-color: $gray-100;
     border-radius: $border-radius;
-
-    @include media-breakpoint-only(sm) {
-    min-height: 140px;
-    }
 }
 
 .filepicker-filelist {
@@ -987,11 +993,15 @@ a.ygtvspacer:hover {
 
 .filemanager .fp-iconview .fp-folder.fp-hascontextmenu .fp-contextmenu {
     position: absolute;
-    right: 0;
-    bottom: 0;
+    right: 4px;
+    top: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
+
+    border: none!important;
+    padding: 10px;
+    width: auto;
 }
 
 .filemanager .fp-treeview .fp-folder.fp-hascontextmenu .fp-contextmenu,
@@ -1006,12 +1016,8 @@ a.ygtvspacer:hover {
 .filepicker-filelist .filepicker-container,
 .filemanager.fm-noitems .fm-empty-container {
     display: block;
-    position: absolute;
-    top: 10px;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-    border: 2px dashed $gray-600;
+    position: relative;
+    border: 2px dashed $gray-400;
     padding-top: 60px;
     border-radius: $border-radius;
     text-align: center;
@@ -1021,13 +1027,14 @@ a.ygtvspacer:hover {
 .filemanager-container .dndupload-target {
     background: $white;
     position: absolute;
-    top: 10px;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
+    min-height: 50px;
+    top: 5px;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
     border: 2px dashed $gray-600;
     border-radius: $border-radius;
-    padding: 60px 0 35px;
+    padding: 15px;
     text-align: center;
 
     font-size: $font-size-xs;
@@ -1039,13 +1046,14 @@ a.ygtvspacer:hover {
 .filemanager-container.dndupload-over .dndupload-target {
     background: $white;
     position: absolute;
-    top: 10px;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
+    min-height: 50px;
+    top: 5px;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
     border: 2px dashed $blue-600;
     border-radius: $border-radius;
-    padding: 60px 0 35px;
+    padding: 15px;
     text-align: center;
 
     font-size: $font-size-xs;
@@ -1059,10 +1067,14 @@ a.ygtvspacer:hover {
 
 .dndsupported .dndupload-message {
     display: block;
-    margin: 5px 0 0;
+    margin: 3px 0 0;
     font-size: $font-size-xs;
     font-weight: $font-weight-sm-bold;
     color: $gray-600;
+
+    position: absolute;
+    top: 18px;
+    left: 80px;
 }
 
 .dnduploadnotsupported-message {
@@ -1094,11 +1106,12 @@ a.ygtvspacer:hover {
 
 .dndupload-arrow {
     background: url([[pix:theme|fp/upload]]) center no-repeat;
-    background-size: 40px;
-    width: 100%;
+    background-size: 24px;
+    width: 60px;
     height: 50px;
     position: absolute;
-    top: 5px;
+    top: -16px;
+    left: -70px;
 }
 
 .fitem.disabled .filepicker-container,
@@ -1249,8 +1262,7 @@ a.ygtvspacer:hover {
   .fp-repo-items {
     .fp-content {
       padding: 10px;
-      height: max-content;
-      overflow: auto;
+      height: 100%;
       border-radius: $border-radius;
     }
   }
@@ -1260,7 +1272,7 @@ a.ygtvspacer:hover {
   font-weight: $font-weight-bold;
 
   a {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     width: auto;
 
@@ -1326,6 +1338,8 @@ a.ygtvspacer:hover {
   width: 90%;
   max-width: 1400px;
 
+  height: 555px!important;
+
   .moodle-dialogue .fp-repo-items {
     height: 100%;
   }
@@ -1347,9 +1361,8 @@ a.ygtvspacer:hover {
 .moodle-dialogue-content {
   .fp-iconview {
     padding: 0;
-    margin-top: 0.5rem;
 
-    height: 750px;
+    height: 100%;
 
     background-color: $gray-100;
     border-radius: $border-radius;
@@ -1372,7 +1385,7 @@ a.ygtvspacer:hover {
   &.nofilesavailable {
     position: relative;
     padding: $alert-padding-y 5rem $alert-padding-y $alert-padding-x;
-    margin-bottom: 2rem;
+    margin: 0;
     border: $alert-border-width solid transparent;
 
     font-size: $font-size-sm;

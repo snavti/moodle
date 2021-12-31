@@ -18,7 +18,7 @@
     Page navbar.
 }}
 
-  <div id="topBar3" class="s-top s-top--sidebar justify-content-center {{#ShowTopBarUserName}}showusername{{/ShowTopBarUserName}} {{#customtopnavhtml}}topbar-customtopnav{{/customtopnavhtml}} {{#TopBarText}}topbar-text{{/TopBarText}} {{^TopBarText}}topbar-withouttext{{/TopBarText}} {{#output.render_lang_menu}}topbar-lang{{/output.render_lang_menu}}">
+  <div id="topBarContainer" class="topBar3 s-top s-top--sidebar justify-content-center {{#ShowTopBarUserName}}showusername{{/ShowTopBarUserName}} {{#customtopnavhtml}}topbar-customtopnav{{/customtopnavhtml}} {{#TopBarText}}topbar-text{{/TopBarText}} {{^TopBarText}}topbar-withouttext{{/TopBarText}} {{#output.render_lang_menu}}topbar-lang{{/output.render_lang_menu}}">
 
     {{> theme_space/navbar-mobile }}
 
@@ -39,7 +39,7 @@
 
         <div class="c-nav-user nav ml-md-auto align-items-center justify-content-sm-end justify-content-lg-center">
 
-            {{#TopBarText}}<div class="c-top-text mx-2 text-sm-center text-lg-left">{{{TopBarText}}}</div>{{/TopBarText}}
+            {{#TopBarText}}<div class="c-top-text c-menu-sep p-md-0 mr-md-3 pr-md-3 text-sm-center text-lg-left">{{{TopBarText}}}</div>{{/TopBarText}}
 
             <div class="search-box d-block">
             {{{ output.search_box }}}

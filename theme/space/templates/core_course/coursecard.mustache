@@ -45,12 +45,14 @@
             </div>
         </a>
         <div class="course-info-container" id="course-info-container-{{id}}-{{uniqid}}">
+        {{^visible}}<div class="d-block"><span class="tag tag-danger mt-3 mb-1">{{#str}} hiddenfromstudents {{/str}}</span></div>{{/visible}}
             <div class="d-flex align-items-start">
                 <div class="w-100">
                     <div class="text-muted muted d-flex w-100 my-1 flex-wrap small">
                         {{$coursecategory}}
                             {{#showcoursecategory}}
-                                <span class="categoryname text-muted mt-2">
+                                <span class="course-categoryname d-inline-flex align-items-center">
+                                    <i class="icon fas fa-graduation-cap"></i>
                                     {{#coursecategory}}
                                         {{{coursecategory}}}
                                     {{/coursecategory}}
@@ -58,11 +60,10 @@
                             {{/showcoursecategory}}
                         {{/coursecategory}}
                         {{#showshortname}}
-                        {{$divider}}{{/divider}}
-                        <span class="sr-only">
-                            {{#str}}aria:courseshortname, core_course{{/str}}
-                        </span>
-                        <div>
+                        <div class="w-100 course-shortname">
+                            <span class="sr-only">
+                                {{#str}}aria:courseshortname, core_course{{/str}}
+                            </span>
                             {{{shortname}}}
                         </div>
                         {{/showshortname}}
@@ -72,7 +73,6 @@
                         <span class="sr-only">
                                 {{#str}}aria:coursename, core_course{{/str}}
                             </span>
-                            {{^visible}}<div class="d-block"><span class="tag tag-danger mb-2">{{#str}} hiddenfromstudents {{/str}}</span></div>{{/visible}}
                             {{$coursename}}{{/coursename}}
                     </a>
                 </div>

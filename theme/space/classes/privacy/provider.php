@@ -18,8 +18,8 @@
  * Privacy Subsystem implementation for theme_space.
  *
  * @package    theme_space
- * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 namespace theme_space\privacy;

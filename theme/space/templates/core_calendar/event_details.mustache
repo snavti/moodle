@@ -76,7 +76,7 @@
 {{/iscategoryevent}}
 {{#course.viewurl}}
     <div class="modal-cal-course w-100 mb-1">
-        <a href="{{course.viewurl}}" class="badge badge-link badge-success">{{#pix}} i/courseevent, core, {{#str}} course {{/str}} {{/pix}}<span class="ml-2">{{{course.fullname}}}</span></a></>
+        <a href="{{course.viewurl}}" class="badge badge-link badge-info">{{#pix}} i/courseevent, core, {{#str}} course {{/str}} {{/pix}}<span class="ml-2">{{{course.fullname}}}</span></a></>
     </div>
 {{/course.viewurl}}
 {{#groupname}}
@@ -93,7 +93,7 @@
 {{#subscription}}
     {{#displayeventsource}}
         <div class="d-inline-flex align-items-center w-100 mb-2">
-            <div class="badge badge-secondary">
+            <div class="badge badge-info">
                 {{#pix}} i/rss, core, {{#str}} eventsource, core_calendar {{/str}} {{/pix}}
                 {{#subscriptionurl}}
                     <span><a href="{{subscriptionurl}}">{{#str}}subscriptionsource, core_calendar, {{{subscriptionname}}}{{/str}}</a></span>

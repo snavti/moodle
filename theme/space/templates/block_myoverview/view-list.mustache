@@ -40,6 +40,7 @@
         data-region="course-content"
         data-course-id="{{{id}}}">
         <div class="d-block">
+        {{^visible}}<div class="d-block"><span class="tag tag-danger mb-2">{{#str}} hiddenfromstudents {{/str}}</span></div>{{/visible}}
             <div class="pr-5">
                 {{$coursecategory}}
                     {{#showcoursecategory}}

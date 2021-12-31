@@ -14,28 +14,39 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * An embedded layout for the space theme.
+ * A login page layout for the space theme.
  *
- * @package   theme_space
- * @copyright 2018 - 2021 Marcin Czaja
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    theme_space
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
-defined('MOODLE_INTERNAL') || die();
+$bodyattributes = $OUTPUT->body_attributes();
+$loginalignment = theme_space_get_setting('loginalignment');
+if ($loginalignment == 1) {
+    $extraclasses[] = 'login-left';
+}
+if ($loginalignment == 2) {
+    $extraclasses[] = 'login-center';
+}
+if ($loginalignment == 3) {
+    $extraclasses[] = 'login-right';
+}
 $siteurl = $CFG->wwwroot;
-
-$fakeblockshtml = $OUTPUT->blocks('side-pre', array(), 'aside', true);
-$hasfakeblocks = strpos($fakeblockshtml, 'data-block="_fake"') !== false;
-
+$bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
-    'hasfakeblocks' => $hasfakeblocks,
-    'fakeblocks' => $fakeblockshtml,
+    'bodyattributes' => $bodyattributes,
     'siteurl' => $siteurl
 ];
+
 $themesettings = new \theme_space\util\theme_settings();
+$templatecontext = array_merge($templatecontext, $themesettings->login_block());
 $templatecontext = array_merge($templatecontext, $themesettings->head_elements());
 $templatecontext = array_merge($templatecontext, $themesettings->fonts());
-echo $OUTPUT->render_from_template('theme_space/embedded', $templatecontext);
+
+echo $OUTPUT->render_from_template('theme_space/login', $templatecontext);

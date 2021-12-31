@@ -1085,7 +1085,9 @@ $popout-header-font-size: 1.5 * $font-size-base;
 $popout-header-height: 4rem;
 
 .path-mod-assign #page-content [data-region="grade-panel"] .mform:not(.unresponsive) .fcontainer .fitem.popout .felement {
-    height: calc(100% - #{$popout-header-height});
+  overflow-y: scroll;
+  max-height: 80vh;
+  position: relative;
 }
 
 .path-mod-assign [data-region="grade-panel"] {
@@ -1140,7 +1142,10 @@ $popout-header-height: 4rem;
 }
 
 .path-mod-assign [data-region="grade-panel"] .fitem.popout {
-  bottom: auto;
+  top: 30px;
+  height: max-content;
+  max-height: calc(100vh - 60px);
+  overflow: hidden;
 }
 
 .path-mod-assign [data-region="grade-panel"] .popout > .col-md-3 {
@@ -1944,8 +1949,13 @@ $grading-content-show-content-button-padding-left: calc(#{map-get($spacers, 2) *
 }
 
 .grade-form {
-  input {
+  .form-check {
     width: 100%;
+    padding-left: 0;
+  }
+
+  .pull-right {
+    font-size: $font-size-xs;
   }
 }
 // End styling for mod_forum.

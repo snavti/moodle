@@ -177,7 +177,7 @@
 }
 
 #chooseqtype .selected {
-    background-color: #fff;
+    background-color: $modal-content-bg;
 
     @include box-shadow(0 0 10px 0 #ccc);
 }
@@ -194,7 +194,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     padding: 1.5em 1.6em;
-    background-color: #fff;
+    background-color: $modal-content-bg;
 }
 
 #chooseqtype .instruction,
@@ -307,7 +307,15 @@
     }
 
     .totalpoints {
-      @extend .badge;
+      display: inline-flex;
+      align-items: center;
+
+      padding: $badge-padding-y $badge-padding-x;
+      font-size: $badge-font-size;
+      font-weight: $badge-font-weight;
+      vertical-align: baseline;
+      border-radius: $badge-border-radius;
+      transition: $general-transition;
       @extend .badge-light;
 
       @include media-breakpoint-between(sm,md) {
@@ -404,11 +412,27 @@ body.path-question-type {
 }
 
 .info .grade {
-  @extend .badge;
+  display: inline-flex;
+  align-items: center;
+
+  padding: $badge-padding-y $badge-padding-x;
+  font-size: $badge-font-size;
+  font-weight: $badge-font-weight;
+  vertical-align: baseline;
+  border-radius: $badge-border-radius;
+  transition: $general-transition;
 }
 
 .info .grade {
-  @extend .badge;
+  display: inline-flex;
+  align-items: center;
+
+  padding: $badge-padding-y $badge-padding-x;
+  font-size: $badge-font-size;
+  font-weight: $badge-font-weight;
+  vertical-align: baseline;
+  border-radius: $badge-border-radius;
+  transition: $general-transition;
   @extend .badge-info;
 }
 
@@ -420,7 +444,15 @@ body.path-question-type {
 
 .que {
   .state {
-    @extend .badge;
+    display: inline-flex;
+    align-items: center;
+
+    padding: $badge-padding-y $badge-padding-x;
+    font-size: $badge-font-size;
+    font-weight: $badge-font-weight;
+    vertical-align: baseline;
+    border-radius: $badge-border-radius;
+    transition: $general-transition;
     @extend .badge-light;
   }
 }
@@ -589,6 +621,7 @@ body.path-question-type {
         max-width: inherit;
 
         background-color: $yellow-100;
+        color: $yellow-900;
         padding: 1rem 1.5rem;
         border-radius: $border-radius;
         font-size: $font-size-sm;
@@ -677,7 +710,15 @@ body.path-question-type {
 }
 
 .que .validationerror {
-  @extend .badge;
+  display: inline-flex;
+  align-items: center;
+
+  padding: $badge-padding-y $badge-padding-x;
+  font-size: $badge-font-size;
+  font-weight: $badge-font-weight;
+  vertical-align: baseline;
+  border-radius: $badge-border-radius;
+  transition: $general-transition;
   @extend .badge-danger;
 }
 // copied from .formFieldState in mixin.less
@@ -1057,6 +1098,12 @@ a#hidebankcmd {
 
 table.quizreviewsummary td.cell {
   padding: .75rem;
+}
+
+table.quizreviewsummary th.cell,
+table.quizreviewsummary td.cell
+{
+  background: inherit;
 }
 
 #page-mod-quiz-review .submitbtns {
@@ -1480,7 +1527,15 @@ div[id^=fitem_id_][id*=fraction_] {
 
 #page-mod-quiz-edit .editing_section,
 #page-mod-quiz-edit ul.slots li.section li.activity a.preview {
-  @extend .badge;
+  display: inline-flex;
+  align-items: center;
+
+  padding: $badge-padding-y $badge-padding-x;
+  font-size: $badge-font-size;
+  font-weight: $badge-font-weight;
+  vertical-align: baseline;
+  border-radius: $badge-border-radius;
+  transition: $general-transition;
   @extend .badge-light;
   @extend .badge-link;
 
@@ -1496,7 +1551,15 @@ div[id^=fitem_id_][id*=fraction_] {
 
 #page-mod-quiz-edit .section-heading .editing_delete,
 #page-mod-quiz-edit ul.slots li.section li.activity .editing_delete {
-  @extend .badge;
+  display: inline-flex;
+  align-items: center;
+
+  padding: $badge-padding-y $badge-padding-x;
+  font-size: $badge-font-size;
+  font-weight: $badge-font-weight;
+  vertical-align: baseline;
+  border-radius: $badge-border-radius;
+  transition: $general-transition;
   @extend .badge-danger;
   @extend .badge-link;
 
@@ -1675,7 +1738,15 @@ div[id^=fitem_id_][id*=fraction_] {
 }
 
 [data-region="question-count-container"] {
-  @extend .badge;
+  display: inline-flex;
+  align-items: center;
+
+  padding: $badge-padding-y $badge-padding-x;
+  font-size: $badge-font-size;
+  font-weight: $badge-font-weight;
+  vertical-align: baseline;
+  border-radius: $badge-border-radius;
+  transition: $general-transition;
   @extend .badge-secondary;
   margin: 1rem 0;
 }
@@ -1717,6 +1788,11 @@ div[id^=fitem_id_][id*=fraction_] {
 
 #page-mod-quiz-report table#attempts.grades span.que {
   margin-bottom: 0;
+}
+
+#page-mod-quiz-report table#attempts {
+  width: 100%;
+  margin: 1rem 0;
 }
 
 // table
@@ -1856,10 +1932,19 @@ div[id^=fitem_id_][id*=fraction_] {
   border-color: $green-400!important;
 }
 
+.path-mod-quiz .qnbutton.correct {
+  color: $green-600;
+}
+
 .path-mod-quiz .qnbutton.notanswered,
 .path-mod-quiz .qnbutton.incorrect {
   background-color: $red-100!important;
   border-color: $red-400!important;
+}
+
+.path-mod-quiz #mod_quiz_navblock .qnbutton.notanswered,
+.path-mod-quiz #mod_quiz_navblock .qnbutton.incorrect {
+  color: $red-600;
 }
 
 .que.multichoice .answer div.r0 input,
@@ -1910,4 +1995,9 @@ div[id^=fitem_id_][id*=fraction_] {
       background-color: $bg;
       color: color-yiq($bg);
   }
+}
+
+.review_option_item {
+  display: inline-flex;
+  width: 92%;
 }

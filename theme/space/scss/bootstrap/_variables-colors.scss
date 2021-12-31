@@ -151,9 +151,9 @@ $dropdown-divider-bg:               $gray-800 !default;
 $dropdown-box-shadow:               #000 !default;
 $dropdown-link-color:               $gray-100 !default;
 $dropdown-link-hover-color:         $gray-100 !default;
-$dropdown-link-hover-bg:            #3a3a3a !default;
+$dropdown-link-hover-bg:            $gray-700 !default;
 $dropdown-link-active-color:        $gray-100 !default;
-$dropdown-link-active-bg:           $theme-color-3 !default;
+$dropdown-link-active-bg:           $gray-700!default;
 $dropdown-link-disabled-color:      $gray-600 !default;
 $dropdown-header-color:             $gray-400 !default;
 

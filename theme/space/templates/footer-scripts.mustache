@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
         touchSupport     : true
       }
   });
-  OverlayScrollbars(document.querySelectorAll('.s-courses .course-box-content-desc, .form-description pre, .accordion-nav-content'),
+  OverlayScrollbars(document.querySelectorAll('{{#showcoursecarddescheight}}.s-courses .course-box-content-desc,{{/showcoursecarddescheight}} .form-description pre, .accordion-nav-content'),
   {scrollbars :
       {
         visibility       : "auto",
@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 
+{{#showcoursecarddescheight}}
 $(".course_category_tree").on("click", "[data-toggle='collapse'], .collapseexpand, .content .subcategories .category .info, .course_category_tree .category.with_children>.info>.categoryname, .category.with_children:not(.collapsed), .category.with_children" ,function(){
   OverlayScrollbars(document.querySelectorAll('.course-contacts-ext-content, .course-box-content-desc'),
   {scrollbars :
@@ -50,6 +51,7 @@ $(".course_category_tree").on("click", "[data-toggle='collapse'], .collapseexpan
       }
   });
 });
+{{/showcoursecarddescheight}}
 
 var h = window.innerHeight;
 var navbar = document.getElementById("topBarContainer");
@@ -59,7 +61,7 @@ var sticky = navbar.offsetTop + {{#topBarOffsetTop}}{{topBarOffsetTop}}{{/topBar
 
 window.onscroll = function() {stickyNav()};
 function stickyNav() {
-  if (h > 2.5 * {{#topBarOffsetTop}}{{topBarOffsetTop}}{{/topBarOffsetTop}}{{^topBarOffsetTop}}300{{/topBarOffsetTop}}) {
+  if (h > 3 * {{#topBarOffsetTop}}{{topBarOffsetTop}}{{/topBarOffsetTop}}{{^topBarOffsetTop}}300{{/topBarOffsetTop}}) {
     if (window.pageYOffset > sticky) {
       navbar.classList.add("sticky-nav");
       settingsBtn.classList.add("sticky");

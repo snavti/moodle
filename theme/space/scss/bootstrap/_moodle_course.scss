@@ -221,11 +221,32 @@ table {
                 @include media-breakpoint-between(sm, md) {
                 left: -10px;
                 z-index: 3;
+
+                &:before {
+                    content: '';
+                    @extend %fa-icon;
+                    @extend .fas;
+
+                    position: absolute;
+                    top: calc(50% - 9px);
+                    left: calc(50% - 6px);
+
+                    content: fa-content($fa-var-sort);
+
+                    font-size: 18px;
+                    color: $body-color;
+                }
+
                 }
 
                 .icon {
                   color: $gray-900;
                   font-size: 12px;
+
+                  @include media-breakpoint-between(sm, md) {
+                      display: none;
+                  }
+
                 }
             }
 
@@ -298,7 +319,8 @@ table {
 
   display: inline-flex;
   align-items: center;
-  width: calc(100% - 70px);
+  width: auto;
+  max-width: calc(100% - 70px);
   align-self: center;
 
   @include media-breakpoint-only(sm) {
@@ -493,7 +515,7 @@ table {
 
     @include media-breakpoint-only(sm) {
       margin: 0.5rem 0;
-      a { width: 50%; }
+      text-align: left;
     }
 }
 
@@ -521,8 +543,8 @@ table {
     margin-left: 1em;
 
     @include media-breakpoint-only(sm) {
-      margin: 0.5rem 0;
-      a { width: 50%; }
+        text-align: right;
+        margin: 0.5rem 0;
     }
 }
 
@@ -960,6 +982,11 @@ span.editinstructions {
     color: $theme-color-3;
     z-index: 1; // Required in order to have this above relatively positioned course content@mixin
 
+    @include media-breakpoint-between(sm, md) {
+    width: 90%;
+    margin: 0 5%;
+    }
+
 }
 
 .dndupload-progress-outer {
@@ -1175,11 +1202,6 @@ span.editinstructions {
     &.even {
         background-color: $table-bg-accent;
     }
-}
-
-.courses > .paging.paging-morelink {
-    text-align: center;
-    padding: $spacer;
 }
 
 .course_category_tree .category .numberofcourse {
@@ -1749,7 +1771,15 @@ span.editinstructions {
 }
 
 .listing-pagination-totals {
-    @extend .badge;
+    display: inline-flex;
+    align-items: center;
+
+    padding: $badge-padding-y $badge-padding-x;
+    font-size: $badge-font-size;
+    font-weight: $badge-font-weight;
+    vertical-align: baseline;
+    border-radius: $badge-border-radius;
+    transition: $general-transition;
     @extend .badge-light;
 }
 
@@ -2136,3 +2166,43 @@ span.editinstructions {
         }
     }
 }
+
+.activity {
+
+    .completion-info-manual {
+      position: absolute;
+      top: 5px;
+      right: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .automatic-completion-conditions,
+    .activity-dates {
+        margin-left: 70px;
+    }
+
+  }
+
+
+  .path-mod {
+    .activity-information {
+        position: relative;
+        top: 0;
+
+        display: inline-flex;
+        align-items: center;
+        flex-direction: row-reverse;
+    }
+
+    .completion-info,
+    .activity-dates {
+        margin: 0!important;
+    }
+
+    .completion-info-manual {
+        margin-right: 10px;
+    }
+  }

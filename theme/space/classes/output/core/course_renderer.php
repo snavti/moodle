@@ -31,6 +31,7 @@ use core_course_category;
 use coursecat_helper;
 use stdClass;
 use core_course_list_element;
+use Mustache_LambdaHelper;
 
 require_once($CFG->dirroot . '/course/renderer.php');
 
@@ -41,6 +42,15 @@ require_once($CFG->dirroot . '/course/renderer.php');
  * @copyright  mod by 2018 Rosea Themes, 2016 Frédéric Massart
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+
+function trunc($phrase, $max_words) {
+    $phrase_array = explode(' ',$phrase);
+    if(count($phrase_array) > $max_words && $max_words > 0)
+       $phrase = implode(' ',array_slice($phrase_array, 0, $max_words)).'...';
+    return $phrase;
+}
+
 class course_renderer extends \core_course_renderer {
 
     /**
@@ -248,6 +258,7 @@ class course_renderer extends \core_course_renderer {
         return $content;
     }
 
+
     /**
      * Returns HTML to display course content (summary, course contacts and optionally category name)
      *
@@ -258,7 +269,7 @@ class course_renderer extends \core_course_renderer {
      * @return string
      */
     protected function coursecat_coursebox_content(coursecat_helper $chelper, $course) {
-        global $CFG, $DB;
+        global $PAGE, $CFG, $DB;
 
 		if ($course instanceof stdClass) {
 
@@ -295,8 +306,14 @@ class course_renderer extends \core_course_renderer {
         if ($course->has_summary()) {
             $content .= html_writer::start_tag('div', array('class' => 'course-box-desc'));
 
-            $content .= $chelper->get_course_formatted_summary($course,
-                array('overflowdiv' => true, 'noclean' => false, 'para' => false));
+            if(!empty($PAGE->theme->settings->cccdlimit)) {
+                //info https://github.com/moodle/moodle/blob/master/lib/classes/output/mustache_shorten_text_helper.php
+                $content .= shorten_text($chelper->get_course_formatted_summary($course,
+                    array('overflowdiv' => false, 'noclean' => false, 'para' => false)), $PAGE->theme->settings->coursecarddesclimit);
+            } else {
+                $content .= $chelper->get_course_formatted_summary($course,
+                array('overflowdiv' => false, 'noclean' => false, 'para' => false));
+            }
 
 
             $content .= html_writer::end_tag('div'); // End summary.

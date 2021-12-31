@@ -41,7 +41,7 @@
         }
 
 }}
-
+<div class="btn-group mr-1" role="group">
     <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" data-action="{{name}}-content"
             aria-haspopup="true" aria-expanded="false" {{^contenttypes}}title="{{#str}}nocontenttypes, core_contentbank{{/str}}"
             disabled{{/contenttypes}}>
@@ -54,11 +54,16 @@
                     <h6 class="dropdown-header">{{ typename }}</h6>
                 {{/typeeditorparams}}
                 {{#typeeditorparams}}
-                    <a class="dropdown-item" href="{{{ baseurl }}}&{{{ typeeditorparams }}}">
-                        <span>{{ typename }}</span>
+                    <a class="dropdown-item icon-size-4" href="{{{ baseurl }}}&{{{ typeeditorparams }}}">
+                        {{#typeicon}}
+                            <img alt="" class="icon" src="{{{ typeicon }}}">
+                        {{/typeicon}}
+                        {{^typeicon}}
+                            {{#pix}} b/h5p_library, core {{/pix}}
+                        {{/typeicon}} {{ typename }}
                     </a>
                 {{/typeeditorparams}}
             {{/types}}
         {{/contenttypes}}
     </div>
-
+</div>

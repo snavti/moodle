@@ -30,7 +30,7 @@
         {{{ output.fp_header }}}
         </div>
     </div>
-    
+
     {{#slot1block1}}{{>theme_space/block-1}}{{/slot1block1}}
     {{#slot1block2}}{{>theme_space/block-2}}{{/slot1block2}}
     {{#slot1block3}}{{>theme_space/block-3}}{{/slot1block3}}
@@ -243,7 +243,9 @@
 
     </div>
 
+    {{^removesidebar}}
     {{#displaynavdrawerfp}}{{> theme_space/nav-drawer }}{{/displaynavdrawerfp}}
+    {{/removesidebar}}
 
     {{> theme_space/footer }}
     {{> theme_space/footer-scripts }}

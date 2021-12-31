@@ -5,7 +5,13 @@
 }
 
 #page {
+  @include media-breakpoint-up(lg) {
+  padding: 85px 30px 0 $box-spacer;
+  }
+
+  @include media-breakpoint-between(sm, md) {
   padding: 20px 30px 0 $box-spacer;
+  }
 
   @include media-breakpoint-between(sm, md) {
     .path-user.path-course.path-course-view & {
@@ -18,8 +24,6 @@
   }
 
   #page-my-index & {
-    padding: 20px 30px 0 $box-spacer;
-
     @include media-breakpoint-only(md) {
       padding: 80px $box-spacer / 2 20px;
     }
@@ -30,24 +34,18 @@
   }
 
   #page-site-index & {
-    padding: 0 0 40px 0;
-
-    @include media-breakpoint-only(md) {
-      padding: 80px 0 / 2 20px;
+    @include media-breakpoint-up(md) {
+      padding: 80px 0 20px;
     }
 
     @include media-breakpoint-only(sm) {
-      padding: 80px 0 / 2 0;
+      padding: 80px 0 0;
     }
   }
 
   #plugins-check-page {
   padding: 20px 0;
   }
-}
-
-.sticky-nav + #page {
-padding-top: 65px;
 }
 
 .sidebar-btn {
@@ -88,7 +86,8 @@ padding-top: 65px;
       right: calc(50% - 6px);
     }
 
-    &[aria-expanded="true"] {
+    .drawer-open-left &,
+    .drawer-open-right & {
       &:after {
         content: fa-content($fa-var-times);
         right: calc(50% - 5px);
@@ -415,7 +414,7 @@ body.drawer-open-left {
     .c-nav {
       a {
         &:hover {
-          background-color: $drawer-nav-box-bg;
+          background-color: $drawer-link-hover-bg;
         }
 
         .nav-icon {
@@ -588,12 +587,12 @@ body.drawer-open-left {
 
               a {
                 font-weight: $font-weight-sm-bold;
+                border-radius: $border-radius;
                 align-items: center;
 
                 &:hover {
-                  color: $drawer-nav-item-text-color-hover;
-                  background-color: $drawer-nav-item-hover;
-                  border-radius: $border-radius;
+                  color: $drawer-nav-item-text-color-hover!important;
+                  background-color: $drawer-nav-item-hover!important;
                 }
 
                 &.active  {
@@ -619,7 +618,7 @@ body.drawer-open-left {
             color: $drawer-nav-item-text-color-active;
 
             a {
-              color: $drawer-nav-item-text-color-active;
+              color: $drawer-nav-item-text-color-active!important;
             }
 
             &:hover {
@@ -777,7 +776,7 @@ body.drawer-open-left {
 
         &:hover {
           color: $drawer-link-hover!important;
-          background-color: $drawer-link-hover-bg;
+          background-color: $drawer-link-hover-bg!important;
           border-radius: $border-radius;
 
           .icon {
@@ -1250,12 +1249,12 @@ body.drawer-open-left {
     }
   }
 
-  #topBar1,
-  #topBar2,
-  #topBar3,
-  #topBar4,
-  #topBar5,
-  #topBar6
+  .topBar1,
+  .topBar2,
+  .topBar3,
+  .topBar4,
+  .topBar5,
+  .topBar6
   {
     .logo {
       margin: 0;
@@ -1290,15 +1289,15 @@ body.drawer-open-left {
     }
   }
 
-  #topBar1 {
+  .topBar1 {
     .c-user-menu {
       margin-right: 45px;
       margin-left: 10px;
     }
   }
 
-  #topBar1,
-  #topBar2
+  .topBar1,
+  .topBar2
   {
     .dropdown-menu-light,
     .c-custom-nav {
@@ -1307,8 +1306,8 @@ body.drawer-open-left {
     }
   }
 
-  #topBar1,
-  #topBar3
+  .topBar1,
+  .topBar3
   {
     .c-top-text {
       position: absolute;
@@ -1318,7 +1317,7 @@ body.drawer-open-left {
     }
   }
 
-  #topBar3
+  .topBar3
   {
 
     .c-custom-nav-container {
@@ -1338,18 +1337,18 @@ body.drawer-open-left {
 
   }
 
-  #topBar4 {
+  .topBar4 {
     .logo {
       padding: 1rem 0;
     }
   }
 
-  #topBar1,
-  #topBar2,
-  #topBar3,
-  #topBar4,
-  #topBar5,
-  #topBar6
+  .topBar1,
+  .topBar2,
+  .topBar3,
+  .topBar4,
+  .topBar5,
+  .topBar6
   {
     &.s-top {
       min-height: 70px;
@@ -1371,7 +1370,7 @@ body.drawer-open-left {
     }
   }
 
-  #topBar5 {
+  .topBar5 {
     .c-custom-nav-btn {
       position: absolute;
       top: -35px;
@@ -1380,12 +1379,12 @@ body.drawer-open-left {
     }
   }
 
-    #topBar5[class*="topbar-"] {
+    .topBar5[class*="topbar-"] {
       .c-custom-nav-btn { top: 5px; }
     }
 
 
-  #topBar6 {
+  .topBar6 {
     .logo {
       margin-top: 20px;
     }
@@ -1409,16 +1408,16 @@ body.drawer-open-left {
     }
   }
 
-      #topBar6[class*="topbar-"] {
+      .topBar6[class*="topbar-"] {
         .c-custom-nav-btn { top: -80px; }
       }
-      #topBar6.topbar-lang {
+      .topBar6.topbar-lang {
         .c-custom-nav-btn { top: -159px; }
       }
 
 
 
-  #topBar3 {
+  .topBar3 {
     .c-custom-nav-btn {
       position: absolute;
       top: 4px;
@@ -1442,34 +1441,34 @@ body.drawer-open-left {
         border-radius: $border-radius;
       }
 
-      #topBar1 &,
-      #topBar2 &,
-      #topBar3 &,
-      #topBar4 &,
-      #topBar5 &,
-      #topBar6 &
+      .topBar1 &,
+      .topBar2 &,
+      .topBar3 &,
+      .topBar4 &,
+      .topBar5 &,
+      .topBar6 &
       {
-        padding-top: 55px!important;
+        padding-top: 38px!important;
       }
 
-      #topBar1:not([class*="topbar-"]) &,
-      #topBar2:not([class*="topbar-"]) &,
-      #topBar3:not([class*="topbar-"]) &,
-      #topBar4:not([class*="topbar-"]) &,
-      #topBar5:not([class*="topbar-"]) &,
-      #topBar6:not([class*="topbar-"]) & {
+      .topBar1:not([class*="topbar-"]) &,
+      .topBar2:not([class*="topbar-"]) &,
+      .topBar3:not([class*="topbar-"]) &,
+      .topBar4:not([class*="topbar-"]) &,
+      .topBar5:not([class*="topbar-"]) &,
+      .topBar6:not([class*="topbar-"]) & {
         padding-top: 0!important;
         padding-bottom: 0!important;
         box-shadow: none!important;
       }
 
-        #topBar1.topbar-text & {
+        .topBar1.topbar-text & {
           padding-top: 120px!important;
         }
 
-        #topBar1.topbar-lang.topbar-text &,
-        #topBar3.topbar-lang.topbar-text &,
-        #topBar4.topbar-lang.topbar-text &
+        .topBar1.topbar-lang.topbar-text &,
+        .topBar3.topbar-lang.topbar-text &,
+        .topBar4.topbar-lang.topbar-text &
         {
           padding-top: 180px!important;
 
@@ -1486,11 +1485,11 @@ body.drawer-open-left {
           }
         }
 
-        #topBar1.topbar-lang.topbar-withouttext &,
-        #topBar3.topbar-lang.topbar-withouttext &,
-        #topBar4.topbar-lang.topbar-withouttext &,
-        #topBar5.topbar-lang.topbar-text &,
-        #topBar6.topbar-lang.topbar-text &
+        .topBar1.topbar-lang.topbar-withouttext &,
+        .topBar3.topbar-lang.topbar-withouttext &,
+        .topBar4.topbar-lang.topbar-withouttext &,
+        .topBar5.topbar-lang.topbar-text &,
+        .topBar6.topbar-lang.topbar-text &
         {
           padding-top: 140px!important;
 
@@ -1507,9 +1506,9 @@ body.drawer-open-left {
           }
         }
 
-        #topBar2.topbar-lang.topbar-text &,
-        #topBar2.topbar-lang.topbar-withouttext,
-        #topBar5.topbar-lang.topbar-withouttext
+        .topBar2.topbar-lang.topbar-text &,
+        .topBar2.topbar-lang.topbar-withouttext,
+        .topBar5.topbar-lang.topbar-withouttext
         {
           padding-top: 110px!important;
 
@@ -1532,17 +1531,17 @@ body.drawer-open-left {
 
 
       .c-lang-menu {
-        #topBar4 & {
+        .topBar4 & {
           width: 100%;
           text-align: center;
         }
       }
 
-      #topBar3[class*="topbar-"] & {
+      .topBar3[class*="topbar-"] & {
         padding-top: 100px!important;
       }
 
-      #topBar4[class*="topbar-"] &
+      .topBar4[class*="topbar-"] &
       {
         padding-top: 60px!important;
       }
@@ -1551,12 +1550,12 @@ body.drawer-open-left {
             display: none!important;
           }
 
-      #topBar5[class*="topbar-"] &
+      .topBar5[class*="topbar-"] &
       {
         padding-top: 70px!important;
       }
 
-      #topBar6[class*="topbar-"] &
+      .topBar6[class*="topbar-"] &
       {
         padding-top: 60px!important;
       }
@@ -1565,12 +1564,12 @@ body.drawer-open-left {
 }
 
 @include media-breakpoint-only(sm) {
-  #topBar1,
-  #topBar2,
-  #topBar3,
-  #topBar4,
-  #topBar5,
-  #topBar6 {
+  .topBar1,
+  .topBar2,
+  .topBar3,
+  .topBar4,
+  .topBar5,
+  .topBar6 {
     .nav {
       padding: 3px;
       background-color: $top-bar-bg;

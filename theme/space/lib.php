@@ -18,8 +18,8 @@
  * Theme functions.
  *
  * @package    theme_space
- * @copyright  2018 Marcin Czaja - Rosea Themes
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
+ * @license    Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -75,6 +75,7 @@ function theme_space_pluginfile($course, $cm, $context, $filearea, $args, $force
 
     if ($context->contextlevel == CONTEXT_SYSTEM && ( $filearea === 'logo' ||
                                                       $filearea === 'customlogotopbar' ||
+                                                      $filearea === 'customloginlogo' ||
                                                       $filearea === 'heroimg' ||
                                                       $filearea === 'heroshadowimg' ||
                                                       $filearea === 'herovideomp4' ||
@@ -349,7 +350,7 @@ function theme_space_get_pre_scss($theme) {
         'btnspecialborderhover' => ['btn-special-border-hover'],
         'btnspecialborderwidth' => ['btn-special-border-width'],
         'btnspecialtext' => ['btn-special-text'],
-        'btnspecialtext-hover' => ['btn-special-text-hover'],
+        'btnspecialtexthover' => ['btn-special-text-hover'],
         'btnspecialshadow' => ['btn-special-shadow'],
         //Drawer
         'drawerbg' => ['drawer-bg'],
