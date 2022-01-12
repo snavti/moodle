@@ -48,8 +48,8 @@ class local_deleteoldquizattempts_delete_questions_cli_testcase extends advanced
         $helper = new local_deleteoldquizattempts\helper();
         $helper->delete_questions_cli_handler($options);
         $output = ob_get_clean();
-        $this->assertContains('Delete unused hidden questions', $output);
-        $this->assertContains('Print out this help', $output);
+        $this->assertStringContainsString('Delete unused hidden questions', $output);
+        $this->assertStringContainsString('Print out this help', $output);
     }
 
     /**
@@ -59,7 +59,7 @@ class local_deleteoldquizattempts_delete_questions_cli_testcase extends advanced
         $this->resetAfterTest(true);
 
         $mockbuilder = $this->getMockBuilder('local_deleteoldquizattempts\helper');
-        $mockbuilder->setMethods(array('delete_unused_questions'));
+        $mockbuilder->onlyMethods(array('delete_unused_questions'));
         $helper = $mockbuilder->getMock();
 
         $expectedstoptime = time() + 300;
@@ -88,7 +88,7 @@ class local_deleteoldquizattempts_delete_questions_cli_testcase extends advanced
         $this->resetAfterTest(true);
 
         $mockbuilder = $this->getMockBuilder('local_deleteoldquizattempts\helper');
-        $mockbuilder->setMethods(array('delete_unused_questions'));
+        $mockbuilder->onlyMethods(array('delete_unused_questions'));
         $helper = $mockbuilder->getMock();
 
         $expectation1 = $helper->expects($this->once());

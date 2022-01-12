@@ -46,7 +46,7 @@ class local_deleteoldquizattempts_task_testcase extends advanced_testcase {
         set_config('deleteunusedquestions', null, 'local_deleteoldquizattempts');
 
         $mockbuilder = $this->getMockBuilder('local_deleteoldquizattempts\helper');
-        $mockbuilder->setMethods(array('delete_attempts', 'delete_unused_questions'));
+        $mockbuilder->onlyMethods(array('delete_attempts', 'delete_unused_questions'));
         $helper = $mockbuilder->getMock();
 
         $expectation1 = $helper->expects($this->never());
@@ -71,7 +71,7 @@ class local_deleteoldquizattempts_task_testcase extends advanced_testcase {
         set_config('deleteunusedquestions', 0, 'local_deleteoldquizattempts');
 
         $mockbuilder = $this->getMockBuilder('local_deleteoldquizattempts\helper');
-        $mockbuilder->setMethods(array('delete_attempts', 'delete_unused_questions'));
+        $mockbuilder->onlyMethods(array('delete_attempts', 'delete_unused_questions'));
         $helper = $mockbuilder->getMock();
 
         $expectedtimestamp = time() - 30 * 3600 * 24;
@@ -93,7 +93,7 @@ class local_deleteoldquizattempts_task_testcase extends advanced_testcase {
         $helper->task_handler();
         $output = ob_get_clean();
 
-        $this->assertContains('Deleted 99 quiz attempts.', $output);
+        $this->assertStringContainsString('Deleted 99 quiz attempts.', $output);
     }
 
     /**
@@ -107,7 +107,7 @@ class local_deleteoldquizattempts_task_testcase extends advanced_testcase {
         set_config('deleteunusedquestions', 1, 'local_deleteoldquizattempts');
 
         $mockbuilder = $this->getMockBuilder('local_deleteoldquizattempts\helper');
-        $mockbuilder->setMethods(array('task_hander', 'delete_attempts', 'delete_unused_questions'));
+        $mockbuilder->onlyMethods(array('delete_attempts', 'delete_unused_questions'));
         $helper = $mockbuilder->getMock();
 
         $expectation1 = $helper->expects($this->never());
@@ -121,7 +121,7 @@ class local_deleteoldquizattempts_task_testcase extends advanced_testcase {
         $helper->task_handler();
         $output = ob_get_clean();
 
-        $this->assertContains('Deleted 88, skipped 77 unused hidden questions.', $output);
+        $this->assertStringContainsString('Deleted 88, skipped 77 unused hidden questions.', $output);
     }
 
     /**
@@ -135,7 +135,7 @@ class local_deleteoldquizattempts_task_testcase extends advanced_testcase {
         set_config('deleteunusedquestions', 1, 'local_deleteoldquizattempts');
 
         $mockbuilder = $this->getMockBuilder('local_deleteoldquizattempts\helper');
-        $mockbuilder->setMethods(array('delete_attempts', 'delete_unused_questions'));
+        $mockbuilder->onlyMethods(array('delete_attempts', 'delete_unused_questions'));
         $helper = $mockbuilder->getMock();
 
         $expectation1 = $helper->expects($this->once());
