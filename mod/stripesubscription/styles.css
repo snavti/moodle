@@ -1,0 +1,197 @@
+#region-main h2 { display:none; }
+.enrolmenticons { display: none;}
+.mainwrapper p {
+	text-align: center;
+}
+.couponcode-wrap {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.couponcode-wrap .couponcode-text{
+	font-size:14px;
+}
+.couponcode-wrap input#coupon{
+	margin: 0 6px;
+}
+div#transaction-status, div#transaction-status-zero {
+	margin: 15px;
+	background: antiquewhite;
+	color: chocolate;
+	display: none;
+}
+.CardField-input-wrapper{ overflow: inherit;} 
+.coursebox .content .summary{width:100%}
+button#apply, button#card-button, button#card-button-zero{
+	padding: 5px 10px;
+	font-size: 13px;
+}
+input#coupon {
+	border: 1px dashed #a2a2a2;
+	padding: 3px 5px;
+}
+p{ text-align:left;}
+.stripe-img img {
+    width: 140px;
+    height: auto !important;
+    border-radius: 0 !important;
+    margin: 10px 0 15px 0;
+}
+body#page-enrol-index #region-main .generalbox.info{
+	width: 100%;
+	box-shadow: none;
+}
+body#page-enrol-index #region-main .generalbox .card a img{
+	max-width: 458px;
+	height: 300px;
+	padding: 0;
+	box-shadow: 0 0 10px #b0afaf;
+}
+#page-enrol-index .access-btn{
+	display: none;
+}
+body#page-enrol-index #region-main .generalbox {
+	padding-left: 2rem;
+	padding-right: 2rem;
+	margin: 0 auto 30px;
+	float: left;
+	box-shadow: 0 0 10px #ccc;
+	clear: both;
+	padding-bottom:30px !important;
+	width: auto !important;
+}
+body#page-enrol-index #region-main .generalbox:last-of-type {
+	width: auto;
+	padding-left: 2rem;
+	padding-right: 2rem;
+	margin: 0 auto;
+	float: left;
+	box-shadow: 0 0 10px #ccc;
+	clear: both;
+	padding-bottom:30px !important;
+}
+#page-enrol-index #region-main-box .card-title {
+	position: relative;
+	line-height: 59px;
+	font-size: 2rem;
+	text-transform: capitalize;
+}
+.StripeElement {
+	padding: 15px;
+	border: 1px solid #e9ebec;
+	background: #f9f9f9;
+	box-shadow: 0 10px 6px -4px #d4d2d2;
+}
+.StripeElement input[placeholder], [placeholder], *[placeholder] {
+	color: red !important;
+}
+/*.generalbox .mainwrapper #amountgreaterzero .StripeElement { float: left; width: 100%;}*/
+.generalbox .mainwrapper #amountgreaterzero .StripeElement iframe { height: 41px;}
+
+/*License styles*/
+.licence-input-in-content-part { display: block; margin: 25px auto; background: #fff; 
+    box-shadow: 0 0 7px #e3e0e0; border-radius: 10px; max-width: 760px; padding: 25px 140px; 
+    text-align: center;
+}
+.licence-input-in-content-part h2 { margin: 0 0 18px 0; padding: 0; font-weight: bold; font-size: 25px; 
+    color: #424242; line-height: 34px;
+}
+.licence-input-in-content-part p { margin: 0; padding: 0; font-weight: 400; font-size: 15px; 
+    color: #393939; line-height: 24px;
+}
+.licence-input-code-div-cls { float: left; width: 100%; margin: 20px 0 28px;}
+.licence-input-code-div-cls input.input-licence-valued { display: inline-block; width: 400px; 
+    height: 48px; border: 1px solid #bebebe; border-radius: 3px; line-height: 48px; text-align: center;
+    color: #242424; font-size: 20px; font-weight: 400; margin: 0 4px;
+}
+.licence-input-code-div-cls input.input-licence-valued:focus { outline: none !important;
+    border:1px solid #aeaeae; box-shadow: 0 0 15px #e1dede;
+}
+
+@media (max-width: 1200px){
+	body#page-enrol-index #region-main .generalbox { width: 90% !important;}
+}
+
+@media (max-width: 1199px){
+	body#page-enrol-index #region-main .generalbox { width: 65% !important;}
+	/*#page-enrol-index #page.container-fluid { padding: 6rem 0 0 6rem !important;}*/
+}
+
+@media (max-width: 991px){
+	body#page-enrol-index #region-main .generalbox { width: 70% !important;}
+}
+
+@media (max-width: 900px){
+	body#page-enrol-index #region-main .generalbox { width: 81% !important;}
+}
+
+@media (max-width: 800px){
+	body#page-enrol-index #region-main .generalbox { width: 90% !important;}
+}
+
+@media (max-width: 767px){
+	body#page-enrol-index #region-main .generalbox { width: 100% !important; padding-left: 15px !important; 
+		padding-right: 15px !important;
+	}
+	#page-enrol-index #page-header .card .card-body { padding: 0 20px;}
+	#page-enrol-index #page-header .card .card-body #page-navbar .breadcrumb { border: none;}
+	/*#page-enrol-index #page.container-fluid { padding: 5rem 15px 0 5rem !important;}*/
+	.licence-input-main-body-section .container { max-width: 100%; padding: 0;}
+	.licence-input-in-content-part { padding: 25px 20px; max-width: 100%;}
+	.licence-input-code-div-cls input.input-licence-valued { width: 100%; margin: 0;}
+	.path-enrol-stripesubscription .page-context-header { padding-left: 0; padding-right: 0;}
+}
+
+@media (max-width: 570px){
+	body#page-enrol-index #region-main .generalbox { width: 100% !important;}
+	body#page-enrol-index #region-main .generalbox .couponcode-wrap input#coupon { width: 40%;}
+	body#page-enrol-index #region-main .generalbox button#apply { padding: 5px 8px;}
+	.licence-input-in-content-part { padding: 25px 15px;}
+	.licence-input-in-content-part h1 { font-size: 22px;}
+	.licence-input-code-div-cls input.input-licence-valued { font-size: 18px;}
+	.path-enrol-stripesubscription .breadcrumb li a { font-size: 14px;}
+	.path-enrol-stripesubscription .breadcrumb-item::before { padding-right: 0;}
+    .page-context-header .page-header-headings h1 { font-size: 21px;}
+}
+
+@media (max-width: 479px){
+	body#page-enrol-index #region-main .generalbox { width: 100% !important;}
+	body#page-enrol-index #region-main .generalbox .couponcode-wrap input#coupon { width: 70%;}
+	body#page-enrol-index #region-main .generalbox .couponcode-wrap span.couponcode-text { width: 100%; float: left;}
+	body#page-enrol-index #region-main .generalbox button#apply { display: block;}
+	/*#page-enrol-index #page.container-fluid { padding: 5rem 15px 0 5rem !important;}*/
+	#page-enrol-index #page-wrapper #page #page-content .card .card-body { padding: 0 8px 10px;}
+	body#page-enrol-index #page-content div#region-main-box { padding: 0 7px;}
+	.generalbox .mainwrapper #amountgreaterzero .StripeElement { padding: 10px;}
+	body#page-enrol-index #region-main .generalbox { padding-left: 12px !important; padding-right: 12px !important;}
+}
+
+@media (min-width: 200px) and (max-width: 700px) {
+	#region-main{
+		padding: 0 15px 12px;
+	}   
+	.generalbox {
+		width: 300px;} 
+		body#page-enrol-index #region-main .generalbox:last-of-type{
+			width: 320px;
+			margin: 0 auto;
+			float: none;
+		} 
+		#page-enrol-index p{
+			text-align: center;
+		} 
+		#apply{
+			margin-top: 10px;
+		}
+		#coupon{
+			margin-top:10px;
+		}
+		#page-enrol-index #region-main-box .card-title{
+			text-align: center;
+		}
+		#page-enrol-index #region-main-box .card-title:before, #page-enrol-index #region-main-box .card-title:after{
+			display: none;
+		}
+		.couponcode-wrap { display: block;
+		}
+	}
