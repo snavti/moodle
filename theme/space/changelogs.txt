@@ -1,6 +1,9 @@
 CHANGELOG
 Space Moodle Theme
 - - - -
+## [1.13.6] January 12, 2022
++ Minor bug fixes
+
 ## [1.13.5] December 12, 2021
 + Minor bug fixes
 

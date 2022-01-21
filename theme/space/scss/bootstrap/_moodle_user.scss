@@ -213,6 +213,11 @@
     padding: 0 3px;
 }
 
+.userlist {
+    .no-overflow {
+        overflow-x: auto;
+    }
+}
 .userlist table#participants {
     min-width: 100%;
     width: max-content;

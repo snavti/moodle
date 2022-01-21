@@ -3990,3 +3990,8 @@ $picker-emojis-per-row: 7 !default;
     }
   }
 }
+
+// Mobile browser bug - overlaping mobile top bar
+.vjs-full-window .video-js.vjs-fullscreen {
+  z-index: 99999!important;
+}
