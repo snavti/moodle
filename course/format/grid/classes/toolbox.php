@@ -27,8 +27,6 @@
 
 namespace format_grid;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The format's toolbox.
  *
@@ -461,7 +459,7 @@ class toolbox {
         }
 
         if (!$sectionimagecontainers = $DB->get_records('format_grid_icon', array('courseid' => $courseid), '',
-                'sectionid, image, displayedimageindex, alttext')) {
+                'sectionid, image, displayedimageindex, updatedisplayedimage, alttext')) {
             $sectionimagecontainers = false;
         }
         return $sectionimagecontainers;
@@ -485,11 +483,13 @@ class toolbox {
         // Only allow this code to be executed once at the same time for the given section id (the id is unique).
         $lockfactory = \core\lock\lock_config::get_lock_factory('format_grid');
         if ($lock = $lockfactory->get_lock('sectionid'.$sectionid, 5)) {
-            if (!$sectionimage = $DB->get_record('format_grid_icon', array('sectionid' => $sectionid))) {
+            if (!$sectionimage = $DB->get_record('format_grid_icon', array('sectionid' => $sectionid),
+                'courseid, sectionid, image, displayedimageindex, updatedisplayedimage, alttext')) {
                 $newimagecontainer = new \stdClass();
                 $newimagecontainer->sectionid = $sectionid;
                 $newimagecontainer->courseid = $courseid;
                 $newimagecontainer->displayedimageindex = 0;
+                $newimagecontainer->updatedisplayedimage = 0;
 
                 if (!$newimagecontainer->id = $DB->insert_record('format_grid_icon', $newimagecontainer, true)) {
                     $lock->release();
@@ -628,26 +628,12 @@ class toolbox {
         return $storedfilerecord;
     }
 
-    /**
-     * Class instance update images callback.
-     */
-    public static function update_displayed_images_callback() {
-        global $DB;
-        if ($gridformatcourses = $DB->get_records('course', array('format' => 'grid'), '', 'id')) {
-            foreach ($gridformatcourses as $gridformatcourse) {
-                $courseformat = course_get_format($gridformatcourse->id);
-                $settings = $courseformat->get_settings(true);
-                self::update_displayed_images($gridformatcourse->id, $courseformat->get_contextid(), $settings, true);
-            }
-        }
-    }
-
     public static function delete_displayed_images($courseformat) {
         $sectionimages = self::get_images($courseformat->get_courseid());
 
         if (is_array($sectionimages)) {
             global $DB;
-            $contextid = $courseformat->get_contextid();
+            $contextid = \format_grid::get_contextid($courseformat);
             $fs = get_file_storage();
             $gridimagepath = self::get_image_path();
             $t = $DB->start_delegated_transaction();
@@ -825,6 +811,11 @@ class toolbox {
                 }
                 $DB->set_field('format_grid_icon', 'displayedimageindex', $sectionimage->displayedimageindex,
                     array('sectionid' => $sectionimage->sectionid));
+                if ($sectionimage->updatedisplayedimage == 1) {
+                    $DB->set_field('format_grid_icon', 'updatedisplayedimage', 0,
+                        array('sectionid' => $sectionimage->sectionid));
+                    $sectionimage->updatedisplayedimage = 0;
+                }
             } else {
                 print_error('cannotconvertuploadedimagetodisplayedimage', 'format_grid',
                     $CFG->wwwroot."/course/view.php?id=".$courseid,
@@ -930,13 +921,16 @@ class toolbox {
         }
     }
 
-    public static function delete_images($courseformat) {
-        $courseid = $courseformat->get_courseid();
+    public static function delete_images($courseid) {
         $sectionimages = self::get_images($courseid);
 
         if (is_array($sectionimages)) {
-            global $DB;
-            $contextid = $courseformat->get_contextid();
+            global $CFG, $DB;
+
+            require_once($CFG->dirroot . '/course/format/lib.php'); // For 'course_get_format()'.
+            $courseformat = course_get_format($courseid);
+
+            $contextid = \format_grid::get_contextid($courseformat);
             $fs = get_file_storage();
             $gridimagepath = self::get_image_path();
 
@@ -963,27 +957,34 @@ class toolbox {
     }
 
     /**
-     * Updates the displayed images because the settings have changed.
-     * @param int $courseid The course id.
-     * @param int $contextid The contextid to use.
-     * @param array $settings The settings to use.
-     * @param int $ignorenorecords True we should not worry about no records existing, possibly down to a restore of a course.
+     * Class instance update images callback.
      */
-    public static function update_displayed_images($courseid, $contextid, $settings, $ignorenorecords) {
+    public static function update_displayed_images_callback() {
         global $DB;
+        if ($gridformatcourses = $DB->get_records('course', array('format' => 'grid'), '', 'id')) {
+            foreach ($gridformatcourses as $gridformatcourse) {
+                self::update_displayed_images($gridformatcourse->id);
+            }
+        }
+    }
 
+    /**
+     * Updates the displayed images because the settings have changed.
+     *
+     * @param int $courseid The course id.
+     */
+    public static function update_displayed_images($courseid) {
         $sectionimages = self::get_images($courseid);
         if (is_array($sectionimages)) {
+            global $DB;
             $t = $DB->start_delegated_transaction();
             foreach ($sectionimages as $sectionimage) {
                 if ($sectionimage->displayedimageindex > 0) {
-                    $sectionimage->newimage = $sectionimage->image;
-                    $sectionimage = self::setup_displayed_image($sectionimage, $contextid, $courseid, $settings);
+                    $DB->set_field('format_grid_icon', 'updatedisplayedimage', 1,
+                        array('sectionid' => $sectionimage->sectionid));
                 }
             }
             $t->allow_commit();
-        } else if (!$ignorenorecords) { // Only report error if it's ok not to have records.
-            print_error('cannotgetimagesforcourse', 'format_grid', '', null, "update_displayed_images - Course id: " . $courseid);
         }
     }
 

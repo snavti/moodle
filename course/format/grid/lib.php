@@ -137,7 +137,7 @@ class format_grid extends format_base {
     public function get_section_name($section) {
         $section = $this->get_section($section);
         if (!empty($section->name)) {
-            return format_string($section->name, true, array('context' => $this->get_context()));
+            return format_string($section->name, true, array('context' => self::get_context($this)));
         } if ($section->section == 0) {
             return get_string('topic0', 'format_grid');
         } else {
@@ -418,7 +418,7 @@ class format_grid extends format_base {
             /* Note: Because 'admin_setting_configcolourpicker' in 'settings.php' needs to use a prefixing '#'
               this needs to be stripped off here if it's there for the format's specific colour picker. */
             $defaults = $this->get_course_format_colour_defaults();
-            $context = $this->get_context();
+            $context = self::get_context($this);
 
             if (is_null($courseconfig)) {
                 $courseconfig = get_config('moodlecourse');
@@ -1057,7 +1057,7 @@ class format_grid extends format_base {
                 }
             }
         }
-        $context = $this->get_context();
+        $context = self::get_context($this);
 
         $changeimagecontaineralignment = has_capability('format/grid:changeimagecontaineralignment', $context);
         $changeimagecontainernavigation = has_capability('format/grid:changeimagecontainernavigation', $context);
@@ -1491,16 +1491,7 @@ class format_grid extends format_base {
             unset($data->resetallgreyouthidden);
         }
 
-        $settings = $this->get_settings();
-        $changedisplayedimages = false;
-        $imageschanged = false;
-        if (isset($data->imagecontainerwidth)) {
-            /* We are have the CONTRIB-4099 options and this is not from a pre-CONTRIB-4099 backup file, so update if a reset
-               does not do that as 'setup_displayed_image' when called from 'update_displayed_images()' will need to use the
-               new values. */
-            $changedisplayedimages = true;
-        }
-
+        $currentsettings = $this->get_settings();
         $data = (array) $data;
         if ($oldcourse !== null) {
             $oldcourse = (array) $oldcourse;
@@ -1529,7 +1520,7 @@ class format_grid extends format_base {
             // If the numsections was decreased, try to completely delete the orphaned sections (unless they are not empty).
             $numsections = (int)$data['numsections'];
             $maxsection = $DB->get_field_sql('SELECT max(section) from {course_sections}
-                        WHERE course = ?', array($this->courseid));
+                WHERE course = ?', array($this->courseid));
             for ($sectionnum = $maxsection; $sectionnum > $numsections; $sectionnum--) {
                 if (!$this->delete_section($sectionnum, false)) {
                     break;
@@ -1538,6 +1529,7 @@ class format_grid extends format_base {
         }
 
         // Now we can do the reset.
+        $ourimageschanged = false;
         if (($resetallimagecontaineralignment) ||
             ($resetallimagecontainernavigation) ||
             ($resetallimagecontainersize) ||
@@ -1548,10 +1540,10 @@ class format_grid extends format_base {
             ($resetallsinglepagesummaryimage) ||
             ($resetallfitpopup) ||
             ($resetallgreyouthidden)) {
-            $imageschanged = $this->reset_grid_setting(0, $resetallimagecontaineralignment, $resetallimagecontainernavigation,
-                $resetallimagecontainersize, $resetallimageresizemethod, $resetallimagecontainerstyle,
-                $resetallsectiontitleoptions, $resetallnewactivity, $resetallsinglepagesummaryimage, $resetallfitpopup,
-                $resetallgreyouthidden);
+            $ourimageschanged = $this->reset_grid_setting(0, $currentsettings, $resetallimagecontaineralignment,
+                $resetallimagecontainernavigation, $resetallimagecontainersize, $resetallimageresizemethod,
+                $resetallimagecontainerstyle, $resetallsectiontitleoptions, $resetallnewactivity,
+                $resetallsinglepagesummaryimage, $resetallfitpopup, $resetallgreyouthidden);
             $changes = true;
         } else if (
             ($resetimagecontaineralignment) ||
@@ -1564,17 +1556,32 @@ class format_grid extends format_base {
             ($resetsinglepagesummaryimage) ||
             ($resetfitpopup) ||
             ($resetgreyouthidden)) {
-            $imageschanged = $this->reset_grid_setting($this->courseid, $resetimagecontaineralignment, $resetimagecontainernavigation,
-                $resetimagecontainersize, $resetimageresizemethod, $resetimagecontainerstyle,
+            $ourimageschanged = $this->reset_grid_setting($this->courseid, $currentsettings, $resetimagecontaineralignment,
+                $resetimagecontainernavigation, $resetimagecontainersize, $resetimageresizemethod, $resetimagecontainerstyle,
                 $resetsectiontitleoptions, $resetnewactivity, $resetsinglepagesummaryimage, $resetfitpopup, $resetgreyouthidden);
             $changes = true;
         }
 
-        // Now we can change the displayed images if needed.
-        if ($changedisplayedimages && (!$imageschanged)) {
-            $settings = $this->get_settings(true); // Invalidate as changed.
+        if (!$ourimageschanged) {
+            // A reset has not changed the images, so check if they need to be.
+            $newsettings = $this->get_settings(true); // Ensure we get the new values.
 
-            \format_grid\toolbox::update_displayed_images($this->courseid, $this->get_contextid(), $settings, true);
+            if (($currentsettings['imagecontainerwidth'] != $newsettings['imagecontainerwidth']) ||
+                ($currentsettings['imagecontainerratio'] != $newsettings['imagecontainerratio'])) {
+                $performimagecontainersize = true;
+            } else {
+                $performimagecontainersize = false;
+            }
+
+            if (($currentsettings['imageresizemethod'] != $newsettings['imageresizemethod'])) {
+                $performimageresizemethod = true;
+            } else {
+                $performimageresizemethod = false;
+            }
+
+            if (($performimagecontainersize) || ($performimageresizemethod)) {
+                \format_grid\toolbox::update_displayed_images($this->courseid);
+            }
         }
 
         return $changes;
@@ -1608,7 +1615,7 @@ class format_grid extends format_base {
             return false;
         }
         if (parent::delete_section($section, $forcedeleteifnotempty)) {
-            \format_grid\toolbox::delete_image($section->id, $this->get_contextid(), $this->get_courseid());
+            \format_grid\toolbox::delete_image($section->id, self::get_contextid($this), $this->get_courseid());
             return true;
         }
         return false;
@@ -1647,7 +1654,7 @@ class format_grid extends format_base {
             global $DB;
             $DB->set_field('format_grid_icon', 'displayedimageindex', 0, array('sectionid' => $sectionimage->sectionid));
             // We know the file is normally deleted, but just in case...
-            $contextid = $this->get_contextid();
+            $contextid = self::get_contextid($this);
             $fs = get_file_storage();
             $gridimagepath = \format_grid\toolbox::get_image_path();
             \format_grid\toolbox::delete_displayed_image($contextid, $sectionimage, $gridimagepath, $fs);
@@ -1670,16 +1677,14 @@ class format_grid extends format_base {
      * @param int $fitpopupreset If true, reset the fit popup to the default in the settings for the format.
      * @param int $greyouthidden If true, reset the greyout hidden to the default in the settings for the format.
      *
-     * @return bool If the displayed images were updated.
+     * @return bool If our images have changed.
      */
-    public function reset_grid_setting($courseid, $imagecontaineralignmentreset, $imagecontainernavigationreset,
-        $imagecontainersizereset, $imageresizemethodreset, $imagecontainerstylereset, $sectiontitleoptionsreset,
-        $newactivityreset, $singlepagesummaryimagereset, $fitpopupreset, $greyouthidden) {
+    private function reset_grid_setting($courseid, $ourcurrentsettings, $imagecontaineralignmentreset,
+        $imagecontainernavigationreset, $imagecontainersizereset, $imageresizemethodreset, $imagecontainerstylereset,
+        $sectiontitleoptionsreset, $newactivityreset, $singlepagesummaryimagereset, $fitpopupreset, $greyouthidden) {
         global $DB, $USER;
 
-        $imagesupdated = false;
-
-        $context = $this->get_context();
+        $context = self::get_context($this);
 
         if ($courseid == 0) {
             $records = $DB->get_records('course', array('format' => $this->format), '', 'id');
@@ -1763,6 +1768,7 @@ class format_grid extends format_base {
             $updategreyouthidden = true;
         }
 
+        $ourimagesupdated = false;
         foreach ($records as $record) {
             if (($updateimagecontaineralignment) ||
                 ($updateimagecontainernavigation) ||
@@ -1780,33 +1786,34 @@ class format_grid extends format_base {
                     $courseformat = $this;
                 }
                 if (($updateimagecontainersize) || ($updateimageresizemethod)) {
-                    $currentsettings = $courseformat->get_settings();
+                    if ($record->id === $this->courseid) {
+                        $currentsettings = $ourcurrentsettings;
+                    } else {
+                        $currentsettings = $courseformat->get_settings();
+                    }
                     $courseformat->update_format_options($updatedata);
                     $newsettings = $courseformat->get_settings(true); // Ensure we get the new values.
 
                     if (($updateimagecontainersize) &&
-                            (($currentsettings['imagecontainerwidth'] != $newsettings['imagecontainerwidth']) ||
-                            ($currentsettings['imagecontainerratio'] != $newsettings['imagecontainerratio']))) {
-                        $performimagecontainersize = true; // Variable $updatedata will be correct.
+                        (($currentsettings['imagecontainerwidth'] != $newsettings['imagecontainerwidth']) ||
+                         ($currentsettings['imagecontainerratio'] != $newsettings['imagecontainerratio']))) {
+                        $performimagecontainersize = true;
                     } else {
-                        // If image resize method needs to operate so use current settings.
-                        $newsettings['imagecontainerwidth'] = $currentsettings['imagecontainerwidth'];
-                        $newsettings['imagecontainerratio'] = $currentsettings['imagecontainerratio'];
                         $performimagecontainersize = false;
                     }
 
                     if (($updateimageresizemethod) &&
-                            ($currentsettings['imageresizemethod'] != $newsettings['imageresizemethod'])) {
-                        $performimageresizemethod = true; // Variable $updatedata will be correct.
+                        ($currentsettings['imageresizemethod'] != $newsettings['imageresizemethod'])) {
+                        $performimageresizemethod = true;
                     } else {
-                        // If image container size needs to operate so use current setting.
-                        $newsettings['imageresizemethod'] = $currentsettings['imageresizemethod'];
                         $performimageresizemethod = false;
                     }
 
                     if (($performimagecontainersize) || ($performimageresizemethod)) {
-                        \format_grid\toolbox::update_displayed_images($record->id, $courseformat->get_contextid(), $newsettings, false);
-                        $imagesupdated = true;
+                        \format_grid\toolbox::update_displayed_images($record->id);
+                        if ($record->id === $this->courseid) {
+                            $ourimagesupdated = true;
+                        }
                     }
                 } else {
                     $courseformat->update_format_options($updatedata);
@@ -1814,7 +1821,7 @@ class format_grid extends format_base {
             }
         }
 
-        return $imagesupdated;
+        return $ourimagesupdated;
     }
 
     // Grid specific methods...
@@ -1903,20 +1910,20 @@ class format_grid extends format_base {
         $this->update_course_format_options($data);
     }
 
-    public function get_context() {
+    public static function get_context($us) {
         global $SITE;
 
-        if ($SITE->id == $this->courseid) {
+        if ($SITE->id == $us->courseid) {
             // Use the context of the page which should be the course category.
             global $PAGE;
             return $PAGE->context;
         } else {
-            return context_course::instance($this->courseid);
+            return context_course::instance($us->courseid);
         }
     }
 
-    public function get_contextid() {
-        return $this->get_context()->id;
+    public static function get_contextid($us) {
+        return self::get_context($us)->id;
     }
 }
 
