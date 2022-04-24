@@ -1,5 +1,6 @@
 <?php
-// This file is part of the Checklist plugin for Moodle - http://moodle.org/
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,957 +16,858 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Functions to link into the main Moodle API
- * @copyright Davo Smith <moodle@davosmith.co.uk>
- * @package mod_checklist
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Grading method controller for the Checklist plugin
+ *
+ * @package    gradingform
+ * @subpackage checklist
+ * @author     Sam Chaffee
+ * @copyright  2011 David Mudrak <david@moodle.com>
+ * @copyright  Copyright (c) 2012 Open LMS (https://www.openlms.net)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-/** Do not sent emails on completion */
-define("CHECKLIST_EMAIL_NO", 0);
-/** Send emails to students on completion */
-define("CHECKLIST_EMAIL_STUDENT", 1);
-/** Send emails to teachers on completion */
-define("CHECKLIST_EMAIL_TEACHER", 2);
-/** Send emails to students and teachers on completion */
-define("CHECKLIST_EMAIL_BOTH", 3);
-
-/** Teacher marked item as "No" */
-define("CHECKLIST_TEACHERMARK_NO", 2);
-/** Teacher marked item as "Yes" */
-define("CHECKLIST_TEACHERMARK_YES", 1);
-/** No teacher mark */
-define("CHECKLIST_TEACHERMARK_UNDECIDED", 0);
-
-/** Checklist updated by students */
-define("CHECKLIST_MARKING_STUDENT", 0);
-/** Checklist updated by teachers */
-define("CHECKLIST_MARKING_TEACHER", 1);
-/** Checklist updated by students and teachers */
-define("CHECKLIST_MARKING_BOTH", 2);
-
-/** Linked activities should not update item status */
-define("CHECKLIST_AUTOUPDATE_NO", 0);
-/** Linked activites should update item status */
-define("CHECKLIST_AUTOUPDATE_YES", 2);
-/** Linked activites should update items status, but can be overridden by students */
-define("CHECKLIST_AUTOUPDATE_YES_OVERRIDE", 1);
-
-/** Do not import activities into the checklist */
-define("CHECKLIST_AUTOPOPULATE_NO", 0);
-/** Import activities from the current section into the checklist */
-define("CHECKLIST_AUTOPOPULATE_SECTION", 2);
-/** Import all activities in the course into the checklist */
-define("CHECKLIST_AUTOPOPULATE_COURSE", 1);
-
-/** Maximum indend allowed */
-define("CHECKLIST_MAX_INDENT", 10);
-
-global $CFG;
-require_once(__DIR__.'/locallib.php');
-require_once($CFG->libdir.'/completionlib.php');
+require_once($CFG->dirroot.'/grade/grading/form/lib.php');
 
 /**
- * Given an object containing all the necessary data,
- * (defined by the form in mod_form.php) this function
- * will create a new instance and return the id number
- * of the new instance.
- *
- * @param object $checklist An object from the form in mod_form.php
- * @return int The id of the newly inserted checklist record
+ * This controller encapsulates the checklist grading logic
  */
-function checklist_add_instance($checklist) {
-    global $DB;
+class gradingform_checklist_controller extends gradingform_controller {
 
-    $checklist->timecreated = time();
-    $checklist->id = $DB->insert_record('checklist', $checklist);
+    // Modes of displaying the checklist (used in gradingform_checklist_renderer)
+    /** checklist display mode: For editing (moderator or teacher creates a checklist) */
+    const DISPLAY_EDIT_FULL     = 1;
+    /** checklist display mode: Preview the checklist design with hidden fields */
+    const DISPLAY_EDIT_FROZEN   = 2;
+    /** checklist display mode: Preview the checklist design (for person with manage permission) */
+    const DISPLAY_PREVIEW       = 3;
+    /** checklist display mode: Preview the checklist (for people being graded) */
+    const DISPLAY_PREVIEW_GRADED= 8;
+    /** checklist display mode: For evaluation, enabled (teacher grades a student) */
+    const DISPLAY_EVAL          = 4;
+    /** checklist display mode: For evaluation, with hidden fields */
+    const DISPLAY_EVAL_FROZEN   = 5;
+    /** checklist display mode: Teacher reviews filled checklist */
+    const DISPLAY_REVIEW        = 6;
+    /** checklist display mode: Display filled checklist (i.e. students see their grades) */
+    const DISPLAY_VIEW          = 7;
 
-    checklist_grade_item_update($checklist);
-
-    if (!empty($checklist->completionexpected)) {
-        \core_completion\api::update_completion_date_event($checklist->coursemodule, 'checklist', $checklist->id,
-                                                           $checklist->completionexpected);
+    /**
+     * Returns the checklist plugin renderer
+     *
+     * @param moodle_page $page the target page
+     * @return gradingform_checklist_renderer
+     */
+    public function get_renderer(moodle_page $page) {
+        return $page->get_renderer('gradingform_'. $this->get_method_name());
     }
 
-    return $checklist->id;
-}
-
-/**
- * Given an object containing all the necessary data,
- * (defined by the form in mod_form.php) this function
- * will update an existing instance with new data.
- *
- * @param object $checklist An object from the form in mod_form.php
- * @return boolean Success/Fail
- */
-function checklist_update_instance($checklist) {
-    global $DB;
-
-    $checklist->timemodified = time();
-    $checklist->id = $checklist->instance;
-
-    $oldrecord = $DB->get_record('checklist', ['id' => $checklist->id]);
-
-    $newmax = $checklist->maxgrade;
-    $oldmax = $oldrecord->maxgrade;
-
-    $oldcompletion = $oldrecord->completionpercent;
-    $newcompletion = $checklist->completionpercent ?? $oldcompletion;
-    $oldcompletiontype = $oldrecord->completionpercenttype;
-    $newcompletiontype = $checklist->completionpercenttype ?? $oldcompletiontype;
-
-    $newautoupdate = $checklist->autoupdate;
-    $oldautoupdate = $oldrecord->autoupdate;
-
-    $newteacheredit = $checklist->teacheredit;
-    $oldteacheredit = $oldrecord->teacheredit;
-
-    $DB->update_record('checklist', $checklist);
-
-    // Add or remove all calendar events, as needed.
-    $course = $DB->get_record('course', array('id' => $checklist->course));
-    $cm = get_coursemodule_from_instance('checklist', $checklist->id, $course->id);
-    $chk = new checklist_class($cm->id, 0, $checklist, $cm, $course);
-    $chk->setallevents();
-
-    checklist_grade_item_update($checklist);
-    if ($newmax != $oldmax) {
-        checklist_update_grades($checklist);
-    } else if ($newcompletion && ($newcompletion != $oldcompletion || $newcompletiontype != $oldcompletiontype)) {
-        // This will already be updated if checklist_update_grades() is called.
-        $ci = new completion_info($course);
-        $context = context_module::instance($cm->id);
-        if (get_config('mod_checklist', 'onlyenrolled')) {
-            $users = get_enrolled_users($context, 'mod/checklist:updateown', 0, 'u.id', null, 0, 0, true);
-        } else {
-            $users = get_users_by_capability($context, 'mod/checklist:updateown', 'u.id');
-        }
-        foreach ($users as $user) {
-            $ci->update_state($cm, COMPLETION_UNKNOWN, $user->id);
-        }
-    }
-    if ($newautoupdate) {
-        if (!$oldautoupdate) {
-            $chk->update_all_autoupdate_checks();
-        } else {
-            $oldautoteacher = ($oldteacheredit == CHECKLIST_MARKING_TEACHER);
-            $newautoteacher = ($newteacheredit == CHECKLIST_MARKING_TEACHER);
-            if ($oldautoteacher != $newautoteacher) {
-                // Just switched to/from teacher-only marking => automatic checkmarks need updating
-                // (as they are updating a different value from before).
-                $chk->update_all_autoupdate_checks();
-            }
-        }
-    }
-
-    if (!empty($checklist->completionexpected)) {
-        \core_completion\api::update_completion_date_event($checklist->coursemodule, 'checklist', $checklist->id,
-                                                           $checklist->completionexpected);
-    }
-
-    return true;
-}
-
-/**
- * Given an ID of an instance of this module,
- * this function will permanently delete the instance
- * and any data that depends on it.
- *
- * @param int $id Id of the module instance
- * @return boolean Success/Failure
- */
-function checklist_delete_instance($id) {
-    global $DB;
-
-    if (!$checklist = $DB->get_record('checklist', array('id' => $id))) {
-        return false;
-    }
-
-    // Remove all calendar events.
-    if ($checklist->duedatesoncalendar) {
-        $checklist->duedatesoncalendar = false;
-        $course = $DB->get_record('course', array('id' => $checklist->course));
-        $cm = get_coursemodule_from_instance('checklist', $checklist->id, $course->id);
-        if ($cm) { // Should not be false, but check, just in case...
-            $chk = new checklist_class($cm->id, 0, $checklist, $cm, $course);
-            $chk->setallevents();
-        }
-    }
-
-    $items = $DB->get_records('checklist_item', array('checklist' => $checklist->id), '', 'id');
-    if (!empty($items)) {
-        $items = array_keys($items);
-        $DB->delete_records_list('checklist_check', 'item', $items);
-        $DB->delete_records_list('checklist_comment', 'itemid', $items);
-        $DB->delete_records('checklist_item', array('checklist' => $checklist->id));
-    }
-    $DB->delete_records('checklist', array('id' => $checklist->id));
-
-    checklist_grade_item_delete($checklist);
-
-    return true;
-}
-
-/**
- * Update all checklist grades on the site
- */
-function checklist_update_all_grades() {
-    global $DB;
-
-    $checklists = $DB->get_records('checklist');
-    foreach ($checklists as $checklist) {
-        checklist_update_grades($checklist);
-    }
-}
-
-/**
- * Update the checklist grades
- * @param object $checklist
- * @param int $userid
- */
-function checklist_update_grades($checklist, $userid = 0) {
-    global $DB;
-
-    $params = array(
-        'checklist' => $checklist->id,
-        'userid' => 0,
-        'itemoptional' => CHECKLIST_OPTIONAL_NO,
-        'hidden' => CHECKLIST_HIDDEN_NO
-    );
-    $items = \mod_checklist\local\checklist_item::fetch_all($params);
-
-    if (!$items) {
-        return;
-    }
-    if (!$course = $DB->get_record('course', array('id' => $checklist->course))) {
-        return;
-    }
-    if (!$cm = get_coursemodule_from_instance('checklist', $checklist->id, $course->id)) {
-        return;
-    }
-    $context = context_module::instance($cm->id);
-
-    $checkgroupings = false; // Don't check items against groupings unless we really have to.
-    $groupings = checklist_class::get_course_groupings($course->id);
-    foreach ($items as $item) {
-        if ($item->groupingid && isset($groupings[$item->groupingid])) {
-            $checkgroupings = true;
-            break;
-        }
-    }
-
-    if ($checklist->teacheredit == CHECKLIST_MARKING_STUDENT) {
-        $date = ', MAX(c.usertimestamp) AS datesubmitted';
-        $where = 'c.usertimestamp > 0';
-    } else {
-        $date = ', MAX(c.teachertimestamp) AS dategraded';
-        $where = 'c.teachermark = '.CHECKLIST_TEACHERMARK_YES;
-    }
-
-    if ($checkgroupings) {
-        if ($userid) {
-            $users = $DB->get_records('user', array('id' => $userid), null, 'id, firstname, lastname');
-        } else {
-            if (get_config('mod_checklist', 'onlyenrolled')) {
-                $users = get_enrolled_users($context, 'mod/checklist:updateown', 0, 'u.id, u.firstname, u.lastname',
-                                            null, 0, 0, true);
-            } else {
-                $users = get_users_by_capability($context, 'mod/checklist:updateown', 'u.id, u.firstname, u.lastname');
-            }
-            if (!$users) {
-                return;
-            }
+    /**
+     * Returns the HTML code displaying the preview of the checklist grading form
+     *
+     * @throws coding_exception
+     * @param moodle_page $page the target page
+     * @return string
+     */
+    public function render_preview(moodle_page $page) {
+        if (!$this->is_form_defined()) {
+            throw new coding_exception('It is the caller\'s responsibility to make sure that the form is actually defined');
         }
 
-        $grades = array();
+        $output = $this->get_renderer($page);
+        $groups = $this->definition->checklist_groups;
+        $options = $this->get_options();
+        $checklist = '';
+        if (has_capability('moodle/grade:managegradingforms', $page->context)) {
+            $checklist .= $output->display_checklist_mapping_explained($this->get_min_max_score());
+            $checklist .= $output->display_checklist($groups, $options, self::DISPLAY_PREVIEW, 'checklist');
+        } else if (!empty($options['alwaysshowdefinition'])) {
+            $checklist .= $output->display_checklist($groups, $options, self::DISPLAY_PREVIEW_GRADED, 'checklist');
+        }
 
-        // With groupings, need to update each user individually (as each has different groupings).
-        foreach ($users as $uid => $user) {
-            $groupings = checklist_class::get_user_groupings($uid, $course->id);
+        return $checklist;
+    }
 
-            $total = 0;
-            $itemlist = [];
-            foreach ($items as $item) {
-                if ($item->groupingid) {
-                    if (!in_array($item->groupingid, $groupings)) {
-                        continue;
-                    }
+    /**
+     * Deletes the checklist definition and all the associated information
+     */
+    protected function delete_plugin_definition() {
+        global $DB;
+
+        // get the list of instances
+        $instances = array_keys($DB->get_records('grading_instances', array('definitionid' => $this->definition->id), '', 'id'));
+        // delete all fillings
+        $DB->delete_records_list('gradingform_checklist_fills', 'instanceid', $instances);
+        // delete instances
+        $DB->delete_records_list('grading_instances', 'id', $instances);
+        // get the list of groups records
+        $groups = array_keys($DB->get_records('gradingform_checklist_groups', array('definitionid' => $this->definition->id), '', 'id'));
+        // delete checklist items items
+        $DB->delete_records_list('gradingform_checklist_items', 'groupid', $groups);
+        // delete groups
+        $DB->delete_records_list('gradingform_checklist_groups', 'id', $groups);
+    }
+
+    /**
+     * If instanceid is specified and grading instance exists and it is created by this rater for
+     * this item, this instance is returned.
+     * If there exists a draft for this raterid+itemid, take this draft (this is the change from parent)
+     * Otherwise new instance is created for the specified rater and itemid
+     *
+     * @param int $instanceid
+     * @param int $raterid
+     * @param int $itemid
+     * @return gradingform_instance
+     */
+    public function get_or_create_instance($instanceid, $raterid, $itemid) {
+        global $DB;
+        if ($instanceid &&
+            $instance = $DB->get_record('grading_instances', array('id'  => $instanceid, 'raterid' => $raterid, 'itemid' => $itemid), '*', IGNORE_MISSING)) {
+            return $this->get_instance($instance);
+        }
+        if ($itemid && $raterid) {
+            if ($rs = $DB->get_records('grading_instances', array('definitionid' => $this->definition->id, 'raterid' => $raterid, 'itemid' => $itemid), 'timemodified DESC', '*', 0, 1)) {
+                $record = reset($rs);
+                $currentinstance = $this->get_current_instance($raterid, $itemid);
+                if ($record->status == gradingform_checklist_instance::INSTANCE_STATUS_INCOMPLETE &&
+                    (!$currentinstance || $record->timemodified > $currentinstance->get_data('timemodified'))) {
+                    $record->isrestored = true;
+                    return $this->get_instance($record);
                 }
-                $itemlist[] = $item->id;
-                $total++;
             }
-            $itemlist = implode(',', $itemlist);
-
-            if (!$total) { // No items - set score to 0.
-                $ugrade = new stdClass;
-                $ugrade->userid = $uid;
-                $ugrade->rawgrade = 0;
-                $ugrade->date = time();
-
-            } else {
-                $sql = 'SELECT (SUM(CASE WHEN '.$where.' THEN 1 ELSE 0 END) * ? / ? ) AS rawgrade'.$date;
-                $sql .= " FROM {checklist_check} c ";
-                $sql .= " WHERE c.item IN ($itemlist)";
-                $sql .= ' AND c.userid = ? ';
-
-                $ugrade = $DB->get_record_sql($sql, array($checklist->maxgrade, $total, $uid));
-                if (!$ugrade) {
-                    $ugrade = new stdClass;
-                    $ugrade->rawgrade = 0;
-                    $ugrade->date = time();
-                }
-                $ugrade->userid = $uid;
-            }
-
-            $ugrade->firstname = $user->firstname;
-            $ugrade->lastname = $user->lastname;
-
-            $grades[$uid] = $ugrade;
         }
-
-    } else {
-        // No need to check groupings, so update all student grades at once.
-
-        if ($userid) {
-            $users = $userid;
-        } else {
-            if (get_config('mod_checklist', 'onlyenrolled')) {
-                $users = get_enrolled_users($context, 'mod/checklist:updateown', 0, 'u.id', null, 0, 0, true);
-            } else {
-                $users = get_users_by_capability($context, 'mod/checklist:updateown', 'u.id', '', '', '', '', '', false);
-            }
-            if (!$users) {
-                return;
-            }
-            $users = array_keys($users);
-        }
-
-        $total = count($items);
-
-        [$usql, $uparams] = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED);
-        [$isql, $iparams] = $DB->get_in_or_equal(array_keys($items), SQL_PARAMS_NAMED);
-
-        if (class_exists('\core_user\fields')) {
-            $namesql = \core_user\fields::for_name()->get_sql('u', true);
-        } else {
-            $namesql = (object)[
-                'selects' => ','.get_all_user_name_fields(true, 'u'),
-                'joins' => '',
-                'params' => [],
-                'mappings' => [],
-            ];
-        }
-
-        $sql = "
-             SELECT u.id AS userid, (SUM(CASE WHEN $where THEN 1 ELSE 0 END) * :maxgrade / :total ) AS rawgrade $date
-                    {$namesql->selects}
-               FROM {user} u
-          LEFT JOIN {checklist_check} c ON u.id = c.userid
-                    {$namesql->joins}
-              WHERE u.id $usql
-                AND c.item $isql
-           GROUP BY u.id {$namesql->selects}
-        ";
-
-        $params = array_merge(['maxgrade' => $checklist->maxgrade, 'total' => $total], $uparams, $iparams, $namesql->params);
-        $grades = $DB->get_records_sql($sql, $params);
+        return $this->create_instance($raterid, $itemid);
     }
 
-    foreach ($grades as $grade) {
-        // Log completion of checklist.
-        if ($grade->rawgrade == $checklist->maxgrade) {
-            if ($checklist->emailoncomplete) {
-                // Do not send another email if this checklist was already 'completed' in the last hour.
-                if (!checklist_sent_email_recently($cm->id)) {
-                    if (!isset($context)) {
-                        $context = context_module::instance($cm->id);
-                    }
+    /**
+     * Extends the module settings navigation
+     *
+     * This function is called when the context for the page is an activity module with the
+     * FEATURE_ADVANCED_GRADING, the user has the permission moodle/grade:managegradingforms
+     * and there is an area with the active grading method set to the given plugin.
+     *
+     * @param settings_navigation $settingsnav {@link settings_navigation}
+     * @param navigation_node $node {@link navigation_node}
+     */
+    public function extend_settings_navigation(settings_navigation $settingsnav, navigation_node $node=null) {
+        $node->add(get_string('definechecklist', 'gradingform_checklist'),
+            $this->get_editor_url(), settings_navigation::TYPE_CUSTOM,
+            null, null, new pix_icon('icon', '', 'gradingform_checklist'));
+    }
 
-                    // Prepare email content.
-                    $details = new stdClass();
-                    $details->user = fullname($grade);
-                    $details->checklist = s($checklist->name);
-                    $details->coursename = $course->fullname;
+    /**
+     * Extends the module navigation
+     *
+     * This function is called when the context for the page is an activity module with the
+     * FEATURE_ADVANCED_GRADING and there is an area with the active grading method set to the given plugin.
+     *
+     * @param global_navigation $navigation {@link global_navigation}
+     * @param navigation_node $node {@link navigation_node}
+     */
+    public function extend_navigation(global_navigation $navigation, navigation_node $node=null) {
+        if (has_capability('moodle/grade:managegradingforms', $this->get_context())) {
+            // no need for preview if user can manage forms, he will have link to manage.php in settings instead
+            return;
+        }
+        if ($this->is_form_defined() && ($options = $this->get_options()) && !empty($options['alwaysshowdefinition'])) {
+            $node->add(get_string('gradingof', 'gradingform_checklist', get_grading_manager($this->get_areaid())->get_area_title()),
+                new moodle_url('/grade/grading/form/'.$this->get_method_name().'/preview.php', array('areaid' => $this->get_areaid())),
+                settings_navigation::TYPE_CUSTOM);
+        }
+    }
 
-                    if ($checklist->emailoncomplete == CHECKLIST_EMAIL_TEACHER
-                        || $checklist->emailoncomplete == CHECKLIST_EMAIL_BOTH
-                    ) {
-                        // Email will be sent to the all teachers who have capability.
-                        $subj = get_string('emailoncompletesubject', 'checklist', $details);
-                        $content = get_string('emailoncompletebody', 'checklist', $details);
-                        $content .= new moodle_url('/mod/checklist/view.php', array('id' => $cm->id));
+    /**
+     * Saves the checklist definition into the database
+     *
+     * @see parent::update_definition()
+     * @param stdClass $newdefinition checklist definition data as coming from gradingform_checklist_editchecklist::get_data()
+     * @param int|null $usermodified optional userid of the author of the definition, defaults to the current user
+     */
+    public function update_definition(stdClass $newdefinition, $usermodified = null) {
+        $this->update_or_check_checklist($newdefinition, $usermodified, true);
+        if (isset($newdefinition->checklist['regrade']) && $newdefinition->checklist['regrade']) {
+            $this->mark_for_regrade();
+        }
+    }
 
-                        $groups = groups_get_all_groups($course->id, $grade->userid, $cm->groupingid);
+    /**
+     * Either saves the checklist definition into the database or check if it has been changed.
+     * Returns the level of changes:
+     * 0 - no changes
+     * 1 - only texts or groups sortorders are changed, students probably do not require re-grading
+     * 2 - added items but maximum score on checklist is the same, students still may not require re-grading
+     * 3 - removed groups or added items or changed number of points, students require re-grading but may be re-graded automatically
+     * 4 - removed items - students require re-grading and not all students may be re-graded automatically
+     * 5 - added groups - all students require manual re-grading
+     *
+     * @param stdClass $newdefinition checklist definition data as coming from gradingform_checklist_editchecklist::get_data()
+     * @param int|null $usermodified optional userid of the author of the definition, defaults to the current user
+     * @param boolean $doupdate if true actually updates DB, otherwise performs a check
+     *
+     * @return int
+     */
+    public function update_or_check_checklist(stdClass $newdefinition, $usermodified = null, $doupdate = false) {
+        global $DB;
 
-                        $groupmode = groups_get_activity_groupmode($cm, $course);
+        // firstly update the common definition data in the {grading_definition} table
+        if ($this->definition === false) {
+            if (!$doupdate) {
+                // if we create the new definition there is no such thing as re-grading anyway
+                return 5;
+            }
+            // if definition does not exist yet, create a blank one
+            // (we need id to save files embedded in description)
+            parent::update_definition(new stdClass(), $usermodified);
+            parent::load_definition();
+        }
+        if (!isset($newdefinition->checklist['options'])) {
+            $newdefinition->checklist['options'] = self::get_default_options();
+        }
+        $newdefinition->options = json_encode($newdefinition->checklist['options']);
+        $editoroptions = self::description_form_field_options($this->get_context());
+        $newdefinition = file_postupdate_standard_editor($newdefinition, 'description', $editoroptions, $this->get_context(),
+            'grading', 'description', $this->definition->id);
 
-                        if (is_array($groups) && count($groups) > 0 && $groupmode != NOGROUPS) {
-                            $groups = array_keys($groups);
-                        } else if ($groupmode != NOGROUPS) {
-                            // If the user is not in a group, and the checklist is set to group mode,
-                            // then set $groups to a non-existant id so that only users with
-                            // 'moodle/site:accessallgroups' get notified.
-                            $groups = -1;
-                        } else {
-                            $groups = '';
+        // reload the definition from the database
+        $currentdefinition = $this->get_definition(true);
+
+        // update checklist data
+        $haschanges = array();
+        if (empty($newdefinition->checklist['groups'])) {
+            $newgroups = array();
+        } else {
+            $newgroups = $newdefinition->checklist['groups']; // new ones to be saved
+        }
+        $currentgroups = $currentdefinition->checklist_groups;
+        $groupsfields = array('sortorder', 'description');
+        $itemfields = array('score', 'sortorder', 'definition');
+        foreach ($newgroups as $id => $group) {
+            // get list of submitted items
+            $itemsdata = array();
+            if (array_key_exists('items', $group)) {
+                $itemsdata = $group['items'];
+            }
+            $groupmaxscore = null;
+            if (preg_match('/^NEWID\d+$/', $id)) {
+                // insert group into DB
+                $data = array('definitionid' => $this->definition->id);
+                foreach ($groupsfields as $key) {
+                    if (array_key_exists($key, $group)) {
+                        if ($key == 'description') {
+                            $group[$key] = trim(clean_param($group[$key], PARAM_TEXT));
                         }
+                        $data[$key] = $group[$key];
+                    }
+                }
+                if ($doupdate) {
+                    $id = $DB->insert_record('gradingform_checklist_groups', $data);
+                }
+                $haschanges[5] = true;
+            } else {
+                // update group in DB
+                $data = array();
+                foreach ($groupsfields as $key) {
+                    if (array_key_exists($key, $group) && $key == 'description') {
+                        $group[$key] = trim(clean_param($group[$key], PARAM_TEXT));
+                    }
+                    if (array_key_exists($key, $group) && $group[$key] != $currentgroups[$id][$key]) {
+                        $data[$key] = $group[$key];
+                    }
+                }
+                if (!empty($data)) {
+                    // update only if something is changed
+                    $data['id'] = $id;
+                    if ($doupdate) {
+                        $DB->update_record('gradingform_checklist_groups', $data);
+                    }
+                    $haschanges[1] = true;
+                }
+                // remove deleted items from DB and calculate the maximum score for this groups
+                foreach ($currentgroups[$id]['items'] as $itemid => $currentitem) {
+                    // group max score is all sum of all items (all items checked)
+                    $groupmaxscore += $currentitem['score'];
 
-                        if ($recipients = get_users_by_capability($context, 'mod/checklist:emailoncomplete',
-                                                                  'u.*', '', '', '', $groups)) {
-                            foreach ($recipients as $recipient) {
-                                email_to_user($recipient, $grade, $subj, $content, '', '', '', false);
+                    if (!array_key_exists($itemid, $itemsdata)) {
+                        if ($doupdate) {
+                            $DB->delete_records('gradingform_checklist_items', array('id' => $itemid));
+                        }
+                        $haschanges[4] = true;
+                    }
+                }
+            }
+            foreach ($itemsdata as $itemid => $item) {
+                if (isset($item['score'])) {
+                    $item['score'] = (float)$item['score'];
+                    if ($item['score'] < 0) {
+                        // TODO why we can't allow negative score for checklist?
+                        $item['score'] = 0;
+                    }
+                }
+                if (preg_match('/^NEWID\d+$/', $itemid)) {
+                    // insert item into DB
+                    $data = array('groupid' => $id);
+                    foreach ($itemfields as $key) {
+                        if (array_key_exists($key, $item)) {
+                            if ($key == 'definition') {
+                                $item[$key] = trim(clean_param($item[$key], PARAM_TEXT));
                             }
+                            $data[$key] = $item[$key];
                         }
                     }
-                    if ($checklist->emailoncomplete == CHECKLIST_EMAIL_STUDENT
-                        || $checklist->emailoncomplete == CHECKLIST_EMAIL_BOTH
-                    ) {
-                        // Email will be sent to the student who completes this checklist.
-                        $subj = get_string('emailoncompletesubjectown', 'checklist', $details);
-                        $content = get_string('emailoncompletebodyown', 'checklist', $details);
-                        $content .= new moodle_url('/mod/checklist/view.php', array('id' => $cm->id));
+                    if ($doupdate) {
+                        $itemid = $DB->insert_record('gradingform_checklist_items', $data);
+                    }
 
-                        $recipientstudent = $DB->get_record('user', array('id' => $grade->userid));
-                        email_to_user($recipientstudent, $grade, $subj, $content, '', '', '', false);
+                    // additional item means that maximum group score will change
+                    $haschanges[3] = true;
+
+                } else {
+                    // update item in DB
+                    $data = array();
+                    foreach ($itemfields as $key) {
+                        if (array_key_exists($key, $item) && $key == 'definition') {
+                            $item[$key] = trim(clean_param($item[$key], PARAM_TEXT));
+                        }
+                        if (array_key_exists($key, $item) && $item[$key] != $currentgroups[$id]['items'][$itemid][$key]) {
+                            $data[$key] = $item[$key];
+                        }
+                    }
+                    if (!empty($data)) {
+                        // update only if something is changed
+                        $data['id'] = $itemid;
+                        if ($doupdate) {
+                            $DB->update_record('gradingform_checklist_items', $data);
+                        }
+                        if (isset($data['score'])) {
+                            $haschanges[3] = true;
+                        }
+                        $haschanges[1] = true;
                     }
                 }
             }
-            $params = array(
-                'contextid' => $context->id,
-                'objectid' => $checklist->id,
-                'userid' => $grade->userid,
-            );
-            $event = \mod_checklist\event\checklist_completed::create($params);
-            $event->trigger();
         }
-        $ci = new completion_info($course);
-        if ($cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
-            $ci->update_state($cm, COMPLETION_UNKNOWN, $grade->userid);
+        // remove deleted groups from DB
+        foreach (array_keys($currentgroups) as $id) {
+            if (!array_key_exists($id, $newgroups)) {
+                if ($doupdate) {
+                    $DB->delete_records('gradingform_checklist_groups', array('id' => $id));
+                    $DB->delete_records('gradingform_checklist_items', array('groupid' => $id));
+                }
+                $haschanges[3] = true;
+            }
+        }
+        foreach (array('status', 'description', 'descriptionformat', 'name', 'options') as $key) {
+            if (isset($newdefinition->$key) && $newdefinition->$key != $this->definition->$key) {
+                $haschanges[1] = true;
+            }
+        }
+        if ($usermodified && $usermodified != $this->definition->usermodified) {
+            $haschanges[1] = true;
+        }
+        if (!count($haschanges)) {
+            return 0;
+        }
+        if ($doupdate) {
+            parent::update_definition($newdefinition, $usermodified);
+            $this->load_definition();
+        }
+        // return the maximum level of changes
+        $changelevels = array_keys($haschanges);
+        sort($changelevels);
+        return array_pop($changelevels);
+    }
+
+    /**
+     * Converts the current definition into an object suitable for the editor form's set_data()
+     *
+     * @param boolean $addemptygroup whether to add an empty group if the checklist is completely empty (just being created)
+     * @return stdClass
+     */
+    public function get_definition_for_editing($addemptygroup = false) {
+
+        $definition = $this->get_definition();
+        $properties = new stdClass();
+        $properties->areaid = $this->areaid;
+        if ($definition) {
+            foreach (array('id', 'name', 'description', 'descriptionformat', 'status') as $key) {
+                $properties->$key = $definition->$key;
+            }
+            $options = self::description_form_field_options($this->get_context());
+            $properties = file_prepare_standard_editor($properties, 'description', $options, $this->get_context(),
+                'grading', 'description', $definition->id);
+        }
+        $properties->checklist = array('groups' => array(), 'options' => $this->get_options());
+        if (!empty($definition->checklist_groups)) {
+            $properties->checklist['groups'] = $definition->checklist_groups;
+        } else if (!$definition && $addemptygroup) {
+            $properties->checklist['groups'] = array('addgroup' => 1);
+        }
+
+        return $properties;
+    }
+
+    /**
+     * Returns the form definition suitable for cloning into another area
+     *
+     * @see parent::get_definition_copy()
+     * @param gradingform_controller $target the controller of the new copy
+     * @return stdClass definition structure to pass to the target's {@link update_definition()}
+     */
+    public function get_definition_copy(gradingform_controller $target) {
+
+        $new = parent::get_definition_copy($target);
+        $old = $this->get_definition_for_editing();
+        $new->description_editor = $old->description_editor;
+        $new->checklist = array('groups' => array(), 'options' => $old->checklist['options']);
+        $newgroupid = 1;
+        $newitemid = 1;
+        foreach ($old->checklist['groups'] as  $oldgroup) {
+            unset($oldgroup['id']);
+            if (isset($oldgroup['items'])) {
+                foreach ($oldgroup['items'] as $olditemid => $olditem) {
+                    unset($olditem['id']);
+                    $oldgroup['items']['NEWID'.$newitemid] = $olditem;
+                    unset($oldgroup['items'][$olditemid]);
+                    $newitemid++;
+                }
+            } else {
+                $oldgroup['items'] = array();
+            }
+            $new->checklist['groups']['NEWID'.$newgroupid] = $oldgroup;
+            $newgroupid++;
+        }
+
+        return $new;
+    }
+
+    /**
+     * Formats the definition description for display on page
+     *
+     * @return string
+     */
+    public function get_formatted_description() {
+        if (!isset($this->definition->description)) {
+            return '';
+        }
+        $context = $this->get_context();
+
+        $options = self::description_form_field_options($this->get_context());
+        $description = file_rewrite_pluginfile_urls($this->definition->description, 'pluginfile.php', $context->id,
+            'grading', 'description', $this->definition->id, $options);
+
+        $formatoptions = array(
+            'noclean' => false,
+            'trusted' => false,
+            'filter' => true,
+            'context' => $context
+        );
+        return format_text($description, $this->definition->descriptionformat, $formatoptions);
+    }
+
+    /**
+     * Marks all instances filled with this checklist with the status INSTANCE_STATUS_NEEDUPDATE
+     */
+    public function mark_for_regrade() {
+        global $DB;
+        if ($this->has_active_instances()) {
+            $conditions = array('definitionid'  => $this->definition->id,
+                'status'  => gradingform_instance::INSTANCE_STATUS_ACTIVE);
+            $DB->set_field('grading_instances', 'status', gradingform_instance::INSTANCE_STATUS_NEEDUPDATE, $conditions);
         }
     }
 
-    checklist_grade_item_update($checklist, $grades);
-}
+    /**
+     * Loads the checklist form definition if it exists
+     *
+     * There is a new array called 'checklist_groups' appended to the list of parent's definition properties.
+     */
+    protected function load_definition() {
+        global $DB;
+        $sql = "SELECT gd.*,
+                       clg.id AS clgid, clg.sortorder AS clgsortorder, clg.description AS clgdescription,
+                       cli.id AS cliid, cli.score AS cliscore, cli.sortorder AS clisortorder, cli.definition AS clidefinition
+                  FROM {grading_definitions} gd
+             LEFT JOIN {gradingform_checklist_groups} clg ON (clg.definitionid = gd.id)
+             LEFT JOIN {gradingform_checklist_items} cli ON (cli.groupid = clg.id)
+                 WHERE gd.areaid = :areaid AND gd.method = :method
+              ORDER BY clg.sortorder, cli.sortorder";
+        $params = array('areaid' => $this->areaid, 'method' => $this->get_method_name());
 
-/**
- * Make sure multiple completion emails are not sent from the same user within the last hour.
- * (Assuming they don't log out and log back in again).
- *
- * @param int $cmid
- * @return bool - true if an email has already been sent recently
- */
-function checklist_sent_email_recently($cmid) {
-    global $SESSION;
-    if (!isset($SESSION->checklist_recent_email)) {
-        $SESSION->checklist_recent_email = array();
-    }
-    if (!empty($SESSION->checklist_recent_email[$cmid])) {
-        $nexttime = $SESSION->checklist_recent_email[$cmid] + HOURSECS;
-        if (time() < $nexttime) {
-            return true;
+        $rs = $DB->get_recordset_sql($sql, $params);
+        $this->definition = false;
+        foreach ($rs as $record) {
+            // pick the common definition data
+            if ($this->definition === false) {
+                $this->definition = new stdClass();
+                foreach (array('id', 'name', 'description', 'descriptionformat', 'status', 'copiedfromid',
+                             'timecreated', 'usercreated', 'timemodified', 'usermodified', 'timecopied', 'options') as $fieldname) {
+                    $this->definition->$fieldname = $record->$fieldname;
+                }
+                $this->definition->checklist_groups = array();
+            }
+            // pick the groups data
+            if (!empty($record->clgid) && empty($this->definition->checklist_groups[$record->clgid])) {
+                foreach (array('id', 'sortorder', 'description') as $fieldname) {
+                    $this->definition->checklist_groups[$record->clgid][$fieldname] = $record->{'clg'.$fieldname};
+                }
+                $this->definition->checklist_groups[$record->clgid]['items'] = array();
+            }
+            // pick the items data
+            if (!empty($record->cliid)) {
+                foreach (array('id', 'score', 'sortorder', 'definition') as $fieldname) {
+                    $value = $record->{'cli'.$fieldname};
+                    if ($fieldname == 'score') {
+                        $value = (float)$value; // To prevent display like 1.00000
+                    }
+                    $this->definition->checklist_groups[$record->clgid]['items'][$record->cliid][$fieldname] = $value;
+                }
+            }
         }
-    }
-    $SESSION->checklist_recent_email[$cmid] = time();
-    return false;
-}
-
-/**
- * Delete the checklist grade item.
- * @param object $checklist
- * @return int
- */
-function checklist_grade_item_delete($checklist) {
-    global $CFG;
-    require_once($CFG->libdir.'/gradelib.php');
-    if (!isset($checklist->courseid)) {
-        $checklist->courseid = $checklist->course;
+        $rs->close();
     }
 
-    return grade_update('mod/checklist', $checklist->courseid, 'mod', 'checklist', $checklist->id, 0, null, array('deleted' => 1));
-}
-
-/**
- * Update the checklist grade items
- * @param object $checklist
- * @param null $grades
- * @return int
- */
-function checklist_grade_item_update($checklist, $grades = null) {
-    global $CFG;
-    require_once($CFG->libdir.'/gradelib.php');
-
-    if (!isset($checklist->courseid)) {
-        $checklist->courseid = $checklist->course;
+    /**
+     * Returns html code to be included in student's feedback.
+     *
+     * @param moodle_page $page
+     * @param int $itemid
+     * @param array $gradinginfo result of function grade_get_grades
+     * @param string $defaultcontent default string to be returned if no active grading is found
+     * @param boolean $cangrade whether current user has capability to grade in this context
+     * @return string
+     */
+    public function render_grade($page, $itemid, $gradinginfo, $defaultcontent, $cangrade) {
+        return $this->get_renderer($page)->display_instances($this->get_active_instances($itemid), $defaultcontent, $cangrade);
     }
 
-    $params = array('itemname' => $checklist->name);
-    if ($checklist->maxgrade > 0) {
-        $params['gradetype'] = GRADE_TYPE_VALUE;
-        $params['grademax'] = $checklist->maxgrade;
-        $params['grademin'] = 0;
-    } else {
-        $params['gradetype'] = GRADE_TYPE_NONE;
-    }
-
-    if ($grades === 'reset') {
-        $params['reset'] = true;
-        $grades = null;
-    }
-
-    return grade_update('mod/checklist', $checklist->courseid, 'mod', 'checklist', $checklist->id, 0, $grades, $params);
-}
-
-/**
- * Return a small object with summary information about what a
- * user has done with a given particular instance of this module
- * Used for user activity reports.
- * $return->time = the time they did it
- * $return->info = a short text description
- *
- * @param object $course
- * @param object $user
- * @param object $mod
- * @param object $checklist
- * @return null
- */
-function checklist_user_outline($course, $user, $mod, $checklist) {
-    global $DB;
-
-    // Handle groupings.
-    $groupingsql = checklist_class::get_grouping_sql($user->id, $checklist->course);
-
-    $sel = 'checklist = ? AND userid = 0 AND itemoptional = '.CHECKLIST_OPTIONAL_NO;
-    $sel .= ' AND hidden = '.CHECKLIST_HIDDEN_NO." AND $groupingsql";
-    $items = $DB->get_records_select('checklist_item', $sel, array($checklist->id), '', 'id');
-    if (!$items) {
-        return null;
-    }
-
-    $total = count($items);
-    [$isql, $iparams] = $DB->get_in_or_equal(array_keys($items));
-
-    $sql = "userid = ? AND item $isql AND ";
-    if ($checklist->teacheredit == CHECKLIST_MARKING_STUDENT) {
-        $sql .= 'usertimestamp > 0';
-        $order = 'usertimestamp DESC';
-    } else {
-        $sql .= 'teachermark = '.CHECKLIST_TEACHERMARK_YES;
-        $order = 'teachertimestamp DESC';
-    }
-    $params = array_merge(array($user->id), $iparams);
-
-    $checks = $DB->get_records_select('checklist_check', $sql, $params, $order);
-
-    $return = null;
-    if ($checks) {
-        $return = new stdClass;
-
-        $ticked = count($checks);
-        $check = reset($checks);
-        if ($checklist->teacheredit == CHECKLIST_MARKING_STUDENT) {
-            $return->time = $check->usertimestamp;
-        } else {
-            $return->time = $check->teachertimestamp;
+    /**
+     * Calculates and returns the possible minimum and maximum score (in points) for this checklist
+     *
+     * @return array
+     */
+    public function get_min_max_score() {
+        if (!$this->is_form_available()) {
+            return null;
         }
-        $percent = sprintf('%0d', ($ticked * 100) / $total);
-        $return->info = get_string('progress', 'checklist').': '.$ticked.'/'.$total.' ('.$percent.'%)';
+        $returnvalue = array('minscore' => 0, 'maxscore' => 0);
+        foreach ($this->get_definition()->checklist_groups as $group) {
+            foreach ($group['items'] as $item) {
+                $returnvalue['maxscore'] += $item['score'];
+            }
+        }
+        return $returnvalue;
     }
 
-    return $return;
+    //// full-text search support /////////////////////////////////////////////
+
+    /**
+     * Prepare the part of the search query to append to the FROM statement
+     *
+     * @param string $gdid the alias of grading_definitions.id column used by the caller
+     * @return string
+     */
+    public static function sql_search_from_tables($gdid) {
+        return " LEFT JOIN {gradingform_checklist_groups} clg ON (clg.definitionid = $gdid)
+                 LEFT JOIN {gradingform_checklist_items} cli ON (cli.groupid = clg.id)";
+    }
+
+    /**
+     * Prepare the parts of the SQL WHERE statement to search for the given token
+     *
+     * The returned array cosists of the list of SQL comparions and the list of
+     * respective parameters for the comparisons. The returned chunks will be joined
+     * with other conditions using the OR operator.
+     *
+     * @param string $token token to search for
+     * @return array
+     */
+    public static function sql_search_where($token) {
+        global $DB;
+
+        $subsql = array();
+        $params = array();
+
+        // search in checklist group description
+        $subsql[] = $DB->sql_like('clg.description', '?', false, false);
+        $params[] = '%'.$DB->sql_like_escape($token).'%';
+
+        // search in checklist item definition
+        $subsql[] = $DB->sql_like('cli.definition', '?', false, false);
+        $params[] = '%'.$DB->sql_like_escape($token).'%';
+
+        return array($subsql, $params);
+    }
+
+    /**
+     * Options for displaying the checklist description field in the form
+     *
+     * @param object $context
+     * @return array options for the form description field
+     */
+    public static function description_form_field_options($context) {
+        global $CFG;
+        return array(
+            'maxfiles' => -1,
+            'maxbytes' => get_max_upload_file_size($CFG->maxbytes),
+            'context'  => $context,
+        );
+    }
+
+    /**
+     * Returns the default options for the checklist display
+     *
+     * @return array
+     */
+    public static function get_default_options() {
+        $options = array(
+            'alwaysshowdefinition' => 1,
+            'showitempointseval' => 1,
+            'showitempointstudent' => 1,
+            'enableitemremarks' => 1,
+            'enablegroupremarks' => 1,
+            'showremarksstudent' => 1
+        );
+        return $options;
+    }
+
+    /**
+     * Gets the options of this checklist definition, fills the missing options with default values
+     *
+     * @return array
+     */
+    public function get_options() {
+        $options = self::get_default_options();
+        if (!empty($this->definition->options)) {
+            $thisoptions = json_decode($this->definition->options);
+            foreach ($thisoptions as $option => $value) {
+                $options[$option] = $value;
+            }
+        }
+        return $options;
+    }
 }
 
 /**
- * Print a detailed representation of what a user has done with
- * a given particular instance of this module, for user activity reports.
+ * Class to manage one checklist grading instance. Stores information and performs actions like
+ * update, copy, validate, submit, etc.
  *
- * @param object $course
- * @param object $user
- * @param object $mod
- * @param object $checklist
- * @return boolean
+ * @copyright  2011 Marina Glancy
+ * @copyright  Copyright (c) 2012 Open LMS (https://www.openlms.net)
  */
-function checklist_user_complete($course, $user, $mod, $checklist) {
-    $chk = new checklist_class($mod->id, $user->id, $checklist, $mod, $course);
+class gradingform_checklist_instance extends gradingform_instance {
 
-    $chk->user_complete();
+    protected $checklist;
 
-    return true;
-}
+    /**
+     * Deletes this (INCOMPLETE) instance from database.
+     */
+    public function cancel() {
+        global $DB;
 
-/**
- * Given a course and a time, this module should find recent activity
- * that has occurred in checklist activities and print it out.
- * Return true if there was output, or false is there was none.
- *
- * @param object $course
- * @param bool $isteacher
- * @param int $timestart
- * @return boolean
- */
-function checklist_print_recent_activity($course, $isteacher, $timestart) {
-    return false;  // True if anything was printed, otherwise false.
-}
-
-/**
- * Print an overview of the checklist
- * @param array $courses
- * @param array $htmlarray
- */
-function checklist_print_overview($courses, &$htmlarray) {
-    global $USER, $CFG, $DB;
-
-    $config = get_config('checklist');
-    if (isset($config->showmymoodle) && !$config->showmymoodle) {
-        return; // Disabled via global config.
-    }
-    if (!isset($config->showcompletemymoodle)) {
-        $config->showcompletemymoodle = 1;
-    }
-    if (!isset($config->showupdateablemymoodle)) {
-        $config->showupdateablemymoodle = 1;
-    }
-    if (empty($courses) || !is_array($courses) || count($courses) == 0) {
-        return;
+        parent::cancel();
+        $DB->delete_records('gradingform_checklist_fills', array('instanceid' => $this->get_id()));
     }
 
-    if (!$checklists = get_all_instances_in_courses('checklist', $courses)) {
-        return;
+    /**
+     * Duplicates the instance before editing (optionally substitutes raterid and/or itemid with
+     * the specified values)
+     *
+     * @param int $raterid value for raterid in the duplicate
+     * @param int $itemid value for itemid in the duplicate
+     * @return int id of the new instance
+     */
+    public function copy($raterid, $itemid) {
+        global $DB;
+        $instanceid = parent::copy($raterid, $itemid);
+        $currentgrade = $this->get_checklist_filling();
+        foreach ($currentgrade['groups'] as $groupid => $group) {
+            foreach ($group['items'] as $record) {
+                $params = array('instanceid' => $instanceid, 'groupid' => $groupid,
+                        'itemid' => $record['itemid'], 'checked' => $record['checked'], 'remark' => $record['remark'],
+                        'remarkformat' => $record['remarkformat']);
+                $DB->insert_record('gradingform_checklist_fills', $params);
+            }
+        }
+        return $instanceid;
     }
 
-    $strchecklist = get_string('modulename', 'checklist');
+    /**
+     * Retrieves from DB and returns the data how this checklist was filled
+     *
+     * @param boolean $force whether to force DB query even if the data is cached
+     * @return array
+     */
+    public function get_checklist_filling($force = false) {
+        global $DB;
 
-    foreach ($checklists as $checklist) {
-        $showall = true;
-        $context = context_module::instance($checklist->coursemodule);
+        if ($this->checklist === null || $force) {
+            $records = $DB->get_records('gradingform_checklist_fills', array('instanceid' => $this->get_id()));
+            $this->checklist = array('groups' => array());
+            foreach ($records as $record) {
+                if (empty($this->checklist['groups'][$record->groupid])) {
+                    $this->checklist['groups'][$record->groupid] = array('items' => array());
+                }
+                $this->checklist['groups'][$record->groupid]['items'][$record->itemid] = (array)$record;
+            }
+        }
+        return $this->checklist;
+    }
 
-        // If only the student is responsible for updating the checklist.
-        if ($checklist->teacheredit == CHECKLIST_MARKING_STUDENT) {
-            if ($showall = !has_capability('mod/checklist:updateown', $context, null, false)) {
-                if ($config->showupdateablemymoodle) {
+    /**
+     * Updates the instance with the data received from grading form. This function may be
+     * called via AJAX when grading is not yet completed, so it does not change the
+     * status of the instance.
+     *
+     * @param array $data
+     */
+    public function update($data) {
+        global $DB;
+
+        $currentgrade = $this->get_checklist_filling();
+        parent::update($data);
+
+        foreach ($data['groups'] as $groupid => $group) {
+            foreach($group['items'] as $itemid => $record) {
+                //handle deletions later
+                if (empty($record['remark']) && empty($record['id'])) {
                     continue;
                 }
+                if (!array_key_exists($groupid, $currentgrade['groups']) || !array_key_exists($itemid, $currentgrade['groups'][$groupid]['items'])) {
+                    $newrecord = array('instanceid' => $this->get_id(), 'groupid' => $groupid,
+                        'itemid' => $itemid, 'checked' => !empty($record['id']), 'remarkformat' => FORMAT_MOODLE);
+                    if (isset($record['remark'])) {
+                        $newrecord['remark'] = clean_param($record['remark'], PARAM_TEXT);
+                    }
+                    $DB->insert_record('gradingform_checklist_fills', $newrecord);
+                } else {
+                    $newrecord = array('id' => $currentgrade['groups'][$groupid]['items'][$itemid]['id']);
+                    foreach (array('remark'/*, 'remarkformat' TODO */) as $key) {
+                        if (isset($record[$key]) && $key == 'remark') {
+                            $record[$key] = clean_param($record[$key], PARAM_TEXT);
+                        }
+                        if (isset($record[$key]) && $currentgrade['groups'][$groupid]['items'][$itemid][$key] != $record[$key]) {
+                            $newrecord[$key] = $record[$key];
+                        }
+                    }
+
+                    if (!empty($record['id']) && empty($currentgrade['groups'][$groupid]['items'][$itemid]['checked'])) {
+                        $newrecord['checked'] = 1;
+                    } else if (empty($record['id']) && !empty($currentgrade['groups'][$groupid]['items'][$itemid]['checked'])) {
+                        $newrecord['checked'] = 0;
+                    }
+                    if (count($newrecord) > 1) {
+                        $DB->update_record('gradingform_checklist_fills', $newrecord);
+                    }
+                }
             }
-        } else { // If the teacher is involved with updating the checklist.
-            if ($config->showupdateablemymoodle) {
-                continue;
+        }
+
+        // take care of unchecked items / deleted comments
+        foreach ($currentgrade['groups'] as $groupid => $group) {
+            foreach($group['items'] as $itemid => $record) {
+                // if the 'id' and 'remark' elements are empty then it is not checked and there is no comment
+                if (empty($data['groups'][$groupid]['items'][$itemid]['id']) && empty($data['groups'][$groupid]['items'][$itemid]['remark'])) {
+                    $DB->delete_records('gradingform_checklist_fills', array('id' => $record['id']));
+                }
             }
         }
 
-        $progressbar = checklist_class::print_user_progressbar($checklist->id, $USER->id,
-                                                               '270px', true, true,
-                                                               !$config->showcompletemymoodle);
-        if (empty($progressbar)) {
-            continue;
+        $this->get_checklist_filling(true);
+    }
+    /**
+     * Calculates the grade to be pushed to the gradebook
+     *
+     * @return int the valid grade from $this->get_controller()->get_grade_range()
+     */
+    public function get_grade() {
+        $grade = $this->get_checklist_filling();
+
+        if (!($scores = $this->get_controller()->get_min_max_score()) || $scores['maxscore'] <= $scores['minscore']) {
+            return -1;
         }
 
-        if ($showall) { // Show all items whether or not they are checked off (as this user is unable to check them off).
-            $groupingsql = checklist_class::get_grouping_sql($USER->id, $checklist->course);
-            $dateitems = $DB->get_records_select('checklist_item',
-                                                 "checklist = ? AND duetime > 0 AND $groupingsql",
-                                                 array($checklist->id),
-                                                 'duetime');
-        } else { // Show only items that have not been checked off.
-            $groupingsql = checklist_class::get_grouping_sql($USER->id, $checklist->course, 'i.');
-            $dateitems = $DB->get_records_sql("SELECT i.* FROM {checklist_item} i
-                                                 JOIN {checklist_check} c ON c.item = i.id
-                                                WHERE i.checklist = ? AND i.duetime > 0 AND c.userid = ? AND usertimestamp = 0
-                                                  AND $groupingsql
-                                                ORDER BY i.duetime", array($checklist->id, $USER->id));
+        $graderange = array_keys($this->get_controller()->get_grade_range());
+        if (empty($graderange)) {
+            return -1;
+        }
+        sort($graderange);
+        $mingrade = $graderange[0];
+        $maxgrade = $graderange[sizeof($graderange) - 1];
+
+        $curscore = 0;
+        foreach ($grade['groups'] as $groupid => $group) {
+            foreach ($group['items'] as $itemid => $record) {
+                // itemid of 0 means a group remark, not used for scoring; also make sure it is checked
+                if (!empty($itemid) && !empty($record['checked'])) {
+                    $curscore += $this->get_controller()->get_definition()->checklist_groups[$groupid]['items'][$record['itemid']]['score'];
+                }
+            }
         }
 
-        $str = '<div class="checklist overview"><div class="name">'.$strchecklist.': '.
-            '<a title="'.$strchecklist.'" href="'.$CFG->wwwroot.'/mod/checklist/view.php?id='.$checklist->coursemodule.'">'.
-            $checklist->name.'</a></div>';
-        $str .= '<div class="info">'.$progressbar.'</div>';
-        foreach ($dateitems as $item) {
-            $str .= '<div class="info">'.format_string($item->displaytext).': ';
-            if ($item->duetime > time()) {
-                $str .= '<span class="itemdue">';
+        $gradeoffset = ($curscore-$scores['minscore'])/($scores['maxscore']-$scores['minscore'])*($maxgrade-$mingrade);
+        if ($this->get_controller()->get_allow_grade_decimals()) {
+            return $gradeoffset + $mingrade;
+        }
+        return round($gradeoffset, 0) + $mingrade;
+    }
+
+    /**
+     * Returns html for form element of type 'grading'.
+     *
+     * @param moodle_page $page
+     * @param MoodleQuickForm_grading $gradingformelement
+     * @return string
+     */
+    public function render_grading_element($page, $gradingformelement) {
+        if (!$gradingformelement->_flagFrozen) {
+            $module = array('name'=>'gradingform_checklist', 'fullpath'=>'/grade/grading/form/checklist/js/checklist.js');
+            $page->requires->js_init_call('M.gradingform_checklist.init', array(array('name' => $gradingformelement->getName())), true, $module);
+            $mode = gradingform_checklist_controller::DISPLAY_EVAL;
+        } else {
+            if ($gradingformelement->_persistantFreeze) {
+                $mode = gradingform_checklist_controller::DISPLAY_EVAL_FROZEN;
             } else {
-                $str .= '<span class="itemoverdue">';
+                $mode = gradingform_checklist_controller::DISPLAY_REVIEW;
             }
-            $str .= date('j M Y', $item->duetime).'</span></div>';
         }
-        $str .= '</div>';
-        if (empty($htmlarray[$checklist->course]['checklist'])) {
-            $htmlarray[$checklist->course]['checklist'] = $str;
-        } else {
-            $htmlarray[$checklist->course]['checklist'] .= $str;
+        $groups = $this->get_controller()->get_definition()->checklist_groups;
+        $options = $this->get_controller()->get_options();
+        $value = $gradingformelement->getValue();
+        $html = '';
+        if ($value === null) {
+            $value = $this->get_checklist_filling();
+        } else if (!$this->validate_grading_element($value)) {
+            $html .= html_writer::tag('div', get_string('checklistnotcompleted', 'gradingform_checklist'), array('class' => 'gradingform_checklist-error'));
         }
-    }
-}
-
-/**
- * Must return an array of user records (all data) who are participants
- * for a given instance of newmodule. Must include every user involved
- * in the instance, independient of his role (student, teacher, admin...)
- * See other modules as example.
- *
- * @param int $checklistid ID of an instance of this module
- * @return mixed boolean/array of students
- */
-function checklist_get_participants($checklistid) {
-    global $DB;
-
-    $params = array($checklistid);
-    $sql = 'SELECT DISTINCT u.id
-              FROM {user} u
-              JOIN {checklist_item} i ON i.userid = u.id
-             WHERE i.checklist = ?';
-    $userids1 = $DB->get_records_sql($sql, $params);
-
-    $sql = 'SELECT DISTINCT u.id
-              FROM {user} u
-              JOIN {checklist_check} c ON c.userid = u.id
-              JOIN {checklist_item} i ON i.id = c.item
-             WHERE i.checklist = ?';
-    $userids2 = $DB->get_records_sql($sql, $params);
-
-    return $userids1 + $userids2;
-}
-
-/**
- * This function returns if a scale is being used by one checklist
- * if it has support for grading and scales. Commented code should be
- * modified if necessary. See forum, glossary or journal modules
- * as reference.
- *
- * @param int $checklistid ID of an instance of this module
- * @param int $scaleid
- * @return bool
- */
-function checklist_scale_used($checklistid, $scaleid) {
-    return false;
-}
-
-/**
- * Checks if scale is being used by any instance of checklist.
- * This function was added in 1.9
- *
- * This is used to find out if scale used anywhere
- * @param int $scaleid
- * @return boolean True if the scale is used by any checklist
- */
-function checklist_scale_used_anywhere($scaleid) {
-    return false;
-}
-
-/**
- * Execute post-install custom actions for the module
- * This function was added in 1.9
- *
- * @return boolean true if success, false on error
- */
-function checklist_install() {
-    return true;
-}
-
-/**
- * Execute post-uninstall custom actions for the module
- * This function was added in 1.9
- *
- * @return boolean true if success, false on error
- */
-function checklist_uninstall() {
-    return true;
-}
-
-/**
- * Get the form elements for the reset form
- * @param HTML_QuickForm $mform
- */
-function checklist_reset_course_form_definition(&$mform) {
-    $mform->addElement('header', 'checklistheader', get_string('modulenameplural', 'checklist'));
-    $mform->addElement('checkbox', 'reset_checklist_progress', get_string('resetchecklistprogress', 'checklist'));
-}
-
-/**
- * Get the options for the reset form
- * @param object $course
- * @return array
- */
-function checklist_reset_course_form_defaults($course) {
-    return array('reset_checklist_progress' => 1);
-}
-
-/**
- * Reset the checklist userdata
- * @param object $data
- * @return array
- */
-function checklist_reset_userdata($data) {
-    global $DB;
-
-    $status = array();
-    $component = get_string('modulenameplural', 'checklist');
-    $typestr = get_string('resetchecklistprogress', 'checklist');
-    $status[] = array('component' => $component, 'item' => $typestr, 'error' => false);
-
-    if (!empty($data->reset_checklist_progress)) {
-        $checklists = $DB->get_records('checklist', array('course' => $data->courseid));
-        if (!$checklists) {
-            return $status;
+        $currentinstance = $this->get_current_instance();
+        if ($currentinstance && $currentinstance->get_status() == gradingform_instance::INSTANCE_STATUS_NEEDUPDATE) {
+            $html .= html_writer::tag('div', get_string('needregrademessage', 'gradingform_checklist'), array('class' => 'gradingform_checklist-regrade'));
+        }
+        $haschanges = false;
+        if ($currentinstance) {
+            $curfilling = $currentinstance->get_checklist_filling();
+            foreach ($curfilling['groups'] as $groupid => $group) {
+                foreach ($group['items'] as $itemid => $item)
+                    // the saved checked status
+                    $value['groups'][$groupid]['items'][$itemid]['savedchecked'] = !empty($item['checked']);
+                    $newremark = null;
+                    $newchecked = null;
+                    if (isset($value['groups'][$groupid]['items'][$itemid]['remark'])) $newremark = $value['groups'][$groupid]['items'][$itemid]['remark'];
+                    if (isset($value['groups'][$groupid]['items'][$itemid]['id'])) $newchecked = !empty($value['groups'][$groupid]['items'][$itemid]['id']);
+                    if ($newchecked != !empty($item['checked']) || $newremark != $item['remark']) {
+                        $haschanges = true;
+                }
+            }
+        }
+        if ($this->get_data('isrestored') && $haschanges) {
+            $html .= html_writer::tag('div', get_string('restoredfromdraft', 'gradingform_checklist'), array('class' => 'gradingform_checklist-restored'));
         }
 
-        [$csql, $cparams] = $DB->get_in_or_equal(array_keys($checklists));
-        $items = $DB->get_records_select('checklist_item', 'checklist '.$csql, $cparams);
-        if (!$items) {
-            return $status;
-        }
+        $html .= html_writer::tag('div', $this->get_controller()->get_formatted_description(), array('class' => 'gradingform_checklist-description clearfix'));
 
-        $itemids = array_keys($items);
-        $DB->delete_records_list('checklist_check', 'item', $itemids);
-        $DB->delete_records_list('checklist_comment', 'itemid', $itemids);
-
-        $sql = "checklist $csql AND userid <> 0";
-        $DB->delete_records_select('checklist_item', $sql, $cparams);
-
-        // Reset the grades.
-        foreach ($checklists as $checklist) {
-            checklist_grade_item_update($checklist, 'reset');
-        }
+        $html .= $this->get_controller()->get_renderer($page)->display_checklist($groups, $options, $mode, $gradingformelement->getName(), $value);
+        return $html;
     }
 
-    return $status;
-}
-
-/**
- * Update calendar events
- * @param int $courseid
- * @param object|int|null $instance
- * @param object|null $cm
- * @return bool
- */
-function checklist_refresh_events($courseid = 0, $instance = null, $cm = null) {
-    global $DB;
-
-    if ($instance) {
-        if (!is_object($instance)) {
-            $instance = $DB->get_record('checklist', ['id' => $instance], '*', MUST_EXIST);
-        }
-        $checklists = [$instance];
-    } else if ($courseid) {
-        $checklists = $DB->get_records('checklist', array('course' => $courseid));
-        $course = $DB->get_record('course', array('id' => $courseid));
-    } else {
-        $checklists = $DB->get_records('checklist');
-        $course = null;
-    }
-
-    foreach ($checklists as $checklist) {
-        if ($checklist->duedatesoncalendar) {
-            $cm = get_coursemodule_from_instance('checklist', $checklist->id, $checklist->course);
-            $chk = new checklist_class($cm->id, 0, $checklist, $cm, $course);
-            $chk->setallevents();
-        }
-    }
-
-    return true;
-}
-
-/**
- * What features does the checklist support?
- * @param string $feature
- * @return bool|null
- */
-function checklist_supports($feature) {
-    global $CFG;
-    if (!defined('FEATURE_SHOW_DESCRIPTION')) {
-        // For backwards compatibility.
-        define('FEATURE_SHOW_DESCRIPTION', 'showdescription');
-    }
-
-    if ((int)$CFG->branch < 28) {
-        if ($feature === FEATURE_GROUPMEMBERSONLY) {
-            return true;
-        }
-    }
-
-    switch ($feature) {
-        case FEATURE_GROUPS:
-            return true;
-        case FEATURE_GROUPINGS:
-            return true;
-        case FEATURE_MOD_INTRO:
-            return true;
-        case FEATURE_GRADE_HAS_GRADE:
-            return true;
-        case FEATURE_COMPLETION_HAS_RULES:
-            return true;
-        case FEATURE_BACKUP_MOODLE2:
-            return true;
-        case FEATURE_SHOW_DESCRIPTION:
-            return true;
-
-        default:
-            return null;
-    }
-}
-
-/**
- * Calculate the completion state of the checklist for the given user.
- * Retained for compatibility with Moodle 3.10 and below.
- * @param object $course
- * @param object $cm
- * @param int $userid
- * @param int $type
- * @return bool
- */
-function checklist_get_completion_state($course, $cm, $userid, $type) {
-    global $DB;
-
-    if (!($checklist = $DB->get_record('checklist', array('id' => $cm->instance)))) {
-        throw new Exception("Can't find checklist {$cm->instance}");
-    }
-
-    $result = $type; // Default return value.
-
-    if ($checklist->completionpercent) {
-        list($ticked, $total) = checklist_class::get_user_progress($cm->instance, $userid);
-        if ($checklist->completionpercenttype === 'items') {
-            // Completionpercent is the actual number of items that need checking-off.
-            $value = $checklist->completionpercent <= $ticked;
-        } else {
-            // Completionpercent is the percentage of items that need checking-off.
-            $value = $checklist->completionpercent <= ($ticked * 100 / $total);
-        }
-        if ($type == COMPLETION_AND) {
-            $result = $result && $value;
-        } else {
-            $result = $result || $value;
-        }
-    }
-
-    return $result;
-}
-
-/**
- * Add extra info needed to output activity onto course page
- * @param object $coursemodule
- * @return cached_cm_info|false
- */
-function checklist_get_coursemodule_info($coursemodule) {
-    global $DB;
-
-    $fields = 'id, name, intro, introformat, completionpercent, completionpercenttype';
-    if (!$checklist = $DB->get_record('checklist', ['id' => $coursemodule->instance], $fields)) {
-        return false;
-    }
-
-    $result = new cached_cm_info();
-    $result->name = $checklist->name;
-    if ($coursemodule->showdescription) {
-        $result->content = format_module_intro('checklist', $checklist, $coursemodule->id, false);
-    }
-
-    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
-        // Needed by Moodle 3.11 and above - ignored by earlier versions.
-        $result->customdata['customcompletionrules']['completionpercent'] = [
-            $checklist->completionpercent, $checklist->completionpercenttype,
-        ];
-    }
-
-    return $result;
 }

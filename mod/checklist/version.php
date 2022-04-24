@@ -1,5 +1,6 @@
 <?php
-// This file is part of the Checklist plugin for Moodle - http://moodle.org/
+
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,19 +14,22 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Version information
+ * Version file for the Checklist plugin
  *
- * @copyright Davo Smith <moodle@davosmith.co.uk>
- * @package mod_checklist
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    gradingform
+ * @subpackage checklist
+ * @author     Sam Chaffee
+ * @copyright  2011 David Mudrak <david@moodle.com>
+ * @copyright  2012 Open LMS (https://www.openlms.net)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
 
-$plugin->version = 2021063000;  // The current module version (Date: YYYYMMDDXX).
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.9.0.2';
-$plugin->requires = 2020061500; // Moodle 3.9.0.
-$plugin->component = 'mod_checklist';
+$plugin->component  = 'gradingform_checklist';
+$plugin->version    = 2021112600;
+$plugin->requires   = 2021051700;
+$plugin->release    = '3.11.3';
+$plugin->maturity   = MATURITY_STABLE;

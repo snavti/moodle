@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,1090 +16,561 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Checklist output functions.
+ * Renderer for the Checklist plugin
  *
- * @package   mod_checklist
- * @copyright 2016 Davo Smith
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    gradingform
+ * @subpackage checklist
+ * @author     Sam Chaffee
+ * @copyright  2011 Marina Glancy
+ * @copyright  2012 Open LMS (https://www.openlms.net)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-use mod_checklist\local\checklist_item;
-use mod_checklist\local\output_status;
-use mod_checklist\local\progress_info;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class mod_checklist_renderer
+ * Checklist grading method plugin renderer
+ *
  */
-class mod_checklist_renderer extends plugin_renderer_base {
+class gradingform_checklist_renderer extends plugin_renderer_base {
     /**
-     * Outpt required / total proress bars.
-     * @param int $totalitems
-     * @param int $requireditems
-     * @param int $allcompleteitems
-     * @param int $reqcompleteitems
-     * @return string
-     */
-    public function progress_bars($totalitems, $requireditems, $allcompleteitems, $reqcompleteitems) {
-        $out = '';
-
-        if ($requireditems > 0 && $totalitems > $requireditems) {
-            $out .= $this->progress_bar($requireditems, $reqcompleteitems, true);
-        }
-        $out .= $this->progress_bar($totalitems, $allcompleteitems, false);
-
-        return $out;
-    }
-
-    /**
-     * Output a single progress bar
-     * @param int $totalitems
-     * @param int $completeitems
-     * @param bool $isrequired
-     * @return string
-     * @throws coding_exception
-     */
-    public function progress_bar($totalitems, $completeitems, $isrequired) {
-        $out = '';
-
-        $percentcomplete = $totalitems ? (($completeitems * 100.0) / $totalitems) : 0.0;
-        if ($isrequired) {
-            $heading = get_string('percentcomplete', 'checklist');
-            $spanid = 'checklistprogressrequired';
-        } else {
-            $heading = get_string('percentcompleteall', 'checklist');
-            $spanid = 'checklistprogressall';
-        }
-
-        // Heading.
-        $heading .= ':&nbsp;';
-        $out .= html_writer::div($heading, 'checklist_progress_heading');
-
-        // Progress bar.
-        $progress = '';
-        $progress .= html_writer::div('&nbsp;', 'checklist_progress_inner', ['style' => "width: {$percentcomplete}%;"]);
-        $progress .= html_writer::div('&nbsp;', 'checklist_progress_anim', ['style' => "width: {$percentcomplete}%;"]);
-        $progress = html_writer::div($progress, 'checklist_progress_outer');
-        $progress .= html_writer::span('&nbsp;'.sprintf('%0d%%', $percentcomplete), 'checklist_progress_percent');
-
-        // Wrap in span + add clearer br.
-        $out .= html_writer::span($progress, '', ['id' => $spanid]);
-        $out .= html_writer::empty_tag('br', ['class' => 'clearer']);
-
-        return $out;
-    }
-
-    /**
-     * Output a progress bar for use outside of the checklist plugin
-     * @param int $totalitems
-     * @param int $completeitems
-     * @param int $width
-     * @param bool $showpercent
-     * @return string
-     */
-    public function progress_bar_external($totalitems, $completeitems, $width, $showpercent) {
-        $out = '';
-
-        $percentcomplete = $totalitems ? ($completeitems * 100.0 / $totalitems) : 0.0;
-
-        $out .= html_writer::div('&nbsp;', 'checklist_progress_inner', ['style' => "width: {$percentcomplete}%;"]);
-        $out = html_writer::div($out, 'checklist_progress_outer', ['style' => "width: $width;"]);
-        if ($showpercent) {
-            $out .= html_writer::span('&nbsp;'.sprintf('%0d%%', $percentcomplete), 'checklist_progress_percent');
-        }
-        $out .= html_writer::empty_tag('br', ['class' => 'clearer']);
-        return $out;
-    }
-
-    /**
-     * Output the checklist items
-     * @param checklist_item[] $items
-     * @param checklist_item[] $useritems
-     * @param bool|int[] $groupings
-     * @param string $intro
-     * @param output_status $status
-     * @param progress_info|null $progress
-     * @param object $student (optional) the student whose checklist is being viewed (if not viewing own checklist)
-     */
-    public function checklist_items($items, $useritems, $groupings, $intro, output_status $status, $progress, $student = null) {
-        echo $this->output->box_start('generalbox boxwidthwide boxaligncenter checklistbox');
-
-        echo html_writer::tag('div', '&nbsp;', array('id' => 'checklistspinner'));
-
-        $thispageurl = new moodle_url($this->page->url);
-        if ($student) {
-            $thispageurl->param('studentid', $student->id);
-        }
-
-        $strteachername = '';
-        $struserdate = '';
-        $strteacherdate = '';
-        if ($status->is_viewother()) {
-            echo '<h2>'.get_string('checklistfor', 'checklist').' '.fullname($student, true).'</h2>';
-            echo '&nbsp;';
-            echo '<form style="display: inline;" action="'.$thispageurl->out_omit_querystring().'" method="get">';
-            echo html_writer::input_hidden_params($thispageurl, array('studentid'));
-            echo '<input type="submit" class="btn btn-secondary" name="viewall" value="'.get_string('viewall', 'checklist').'" />';
-            echo '</form>';
-
-            if (!$status->is_editcomments()) {
-                echo '<form style="display: inline;" action="'.$thispageurl->out_omit_querystring().'" method="get">';
-                echo html_writer::input_hidden_params($thispageurl);
-                echo '<input type="hidden" name="editcomments" value="on" />';
-                echo ' <input type="submit" class="btn btn-secondary" name="viewall" value="'.
-                    get_string('addcomments', 'checklist').'" />';
-                echo '</form>';
-            }
-            echo '<form style="display: inline;" action="'.$thispageurl->out_omit_querystring().'" method="get">';
-            echo html_writer::input_hidden_params($thispageurl);
-            echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
-            echo '<input type="hidden" name="action" value="toggledates" />';
-            echo ' <input type="submit" class="btn btn-secondary" name="toggledates" value="'.
-                get_string('toggledates', 'checklist').'" />';
-            echo '</form>';
-
-            $strteacherdate = get_string('teacherdate', 'mod_checklist');
-            $struserdate = get_string('userdate', 'mod_checklist');
-            $strteachername = get_string('teacherid', 'mod_checklist');
-        }
-
-        echo $intro;
-        echo '<br/>';
-
-        if ($status->is_showprogressbar() && $progress) {
-            echo $this->progress_bars($progress->totalitems, $progress->requireditems,
-                                      $progress->allcompleteitems, $progress->requiredcompleteitems);
-        }
-
-        if (!$items) {
-            print_string('noitems', 'checklist');
-        } else {
-            $focusitem = false;
-            if ($status->is_updateform()) {
-                if ($status->is_canaddown() && !$status->is_viewother()) {
-                    echo '<form style="display:inline;" action="'.$thispageurl->out_omit_querystring().'" method="get">';
-                    echo html_writer::input_hidden_params($thispageurl);
-                    if ($status->is_addown()) {
-                        // Switch on for any other forms on this page (but off if this form submitted).
-                        $thispageurl->param('useredit', 'on');
-                        echo '<input type="submit" class="btn btn-secondary" name="submit" value="'.
-                            get_string('addownitems-stop', 'checklist').'" />';
-                    } else {
-                        echo '<input type="hidden" name="useredit" value="on" />';
-                        echo '<input type="submit" class="btn btn-secondary" name="submit" value="'.
-                            get_string('addownitems', 'checklist').'" />';
-                    }
-                    echo '</form>';
-                }
-
-                echo '<form action="'.$thispageurl->out_omit_querystring().'" class="form-inline" method="post">';
-                echo html_writer::input_hidden_params($thispageurl);
-                echo '<input type="hidden" name="action" value="updatechecks" />';
-                echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
-            }
-
-            if ($useritems) {
-                reset($useritems);
-            }
-
-            if ($status->is_teachermarklocked()) {
-                echo '<p class="checklistwarning">'.get_string('lockteachermarkswarning', 'checklist').'</p>';
-                echo '<div style="flex-basis:100%; height:0"></div>';
-            }
-
-            echo '<ol class="checklist" id="checklistouter">';
-            $currindent = 0;
-            foreach ($items as $item) {
-
-                if ($item->hidden) {
-                    continue;
-                }
-
-                if ($status->is_checkgroupings() && $item->groupingid) {
-                    if (!in_array($item->groupingid, $groupings)) {
-                        continue; // Current user is not a member of this item's grouping, so skip.
-                    }
-                }
-
-                while ($item->indent > $currindent) {
-                    $currindent++;
-                    echo '<ol class="checklist">';
-                }
-                while ($item->indent < $currindent) {
-                    $currindent--;
-                    echo '</ol>';
-                }
-                $itemname = '"item'.$item->id.'"';
-                $checked = '';
-                if ($status->is_updateform() || $status->is_viewother() || $status->is_userreport()) {
-                    if ($item->is_checked_student()) {
-                        $checked = ' checked="checked" ';
-                    }
-                }
-                if ($status->is_viewother() || $status->is_userreport()) {
-                    $checked .= ' disabled="disabled" ';
-                } else if (!$status->is_overrideauto()) {
-                    if ($item->is_auto_item()) {
-                        $checked .= ' disabled="disabled" ';
-                    }
-                }
-                switch ($item->colour) {
-                    case 'red':
-                        $itemcolour = 'itemred';
-                        break;
-                    case 'orange':
-                        $itemcolour = 'itemorange';
-                        break;
-                    case 'green':
-                        $itemcolour = 'itemgreen';
-                        break;
-                    case 'purple':
-                        $itemcolour = 'itempurple';
-                        break;
-                    default:
-                        $itemcolour = 'itemblack';
-                }
-
-                $checkclass = '';
-                if ($item->is_heading()) {
-                    $optional = ' class="itemheading '.$itemcolour.' ml-1" ';
-                } else if ($item->is_required()) {
-                    $optional = ' class="'.$itemcolour.' ml-1" ';
-                } else {
-                    $optional = ' class="itemoptional '.$itemcolour.' ml-1" ';
-                    $checkclass = ' itemoptional';
-                }
-
-                echo '<li>';
-                if ($status->is_showteachermark()) {
-                    if (!$item->is_heading()) {
-                        if ($status->is_viewother()) {
-                            $opts = [
-                                CHECKLIST_TEACHERMARK_UNDECIDED => '',
-                                CHECKLIST_TEACHERMARK_YES => get_string('yes'),
-                                CHECKLIST_TEACHERMARK_NO => get_string('no'),
-                            ];
-                            $attr = ['id' => 'item'.$item->id]; // TODO davo - fix itemname handling.
-                            if ($status->is_teachermarklocked() && $item->is_checked_teacher()) {
-                                $attr['disabled'] = 'disabled';
-                            } else if (!$status->is_showcheckbox() && !$status->is_overrideauto() && $item->is_auto_item()) {
-                                // For teacher-only checklists with autoupdate not allowed to override, disable changing of
-                                // automatic update items.
-                                $attr['disabled'] = 'disabled';
-                            }
-
-                            echo html_writer::select($opts, "items[{$item->id}]", $item->teachermark, false, $attr);
-
-                        } else {
-                            echo html_writer::empty_tag('img', [
-                                'src' => $item->get_teachermark_image_url(),
-                                'alt' => $item->get_teachermark_text(),
-                                'title' => $item->get_teachermark_text(),
-                                'class' => $item->get_teachermark_class(),
-                            ]);
-                        }
-                    }
-                }
-                if ($status->is_showcheckbox()) {
-                    if (!$item->is_heading()) {
-                        $id = ' id='.$itemname.' ';
-                        if ($status->is_viewother() && $status->is_showteachermark()) {
-                            $id = '';
-                        }
-                        echo '<input class="checklistitem'.$checkclass.'" type="checkbox"' .
-                            ' class="checkbox-inline" name="items[]" '.$id.$checked.
-                            ' value="'.$item->id.'" />';
-                    }
-                }
-                echo '<label for='.$itemname.$optional.'>'.format_string($item->displaytext).'</label>';
-                echo $this->item_grouping($item);
-
-                echo $this->checklist_item_link($item);
-
-                if ($status->is_addown()) {
-                    echo '&nbsp;<a href="'.$thispageurl->out(true, array(
-                            'itemid' => $item->id, 'sesskey' => sesskey(), 'action' => 'startadditem'
-                        )).'">';
-                    $title = get_string('additemalt', 'checklist');
-                    echo $this->output->pix_icon('add', $title, 'mod_checklist', ['title' => $title]).'</a>';
-                }
-
-                if ($item->duetime) {
-                    if ($item->duetime > time()) {
-                        echo '<span class="checklist-itemdue"> '.userdate($item->duetime, get_string('strftimedate')).'</span>';
-                    } else {
-                        echo '<span class="checklist-itemoverdue"> '.userdate($item->duetime, get_string('strftimedate')).'</span>';
-                    }
-                }
-
-                if ($status->is_showcompletiondates()) {
-                    if (!$item->is_heading()) {
-                        if ($status->is_showteachermark() && $item->teachertimestamp) {
-                            if ($item->get_teachername()) {
-                                echo '<span class="itemteachername" title="'.$strteachername.'">'.
-                                    $item->get_teachername().'</span>';
-                            }
-                            echo '<span class="itemteacherdate" title="'.$strteacherdate.'">'.
-                                userdate($item->teachertimestamp, get_string('strftimedatetimeshort')).'</span>';
-                        }
-                        if ($status->is_showcheckbox() && $item->usertimestamp) {
-                            echo '<span class="itemuserdate" title="'.$struserdate.'">'.
-                                userdate($item->usertimestamp, get_string('strftimedatetimeshort')).'</span>';
-                        }
-                    }
-                }
-
-                if ($status->is_teachercomments()) {
-                    if ($comment = $item->get_comment()) {
-                        echo ' <span class="teachercomment">&nbsp;';
-                        if ($comment->commentby) {
-                            echo '<a href="'.$comment->get_commentby_url().'">'.$comment->get_commentby_name().'</a>: ';
-                        }
-                        if ($status->is_editcomments()) {
-                            $outid = '';
-                            if (!$focusitem) {
-                                $focusitem = 'firstcomment';
-                                $outid = ' id="firstcomment" ';
-                            }
-                            echo '<input type="text" class="form-control form-text-inline"' .
-                                ' name="teachercomment['.$item->id.']" value="'.s($comment->text).
-                                '" '.$outid.'/>';
-                        } else {
-                            echo s($comment->text);
-                        }
-                        echo '&nbsp;</span>';
-                    } else if ($status->is_editcomments()) {
-                        echo '&nbsp;<input type="text" class="form-control form-text-inline"' .
-                            ' name="teachercomment['.$item->id.']" />';
-                    }
-                }
-
-                echo '</li>';
-
-                // Output any user-added items.
-                if ($useritems) {
-                    /** @var checklist_item $useritem */
-                    $useritem = current($useritems);
-
-                    if ($useritem && ($useritem->position == $item->position)) {
-                        $thisitemurl = new moodle_url($thispageurl, ['action' => 'updateitem', 'sesskey' => sesskey()]);
-
-                        echo '<ol class="checklist">';
-                        while ($useritem && ($useritem->position == $item->position)) {
-                            $itemname = '"item'.$useritem->id.'"';
-                            $checked = ($status->is_updateform() && $useritem->is_checked_student()) ? ' checked="checked" ' : '';
-                            if ($useritem->is_editme()) {
-                                $itemtext = explode("\n", $useritem->displaytext, 2);
-                                $itemtext[] = '';
-                                $text = $itemtext[0];
-                                $note = $itemtext[1];
-                                $thisitemurl->param('itemid', $useritem->id);
-
-                                echo '<li>';
-                                echo '<div style="float: left;">';
-                                if ($status->is_showcheckbox()) {
-                                    echo '<input class="checklistitem itemoptional checkbox-inline" type="checkbox"' .
-                                        ' name="items[]" id='.
-                                        $itemname.$checked.' disabled="disabled" value="'.$useritem->id.'" />';
-                                }
-                                echo '<form style="display:inline" class="form-inline" action="'.
-                                    $thisitemurl->out_omit_querystring().
-                                    '" method="post">';
-                                echo html_writer::input_hidden_params($thisitemurl);
-                                echo '<input type="text" class="form-control form-text-inline" size="'.
-                                    CHECKLIST_TEXT_INPUT_WIDTH.'" name="displaytext" value="'.s($text).
-                                    '" id="updateitembox" />';
-                                echo '<input type="submit" class="btn btn-secondary" name="updateitem" value="'.
-                                    get_string('updateitem', 'checklist').'" />';
-                                echo '<br />';
-                                echo '<textarea name="displaytextnote" rows="3" cols="25">'.s($note).'</textarea>';
-                                echo '</form>';
-                                echo '</div>';
-
-                                echo '<form style="display:inline;" class="form-inline" action="'.
-                                    $thispageurl->out_omit_querystring().
-                                    '" method="get">';
-                                echo html_writer::input_hidden_params($thispageurl);
-                                echo '<input type="submit" class="btn btn-secondary" name="canceledititem" value="'.
-                                    get_string('canceledititem', 'checklist').'" />';
-                                echo '</form>';
-                                echo '<br style="clear: both;" />';
-                                echo '</li>';
-
-                                $focusitem = 'updateitembox';
-                            } else {
-                                echo '<li>';
-                                if ($status->is_showcheckbox()) {
-                                    echo '<input class="checklistitem itemoptional checkbox-inline" type="checkbox"' .
-                                        ' name="items[]" id='.
-                                        $itemname.$checked.' value="'.$useritem->id.'" />';
-                                }
-                                $splittext = explode("\n", s($useritem->displaytext), 2);
-                                $splittext[] = '';
-                                $text = $splittext[0];
-                                $note = str_replace("\n", '<br />', $splittext[1]);
-                                echo '<label class="useritem" for='.$itemname.'>'.$text.'</label>';
-
-                                if ($status->is_addown()) {
-                                    $baseurl = $thispageurl.'&amp;itemid='.$useritem->id.'&amp;sesskey='.sesskey().'&amp;action=';
-                                    echo '&nbsp;<a href="'.$baseurl.'edititem">';
-                                    $title = get_string('edititem', 'checklist');
-                                    echo $this->output->pix_icon('t/edit', $title, 'moodle', ['title' => $title]).'</a>';
-
-                                    echo '&nbsp;<a href="'.$baseurl.'deleteitem" class="deleteicon">';
-                                    $title = get_string('deleteitem', 'checklist');
-                                    echo $this->output->pix_icon('remove', $title, 'mod_checklist', ['title' => $title]).'</a>';
-                                }
-                                if ($note != '') {
-                                    echo '<div class="note">'.$note.'</div>';
-                                }
-
-                                echo '</li>';
-                            }
-                            $useritem = next($useritems);
-                        }
-                        echo '</ol>';
-                    }
-                }
-
-                if ($status->is_addown() && ($item->id == $status->get_additemafter())) {
-                    $thisitemurl = clone $thispageurl;
-                    $thisitemurl->param('action', 'additem');
-                    $thisitemurl->param('position', $item->position);
-                    $thisitemurl->param('sesskey', sesskey());
-
-                    echo '<ol class="checklist"><li>';
-                    echo '<div style="float: left;">';
-                    echo '<form action="'.$thispageurl->out_omit_querystring().'" class="form-inline" method="post">';
-                    echo html_writer::input_hidden_params($thisitemurl);
-                    if ($status->is_showcheckbox()) {
-                        echo '<input type="checkbox" class="checkbox-inline" disabled="disabled" />';
-                    }
-                    echo '<input type="text" class="form-control form-text-inline" size="'.
-                        CHECKLIST_TEXT_INPUT_WIDTH.'" name="displaytext" value="" id="additembox" />';
-                    echo '<input type="submit" class="btn btn-secondary" name="additem" value="'.
-                        get_string('additem', 'checklist').'" />';
-                    echo '<br />';
-                    echo '<textarea name="displaytextnote" rows="3" cols="25"></textarea>';
-                    echo '</form>';
-                    echo '</div>';
-
-                    echo '<form style="display:inline" action="'.$thispageurl->out_omit_querystring().'" method="get">';
-                    echo html_writer::input_hidden_params($thispageurl);
-                    echo '<input type="submit" class="btn btn-secondary" name="canceledititem" value="'.
-                        get_string('canceledititem', 'checklist').'" />';
-                    echo '</form>';
-                    echo '<br style="clear: both;" />';
-                    echo '</li></ol>';
-
-                    if (!$focusitem) {
-                        $focusitem = 'additembox';
-                    }
-                }
-            }
-            echo '</ol>';
-
-            if ($status->is_updateform()) {
-                echo '<div style="flex-basis:100%; height:0"></div>';
-                echo '<input id="checklistsavechecks" type="submit" name="submit" value="'.
-                    get_string('savechecks', 'checklist').'" />';
-                if ($status->is_viewother()) {
-                    echo '&nbsp;<input type="submit" class="btn btn-secondary" name="save" value="'.
-                        get_string('savechecks', 'mod_checklist').'" />';
-                    echo '&nbsp;<input type="submit" class="btn btn-secondary" name="savenext" value="'.
-                        get_string('saveandnext').'" />';
-                    echo '&nbsp;<input type="submit" class="btn btn-secondary" name="viewnext" value="'.
-                        get_string('next').'" />';
-                }
-                echo '</form>';
-            }
-
-            if ($focusitem) {
-                echo '<script type="text/javascript">document.getElementById("'.$focusitem.'").focus();</script>';
-            }
-
-            if ($status->is_addown()) {
-                echo '<script type="text/javascript">';
-                echo 'function confirmdelete(url) {';
-                echo 'if (confirm("'.get_string('confirmdeleteitem', 'checklist').'")) { window.location = url; } ';
-                echo '} ';
-                echo 'var links = document.getElementById("checklistouter").getElementsByTagName("a"); ';
-                echo 'for (var i in links) { ';
-                echo 'if (links[i].className == "deleteicon") { ';
-                echo 'var url = links[i].href;';
-                echo 'links[i].href = "#";';
-                echo 'links[i].onclick = new Function( "confirmdelete(\'"+url+"\')" ) ';
-                echo '}} ';
-                echo '</script>';
-            }
-        }
-
-        echo $this->output->box_end();
-    }
-
-    /**
-     * Output the item link
-     * @param checklist_item $item
-     * @return string
-     * @throws coding_exception
-     * @throws moodle_exception
-     */
-    protected function checklist_item_link(checklist_item $item) {
-        $out = '';
-        if ($url = $item->get_link_url()) {
-            $attrs = [];
-            $out .= '&nbsp;';
-            switch ($item->get_link_type()) {
-                case checklist_item::LINK_MODULE:
-                    $icon = $this->output->pix_icon('follow_link', get_string('linktomodule', 'checklist'), 'mod_checklist');
-                    break;
-                case checklist_item::LINK_COURSE:
-                    $icon = $this->output->pix_icon('i/course', get_string('linktocourse', 'checklist'));
-                    break;
-                case checklist_item::LINK_URL:
-                    $icon = $this->output->pix_icon('follow_link', get_string('linktourl', 'checklist'), 'mod_checklist');
-                    if ($item->openlinkinnewwindow) {
-                        $attrs['target'] = '_blank';
-                    }
-                    break;
-            }
-            $out .= html_writer::link($url, $icon, $attrs);
-        }
-        return $out;
-    }
-
-    /**
-     * Output edit items list
-     * @param checklist_item[] $items
-     * @param output_status $status
-     */
-    public function checklist_edit_items($items, $status) {
-        echo $this->output->box_start('generalbox boxwidthwide boxaligncenter');
-
-        $currindent = 0;
-        $addatend = true;
-        $focusitem = false;
-        $hasauto = false;
-
-        $thispageurl = new moodle_url($this->page->url, ['sesskey' => sesskey()]);
-        if ($status->get_additemafter()) {
-            $thispageurl->param('additemafter', $status->get_additemafter());
-        }
-        if ($status->is_editdates()) {
-            $thispageurl->param('editdates', 'on');
-        }
-        if ($status->get_itemid()) {
-            $thispageurl->param('itemid', $status->get_itemid());
-        }
-
-        if ($status->is_autoupdatewarning()) {
-            switch ($status->get_autoupdatewarning()) {
-                case CHECKLIST_MARKING_STUDENT:
-                    echo '<p>'.get_string('autoupdatewarning_student', 'checklist').'</p>';
-                    break;
-                case CHECKLIST_MARKING_TEACHER:
-                    echo '<p>'.get_string('autoupdatewarning_teacher', 'checklist').'</p>';
-                    break;
-                default:
-                    echo '<p class="checklistwarning">'.get_string('autoupdatewarning_both', 'checklist').'</p>';
-                    break;
-            }
-        }
-
-        // Start the ordered list of checklist items.
-        $attr = ['class' => 'checklist'];
-        if ($status->is_editdates() || $status->is_editlinks()) {
-            $attr['class'] .= ' checklist-extendedit';
-        }
-        echo html_writer::start_tag('ol', $attr);
-
-        // Output each item.
-        if ($items) {
-            $lastitem = count($items);
-            $lastindent = 0;
-
-            echo html_writer::start_tag('form', array('action' => $thispageurl->out_omit_querystring(), 'method' => 'post'));
-            echo html_writer::input_hidden_params($thispageurl);
-
-            if ($status->is_autopopulate()) {
-                echo html_writer::empty_tag('input', array(
-                    'type' => 'submit', 'name' => 'showhideitems',
-                    'value' => get_string('showhidechecked', 'checklist'),
-                    'class' => 'btn btn-secondary'
-                ));
-            }
-
-            foreach ($items as $item) {
-
-                while ($item->indent > $currindent) {
-                    $currindent++;
-                    echo '<ol class="checklist">';
-                }
-                while ($item->indent < $currindent) {
-                    $currindent--;
-                    echo '</ol>';
-                }
-
-                $itemname = '"item'.$item->id.'"';
-                $itemurl = new moodle_url($thispageurl, ['itemid' => $item->id]);
-
-                switch ($item->colour) {
-                    case 'red':
-                        $itemcolour = 'itemred';
-                        $nexticon = 'colour_orange';
-                        break;
-                    case 'orange':
-                        $itemcolour = 'itemorange';
-                        $nexticon = 'colour_green';
-                        break;
-                    case 'green':
-                        $itemcolour = 'itemgreen';
-                        $nexticon = 'colour_purple';
-                        break;
-                    case 'purple':
-                        $itemcolour = 'itempurple';
-                        $nexticon = 'colour_black';
-                        break;
-                    default:
-                        $itemcolour = 'itemblack';
-                        $nexticon = 'colour_red';
-                }
-
-                $autoitem = ($status->is_autopopulate()) && ($item->moduleid != 0);
-                if ($autoitem) {
-                    $autoclass = ' itemauto';
-                } else {
-                    $autoclass = '';
-                }
-                $hasauto = $hasauto || ($item->moduleid != 0);
-
-                if ($item->is_editme()) {
-                    echo '<li class="checklist-edititem form-inline">';
-                } else {
-                    echo '<li>';
-                }
-
-                echo html_writer::start_span('', array('style' => 'display: inline-block; width: 16px;'));
-                if ($autoitem && $item->hidden != CHECKLIST_HIDDEN_BYMODULE) {
-                    echo html_writer::checkbox('items['.$item->id.']', $item->id, false, '',
-                                               array('title' => $item->displaytext, 'class' => 'checkbox-inline'));
-                }
-                echo html_writer::end_span();
-
-                // Item optional toggle.
-                if ($item->is_optional()) {
-                    $title = get_string('optionalitem', 'checklist');
-                    echo '<a href="'.$itemurl->out(true, array('action' => 'makeheading')).'">';
-                    echo $this->output->pix_icon('empty_box', $title, 'mod_checklist', ['title' => $title]).'</a>&nbsp;';
-                    $optional = ' class="itemoptional '.$itemcolour.$autoclass.'" ';
-                } else if ($item->is_heading()) {
-                    if ($item->hidden) {
-                        $title = get_string('headingitem', 'checklist');
-                        echo $this->output->pix_icon('no_box', $title, 'mod_checklist', ['title' => $title]).'&nbsp;';
-                        $optional = ' class="'.$itemcolour.$autoclass.' itemdisabled"';
-                    } else {
-                        $title = get_string('headingitem', 'checklist');
-                        if (!$autoitem) {
-                            echo '<a href="'.$itemurl->out(true, array('action' => 'makerequired')).'">';
-                        }
-                        echo $this->output->pix_icon('no_box', $title, 'mod_checklist', ['title' => $title]);
-                        if (!$autoitem) {
-                            echo '</a>';
-                        }
-                        echo '&nbsp;';
-                        $optional = ' class="itemheading '.$itemcolour.$autoclass.'" ';
-                    }
-                } else if ($item->hidden) {
-                    $title = get_string('requireditem', 'checklist');
-                    echo $this->output->pix_icon('tick_box', $title, 'mod_checklist', ['title' => $title]).'&nbsp;';
-                    $optional = ' class="'.$itemcolour.$autoclass.' itemdisabled"';
-                } else {
-                    $title = get_string('requireditem', 'checklist');
-                    echo '<a href="'.$itemurl->out(true, array('action' => 'makeoptional')).'">';
-                    echo $this->output->pix_icon('tick_box', $title, 'mod_checklist', ['title' => $title]).'</a>&nbsp;';
-                    $optional = ' class="'.$itemcolour.$autoclass.'"';
-                }
-
-                if ($item->is_editme()) {
-                    // Edit item form.
-                    $focusitem = 'updateitembox';
-                    $addatend = false;
-                    echo $this->edit_item_form($status, $item);
-
-                } else {
-                    // Item text.
-                    echo '<label for='.$itemname.$optional.'>'.format_string($item->displaytext).'</label> ';
-
-                    // Grouping.
-                    echo $this->item_grouping($item);
-
-                    // Item colour.
-                    if (!empty(get_config('mod_checklist', 'showcolorchooser'))) {
-                        echo '<a href="' . $itemurl->out(true, array('action' => 'nextcolour')) . '">';
-                        $title = get_string('changetextcolour', 'checklist');
-                        echo $this->output->pix_icon($nexticon, $title, 'mod_checklist', ['title' => $title]) . '</a>';
-                    }
-
-                    // Edit item.
-                    if (!$autoitem) {
-                        $edititemurl = new moodle_url($itemurl, ['action' => 'edititem']);
-                        $edititemurl->remove_params('additemafter');
-                        echo '<a href="'.$edititemurl->out().'">';
-                        $title = get_string('edititem', 'checklist');
-                        echo $this->output->pix_icon('t/edit', $title, 'moodle', ['title' => $title]).'</a>&nbsp;';
-                    }
-
-                    // Change item indent.
-                    if (!$autoitem && $item->indent > 0) {
-                        echo '<a href="'.$itemurl->out(true, array('action' => 'unindentitem')).'">';
-                        $title = get_string('unindentitem', 'checklist');
-                        echo $this->output->pix_icon('t/left', $title, 'moodle', ['title' => $title]).'</a>';
-                    }
-                    if (!$autoitem && ($item->indent < CHECKLIST_MAX_INDENT) && (($lastindent + 1) > $currindent)) {
-                        echo '<a href="'.$itemurl->out(true, array('action' => 'indentitem')).'">';
-                        $title = get_string('indentitem', 'checklist');
-                        echo $this->output->pix_icon('t/right', $title, 'moodle', ['title' => $title]).'</a>';
-                    }
-
-                    echo '&nbsp;';
-
-                    // Move item up/down.
-                    if (!$autoitem && $item->position > 1) {
-                        echo '<a href="'.$itemurl->out(true, array('action' => 'moveitemup')).'">';
-                        $title = get_string('moveitemup', 'checklist');
-                        echo $this->output->pix_icon('t/up', $title, 'moodle', ['title' => $title]).'</a>';
-                    }
-                    if (!$autoitem && $item->position < $lastitem) {
-                        echo '<a href="'.$itemurl->out(true, array('action' => 'moveitemdown')).'">';
-                        $title = get_string('moveitemdown', 'checklist');
-                        echo $this->output->pix_icon('t/down', $title, 'moodle', ['title' => $title]).'</a>';
-                    }
-
-                    // Hide/delete item.
-                    if ($autoitem) {
-                        if ($item->hidden != CHECKLIST_HIDDEN_BYMODULE) {
-                            echo '&nbsp;<a href="'.$itemurl->out(true, array('action' => 'deleteitem')).'">';
-                            if ($item->hidden == CHECKLIST_HIDDEN_MANUAL) {
-                                $title = get_string('show');
-                                echo $this->output->pix_icon('t/show', $title, 'moodle', ['title' => $title]).'</a>';
-                            } else {
-                                $title = get_string('hide');
-                                echo $this->output->pix_icon('t/hide', $title, 'moodle', ['title' => $title]).'</a>';
-                            }
-                        }
-                    } else {
-                        echo '&nbsp;<a href="'.$itemurl->out(true, array('action' => 'deleteitem')).'">';
-                        $title = get_string('deleteitem', 'checklist');
-                        echo $this->output->pix_icon('t/delete', $title, 'moodle', ['title' => $title]).'</a>';
-                    }
-
-                    // Add item icon.
-                    echo '&nbsp;&nbsp;&nbsp;<a href="'.$itemurl->out(true, array('action' => 'startadditem')).'">';
-                    $title = get_string('additemhere', 'checklist');
-                    echo $this->output->pix_icon('add', $title, 'mod_checklist', ['title' => $title]).'</a>';
-
-                    // Due time.
-                    if ($item->duetime) {
-                        if ($item->duetime > time()) {
-                            echo '<span class="checklist-itemdue"> '.userdate($item->duetime, get_string('strftimedate')).'</span>';
-                        } else {
-                            echo '<span class="checklist-itemoverdue"> '.
-                                userdate($item->duetime, get_string('strftimedate')).'</span>';
-                        }
-                    }
-
-                    // Link (if any).
-                    echo $this->checklist_item_link($item);
-                }
-
-                if ($status->get_additemafter() == $item->id) {
-                    $addatend = false;
-                    if (!$focusitem) {
-                        $focusitem = 'additembox';
-                    }
-                    echo $this->add_item_form($status, $thispageurl, $currindent, $item->position + 1);
-                }
-
-                $lastindent = $currindent;
-
-                echo '</li>';
-            }
-
-            echo html_writer::end_tag('form');
-        }
-
-        if ($addatend) {
-            if (!$focusitem) {
-                $focusitem = 'additembox';
-            }
-            echo $this->add_item_form($status, $thispageurl, $currindent);
-        }
-        echo '</ol>';
-        while ($currindent) {
-            $currindent--;
-            echo '</ol>';
-        }
-
-        // Edit dates button.
-        $editdatesurl = new moodle_url($thispageurl);
-        $editdatesurl->remove_params('sesskey');
-        if ($status->is_editdates()) {
-            $editdatesurl->remove_params('editdates');
-            $editdatesstr = get_string('editdatesstop', 'mod_checklist');
-        } else {
-            $editdatesurl->param('editdates', 'on');
-            $editdatesstr = get_string('editdatesstart', 'mod_checklist');
-        }
-        echo $this->output->single_button($editdatesurl, $editdatesstr, 'get');
-
-        // Remove autopopulate button.
-        if (!$status->is_autopopulate() && $hasauto) {
-            $removeautourl = new moodle_url($thispageurl, ['removeauto' => 1]);
-            echo $this->output->single_button($removeautourl, get_string('removeauto', 'mod_checklist'));
-        }
-
-        if ($focusitem) {
-            echo '<script type="text/javascript">document.getElementById("'.$focusitem.'").focus();</script>';
-        }
-
-        echo $this->output->box_end();
-    }
-
-    /**
-     * Output the edit date form
-     * @param int $ts
-     * @return string
-     * @throws coding_exception
-     */
-    protected function edit_date_form($ts = 0) {
-        $out = '';
-
-        $out .= '<br>';
-        $id = uniqid();
-        if ($ts == 0) {
-            $disabled = true;
-            $date = usergetdate(time());
-        } else {
-            $disabled = false;
-            $date = usergetdate($ts);
-        }
-        $day = $date['mday'];
-        $month = $date['mon'];
-        $year = $date['year'];
-
-        // Day.
-        $opts = range(1, 31);
-        $opts = array_combine($opts, $opts);
-        $out .= html_writer::select($opts, 'duetime[day]', $day, null, ['id' => "timedueday{$id}"]);
-
-        // Month.
-        $opts = [];
-        for ($i = 1; $i <= 12; $i++) {
-            $opts[$i] = userdate(gmmktime(12, 0, 0, $i, 15, 2000), "%B");
-        }
-        $out .= html_writer::select($opts, 'duetime[month]', $month, null, ['id' => "timeduemonth{$id}"]);
-
-        // Year.
-        $today = usergetdate(time());
-        $thisyear = $today['year'];
-        $opts = range($thisyear - 5, $thisyear + 10);
-        $opts = array_combine($opts, $opts);
-        $out .= html_writer::select($opts, 'duetime[year]', $year, null, ['id' => "timedueyear{$id}"]);
-
-        // Disabled checkbox.
-        $attr = [
-            'type' => 'checkbox', 'class' => 'checkbox-inline', 'name' => 'duetimedisable',
-            'id' => "timeduedisable{$id}", 'onclick' => "toggledate{$id}()"
-        ];
-        if ($disabled) {
-            $attr['checked'] = 'checked';
-        }
-        $out .= html_writer::empty_tag('input', $attr);
-        $out .= html_writer::label(get_string('disable'), "timeduedisable{$id}");
-
-        // Script to disable items when unchecked.
-        $out .= <<< ENDSCRIPT
-<script type="text/javascript">
-    function toggledate{$id}() {
-        var disable = document.getElementById('timeduedisable{$id}').checked;
-        var day = document.getElementById('timedueday{$id}');
-        var month = document.getElementById('timeduemonth{$id}');
-        var year = document.getElementById('timedueyear{$id}');
-        if (disable) {
-            day.setAttribute('disabled','disabled');
-            month.setAttribute('disabled', 'disabled');
-            year.setAttribute('disabled', 'disabled');
-        } else {
-            day.removeAttribute('disabled');
-            month.removeAttribute('disabled');
-            year.removeAttribute('disabled');
-        }
-    }
-    toggledate{$id}();
-</script>
-ENDSCRIPT;
-
-        return html_writer::span($out, 'checklistformitem');
-    }
-
-    /**
-     * Output the edit link form
-     * @param output_status $status
-     * @param checklist_item $item (optional)
-     * @return string
-     */
-    protected function edit_link_form(output_status $status, $item = null) {
-        $out = '';
-
-        $out .= '<br>';
-        $out .= html_writer::tag('label', get_string('linkto', 'mod_checklist')).' ';
-        if ($status->is_allowcourselinks()) {
-            $selected = $item ? $item->linkcourseid : null;
-            $out .= html_writer::select(checklist_class::get_linkable_courses(), 'linkcourseid', $selected,
-                                        ['' => get_string('choosecourse', 'mod_checklist')]);
-            $out .= ' '.get_string('or', 'mod_checklist').' ';
-        }
-        $out .= html_writer::label(get_string('url'), 'id_linkurl', true, ['class' => 'accesshide']);
-        $attr = [
-            'type' => 'text',
-            'name' => 'linkurl',
-            'id' => 'id_linkurl',
-            'size' => 40,
-            'value' => $item ? $item->linkurl : '',
-            'placeholder' => get_string('enterurl', 'mod_checklist'),
-            'class' => 'form-control',
-        ];
-        $out .= html_writer::empty_tag('input', $attr);
-
-        $attr = [
-            'type' => 'checkbox',
-            'class' => 'form-control',
-            'id' => 'id_openlinkinnewwindow',
-        ];
-        $out .= html_writer::checkbox(
-            'openlinkinnewwindow',
-            1,
-            $item ? (bool) $item->openlinkinnewwindow : false,
-            get_string('openlinkinnewwindow', 'mod_checklist'),
-            $attr
-        );
-
-        return html_writer::span($out, 'checklistformitem');
-    }
-
-    /**
-     * Form to select the grouping for the current item
+     * This function returns html code for displaying group. Depending on $mode it may be the
+     * code to edit checklist, to preview the checklist, to evaluate somebody or to review the evaluation.
      *
-     * @param output_status $status
-     * @param checklist_item $item (optional)
+     * This function may be called from display_checklist() to display the whole checklist, or it can be
+     * called by itself to return a template used by JavaScript to add new empty groups to the
+     * checklist being designed.
+     * In this case it will use macros like {NAME}, {ITEMS}, {GROUP-id}, etc.
+     *
+     * When overriding this function it is very important to remember that all elements of html
+     * form (in edit or evaluate mode) must have the name $elementname.
+     *
+     * Also JavaScript relies on the class names of elements and when developer changes them
+     * script might stop working.
+     *
+     * @param int $mode checklist display mode @see gradingform_checklist_controller
+     * @param array $options
+     * @param string $elementname the name of the form element (in editor mode) or the prefix for div ids (in view mode)
+     * @param array|null $group group data
+     * @param string $itemsstr evaluated templates for this group items
+     * @param array|null $gvalue (only in view mode) teacher's feedback on this group
      * @return string
      */
-    protected function edit_grouping_form(output_status $status, $item = null) {
-        $out = '';
-
-        $out .= '<br>';
-        $out .= html_writer::label(get_string('grouping', 'mod_checklist'), 'id_grouping').' ';
-        $selected = $item ? $item->groupingid : null;
-        $groupings = checklist_class::get_course_groupings($status->get_courseid());
-        $out .= html_writer::select($groupings, 'groupingid', $selected, [0 => get_string('anygrouping', 'mod_checklist')],
-                                    ['id' => 'id_grouping']);
-
-        return html_writer::span($out, 'checklistformitem');
-    }
-
-    /**
-     * Output the add item form
-     * @param output_status $status
-     * @param moodle_url $thispageurl
-     * @param int $currindent
-     * @param int $position (optional)
-     * @return string
-     */
-    protected function add_item_form(output_status $status, moodle_url $thispageurl, $currindent, $position = null) {
-        $out = '';
-        $addingatend = ($position === null);
-
-        $out .= '<li class="checklist-edititem form-inline">';
-        if ($addingatend) {
-            $out .= '<form action="'.$thispageurl->out_omit_querystring().'" class="form-inline" method="post">';
-            $out .= html_writer::input_hidden_params($thispageurl);
-        }
-
-        if ($addingatend) {
-            $out .= '<input type="hidden" name="action" value="additem" />';
+    public function group_template($mode, $options, $elementname = '{NAME}', $group = null, $itemsstr = '{ITEMS}', $gvalue = null) {
+        // TODO description format, remark format
+        if ($group === null || !is_array($group) || !array_key_exists('id', $group)) {
+            $group = array('id' => '{GROUP-id}', 'description' => '{GROUP-description}', 'sortorder' => '{GROUP-sortorder}', 'class' => '{GROUP-class}');
         } else {
-            $out .= '<input type="hidden" name="position" value="'.$position.'" />';
+            foreach (array('sortorder', 'description', 'class') as $key) {
+                // set missing array elements to empty strings to avoid warnings
+                if (!array_key_exists($key, $group)) {
+                    $group[$key] = '';
+                }
+            }
         }
-        $out .= '<input type="hidden" name="indent" value="'.$currindent.'" />';
-        $out .= $this->output->pix_icon('tick_box', '', 'mod_checklist');
-        $out .= '<input type="text" class="form-control form-text-inline" size="'.
-            CHECKLIST_TEXT_INPUT_WIDTH.'" name="displaytext" value="" id="additembox" />';
-        $out .= '<input type="submit" class="btn btn-secondary" name="additem" value="'.
-            get_string('additem', 'checklist').'" />';
-        if (!$addingatend) {
-            $out .= '<input type="submit" class="btn btn-secondary" name="canceledititem" value="'.
-                get_string('canceledititem', 'checklist').'" />';
+        $grouptemplate = html_writer::start_tag('div', array('class' => 'group'. $group['class'], 'id' => '{NAME}-groups-{GROUP-id}'));
+        $controls = '';
+        if ($mode == gradingform_checklist_controller::DISPLAY_EDIT_FULL) {
+            $controls .= html_writer::start_tag('div', array('class' => 'controls'));
+            foreach (array('moveup', 'delete', 'movedown') as $key) {
+                $value = get_string('group'.$key, 'gradingform_checklist');
+                $labelforctrl = html_writer::tag('label', $value, array('class' => 'hiddenelement', 'for' => '{NAME}-groups-{GROUP-id}-'.$key));
+                $button = $labelforctrl . html_writer::empty_tag('input', array('type' => 'submit', 'name' => '{NAME}[groups][{GROUP-id}]['.$key.']',
+                    'id' => '{NAME}-groups-{GROUP-id}-'.$key, 'value' => $value, 'title' => $value, 'tabindex' => -1));
+                $controls .= html_writer::tag('div', $button, array('class' => $key));
+            }
+            $controls .= html_writer::end_tag('div'); // .controls
+            $grouptemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][sortorder]', 'value' => $group['sortorder']));
+            $labelfordesc = html_writer::tag('label', get_string('groupdescription', 'gradingform_checklist'),
+                    array('class' => 'hiddenelement', 'for' => '{NAME}-groups-{GROUP-id}-description-input'));
+            $description = $labelfordesc . html_writer::empty_tag('input', array('type' => 'text', 'id' => '{NAME}-groups-{GROUP-id}-description-input',
+                    'name' => '{NAME}[groups][{GROUP-id}][description]', 'value' => $group['description']));
+        } else {
+            if ($mode == gradingform_checklist_controller::DISPLAY_EDIT_FROZEN) {
+                $grouptemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][sortorder]', 'value' => $group['sortorder']));
+                $grouptemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][description]', 'value' => $group['description']));
+            }
+            $description = $group['description'];
         }
-        if ($status->is_editlinks()) {
-            $out .= $this->edit_link_form($status);
+        $descriptionclass = 'description';
+        if (isset($group['error_description'])) {
+            $descriptionclass .= ' error';
         }
-        if ($status->is_editdates()) {
-            $out .= $this->edit_date_form();
+        $grouptemplate .= html_writer::tag('div', $description, array('class' => $descriptionclass, 'id' => '{NAME}-groups-{GROUP-id}-description'));
+        $grouptemplate .= $controls;
+        $itemsstrdiv = html_writer::tag('div', html_writer::tag('div', $itemsstr, array('id' => '{NAME}-groups-{GROUP-id}-items')));
+        $itemsclass = 'items';
+        if (isset($group['error_items'])) {
+            $itemsclass .= ' error';
         }
-        if ($status->is_editgrouping()) {
-            $out .= $this->edit_grouping_form($status);
+        $grouptemplate .= html_writer::tag('div', $itemsstrdiv, array('class' => $itemsclass));
+        if ($mode == gradingform_checklist_controller::DISPLAY_EDIT_FULL) {
+            $value = get_string('groupadditem', 'gradingform_checklist');
+            $labelforadditem = html_writer::tag('label', $value, array('class' => 'hiddenelement', 'for' => '{NAME}-groups-{GROUP-id}-items-additem'));
+            $button = $labelforadditem . html_writer::empty_tag('input', array('type' => 'submit', 'name' => '{NAME}[groups][{GROUP-id}][items][additem]',
+                    'id' => '{NAME}-groups-{GROUP-id}-items-additem', 'value' => $value, 'title' => $value));
+            $grouptemplate .= html_writer::tag('div', $button, array('class' => 'additem'));
+        }
+        $displayremark = ($options['enablegroupremarks'] && ($mode != gradingform_checklist_controller::DISPLAY_VIEW || $options['showremarksstudent']));
+        if ($displayremark) {
+            $currentremark = '';
+            if (isset($gvalue['items'][0]['remark'])) {
+                $currentremark = $gvalue['items'][0]['remark'];
+            }
+            if ($mode == gradingform_checklist_controller::DISPLAY_EVAL) {
+                $labelforremark = html_writer::tag('label', get_string('groupremark', 'gradingform_checklist', $group['description']),
+                        array('class' => 'hiddenelement', 'for' => '{NAME}-groups-{GROUP-id}-items-0-remark'));
+                $input = $labelforremark . html_writer::tag('textarea', htmlspecialchars($currentremark),
+                        array('id' => '{NAME}-groups-{GROUP-id}-items-0-remark', 'name' => '{NAME}[groups][{GROUP-id}][items][0][remark]', 'cols' => '10', 'rows' => '5'));
+                $grouptemplate .= html_writer::tag('div', $input, array('class' => 'remark'));
+            } else if ($mode == gradingform_checklist_controller::DISPLAY_EVAL_FROZEN) {
+                $grouptemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][items][0][remark]', 'value' => $currentremark));
+            } else if ($mode == gradingform_checklist_controller::DISPLAY_REVIEW || $mode == gradingform_checklist_controller::DISPLAY_VIEW) {
+                $feedbackstr = empty($currentremark) ? '' : html_writer::tag('span', get_string('groupfeedback', 'gradingform_checklist', $group['description']) . ': ', array('class' => 'checklistfeedback'));
+                $grouptemplate .= html_writer::tag('div', $feedbackstr . $currentremark, array('class' => 'remark')); // TODO maybe some prefix here like 'Teacher remark:'
+            }
         }
 
-        if ($addingatend) {
-            $out .= '</form>';
-        }
-        $out .= '</li>';
+        $displaypointseval = $options['showitempointseval'] && ($mode == gradingform_checklist_controller::DISPLAY_EVAL
+                || $mode == gradingform_checklist_controller::DISPLAY_EVAL_FROZEN || $mode == gradingform_checklist_controller::DISPLAY_REVIEW);
+        $displaypointsrev  = $options['showitempointstudent'] && ($mode == gradingform_checklist_controller::DISPLAY_VIEW);
 
-        return $out;
+        if ($displaypointseval || $displaypointsrev) {
+            // tally the checked pts and total pts
+            $checkedpts = 0;
+            $totalpts   = 0;
+            foreach ($group['items'] as $itemid => $item) {
+                $totalpts += $item['score'];
+                if (!empty($gvalue['items'][$itemid]['checked'])) {
+                    $checkedpts += $item['score'];
+                }
+            }
+            $checkedpts = html_writer::tag('span', $checkedpts, array('class' => 'scoredpoints'));
+            $totalpts   = html_writer::tag('span', $totalpts, array('class' => 'outofpoints'));
+
+            // add to the template
+            $grouptemplate .= html_writer::tag('div', get_string('grouppoints', 'gradingform_checklist') . ": $checkedpts/$totalpts", array('class' => 'pointstotals'));
+        }
+        $grouptemplate .= html_writer::end_tag('div'); // .group
+
+        $grouptemplate = str_replace('{NAME}', $elementname, $grouptemplate);
+        $grouptemplate = str_replace('{GROUP-id}', $group['id'], $grouptemplate);
+        return $grouptemplate;
     }
 
     /**
-     * Output the edit item form
-     * @param output_status $status
-     * @param checklist_item $item
+     * This function returns html code for displaying one item of one group. Depending on $mode
+     * it may be the code to edit checklist, to preview the checklist, to evaluate somebody or to review the evaluation.
+     *
+     * This function may be called from display_checklist() to display the whole checklist, or it can be
+     * called by itself to return a template used by JavaScript to add new empty item to the
+     * group during the design of checklist.
+     * In this case it will use macros like {NAME}, {GROUP-id}, {ITEM-id}, etc.
+     *
+     * When overriding this function it is very important to remember that all elements of html
+     * form (in edit or evaluate mode) must have the name $elementname.
+     *
+     * Also JavaScript relies on the class names of elements and when developer changes them
+     * script might stop working.
+     *
+     * @param int $mode checklist display mode @see gradingform_checklist_controller
+     * @param array $options
+     * @param string $elementname the name of the form element (in editor mode) or the prefix for div ids (in view mode)
+     * @param string|int $groupid either id of the nesting group or a macro for template
+     * @param array|null $item item data, also in view mode it might also have property $item['checked'] whether this item is checked
      * @return string
      */
-    protected function edit_item_form(output_status $status, checklist_item $item) {
-        $out = '';
-
-        $out .= '<input type="text" class="form-control form-text-inline" size="'.
-            CHECKLIST_TEXT_INPUT_WIDTH.'" name="displaytext" value="'.
-            s($item->displaytext).'" id="updateitembox" />';
-        $out .= '<input type="submit" class="btn btn-secondary" name="updateitem" value="'.
-            get_string('updateitem', 'checklist').'" />';
-        $out .= '<input type="submit" class="btn btn-secondary" name="canceledititem" value="'.
-            get_string('canceledititem', 'checklist').'" />';
-        if ($status->is_editlinks()) {
-            $out .= $this->edit_link_form($status, $item);
-        }
-        if ($status->is_editdates()) {
-            $out .= $this->edit_date_form($item->duetime);
-        }
-        if ($status->is_editgrouping()) {
-            $out .= $this->edit_grouping_form($status, $item);
+    public function item_template($mode, $options, $elementname = '{NAME}', $groupid = '{GROUP-id}', $item = null) {
+        // TODO definition format
+        if (!isset($item['id'])) {
+            $item = array('id' => '{ITEM-id}', 'definition' => '{ITEM-definition}', 'score' => '{ITEM-score}', 'class' => '{ITEM-class}', 'sortorder' => '{ITEM-sortorder}', 'checked' => false);
+        } else {
+            foreach (array('score', 'definition', 'class', 'checked') as $key) {
+                // set missing array elements to empty strings to avoid warnings
+                if (!array_key_exists($key, $item)) {
+                    $item[$key] = '';
+                }
+            }
         }
 
-        return $out;
+        // Template for one item within one group
+        $divattributes = array('id' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}', 'class' => 'item'. $item['class']);
+
+        $itemtemplate = html_writer::start_tag('div', $divattributes);
+        $itemtemplate .= html_writer::start_tag('div', array('class' => 'item-wrapper'));
+        if ($mode == gradingform_checklist_controller::DISPLAY_EDIT_FULL) {
+            $labelfordef = html_writer::tag('label', get_string('itemdefinition', 'gradingform_checklist'),
+                    array('class' => 'hiddenelement', 'for' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-definition-input'));
+            $definition = $labelfordef . html_writer::empty_tag('input', array('type' => 'text',
+                    'id' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-definition-input',
+                    'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][definition]', 'value' => $item['definition']));
+
+            $labelforscore = html_writer::tag('label', get_string('itemscore', 'gradingform_checklist'),
+                    array('class' => 'hiddenelement', 'for' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-score-input'));
+            $score = $labelforscore . html_writer::empty_tag('input', array('type' => 'text', 'id' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-score-input',
+                    'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][score]', 'size' => '3', 'value' => $item['score']));
+
+            $itemtemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][sortorder]', 'value' => $item['sortorder']));
+        } else {
+            if ($mode == gradingform_checklist_controller::DISPLAY_EDIT_FROZEN) {
+                $itemtemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][definition]', 'value' => $item['definition']));
+                $itemtemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][score]', 'value' => $item['score']));
+                $itemtemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][sortorder]', 'value' => $item['sortorder']));
+            }
+            $definition = $item['definition'];
+            $score = $item['score'];
+        }
+        if ($mode == gradingform_checklist_controller::DISPLAY_EVAL) {
+            $labelforcheckitem = html_writer::tag('label', get_string('checkitem', 'gradingform_checklist', $item['definition']),
+                    array('class' => 'hiddenelement', 'for' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-id-input'));
+            $input = $labelforcheckitem . html_writer::empty_tag('input', array('type' => 'checkbox',
+                    'id' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-id-input', 'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][id]',
+                    'value' => $item['id']) + ($item['checked'] ? array('checked' => 'checked') : array()));
+            $itemtemplate .= html_writer::tag('div', $input, array('class' => 'checkbox'));
+        } else if ($mode == gradingform_checklist_controller::DISPLAY_REVIEW || $mode == gradingform_checklist_controller::DISPLAY_VIEW) {
+            if (empty($item['checked'])) {
+                $iconname = 'i/grade_incorrect';
+                $alttext  = get_string('unchecked', 'gradingform_checklist');
+            } else {
+                $iconname = 'i/grade_correct';
+                $alttext  = get_string('checked', 'gradingform_checklist');
+            }
+            $itemtemplate .= html_writer::tag('div', $this->output->pix_icon($iconname, $alttext), array('class' => 'checkbox'));
+        }
+        if ($mode == gradingform_checklist_controller::DISPLAY_EVAL_FROZEN && $item['checked']) {
+            $itemtemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][id]', 'value' => $item['id']));
+        }
+
+        if ($mode == gradingform_checklist_controller::DISPLAY_REVIEW || $mode == gradingform_checklist_controller::DISPLAY_VIEW) {
+            $realscore = !empty($item['checked']) ? $item['score'] : '0';
+            $score = $realscore . '/' . $score;
+        }
+        $score = html_writer::tag('span', $score, array('id' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-score', 'class' => 'scorevalue'));
+        $definitionclass = 'definition';
+        if (isset($item['error_definition'])) {
+            $definitionclass .= ' error';
+        }
+        $itemtemplate .= html_writer::tag('div', $definition, array('class' => $definitionclass, 'id' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-definition'));
+        $displayscore = true;
+        if (!$options['showitempointseval'] && in_array($mode, array(gradingform_checklist_controller::DISPLAY_EVAL, gradingform_checklist_controller::DISPLAY_EVAL_FROZEN, gradingform_checklist_controller::DISPLAY_REVIEW))) {
+            $displayscore = false;
+        }
+        if (!$options['showitempointstudent'] && in_array($mode, array(gradingform_checklist_controller::DISPLAY_VIEW, gradingform_checklist_controller::DISPLAY_PREVIEW_GRADED))) {
+            $displayscore = false;
+        }
+        if ($displayscore) {
+            $scoreclass = 'score';
+            if (isset($item['error_score'])) {
+                $scoreclass .= ' error';
+            }
+            $itemtemplate .= html_writer::tag('div', get_string('scorepostfix', 'gradingform_checklist', $score), array('class' => $scoreclass));
+        }
+        if ($mode == gradingform_checklist_controller::DISPLAY_EDIT_FULL) {
+            $value = get_string('itemdelete', 'gradingform_checklist');
+            $labelfordelete = html_writer::tag('label', $value, array('class' => 'hiddenelement', 'for' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-delete'));
+            $button = $labelfordelete . html_writer::empty_tag('input', array('type' => 'submit', 'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][delete]',
+                    'id' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-delete', 'value' => $value, 'title' => $value, 'tabindex' => -1));
+            $itemtemplate .= html_writer::tag('div', $button, array('class' => 'delete'));
+        }
+        $displayremark = ($options['enableitemremarks'] && ($mode != gradingform_checklist_controller::DISPLAY_VIEW || $options['showremarksstudent']));
+        if ($displayremark) {
+            $currentremark = '';
+            if (isset($item['remark'])) {
+                $currentremark = $item['remark'];
+            }
+            if ($mode == gradingform_checklist_controller::DISPLAY_EVAL) {
+                $labelforremark = html_writer::tag('label', get_string('itemremark', 'gradingform_checklist', $item['definition']),
+                        array('class' => 'hiddenelement', 'for' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-remark-input'));
+                $input = $labelforremark . html_writer::tag('textarea', htmlspecialchars($currentremark), array('id' => '{NAME}-groups-{GROUP-id}-items-{ITEM-id}-remark-input',
+                        'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][remark]', 'cols' => '20', 'rows' => '3'));
+                $itemtemplate .= html_writer::tag('div', $input, array('class' => 'remark'));
+            } else if ($mode == gradingform_checklist_controller::DISPLAY_EVAL_FROZEN) {
+                $itemtemplate .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '{NAME}[groups][{GROUP-id}][items][{ITEM-id}][remark]', 'value' => $currentremark));
+            } else if ($mode == gradingform_checklist_controller::DISPLAY_REVIEW || $mode == gradingform_checklist_controller::DISPLAY_VIEW) {
+                $feedbackstr = empty($currentremark) ? '' : html_writer::tag('span', get_string('itemfeedback', 'gradingform_checklist', $item['definition']) . ': ', array('class' => 'checklistfeedback'));
+                $itemtemplate .= html_writer::tag('div', $feedbackstr . $currentremark, array('class' => 'remark')); // TODO maybe some prefix here like 'Teacher remark:'
+            }
+        }
+        $itemtemplate .= html_writer::end_tag('div'); // .item-wrapper
+        $itemtemplate .= html_writer::end_tag('div'); // .item
+
+        $itemtemplate = str_replace('{NAME}', $elementname, $itemtemplate);
+        $itemtemplate = str_replace('{GROUP-id}', $groupid, $itemtemplate);
+        $itemtemplate = str_replace('{ITEM-id}', $item['id'], $itemtemplate);
+        return $itemtemplate;
     }
 
     /**
-     * Output the item grouping details
-     * @param object $item
+     * This function returns html code for displaying checklist template (content before and after
+     * groups list). Depending on $mode it may be the code to edit checklist, to preview the checklist,
+     * to evaluate somebody or to review the evaluation.
+     *
+     * This function is called from display_checklist() to display the whole checklist.
+     *
+     * When overriding this function it is very important to remember that all elements of html
+     * form (in edit or evaluate mode) must have the name $elementname.
+     *
+     * Also JavaScript relies on the class names of elements and when developer changes them
+     * script might stop working.
+     *
+     * @param int $mode checklist display mode @see gradingform_checklist_controller
+     * @param array $options
+     * @param string $elementname the name of the form element (in editor mode) or the prefix for div ids (in view mode)
+     * @param string $groupsstr evaluated templates for this checklist's groups
+     * @param string $totalpointsstr the total points string
      * @return string
      */
-    public function item_grouping($item) {
-        $out = '';
-        if ($item->groupingname) {
-            $out .= ' ';
-            $out .= html_writer::span("({$item->groupingname})", 'checklist-groupingname');
-            $out .= ' ';
+    protected function checklist_template($mode, $options, $elementname, $groupsstr, $totalpointsstr) {
+        $classsuffix = ''; // CSS suffix for class of the main div. Depends on the mode
+        switch ($mode) {
+            case gradingform_checklist_controller::DISPLAY_EDIT_FULL:
+                $classsuffix = ' editor editable'; break;
+            case gradingform_checklist_controller::DISPLAY_EDIT_FROZEN:
+                $classsuffix = ' editor frozen';  break;
+            case gradingform_checklist_controller::DISPLAY_PREVIEW:
+            case gradingform_checklist_controller::DISPLAY_PREVIEW_GRADED:
+                $classsuffix = ' editor preview';  break;
+            case gradingform_checklist_controller::DISPLAY_EVAL:
+                $classsuffix = ' evaluate editable'; break;
+            case gradingform_checklist_controller::DISPLAY_EVAL_FROZEN:
+                $classsuffix = ' evaluate frozen';  break;
+            case gradingform_checklist_controller::DISPLAY_REVIEW:
+                $classsuffix = ' review';  break;
+            case gradingform_checklist_controller::DISPLAY_VIEW:
+                $classsuffix = ' view';  break;
         }
-        return $out;
+
+        $checklisttemplate = html_writer::start_tag('div', array('id' => 'checklist-{NAME}', 'class' => 'clearfix gradingform_checklist'.$classsuffix));
+        $checklisttemplate .= html_writer::tag('div', $groupsstr, array('class' => 'groups', 'id' => '{NAME}-groups'));
+        if ($mode == gradingform_checklist_controller::DISPLAY_EDIT_FULL) {
+            $value = get_string('addgroup', 'gradingform_checklist');
+            $labelforaddgroup = html_writer::tag('label', $value, array('class' => 'hiddenelement', 'for' => '{NAME}-groups-addgroup'));
+            $input = $labelforaddgroup . html_writer::empty_tag('input', array('type' => 'submit', 'name' => '{NAME}[groups][addgroup]',
+                    'id' => '{NAME}-groups-addgroup', 'value' => $value, 'title' => $value));
+            $checklisttemplate .= html_writer::tag('div', $input, array('class' => 'addgroup'));
+        }
+        $checklisttemplate .= $totalpointsstr;
+        $checklisttemplate .= $this->checklist_edit_options($mode, $options);
+        $checklisttemplate .= html_writer::end_tag('div');
+
+        return str_replace('{NAME}', $elementname, $checklisttemplate);
+    }
+
+    /**
+     * Generates html template to view/edit the checklist options. Expression {NAME} is used in
+     * template for the form element name
+     *
+     * @param int $mode
+     * @param array $options
+     * @return string
+     */
+    protected function checklist_edit_options($mode, $options) {
+        if ($mode != gradingform_checklist_controller::DISPLAY_EDIT_FULL
+            && $mode != gradingform_checklist_controller::DISPLAY_EDIT_FROZEN
+            && $mode != gradingform_checklist_controller::DISPLAY_PREVIEW) {
+            // Options are displayed only for people who can manage
+            return '';
+        }
+        $html = html_writer::start_tag('div', array('class' => 'options'));
+        $html .= html_writer::tag('div', get_string('checklistoptions', 'gradingform_checklist'), array('class' => 'optionsheading'));
+        $attrs = array('type' => 'hidden', 'name' => '{NAME}[options][optionsset]', 'value' => 1);
+        foreach ($options as $option => $value) {
+            $html .= html_writer::start_tag('div', array('class' => 'option '.$option));
+            $attrs = array('name' => '{NAME}[options]['.$option.']', 'id' => '{NAME}-options-'.$option);
+
+            if ($mode == gradingform_checklist_controller::DISPLAY_EDIT_FROZEN && $value) {
+                $html .= html_writer::empty_tag('input', $attrs + array('type' => 'hidden', 'value' => $value));
+            }
+            // Display option as checkbox
+            $attrs['type'] = 'checkbox';
+            $attrs['value'] = 1;
+            if ($value) {
+                $attrs['checked'] = 'checked';
+            }
+            if ($mode == gradingform_checklist_controller::DISPLAY_EDIT_FROZEN || $mode == gradingform_checklist_controller::DISPLAY_PREVIEW) {
+                $attrs['disabled'] = 'disabled';
+                unset($attrs['name']);
+            }
+            $html .= html_writer::empty_tag('input', $attrs);
+            $html .= html_writer::tag('label', get_string($option, 'gradingform_checklist'), array('for' => $attrs['id']));
+
+            $html .= html_writer::end_tag('div'); // .option
+        }
+        $html .= html_writer::end_tag('div'); // .options
+        return $html;
+    }
+
+    /**
+     * This function returns html code for displaying checklist. Depending on $mode it may be the code
+     * to edit checklist, to preview the checklist, to evaluate somebody or to review the evaluation.
+     *
+     * It is very unlikely that this function needs to be overriden by theme. It does not produce
+     * any html code, it just prepares data about checklist design and evaluation, adds the CSS
+     * class to elements and calls the functions item_template, group_template and
+     * checklist_template
+     *
+     * @param array $groups data about the checklist design
+     * @param array $options
+     * @param int $mode checklist display mode @see gradingform_checklist_controller
+     * @param string $elementname the name of the form element (in editor mode) or the prefix for div ids (in view mode)
+     * @param array $values evaluation result
+     * @return string
+     */
+    public function display_checklist($groups, $options, $mode, $elementname = null, $values = null) {
+        $groupsstr = '';
+        $totalpointsstr = '';
+        $totalpoints = 0;
+        $scoredpoints = 0;
+        $cnt = 0;
+        foreach ($groups as $id => $group) {
+            $group['class'] = $this->get_css_class_suffix($cnt++, sizeof($groups) -1);
+            $group['id'] = $id;
+            $itemsstr = '';
+            $itemcnt = 0;
+            if (isset($values['groups'][$id])) {
+                $groupvalue = $values['groups'][$id];
+            } else {
+                $groupvalue = null;
+            }
+            foreach ($group['items'] as $itemid => $item) {
+                $item['id'] = $itemid;
+                $item['class'] = $this->get_css_class_suffix($itemcnt++, sizeof($group['items']) -1);
+                $item['checked'] = !empty($groupvalue['items'][$itemid]['checked']);
+                if ($item['checked'] && ($mode == gradingform_checklist_controller::DISPLAY_EVAL_FROZEN || $mode == gradingform_checklist_controller::DISPLAY_REVIEW || $mode == gradingform_checklist_controller::DISPLAY_VIEW)) {
+                    $item['class'] .= ' checked';
+                    //in mode DISPLAY_EVAL the class 'checked' will be added by JS if it is enabled. If JS is not enabled, the 'checked' class will only confuse
+                }
+                if (!empty($groupvalue['items'][$itemid]['savedchecked'])) {
+                    $item['class'] .= ' currentchecked';
+                }
+                if (!empty($groupvalue['items'][$itemid]['remark'])) {
+                    $item['remark'] = $groupvalue['items'][$itemid]['remark'];
+                }
+                $itemsstr .= $this->item_template($mode, $options, $elementname, $id, $item);
+
+                // tally for total and scored points
+                $totalpoints += $item['score'];
+                if (!empty($groupvalue['items'][$itemid]['checked'])) {
+                    $scoredpoints += $item['score'];
+                }
+            }
+            $groupsstr .= $this->group_template($mode, $options, $elementname, $group, $itemsstr, $groupvalue);
+        }
+
+        $displaypointseval = $options['showitempointseval'] && ($mode == gradingform_checklist_controller::DISPLAY_EVAL
+            || $mode == gradingform_checklist_controller::DISPLAY_EVAL_FROZEN || $mode == gradingform_checklist_controller::DISPLAY_REVIEW);
+        $displaypointsrev  = $options['showitempointstudent'] && ($mode == gradingform_checklist_controller::DISPLAY_VIEW);
+
+        if ($displaypointseval || $displaypointsrev) {
+            $checkedpts = html_writer::tag('span', $scoredpoints, array('class' => 'scoredpoints'));
+            $totalpts   = html_writer::tag('span', $totalpoints, array('class' => 'outofpoints'));
+
+            // add to the template
+            $totalpointsstr = html_writer::tag('div', get_string('overallpoints', 'gradingform_checklist') . ": $checkedpts/$totalpts", array('class' => 'pointstotals'));
+        }
+        return $this->checklist_template($mode, $options, $elementname, $groupsstr, $totalpointsstr);
+    }
+
+    /**
+     * Help function to return CSS class names for element (first/last/even/odd) with leading space
+     *
+     * @param int $idx index of this element in the row/column
+     * @param int $maxidx maximum index of the element in the row/column
+     * @return string
+     */
+    protected function get_css_class_suffix($idx, $maxidx) {
+        $class = '';
+        if ($idx == 0) {
+            $class .= ' first';
+        }
+        if ($idx == $maxidx) {
+            $class .= ' last';
+        }
+        if ($idx%2) {
+            $class .= ' odd';
+        } else {
+            $class .= ' even';
+        }
+        return $class;
+    }
+
+    /**
+     * Displays for the student the list of instances or default content if no instances found
+     *
+     * @param array $instances array of objects of type gradingform_checklist_instance
+     * @param string $defaultcontent default string that would be displayed without advanced grading
+     * @param boolean $cangrade whether current user has capability to grade in this context
+     * @return string
+     */
+    public function display_instances($instances, $defaultcontent, $cangrade) {
+        $return = '';
+        if (sizeof($instances)) {
+            $return .= html_writer::start_tag('div', array('class' => 'advancedgrade'));
+            $idx = 0;
+            foreach ($instances as $instance) {
+                $return .= $this->display_instance($instance, $idx++, $cangrade);
+            }
+            $return .= html_writer::end_tag('div');
+        }
+        return $return. $defaultcontent;
+    }
+
+    /**
+     * Displays one grading instance
+     *
+     * @param gradingform_checklist_instance $instance
+     * @param int $idx unique number of instance on page
+     * @param boolean $cangrade whether current user has capability to grade in this context
+     * @return string
+     */
+    public function display_instance(gradingform_checklist_instance $instance, $idx, $cangrade) {
+        $groups = $instance->get_controller()->get_definition()->checklist_groups;
+        $options = $instance->get_controller()->get_options();
+        $values = $instance->get_checklist_filling();
+        if ($cangrade) {
+            $mode = gradingform_checklist_controller::DISPLAY_REVIEW;
+        } else {
+            $mode = gradingform_checklist_controller::DISPLAY_VIEW;
+        }
+        $output = '';
+        $output .= $this->box($instance->get_controller()->get_formatted_description(), 'gradingform_checklist-description');
+        $output .= $this->display_checklist($groups, $options, $mode, 'checklist'.$idx, $values);
+
+        return $output;
+    }
+
+    public function display_regrade_confirmation($elementname, $changelevel, $value) {
+        $html = html_writer::start_tag('div', array('class' => 'gradingform_checklist-regrade'));
+        if ($changelevel<=2) {
+            $html .= get_string('regrademessage1', 'gradingform_checklist');
+            $selectoptions = array(
+                0 => get_string('regradeoption0', 'gradingform_checklist'),
+                1 => get_string('regradeoption1', 'gradingform_checklist')
+            );
+            $html .= html_writer::select($selectoptions, $elementname.'[regrade]', $value, false);
+        } else {
+            $html .= get_string('regrademessage5', 'gradingform_checklist');
+            $html .= html_writer::empty_tag('input', array('name' => $elementname.'[regrade]', 'value' => 1, 'type' => 'hidden'));
+        }
+        $html .= html_writer::end_tag('div');
+        return $html;
+    }
+
+    /**
+     * Generates and returns HTML code to display information box about how checklist score is converted to the grade
+     *
+     * @param array $scores
+     * @return string
+     */
+    public function display_checklist_mapping_explained($scores) {
+        $html = '';
+        if (!$scores) {
+            return $html;
+        }
+        $html .= $this->box(
+            html_writer::tag('h4', get_string('checklistmapping', 'gradingform_checklist')).
+                html_writer::tag('div', get_string('checklistmappingexplained', 'gradingform_checklist', (object)$scores))
+            , 'generalbox checklistmappingexplained');
+        return $html;
     }
 }
