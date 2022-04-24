@@ -27,8 +27,6 @@
 
 use enrol_autoenrol\enrol_form;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class enrol_autoenrol_plugin
  *
@@ -935,11 +933,12 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $a = new stdClass();
         $a->coursename = format_string($course->fullname, true, array('context' => $context));
         $a->profileurl = new moodle_url($CFG->wwwroot . '/user/view.php', array('id' => $user->id, 'course' => $course->id));
+        $a->link = course_get_url($course)->out();
 
         if (trim($instance->customtext1) !== '') {
             $message = $instance->customtext1;
-            $key = array('{$a->coursename}', '{$a->profileurl}', '{$a->fullname}', '{$a->email}');
-            $value = array($a->coursename, $a->profileurl, fullname($user), $user->email);
+            $key = array('{$a->coursename}', '{$a->profileurl}', '{$a->link}', '{$a->fullname}', '{$a->email}');
+            $value = array($a->coursename, $a->profileurl, $a->link, fullname($user), $user->email);
             $message = str_replace($key, $value, $message);
             if (strpos($message, '<') === false) {
                 // Plain text only.

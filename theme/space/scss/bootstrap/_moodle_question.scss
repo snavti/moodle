@@ -2001,24 +2001,3 @@ div[id^=fitem_id_][id*=fraction_] {
   display: inline-flex;
   width: 92%;
 }
-
-.generalfeedback,
-.feedback {
-  img,
-  iframe {
-    @include media-breakpoint-down(md) {
-    max-width: 100%;
-    height: auto;
-    }
-  }
-}
-
-.que .qtext {
-  img,
-  iframe {
-    @include media-breakpoint-down(md) {
-    max-width: 100%;
-    height: auto;
-    }
-  }  
-}

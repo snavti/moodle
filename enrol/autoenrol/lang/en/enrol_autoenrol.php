@@ -38,6 +38,7 @@ The following placeholders may be included in the message:
 
 * Course name {$a->coursename}
 * Link to user\'s profile page {$a->profileurl}
+* Link to course {$a->link}
 * User email {$a->email}
 * User fullname {$a->fullname}';
 $string['enrolme'] = 'Enrol me';
@@ -147,7 +148,7 @@ $string['expirymessageenrollerbody'] = 'Autoenrolment in the course \'{$a->cours
 {$a->users}
 
 To extend their enrolment, go to {$a->extendurl}';
-$string['expirymessageenrolledsubject'] = 'Selft enrolment expiry notification';
+$string['expirymessageenrolledsubject'] = 'Autoenrolment expiry notification';
 $string['expirymessageenrolledbody'] = 'Dear {$a->user},
 
 This is a notification that your enrolment in the course \'{$a->course}\' is due to expire on {$a->timeend}.

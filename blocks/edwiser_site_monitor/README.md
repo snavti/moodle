@@ -144,7 +144,7 @@ Wisdmlabs
 
 # Provided by
 
-[![alt text](https://git.wisdmlabs.net/edwiser/edwiser_site_monitor/raw/dev/pix/edwiser-logo.png)](https://edwiser.org)
+[![alt text](https://github.com/WisdmLabs/moodle-block_edwiser_site_monitor/blob/master/pix/edwiser-logo.png)](https://edwiser.org)
 
 -----------------------------
 

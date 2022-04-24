@@ -25,8 +25,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class enrol_autoenrol_edit_form
  *
@@ -75,6 +73,14 @@ class enrol_autoenrol_edit_form extends moodleform {
             $logourl = $OUTPUT->image_url('logo', 'enrol_autoenrol');
         } else {
             $logourl = $OUTPUT->pix_url('logo', 'enrol_autoenrol');
+        }
+
+        // Merge these two settings to one value for the single selection element.
+        if (isset($instance->notifyall) && isset($instance->expirynotify)) {
+            if ($instance->notifyall && $instance->expirynotify) {
+                $instance->expirynotify = 2;
+            }
+            unset($instance->notifyall);
         }
 
         $img = html_writer::empty_tag(

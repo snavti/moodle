@@ -1,6 +1,83 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.3.0] 2022-04-19
+### Added
+- New {ifhasarolename roleshortname}{/ifhasarolename} tags.
+- Sample ALPHA code in the documentation to patch Moodle 4.0 themes for support in the custom menu.
+- New {courseprogresspercent} tag.
+- New {ifmobile}{/ifmobile} tags.
+- New {ifnotmobile}{/ifnotmobile} tags.
+- New {ifnotinactivity}{/ifnotinactivity} tags.
+- New {ifinactivity}{/ifinactivity} tags.
+- New {ifnotactivitycompleted id}{/ifnotactivitycompleted} tags.
+- New {ifactivitycompleted id}{/ifactivitycompleted} tags.
+- Support for optional course ID parameter in the {coursename} tag.
+- Support for optional course ID parameter in the {coursesummary} tag.
+- New {qrcode}{/qrcode} tags.
+- New {lastlogin} tag.
+- New {mygroups} tag.
+- New {teamcards} (ALPHA) tag.
+- New {ifnotvisible}{/ifnotvisible} tags.
+- New {showmore}{/showmore} tags (ALPHA).
+- New {menuadmin} tag.
+- New {mycoursescards} tag.
+- New fc-coursecontacts and fc-coursecontactroles classes for {coursecontacts} HTML.
+- New {coursecontacts} tag (formerly {courseteachers}).
+- {coursecontacts} can now optionally display user profile description.
+- {coursecontacts} can now optionally link to phone number.
+- New {chart progressbar x Title text} tag (ALPHA).
+- New {chart radial x Title text} tag (ALPHA).
+- New {chart pie x Title text} tag (ALPHA).
+- New {markborder}{/markborder} tags.
+- New {marktext}{/marktext} tags.
+- New {coursegradepercent} tag.
+- New {button}{/button} tags
+- New {ifnothome}{/ifnothome} tags.
+- New {label}{/label} tags.
+- New setting to enable/disable {categorycards} background.
+- New fc-categorycards class to {categorycards} to make it easier to customize.
+- New fc-categorycard-ID# class to {categorycards} to make it possible to customize background of card.
+- New {sectionname} tag.
+- New {hr} tag.
+- New {coursecardsbyenrol} tag.
+- New {userscountrycount} tag.
+- Missing support for {supportname}, {supportemail} and {supportpage} tags.
+- Known limitation in README.md regarding Moodle's 'Download course content' feature.
+- Compatibility with Moodle 4.0
+### Updated
+- Improve parsing of {scrape} tag. Improper syntax will no longer make Moodle crash, the tag just won't work properly.
+- {lang}, {idnumber} and {coursegradepercent} tags can now be used within other tags for example.
+- {coursesummary} tag is now processed through Moodle filters for multi-language support.
+- Fixed {coursecards catid}.
+- Fixed many tags that did not work if they contained a line break.
+- Tag %7Bcoursecontextid%7D now works.
+- Fix-166,168,191 multiple instances of date/time related tags (firstaccessdate, coursestartdate, courseenddate, coursecompletiondate, now)
+- {coursesactive} no longer count courses that are before start date or after end date, if any.
+- Renamed {courseteachers} tag to {coursecontacts}. No longer ALPHA.
+- {coursecontacts} now display's based on role coursecontacts setting in Site Admin > Display > Courses.
+- The {highlight} tag now uses HTML5 mark tags instead of span tags.
+- Replaced Learn Moodle link with Moodle Academy in menudev.
+- Page Builder link now works in menudev.
+- Photo Editor link now works in menudev.
+- Screen Recorder link now works in menudev.
+- Fixed undefined COMPLETION_ENABLED error on Dashboard.
+- Full name now supports RTL languages.
+- Refactored the {coursecards} code. No longer displays empty list.
+- Fixed {ifprofile_field_...} tag visibility and clarified documentation.
+- {coursecards} no longer displays hidden courses or those whose end-dates are past, unless you are an administrator.
+- Results from {course_field_shortname} and {course_fields} are now processed through Moodle filters.
+- Updated the documentation and fix typos.
+- Tested to be compatible up to and including Moodle 4.0.
+- Updated copyright notice to include 2022.
+
+## [2.2.1] 2021-05-25
+### Updated
+- Corrections in some of the language strings.
+- Completed French translation.
+- Clarification for {coursecards} and {categorycards} documentation in this README.md file.
+- There is no new or changed functionality in this release.
+
 ## [2.2.0] 2021-05-22
 ### Added
 - New {courseteachers} tag (ALPHA).
@@ -29,6 +106,7 @@ All notable changes to this project will be documented in this file.
 - {filtercodes} tag now works on all pages but only for users who have course:update capability.
 - Custom menu tags should not be processed through the "URL to Link" (urltolink) filter. See README.md to update your theme.
 - Documentation in this README.md file.
+- Tested to be compatible up to and including Moodle 3.11.
 - Copyright notice for 2021.
 
 ## [2.1.0] 2020-11-23

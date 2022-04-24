@@ -18,12 +18,10 @@
  * FilterCodes filter upgrade code.
  *
  * @package    filter_filtercodes
- * @copyright  2017-2021 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2017-2022 TNG Consulting Inc. - www.tngconsulting.ca
  * @author     Michael Milette
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Upgrade code for the FilterCodes filter plugin.

@@ -24,10 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Auto Enrol pluing upgrade task
+ * Auto Enrol plugin upgrade task
  *
  * @param int $oldversion the version we are upgrading from
  * @return bool always true
@@ -259,6 +257,10 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
             }
         }
         upgrade_plugin_savepoint(true, 2021112600, 'enrol', 'autoenrol');
+    }
+
+    if ($oldversion < 2022033100) {
+        upgrade_plugin_savepoint(true, 2022033100, 'enrol', 'autoenrol');
     }
 
     return true;

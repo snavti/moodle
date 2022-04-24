@@ -18,7 +18,7 @@
  * English strings for FilterCodes plugin.
  *
  * @package    filter_filtercodes
- * @copyright  2017-2021 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2017-2022 TNG Consulting Inc. - www.tngconsulting.ca
  * @author     Michael Milette
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -43,13 +43,33 @@ $string['escapebraces'] = 'Escape tags';
 $string['escapebraces_desc'] = 'When this option is checked, you will be able to display FilterCode tags without them being interpreted by this filter by wrapping your tag in [ brackets ]. This can be very useful when creating FilterCodes documentation for the teachers and course creators on your Moodle site.<br><br>Example: [{fullname}] will not display the user\'s full name but display the {fullname} tag instead without the brackets.';
 $string['hidecompletedcourses'] = 'Hide completed courses';
 $string['hidecompletedcourses_desc'] = 'Enable to filter out completed courses in {mycoursesmenu} tag listings.';
-$string['courseteachershowpic'] = 'Show teacher picture';
-$string['courseteachershowpic_desc'] = 'If enabled, will display the teacher\'s profile picture in {courseteachers} tags.';
-$string['courseteacherlinktype'] = 'Teacher link type';
-$string['courseteacherlinktype_desc'] = 'Choose the type of link for the teacher\s link in the {courseteachers} tags.';
+$string['coursecontactshowpic'] = 'Show contact picture';
+$string['coursecontactshowpic_desc'] = 'If enabled, will display the contact\'s profile picture in {coursecontacts} tags.';
+$string['coursecontactshowdesc'] = 'Show contact\'s profile description.';
+$string['coursecontactshowdesc_desc'] = 'If enabled, will display the contact\'s profile description in {coursecontacts} tags.';
+$string['coursecontactlinktype'] = 'Contact link type';
+$string['coursecontactlinktype_desc'] = 'Choose the type of link for the contact\s link in the {coursecontacts} tags.';
 $string['ifprofilefiedonlyvisible'] = '{ifprofile_field_} only visible.';
-$string['ifprofilefiedonlyvisible_desc'] = 'Restrict the {ifprofile_field_...} tag to only access visible profile fields. Hidden fields will behave as if the field was empty. If unchecked, this tag will be able to check hidden user fields.';
-
+$string['ifprofilefiedonlyvisible_desc'] = 'When checked, restrict the {ifprofile_field_...} tag to only access visible user profile fields. Hidden fields will behave as if they were empty. If unchecked, this tag will be also able to check hidden fields.';
+$string['categorycardshowpic'] = 'Show {categorycards} background';
+$string['categorycardshowpic_desc'] = 'If enabled, will display a background colour/pattern for {categorycards} tag similar to the course images when no image was specified.';
+$string['coursecardsbyenrol'] = 'Maximum {coursecardsbyenrol} cards.';
+$string['coursecardsbyenrol_desc'] = 'Maximum number of course cards to display for {coursecardsbyenrol} tag. Set to zero for unlimited (not recommended).';
+$string['chartprogressbarlabel'] = '{$a->label}: {$a->value}';
+$string['teamcardsformat'] = 'Team cards format';
+$string['teamcardsformat_desc'] = 'Choose how the team members will appear in the {teamcards} tag.<br>
+<ul>
+<li>None: Displays just the picture and name as a card without the user description.</li>
+<li>Icon: Same as none except that the user description appears in an information popup bubble.</li>
+<li>Brief: Same as none but displays the description below the user picture and name.</li>
+<li>Verbose: List format. Recommended if your team members tends to have long user descriptions.</li>
+</ul>';
+$string['brief'] = 'Brief';
+$string['verbose'] = 'Verbose';
+$string['teamcardslinktype'] = 'Team link type';
+$string['teamcardslinktype_desc'] = 'Choose the type of link for the team member\'s link in the {teamcards} tag. Note: Photo will automatically be linked to profile when the user is logged-in regardless of your choice here.';
+$string['narrowpage'] = 'Narrow page';
+$string['narrowpage_desc'] = 'Enable this option to optimize display of information if Moodle is using a theme with limited page width (e.g., Boost in Moodle 4.0).';
 $string['sizeb'] = 'B';
 $string['sizekb'] = 'KB';
 $string['sizemb'] = 'MB';
@@ -62,15 +82,14 @@ $string['sizeyb'] = 'YB';
 $string['globaltagheadingtitle'] = 'Global custom tags';
 $string['globaltagheadingdesc'] = 'Define your own global tags, sometimes also called global blocks.';
 $string['globaltagcount'] = 'Number of global tags.';
-$string['globaltagcountdesc'] = 'Select the number of tags you want to define. For optional performance, only select the the number you will need.';
+$string['globaltagcountdesc'] = 'Select the number of tags you want to define. For optimal performance, only select the the number you will need.';
 $string['globaltagnametitle'] = 'Tag: global_';
-$string['globaltagnamedesc'] = 'This will be part of your tag name, prefixed with "global_". Example: If you enter "address" here, your tag will be called {global_address}". Must be a single string of letters only, no spaces, numbers or special characters are permitted.';
+$string['globaltagnamedesc'] = 'This will be part of your tag name, prefixed with "global_". Example: If you enter "address" here, your tag will be called {global_address}". Must be a single string of letters only. Spaces, numbers and special characters are not permitted.';
 $string['globaltagcontenttitle'] = 'Content';
 $string['globaltagcontentdesc'] = 'This is the content that your global tag will replace. Example: If your tag is called "{global_address}", that tag will be replaced by the content entered into this field.';
 $string['pagebuilder'] = 'Page builder';
 $string['pagebuilderlink'] = 'https://www.layoutit.com/build';
 $string['photoeditor'] = 'Photo editor';
-$string['photoeditorname'] = 'Pixlr';
 $string['photoeditorlink'] = 'https://pixlr.com/editor/';
 $string['screenrec'] = 'Screen recorder';
 $string['screenreclink'] = 'https://screenapp.io/#/recording';

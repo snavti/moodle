@@ -87,16 +87,8 @@
                     </section>
                     {{/hasmaintopwidgets}}
 
-                    <section id="region-main" {{#hasblocks}}class="has-blocks mb-3"{{/hasblocks}}>
                     {{{ output.main_content }}}
-                    </section>
 
-                    {{#hasblocks}}
-                    <section data-region="blocks-column" class="sidebar-widgets d-print-none">
-                        {{{ sidepreblocks }}}
-                    </section>
-                    {{/hasblocks}}
-                    
                     {{{ output.activity_navigation }}}
                     {{{ output.course_content_footer }}}
 

@@ -25,13 +25,15 @@
  * @copyright 2016 onwards AL Rachels (drachels@drachels.com)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+use mod_hotquestion\local\results;
 use \mod_hotquestion\event\course_module_viewed;
 
 require_once("../../config.php");
 require_once("lib.php");
 require_once("locallib.php");
 require_once("mod_form.php");
+require_once($CFG->dirroot . '/comment/lib.php');
+comment::init();
 
 $id = required_param('id', PARAM_INT);                  // Course_module ID.
 $ajax = optional_param('ajax', 0, PARAM_BOOL);          // Asychronous form request.
@@ -40,11 +42,10 @@ $roundid = optional_param('round', -1, PARAM_INT);      // Round id.
 $changegroup = optional_param('group', -1, PARAM_INT);  // Choose the current group.
 
 if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
-    print_error("Course Module ID was incorrect");
+    throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 }
-if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
-    print_error("Course is misconfigured");
-}
+
+$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 
 // Construct hotquestion instance.
 $hq = new mod_hotquestion($id, $roundid);
@@ -58,15 +59,15 @@ $entriesmanager = has_capability('mod/hotquestion:manageentries', $context);
 $canask = has_capability('mod/hotquestion:ask', $context);
 
 if (!$entriesmanager && !$canask) {
-    print_error('accessdenied', 'hotquestion');
+    throw new moodle_exception(get_string('accessdenied', 'hotquestion'));
 }
 
 if (! $hotquestion = $DB->get_record("hotquestion", array("id" => $cm->instance))) {
-    print_error("Course module is incorrect");
+    throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 }
 
 if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
-    print_error("Course module is incorrect");
+    throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 }
 
 // Trigger module viewed event.
@@ -89,17 +90,6 @@ if (!$ajax) {
     $PAGE->set_context($context);
     $PAGE->set_cm($hq->cm);
     $PAGE->add_body_class('hotquestion');
-    $jsmodule = array(
-        'name'     => 'mod_hotquestion',
-        'fullpath' => '/mod/hotquestion/module.js',
-        'requires' => array('base', 'io', 'node', 'event-valuechange'),
-        'strings'  => array(
-            array('invalidquestion', 'hotquestion'),
-            array('connectionerror', 'hotquestion')
-        )
-    );
-
-    $PAGE->requires->js_init_call('M.mod_hotquestion.init', null, true, $jsmodule);
 }
 
 require_capability('mod/hotquestion:view', $context);
@@ -108,16 +98,38 @@ require_capability('mod/hotquestion:view', $context);
 $output = $PAGE->get_renderer('mod_hotquestion');
 $output->init($hq);
 
-// Process submited question.
+// Process submitted question.
 if (has_capability('mod/hotquestion:ask', $context)) {
     $mform = new hotquestion_form(null, array($hq->instance->anonymouspost, $hq->cm));
     if ($fromform = $mform->get_data()) {
-        if (!$hq->add_new_question($fromform)) {
+        // If there is a post, $fromform will contain text, format, id, and submitbutton.
+        // 20210314 Prevent CSFR.
+        confirm_sesskey();
+        $timenow = time();
+
+        // This will be overwritten after we have the entryid.
+        $newentry = new stdClass();
+        $newentry->hotquestion = $hq->instance->id;
+        $newentry->content = $fromform->text_editor['text'];
+        $newentry->format = $fromform->text_editor['format'];
+        $newentry->userid = $USER->id;
+        $newentry->time = $timenow;
+        if ($fromform->anonymous = null) {
+            $newentry->anonymous = $fromform->anonymous;
+        } else {
+            $newentry->anonymous = 0;
+        }
+        $newentry->approved = $hq->instance->approval;
+        $newentry->tpriority = 0;
+        $newentry->submitbutton = $fromform->submitbutton;
+
+        if (!$hq->add_new_question($fromform)) { // Returns 1 if valid question submitted.
             redirect('view.php?id='.$hq->cm->id, get_string('invalidquestion', 'hotquestion'));
         }
         if (!$ajax) {
             redirect('view.php?id='.$hq->cm->id, get_string('questionsubmitted', 'hotquestion'));
         }
+        die;
     }
 }
 
@@ -197,7 +209,7 @@ if (!$ajax) {
     // Allow access at any time to manager and editing teacher but prevent access to students.
     if (!(has_capability('mod/hotquestion:manage', $context))) {
         // Check availability timeopen and timeclose. Added 10/2/16.
-        if (!(hq_available($hotquestion))) {  // Availability restrictions.
+        if (!(results::hq_available($hotquestion))) {  // Availability restrictions.
             if ($hotquestion->timeclose != 0 && time() > $hotquestion->timeclose) {
                 echo $output->hotquestion_inaccessible(get_string('hotquestionclosed',
                     'hotquestion', userdate($hotquestion->timeclose)));
@@ -210,14 +222,25 @@ if (!$ajax) {
             // Password code can go here. e.g. // } else if {.
         }
     }
-    // Print hotquestion description.
-    echo $output->introduction();
+    // 20220301 Added activity completion to the hotquestion description.
+    $cminfo = cm_info::create($cm);
+    $completiondetails = \core_completion\cm_completion_details::get_instance($cminfo, $USER->id);
+    $activitydates = \core\activity_dates::get_dates_for_module($cminfo, $USER->id);
+    echo $output->introduction($cminfo, $completiondetails, $activitydates);
+
+    // 20211219 Added link to all HotQuestion activities.
+    echo '<span style="float:right"><a href="index.php?id='
+         .$course->id
+         .'">'
+         .get_string('viewallhotquestions', 'hotquestion')
+         .'</a></span><br>';
+    echo
 
     // Print group information (A drop down box will be displayed if the user
     // is a member of more than one group, or has access to all groups).
-    groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/hotquestion/view.php?id=' . $cm->id);
+    groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
 
-    // Print the text box for typing submissions in.
+    // Print the textarea box for typing submissions in.
     if (has_capability('mod/hotquestion:ask', $context)) {
         $mform->display();
     }
@@ -229,7 +252,7 @@ echo $output->container_start("toolbar");
 echo $output->toolbar(has_capability('mod/hotquestion:manageentries', $context));
 echo $output->container_end();
 
-// Print questions list.
+// Print questions list from the current round.
 echo $output->questions(has_capability('mod/hotquestion:vote', $context));
 echo $output->container_end();
 
