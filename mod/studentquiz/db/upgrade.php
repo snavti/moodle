@@ -29,6 +29,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_studentquiz\local\studentquiz_helper;
 use mod_studentquiz\utils;
 
 defined('MOODLE_INTERNAL') || die();
@@ -813,5 +814,154 @@ function xmldb_studentquiz_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020051200, 'studentquiz');
     }
 
+    if ($oldversion < 2021072000) {
+
+        // Define field pinned to be added to studentquiz_question.
+        $table = new xmldb_table('studentquiz_question');
+        $field = new xmldb_field('pinned', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'hidden');
+
+        // Conditionally launch add field pinned.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Studentquiz savepoint reached.
+        upgrade_mod_savepoint(true, 2021072000, 'studentquiz');
+    }
+
+    if ($oldversion < 2021101200) {
+        // Define field groupid to be added to studentquiz_question.
+        $table = new xmldb_table('studentquiz_question');
+        $field = new xmldb_field('groupid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '-1', 'hidden');
+
+        // Conditionally launch add field groupid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key groupid (foreign) to be added to studentquiz_question.
+        $key = new xmldb_key('groupid', XMLDB_KEY_FOREIGN, ['groupid'], 'groups', ['id']);
+
+        // Launch add key groupid.
+        $dbman->add_key($table, $key);
+
+        // Studentquiz savepoint reached.
+        upgrade_mod_savepoint(true, 2021101200, 'studentquiz');
+    }
+
+    if ($oldversion < 2021102100) {
+
+        // Define field type to be added to studentquiz_comment.
+        $table = new xmldb_table('studentquiz_comment');
+        $field = new xmldb_field('type', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'status');
+
+        // Conditionally launch add field type.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Studentquiz savepoint reached.
+        upgrade_mod_savepoint(true, 2021102100, 'studentquiz');
+    }
+
+    if ($oldversion < 2021102501) {
+
+        // Define field lastreadprivatecomment to be added to studentquiz_progress.
+        $table = new xmldb_table('studentquiz_progress');
+        $field = new xmldb_field('lastreadprivatecomment', XMLDB_TYPE_INTEGER, '10', null, true, null, 0, 'correctattempts');
+
+        // Conditionally launch add field lastreadprivatecomment.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field lastreadpubliccomment to be added to studentquiz_progress.
+        $field = new xmldb_field('lastreadpubliccomment', XMLDB_TYPE_INTEGER, '10', null, true, null, 0, 'lastreadprivatecomment');
+
+        // Conditionally launch add field lastreadpubliccomment.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // We assume that all old user which have attempted the question have read all comments.
+        $time = time();
+        $DB->set_field('studentquiz_progress', 'lastreadprivatecomment', $time);
+        $DB->set_field('studentquiz_progress', 'lastreadpubliccomment', $time);
+
+        // Studentquiz savepoint reached.
+        upgrade_mod_savepoint(true, 2021102501, 'studentquiz');
+    }
+
+    if ($oldversion < 2021102502) {
+        // Define table studentquiz_state_history to be created.
+        $table = new xmldb_table('studentquiz_state_history');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('state', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Add key.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('questionid', XMLDB_KEY_FOREIGN, ['questionid'], 'question', ['id']);
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Conditionally launch create table for studentquiz_state_history.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+
+            $sql = "SELECT sqq.questionid, sqq.state, q.createdby, q.timecreated
+                      FROM {studentquiz_question} sqq
+                      JOIN {question} q ON q.id = sqq.questionid";
+            $sqlcount = "SELECT COUNT(DISTINCT sqq.questionid)
+                           FROM {studentquiz_question} sqq
+                           JOIN {question} q ON q.id = sqq.questionid";
+
+            $total = $DB->count_records_sql($sqlcount);
+
+            if ($total > 0) {
+                $progressbar = new progress_bar('updatestatequestions', 500, true);
+                $sqquestions = $DB->get_recordset_sql($sql);
+                $transaction = $DB->start_delegated_transaction();
+                $i = 1;
+                foreach ($sqquestions as $sqquestion) {
+                    // Create action new question by onwer.
+                    utils::question_save_action($sqquestion->questionid, $sqquestion->createdby,
+                        studentquiz_helper::STATE_NEW, $sqquestion->timecreated);
+
+                    if (!($sqquestion->state == studentquiz_helper::STATE_NEW)) {
+                        utils::question_save_action($sqquestion->questionid, get_admin()->id, $sqquestion->state, null);
+                    }
+                    $progressbar->update($i, $total, "Update the state for question - {$i}/{$total}.");
+                    $i++;
+                }
+                $transaction->allow_commit();
+                $sqquestions->close();
+            }
+        }
+
+        // Studentquiz savepoint reached.
+        upgrade_mod_savepoint(true, 2021102502, 'studentquiz');
+    }
+
+    if ($oldversion < 2021120200) {
+        // Define field privatecommenting to be added to studentquiz.
+        $table = new xmldb_table('studentquiz');
+        $field = new xmldb_field('privatecommenting', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'digestfirstday');
+
+        // Conditionally launch add field privatecommenting.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Update old data to set the privatecommenting to the current site config.
+        $privatecommenting = get_config('studentquiz', 'showprivatecomment');
+        $DB->set_field('studentquiz', 'privatecommenting', $privatecommenting);
+
+        // Studentquiz savepoint reached.
+        upgrade_mod_savepoint(true, 2021120200, 'studentquiz');
+    }
+
     return true;
 }
+

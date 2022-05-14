@@ -1,10 +1,8 @@
 # Changelog
 
-## 4.0.0 (2022042000)
+## 3.11.7 (2022031510)
 ### Changed
-- This version of the plugin is only for Moodle LMS 4.0 and above
-- New icon for Moodle LMS 4.0
-- Use new API to display activity header
+- Prevent race condition resulting in issuing course certificate twice
 
 ## 3.11.6 (2022031500)
 ### Added

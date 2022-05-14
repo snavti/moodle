@@ -15,17 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define all the backup steps that will be used by the backup_studentquiz_activity_structure_step
- *
- * @package   mod_studentquiz
- * @category  backup
- * @copyright 2017 HSR (http://www.hsr.ch)
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-defined('MOODLE_INTERNAL') || die;
-
-/**
  * Define the complete StudentQuiz structure for backup, with file and id annotations
  *
  * @package   mod_studentquiz
@@ -51,7 +40,7 @@ class backup_studentquiz_activity_structure_step extends backup_questions_activi
                 'questionquantifier', 'approvedquantifier', 'ratequantifier',
                 'correctanswerquantifier', 'incorrectanswerquantifier',
                 'allowedqtypes', 'aggregated', 'excluderoles', 'forcerating', 'forcecommenting',
-                'commentdeletionperiod', 'reportingemail', 'digesttype', 'digestfirstday'
+                'commentdeletionperiod', 'reportingemail', 'digesttype', 'digestfirstday', 'privatecommenting'
         ));
 
         // StudentQuiz Attempt -> User, Question usage Id.
@@ -67,14 +56,14 @@ class backup_studentquiz_activity_structure_step extends backup_questions_activi
 
         // StudentQuiz -> Question.
         $questions = new backup_nested_element('questions');
-        $question = new backup_nested_element('question', array('questionid'), array('state', 'hidden'));
+        $question = new backup_nested_element('question', array('questionid'), array('state', 'hidden', 'groupid', 'pinned'));
         $questions->add_child($question);
         $studentquiz->add_child($questions);
 
         // StudentQuiz -> Question -> Student.
         $progresses = new backup_nested_element('progresses');
         $progress = new backup_nested_element('progress', array('questionid', 'userid'),
-            array('lastanswercorrect', 'attempts', 'correctattempts'));
+            array('lastanswercorrect', 'attempts', 'correctattempts', 'lastreadprivatecomment', 'lastreadpubliccomment'));
         $progresses->add_child($progress);
         $studentquiz->add_child($progresses);
 
@@ -87,7 +76,7 @@ class backup_studentquiz_activity_structure_step extends backup_questions_activi
         // Comment -> Question, User.
         $comments = new backup_nested_element('comments');
         $comment = new backup_nested_element('comment', ['usermodified', 'questionid', 'userid', 'id'], [
-                'comment', 'created', 'parentid', 'status', 'timemodified'
+                'comment', 'created', 'parentid', 'status', 'type', 'timemodified'
         ]);
         $comments->add_child($comment);
         $studentquiz->add_child($comments);
@@ -111,6 +100,12 @@ class backup_studentquiz_activity_structure_step extends backup_questions_activi
                 ['content', 'recipientid', 'status', 'timetosend']);
         $notifications->add_child($notification);
         $studentquiz->add_child($notifications);
+
+        // Question -> User -> State history.
+        $statehitories = new backup_nested_element('statehistories');
+        $statehistory = new backup_nested_element('state_history', ['userid', 'questionid'], ['state', 'timecreated']);
+        $statehitories->add_child($statehistory);
+        $studentquiz->add_child($statehitories);
 
         // Define data sources.
         $studentquiz->set_source_table('studentquiz',
@@ -168,6 +163,16 @@ class backup_studentquiz_activity_structure_step extends backup_questions_activi
                                    WHERE sq.id = :studentquizid
                                 ORDER BY ch.commentid, ch.id";
             $commenthistory->set_source_sql($commenthistorysql, ['studentquizid' => backup::VAR_PARENTID]);
+
+            // Only select state histories to questions of this StudentQuiz.
+            $statehistorysql = "SELECT sh.*
+                                  FROM {studentquiz} sq
+                                  JOIN {context} con ON con.instanceid = sq.coursemodule
+                                  JOIN {question_categories} qc ON qc.contextid = con.id
+                             LEFT JOIN {question} q ON q.category = qc.id
+                                  JOIN {studentquiz_state_history} sh ON sh.questionid = q.id
+                                 WHERE sq.id = :studentquizid";
+            $statehistory->set_source_sql($statehistorysql, ['studentquizid' => backup::VAR_PARENTID]);
         }
 
         // Define id annotations.
@@ -175,11 +180,14 @@ class backup_studentquiz_activity_structure_step extends backup_questions_activi
         $progress->annotate_ids('question', 'questionid');
         $attempt->annotate_ids('user', 'userid');
         $question->annotate_ids('question', 'questionid');
+        $question->annotate_ids('group', 'groupid');
         $rate->annotate_ids('user', 'userid');
         $comment->annotate_ids('user', 'userid');
         $comment->annotate_ids('user', 'usermodified');
         $commenthistory->annotate_ids('user', 'userid');
         $notification->annotate_ids('studentquiz', 'studentquizid');
+        $statehistory->annotate_ids('user', 'userid');
+        $statehistory->annotate_ids('question', 'questionid');
 
         // Define file annotations (we do not use itemid in this example).
         $studentquiz->annotate_files('mod_studentquiz', 'intro', null);

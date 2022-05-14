@@ -21,6 +21,7 @@
  * @copyright  2017 HSR (http://www.hsr.ch)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+use mod_studentquiz\utils;
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/questionlib.php');
@@ -199,6 +200,8 @@ $navinfo->current = $slot;
 $navinfo->total = $questionscount;
 $PAGE->navbar->add(get_string('nav_question_no', 'studentquiz', $navinfo));
 
+utils::require_access_to_a_relevant_group($cm, $context);
+
 echo $OUTPUT->header();
 
 $info = new stdClass();
@@ -224,7 +227,7 @@ $html .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cm
 $html .= $questionusage->render_question($slot, $options, (string)$slot);
 
 // Output the state change select box.
-$statechangehtml = $output->render_state_choice($question->id, $course->id, $cmid);
+$statechangehtml = $output->render_state_choice($question, $course->id, $cmid);
 $navigationhtml = $output->render_navigation_bar($hasprevious, $hasnext, $isanswered);
 
 // Change state will always first thing below navigation.

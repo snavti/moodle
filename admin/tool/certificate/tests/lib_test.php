@@ -57,8 +57,6 @@ class lib_test extends advanced_testcase {
 
     /**
      * Test tool_certificate_can_course_category_delete.
-     *
-     * @covers ::tool_certificate_can_course_category_delete
      */
     public function test_can_course_category_delete() {
         $user = $this->getDataGenerator()->create_user();
@@ -98,8 +96,6 @@ class lib_test extends advanced_testcase {
 
     /**
      * Test tool_certificate_can_course_category_delete_move.
-     *
-     * @covers ::tool_certificate_can_course_category_delete_move
      */
     public function test_can_course_category_delete_move() {
         $user = $this->getDataGenerator()->create_user();
@@ -143,9 +139,6 @@ class lib_test extends advanced_testcase {
 
     /**
      * Test move/remove template on category deletion.
-     *
-     * @covers ::tool_certificate_can_course_category_delete
-     * @covers ::tool_certificate_can_course_category_delete_move
      */
     public function test_delete_category_with_certificates() {
         $roleid = create_role('Dummy role', 'dummyrole', 'dummy role description');
@@ -224,9 +217,6 @@ class lib_test extends advanced_testcase {
 
     /**
      * Test category deletion for the purpose of callback behaviour with no certificates.
-     *
-     * @covers ::tool_certificate_can_course_category_delete
-     * @covers ::tool_certificate_can_course_category_delete_move
      */
     public function test_delete_category_with_no_certificates() {
         $user = $this->getDataGenerator()->create_user();

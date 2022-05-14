@@ -13,20 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Define all the restore steps that will be used by the restore_studentquiz_activity_structure_step
- *
- * @package   mod_studentquiz
- * @category  backup
- * @copyright 2017 HSR (http://www.hsr.ch)
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 use mod_studentquiz\local\studentquiz_helper;
 use mod_studentquiz\utils;
-
-defined('MOODLE_INTERNAL') || die;
 
 /**
  * Structure step to restore one StudentQuiz activity
@@ -95,6 +83,11 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
                 '/activity/studentquiz/notifications/notification');
         $paths[] = $notification;
 
+        // Restore State histories.
+        $statehistories = new restore_path_element('state_history',
+            '/activity/studentquiz/statehistories/state_history');
+        $paths[] = $statehistories;
+
         // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
@@ -153,6 +146,9 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
         }
         if (empty($data->forcecommenting)) {
             $data->forcecommenting = get_config('studentquiz', 'forcecommenting');
+        }
+        if (empty($data->privatecommenting)) {
+            $data->privatecommenting = get_config('studentquiz', 'showprivatecomment');
         }
         if (!isset($data->commentdeletionperiod)) {
             $data->commentdeletionperiod = get_config('studentquiz', 'commentediting_deletionperiod');
@@ -217,6 +213,7 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->deleteuserid = $this->get_mappingid_or_null('user', $data->deleteuserid);
         $data->edituserid = $this->get_mappingid_or_null('user', $data->edituserid);
+        $data->type = $data->type ?? utils::COMMENT_TYPE_PUBLIC;
 
         // If is a reply (parentid != 0).
         if (!empty($data->parentid)) {
@@ -269,6 +266,7 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
 
         $data = (object) $data;
         $data->questionid = $this->get_mappingid('question', $data->questionid);
+        $data->groupid = $this->get_mappingid('group', $data->groupid ?? 0);
 
         if (!isset($data->state)) {
             if (isset($data->approved)) {
@@ -281,6 +279,10 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
 
         if (!isset($data->hidden)) {
             $data->hidden = 0;
+        }
+
+        if (!isset($data->pinned)) {
+            $data->pinned = 0;
         }
 
         $DB->insert_record('studentquiz_question', $data);
@@ -317,6 +319,26 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
         $data->studentquizid = $this->get_mappingid('notification', $data->studentquizid);
 
         $DB->insert_record('studentquiz_notification', $data);
+    }
+
+    /**
+     * Process state history data.
+     *
+     * @param array $data parsed element data
+     */
+    protected function process_state_history($data) {
+        global $DB;
+
+        // If the path content is null, we will fix it after excuting.
+        if (!isset($data)) {
+            return;
+        }
+
+        $data = (object) $data;
+        $data->questionid = $this->get_mappingid('question', $data->questionid);
+        $data->userid = $this->get_mappingid('user', $data->userid);
+
+        $DB->insert_record('studentquiz_state_history', $data);
     }
 
     /**
@@ -361,6 +383,8 @@ class restore_studentquiz_activity_structure_step extends restore_questions_acti
         // Workaround setting default question state if no state data is available.
         // ref: https://tracker.moodle.org/browse/MDL-67406.
         mod_studentquiz_fix_all_missing_question_state_after_restore($this->get_courseid());
+        // Fix restore legacy data without path content.
+        utils::fix_all_missing_question_state_history_after_restore($this->get_courseid());
     }
 
     /**

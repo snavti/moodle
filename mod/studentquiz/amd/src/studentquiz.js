@@ -16,9 +16,9 @@
 /**
  * Javascript for save rating and save, remove and listing comments
  *
- * @package    mod_studentquiz
- * @copyright  2017 HSR (http://www.hsr.ch)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @module    mod_studentquiz/studentquiz
+ * @copyright 2017 HSR (http://www.hsr.ch)
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /* jshint latedef:nofunc */
@@ -88,8 +88,12 @@ define(['jquery'], function($) {
 
         // Select all questions.
         selectAllQuestions: function() {
-            $(document).ready(function() {
-                $('#qbheadercheckbox').trigger('click');
+            let headerCheckbox = document.getElementById('qbheadercheckbox');
+
+            require(['core/checkbox-toggleall'], () => {
+                if (!headerCheckbox.checked) {
+                    headerCheckbox.click();
+                }
             });
         }
     };

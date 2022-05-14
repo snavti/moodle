@@ -14,25 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_studentquiz\bank;
+
 /**
- * Representing performances column
+ * Represent performances column in studentquiz_bank_view
  *
  * @package    mod_studentquiz
  * @copyright  2017 HSR (http://www.hsr.ch)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace mod_studentquiz\bank;
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Represent performances column in studentquiz_bank_view
- *
- * @copyright  2017 HSR (http://www.hsr.ch)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class attempts_column extends \core_question\bank\column_base {
+class attempts_column extends studentquiz_column_base {
 
     /**
      * Renderer
@@ -104,7 +95,11 @@ class attempts_column extends \core_question\bank\column_base {
      * @return array additional fields
      */
     public function get_required_fields() {
-        return array('sp.attempts AS myattempts', 'sp.lastanswercorrect AS mylastanswercorrect');
+        return [
+            'sp.attempts AS myattempts',
+            'sp.lastanswercorrect AS mylastanswercorrect',
+            '(CASE WHEN sp.attempts = 0 THEN NULL ELSE sp.lastanswercorrect END) as mylastanswercorrectforsort'
+        ];
     }
 
     /**
@@ -115,7 +110,7 @@ class attempts_column extends \core_question\bank\column_base {
         return array(
             'myattempts' => array('field' => 'myattempts',
                 'title' => get_string('number_column_name', 'studentquiz')),
-            'mylastattempt' => array('field' => 'mylastanswercorrect',
+            'mylastattempt' => array('field' => 'mylastanswercorrectforsort',
                 'title' => get_string('latest_column_name', 'studentquiz')),
         );
     }

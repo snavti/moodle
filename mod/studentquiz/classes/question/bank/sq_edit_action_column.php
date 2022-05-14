@@ -14,6 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_studentquiz\bank;
+
+use core_question\bank\edit_action_column;
+use mod_studentquiz\local\studentquiz_helper;
+
 /**
  * Represent edit action in studentquiz_bank_view
  *
@@ -22,39 +27,26 @@
  * @copyright 2019 HSR (http://www.hsr.ch)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace mod_studentquiz\bank;
-
-use core_question\bank\edit_action_column;
-use mod_studentquiz\local\studentquiz_helper;
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Represent edit action in studentquiz_bank_view
- *
- * @author Huong Nguyen <huongnv13@gmail.com>
- * @copyright 2019 HSR (http://www.hsr.ch)
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class sq_edit_action_column extends edit_action_column {
 
     /**
-     * Output the contents of this column.
+     * Override method to get url and label for edit action of the studentquiz.
      *
-     * @param object $question the row from the $question table, augmented with extra information.
-     * @param string $rowclasses CSS class names that should be applied to this row of output.
+     * @param \stdClass $question The row from the $question table, augmented with extra information.
+     * @return array With three elements.
+     *      $url - The URL to perform the action.
+     *      $icon - The icon for this action.
+     *      $label - Text label to display in the UI (either in the menu, or as a tool-tip on the icon)
      */
-    protected function display_content($question, $rowclasses) {
-        $canedit = true;
+    protected function get_url_icon_and_label(\stdClass $question): array {
+
         if (($question->state == studentquiz_helper::STATE_APPROVED || $question->state == studentquiz_helper::STATE_DISAPPROVED) &&
                 !has_capability('mod/studentquiz:previewothers', $this->qbank->get_most_specific_context())) {
             // Do not render Edit icon if Question is in approved/disapproved state for Student.
-            $canedit = false;
+            return [null, null, null];
         }
-        if ($canedit) {
-            parent::display_content($question, $rowclasses);
-        }
+
+        return parent::get_url_icon_and_label($question);
     }
 
 }

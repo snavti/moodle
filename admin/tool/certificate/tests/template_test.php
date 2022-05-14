@@ -25,7 +25,6 @@ use context_system;
  * Unit tests for the certificate class.
  *
  * @package    tool_certificate
- * @covers     \tool_certificate\template
  * @copyright  2018 Daniel Neis Araujo <daniel@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -592,7 +591,7 @@ class template_test extends advanced_testcase {
      */
     private function add_spanish_language_pack(): void {
         global $CFG;
-        $langfolder = $CFG->dataroot . '/lang/es';
+        $langfolder = $CFG->dataroot . '/lang/es'; // @codingStandardsIgnoreLine - false positive on php 7.2.
         check_dir_exists($langfolder);
         $langconfig = "<?php\n\$string['parentlanguage'] = 'en';";
         file_put_contents($langfolder . '/langconfig.php', $langconfig);

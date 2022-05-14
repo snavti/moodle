@@ -18,16 +18,13 @@
  * This plugin for Moodle is used to send emails through a web form.
  *
  * @package    local_contact
- * @copyright  2016-2021 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2016-2022 TNG Consulting Inc. - www.tngconsulting.ca
  * @author     Michael Milette
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * local_contact class. Handles processing of information submitted from a web form.
- * @copyright  2016-2021 TNG Consulting Inc. - www.tngconsulting.ca
+ * @copyright  2016-2022 TNG Consulting Inc. - www.tngconsulting.ca
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_contact {
@@ -44,7 +41,7 @@ class local_contact {
         if (isloggedin() && !isguestuser()) {
             // If logged-in as non guest, use their registered fullname and email address.
             global $USER;
-            $this->fromname = $USER->firstname . ' ' . $USER->lastname;
+            $this->fromname = get_string('fullnamedisplay', null, $USER);
             $this->fromemail = $USER->email;
              // Insert name and email address at first position in $_POST array.
             if (!empty($_POST['email'])) {
@@ -373,7 +370,7 @@ class local_contact {
     private function moodleuserstatus($emailaddress) {
         if (isloggedin() && !isguestuser()) {
             global $USER;
-            $info = $USER->firstname . ' ' . $USER->lastname . ' / ' . $USER->email . ' (' . $USER->username .
+            $info = get_string('fullnamedisplay', null, $USER) . ' / ' . $USER->email . ' (' . $USER->username .
                     ' / ' . get_string('eventuserloggedin', 'auth') . ')';
         } else {
             global $DB;
@@ -396,7 +393,7 @@ class local_contact {
                         $extrainfo .= ' / ' . get_string('notconfirmed', 'local_contact');
                     }
 
-                    $info = $user->firstname . ' ' . $user->lastname . ' / ' . $user->email . ' (' . $user->username .
+                    $info = get_string('fullnamedisplay', null, $user) . ' / ' . $user->email . ' (' . $user->username .
                             ' / ' . get_string('eventuserloggedout') . $extrainfo . ')';
                     break;
                 default: // We found multiple users with this email address.

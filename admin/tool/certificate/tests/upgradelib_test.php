@@ -71,8 +71,6 @@ class upgradelib_test extends advanced_testcase {
 
     /**
      * Test for function tool_certificate_upgrade_remove_tenant_field()
-     *
-     * @covers ::tool_certificate_upgrade_remove_tenant_field
      */
     public function test_tool_certificate_upgrade_remove_tenant_field() {
         global $DB;
@@ -112,8 +110,6 @@ class upgradelib_test extends advanced_testcase {
 
     /**
      * Tests for tool_certificate_upgrade_move_data_to_customfields()
-     *
-     * @covers ::tool_certificate_upgrade_move_data_to_customfields
      */
     public function test_tool_certificate_upgrade_move_data_to_customfields() {
         global $DB;
@@ -178,8 +174,6 @@ class upgradelib_test extends advanced_testcase {
 
     /**
      * Tests for tool_certificate_upgrade_store_fullname_in_data()
-     *
-     * @covers ::tool_certificate_upgrade_store_fullname_in_data
      */
     public function test_tool_certificate_upgrade_store_fullname_in_data() {
         global $DB;
@@ -216,8 +210,6 @@ class upgradelib_test extends advanced_testcase {
 
     /**
      * Test for tool_certificate_delete_certificates_with_missing_context()
-     *
-     * @covers ::tool_certificate_delete_certificates_with_missing_context
      */
     public function test_tool_certificate_delete_certificates_with_missing_context() {
         global $DB;
@@ -258,8 +250,6 @@ class upgradelib_test extends advanced_testcase {
 
     /**
      * Test for test_tool_certificate_delete_orphaned_issue_files()
-     *
-     * @covers ::tool_certificate_delete_orphaned_issue_files
      */
     public function test_tool_certificate_delete_orphaned_issue_files() {
         global $DB;
@@ -296,8 +286,6 @@ class upgradelib_test extends advanced_testcase {
 
     /**
      * Test for tool_certificate_fix_orphaned_template_element_files()
-     *
-     * @covers ::tool_certificate_fix_orphaned_template_element_files
      */
     public function test_tool_certificate_fix_orphaned_template_element_files() {
         $this->resetAfterTest();

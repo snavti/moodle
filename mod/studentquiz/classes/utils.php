@@ -14,21 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Class that holds utility functions used by mod_studentquiz.
- *
- * @package mod_studentquiz
- * @copyright 2020 The Open University
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_studentquiz;
 
-defined('MOODLE_INTERNAL') || die();
-
+use core\dml\sql_join;
+use core_courseformat\output\local\state\cm;
+use core_question\bank\search\hidden_condition;
 use external_value;
 use external_single_structure;
 use mod_studentquiz\commentarea\comment;
+use moodle_url;
+use mod_studentquiz\local\studentquiz_helper;
 
 /**
  * Class that holds utility functions used by mod_studentquiz.
@@ -59,6 +54,18 @@ style3 = superscript, subscript
 style4 = unorderedlist, orderedlist
 style5 = html';
 
+    /** @var string - Comment type public. */
+    const COMMENT_TYPE_PUBLIC = 0;
+
+    /** @var string - Comment type private. */
+    const COMMENT_TYPE_PRIVATE = 1;
+
+    /** @var string - User preference question active tab. */
+    const USER_PREFERENCE_QUESTION_ACTIVE_TAB = 'mod_studentquiz_question_active_tab';
+
+    /** @var int Hidden question. */
+    const HIDDEN  = 1;
+
     /**
      * Get Comment Area web service comment reply structure.
      *
@@ -73,12 +80,13 @@ style5 = html';
                 'shortcontent' => new external_value(PARAM_RAW, 'Comment short content'),
                 'numberofreply' => new external_value(PARAM_INT, 'Number of reply for this comment'),
                 'authorname' => new external_value(PARAM_TEXT, 'Author of this comment'),
+                'authorprofileurl' => new external_value(PARAM_TEXT, 'Profile url author of this comment'),
                 'posttime' => new external_value(PARAM_RAW, 'Comment create time'),
                 'deleted' => new external_value(PARAM_BOOL, 'Comment is deleted or not'),
                 'deletedtime' => new external_value(PARAM_RAW, 'Comment edited time, if not deleted return 0'),
                 'deleteuser' => new external_single_structure([
-                        'firstname' => new external_value(PARAM_TEXT, 'Delete user first name'),
-                        'lastname' => new external_value(PARAM_TEXT, 'Delete user last name'),
+                        'fullname' => new external_value(PARAM_TEXT, 'Delete user first name'),
+                        'profileurl' => new external_value(PARAM_TEXT, 'Delete user last name'),
                 ]),
                 'candelete' => new external_value(PARAM_BOOL, 'Can delete this comment or not.'),
                 'canreply' => new external_value(PARAM_BOOL, 'Can reply this comment or not.'),
@@ -322,22 +330,27 @@ style5 = html';
     }
 
     /**
-     * Check permision can self comment and rating.
+     * Check permision can self comment.
      *
-     * @param question_definition $question Current Question stdClass
+     * @param \question_definition $question Current Question stdClass
      * @param int $cmid Current Cmid
+     * @param int $type Comment type.
+     * @param bool $privatecommenting Does this studentquiz enable private commenting?
      * @return boolean
      */
-    public static function allow_self_comment_and_rating_in_preview_mode(\question_definition $question, $cmid) {
+    public static function allow_self_comment_and_rating_in_preview_mode(\question_definition $question, $cmid,
+             $type = self::COMMENT_TYPE_PUBLIC, $privatecommenting = false) {
         global $USER, $PAGE;
+
         $context = \context_module::instance($cmid);
-        if (
-            $PAGE->pagetype == 'mod-studentquiz-preview'
-            && $USER->id == $question->createdby
-            && !has_capability('mod/studentquiz:canselfratecomment', $context)
-        ) {
-            return false;
+        if ($PAGE->pagetype == 'mod-studentquiz-preview' && !has_capability('mod/studentquiz:canselfratecomment', $context)) {
+            if ($type == self::COMMENT_TYPE_PUBLIC || !$privatecommenting ||
+                    $USER->id != $question->createdby ||
+                    self::get_question_state($question) == \mod_studentquiz\local\studentquiz_helper::STATE_APPROVED) {
+                return false;
+            }
         }
+
         return true;
     }
 
@@ -409,5 +422,406 @@ style5 = html';
         }
 
         return false;
+    }
+
+    /**
+     * We hide 'All participants' option in group mode. It doesn't make sense to display question of all groups together,
+     * and it makes confusing in reports. If the group = 0, NULL or an invalid group,
+     * we force to chose first available group by default.
+     *
+     * @param stdClass $cm Course module class.
+     */
+    public static function set_default_group($cm) {
+        global $USER;
+
+        $allowedgroups = groups_get_activity_allowed_groups($cm, $USER->id);
+        if ($allowedgroups && !groups_get_activity_group($cm, true, $allowedgroups)) {
+            // Although the UI show that the first group is selected, the param 'group' is not set,
+            // so the groups_get_activity_group() will return wrong value. We have to set it in $_GET to prevent the
+            // problem when user go to the student quiz in the first time.
+            $_GET['group'] = reset($allowedgroups)->id;
+        }
+    }
+
+    /**
+     * Get group joins for creating sql, using field groupid in studentquiz_question table.
+     * If $groupid = 0, return empty sql_join to reduce the complication of the sql.
+     *
+     * @param int $groupid Group id.
+     * @param string $groupidcolumn Group id column for the where clause.
+     * @return sql_join The joins clause will be empty in this case, we just return the wheres and params.
+     */
+    public static function groups_get_questions_joins($groupid = 0, $groupidcolumn = 'sqq.groupid') {
+        static $i = 0;
+        $i++;
+        $alias = 'gid' . $i;
+
+        $joins = '';
+        $wheres = '';
+        $params = [];
+        if ($groupid) {
+            $wheres = "{$groupidcolumn} = :{$alias}";
+            $params[$alias] = $groupid;
+        }
+
+        return new sql_join($joins, $wheres, $params);
+    }
+
+    /**
+     * Get sql join to return users in a group.
+     * To fix the issue in MOODLE_38_STABLE: the groups_get_members_join still return the join clause when we
+     * turn off the group mode.
+     *
+     * @param int $groupid The group id.
+     * @param string $useridcolumn The column of the user id from the calling SQL, e.g. u.id
+     * @param context $context Course context or a context within a course. Mandatory when $groupids includes USERSWITHOUTGROUP
+     * @return sql_join Contains joins, wheres, params
+     * @throws coding_exception if empty or invalid context submitted when $groupid = USERSWITHOUTGROUP
+     */
+    public static function sq_groups_get_members_join($groupid, $useridcolumn, $context = null) {
+        // Don't need to join with group members if the user has the capability 'moodle/site:accessallgroups'.
+        if (!$groupid || has_capability('moodle/site:accessallgroups', $context)) {
+            $joins = '';
+            $wheres = '';
+            $params = [];
+
+            return new sql_join($joins, $wheres, $params);
+        }
+
+        return groups_get_members_join($groupid, $useridcolumn, $context);
+    }
+
+    /**
+     * Mark the active tab in question comment tabs.
+     *
+     * @param array $tabs All tabs.
+     * @param bool $privatecommenting Does the studentquiz enable private commenting?
+     * @return void.
+     */
+    public static function mark_question_comment_current_active_tab(&$tabs, $privatecommenting = false): void {
+        $currentactivetab = '';
+        if ($privatecommenting) {
+            // First view default is private comment tab.
+            $currentactivetab = get_user_preferences(self::USER_PREFERENCE_QUESTION_ACTIVE_TAB, self::COMMENT_TYPE_PRIVATE);
+        }
+
+        $found = false;
+        if ($currentactivetab) {
+            foreach ($tabs as $key => $tab) {
+                if ($tab['id'] == $currentactivetab) {
+                    $tabs[$key]['active'] = true;
+                    $found = true;
+                }
+            }
+        }
+
+        // If we can not found any tab, just active the first tab.
+        if (!$found) {
+            $tabs[0]['active'] = true;
+        }
+
+        // Allow user to update user preference via ajax.
+        user_preference_allow_ajax_update(self::USER_PREFERENCE_QUESTION_ACTIVE_TAB, PARAM_TEXT);
+    }
+
+    /**
+     * Can the current user view the private comment of this question.
+     *
+     * @param int $cmid Course module id.
+     * @param \question_definition $question Question definition object.
+     * @param bool $privatecommenting Does the studentquiz enable private commenting?
+
+     * @return bool Question's state.
+     */
+    public static function can_view_private_comment($cmid, $question, $privatecommenting = false) {
+        global $USER;
+
+        if (!$privatecommenting) {
+            return false;
+        }
+
+        $context = \context_module::instance($cmid);
+        if (!has_capability('mod/studentquiz:cancommentprivately', $context)) {
+            if (!has_capability('mod/studentquiz:canselfcommentprivately', $context) ||
+                    $USER->id != $question->createdby) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Can the current user view the state_history table of this question.
+     *
+     * @param int $cmid Course module id.
+     * @param \question_definition $question Question definition object.
+     * @return bool Question's state.
+     */
+    public static function can_view_state_history($cmid, $question) {
+        global $USER;
+
+        $context = \context_module::instance($cmid);
+        if (!has_capability('mod/studentquiz:changestate', $context) && $USER->id != $question->createdby) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get current state of question.
+     *
+     * @param \stdClass $question Question.
+     * @return int Question's state.
+     */
+    public static function get_question_state($question) {
+        global $DB;
+
+        return $DB->get_field('studentquiz_question', 'state', ['questionid' => $question->id]);
+    }
+
+    /**
+     * Get the url to view an user's profile.
+     *
+     * @param int $userid The userid
+     * @param int $courseid The courseid
+     * @return moodle_url
+     */
+    public static function get_user_profile_url(int $userid, int $courseid): moodle_url {
+        return new moodle_url('/user/view.php', [
+            'id' => $userid,
+            'course' => $courseid
+        ]);
+    }
+
+    /**
+     * Get studentquiz progress.
+     *
+     * @param int $qid Question Id.
+     * @param int $userid User Id.
+     * @param int $studentquizid Studentquiz Id.
+     * @return \stdClass Studentquiz progress object.
+     */
+    public static function get_studentquiz_progress($qid, $userid, $studentquizid): \stdClass {
+        global $DB;
+
+        $studentquizprogress = $DB->get_record('studentquiz_progress', array('questionid' => $qid,
+            'userid' => $userid, 'studentquizid' => $studentquizid));
+        if ($studentquizprogress == false) {
+            $studentquizprogress = mod_studentquiz_get_studenquiz_progress_class($qid, $userid, $studentquizid);
+        }
+
+        return $studentquizprogress;
+    }
+
+    /**
+     * Update studentquiz progress object into db.
+     *
+     * @param \stdClass $studentquizprogress The studentquiz progress object.
+     * @return bool|int
+     */
+    public static function update_studentquiz_progress(\stdClass $studentquizprogress) {
+        global $DB;
+
+        if (!empty($studentquizprogress->id)) {
+            $result = $DB->update_record('studentquiz_progress', $studentquizprogress);
+        } else {
+            $result = $studentquizprogress->id = $DB->insert_record('studentquiz_progress', $studentquizprogress, true);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Saving the action change state.
+     *
+     * @param int $questionid Id of question
+     * @param int|null $userid
+     * @param int $state The state of the question in the StudentQuiz.
+     * @param int $timecreated The time do action.
+     * @return bool|int True or new id
+     */
+    public static function question_save_action(int $questionid, int $userid = null, int $state, int $timecreated = null) {
+        global $DB, $USER;
+
+        $data = new \stdClass();
+        $data->questionid = $questionid;
+        $data->userid = isset($userid) ? $userid : $USER->id;
+        $data->state = $state;
+        $data->timecreated = isset($timecreated) ? $timecreated : time();
+
+        return $DB->insert_record('studentquiz_state_history', $data);
+    }
+
+    /**
+     * Finds all the questions missing the state history information and create the default state history for imports
+     * into the database.
+     *
+     * @param int|null $courseorigid
+     * @return void
+     */
+    public static function fix_all_missing_question_state_history_after_restore($courseorigid=null): void {
+        global $DB;
+
+        $params = [];
+        if (!empty($courseorigid)) {
+            $params['course'] = $courseorigid;
+        }
+
+        $transaction = $DB->start_delegated_transaction();
+        $studentquizes = $DB->get_recordset_select('studentquiz', 'course = :course', $params);
+
+        foreach ($studentquizes as $studentquiz) {
+            $context = \context_module::instance($studentquiz->coursemodule);
+            $studentquiz = mod_studentquiz_load_studentquiz($studentquiz->coursemodule, $context->id);
+
+            $sql = "SELECT sqq.questionid, sqq.state, q.createdby, q.timecreated
+                      FROM {studentquiz} sq
+                      JOIN {context} con ON con.instanceid = sq.coursemodule
+                      JOIN {question_categories} qc ON qc.contextid = con.id
+                      JOIN {question} q ON q.category = qc.id
+                      JOIN {studentquiz_question} sqq ON sqq.questionid = q.id
+                     WHERE sq.coursemodule = :coursemodule
+                           AND qc.id = :categoryid
+                           AND NOT EXISTS (SELECT 1 FROM {studentquiz_state_history} WHERE questionid = q.id)";
+
+            $params = [
+                'coursemodule' => $studentquiz->coursemodule,
+                'categoryid' => $studentquiz->categoryid
+            ];
+            $sqquestions = $DB->get_recordset_sql($sql, $params);
+
+            if ($sqquestions) {
+                foreach ($sqquestions as $sqquestion) {
+                    // Create action new question by onwer.
+                    self::question_save_action($sqquestion->questionid, $sqquestion->createdby,
+                        studentquiz_helper::STATE_NEW, $sqquestion->timecreated);
+
+                    if (!($sqquestion->state == studentquiz_helper::STATE_NEW)) {
+                        self::question_save_action($sqquestion->questionid, get_admin()->id, $sqquestion->state, null);
+                    }
+                }
+            }
+            $sqquestions->close();
+        }
+
+        $studentquizes->close();
+        $transaction->allow_commit();
+    }
+
+    /**
+     * Get state history data.
+     *
+     * @param \question_definition $question Question definition object.
+     * @return array State histories and Users array.
+     */
+    public static function get_state_history_data($question): array {
+        global $DB;
+
+        $statehistories = $DB->get_records('studentquiz_state_history', ['questionid' => $question->id], 'timecreated, id');
+        $users = self::get_users_change_state($statehistories);
+
+        return [$statehistories, $users];
+    }
+
+    /**
+     * List of users do action change state.
+     *
+     * @param array $statehistories Lists of state histories.
+     * @return array List of users do action change state.
+     */
+    public static function get_users_change_state(array $statehistories): array {
+        global $DB;
+
+        $userids = [];
+        foreach ($statehistories as $statehistory) {
+            $userids[$statehistory->userid] = 1;
+        }
+
+        return $DB->get_records_list('user', 'id', array_keys($userids), '', '*');
+    }
+
+    /**
+     * Get current visibility of question.
+     *
+     * @param int $questionid Question's id.
+     * @return bool Question's visibility hide/show.
+     */
+    public static function check_is_question_hidden(int $questionid): bool {
+        global $DB;
+        $ishidden = $DB->get_field('studentquiz_question', 'hidden', ['questionid' => $questionid]);
+
+        return $ishidden == self::HIDDEN;
+    }
+
+    /**
+     * Return 'comment' or 'comments' base on the $numberofcomments.
+     *
+     * @param int $numberofcomments The studentquiz progress object.
+     * @return string
+     */
+    public static function get_comment_plural_text($numberofcomments) {
+        if (isset($numberofcomments) && $numberofcomments == 1) {
+            return get_string('comment', 'studentquiz');
+        } else {
+            return get_string('commentplural', 'studentquiz');
+        }
+    }
+
+    /**
+     * List of states of questions.
+     *
+     * @param array $questionids Array of question's id.
+     * @return array List of states.
+     */
+    public static function get_states(array $questionids): array {
+        global $DB;
+
+        return $DB->get_records_list('studentquiz_question', 'questionid', $questionids, '', 'questionid, state');
+    }
+
+    /**
+     * Get state of question.
+     *
+     * @param int $questionid Question's id.
+     * @return int State of question.
+     */
+    public static function get_state_question(int $questionid): int {
+        global $DB;
+
+        return $DB->get_field('studentquiz_question', 'state', ['questionid' => $questionid]);
+    }
+
+    /**
+     * List of questionnames of questions.
+     *
+     * @param array $questionids Array of question's id.
+     * @return array List of questionnames.
+     */
+    public static function get_question_names(array $questionids): array {
+        global $DB;
+
+        return $DB->get_records_list('question', 'id', $questionids, '', 'id, name');
+    }
+
+    /**
+     * Makes security checks for viewing. Will return an error message if the user cannot access the student quiz.
+     *
+     * @param object $cm - The course module object.
+     * @param \context $context The context module.
+     * @param string $title Page's title.
+     * @return void
+     */
+    public static function require_access_to_a_relevant_group(object $cm, \context $context, string $title = ''): void {
+        global $COURSE, $PAGE;
+        $groupmode = (int)groups_get_activity_groupmode($cm, $COURSE);
+        $currentgroup = groups_get_activity_group($cm, true);
+
+        if ($groupmode === SEPARATEGROUPS && !$currentgroup && !has_capability('moodle/site:accessallgroups', $context)) {
+            $renderer = $PAGE->get_renderer('mod_studentquiz');
+            $renderer->render_error_message(get_string('error_permission', 'studentquiz'), $title);
+            exit();
+        }
     }
 }

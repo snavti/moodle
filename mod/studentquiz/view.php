@@ -24,6 +24,7 @@
  * @copyright  2017 HSR (http://www.hsr.ch)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+use mod_studentquiz\utils;
 
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/viewlib.php');
@@ -77,11 +78,30 @@ $renderer->init_question_table_wanted_columns();
 // Load view.
 $view = new mod_studentquiz_view($course, $context, $cm, $studentquiz, $USER->id, $report);
 
+// Redirect to overview if there are no selected questions.
+if ((optional_param('approveselected', false, PARAM_BOOL) || optional_param('deleteselected', false, PARAM_BOOL)) &&
+        !optional_param('confirm', '', PARAM_ALPHANUM) ||
+        optional_param('move', false, PARAM_BOOL)) {
+    if (!mod_studentquiz_helper_get_ids_by_raw_submit($_REQUEST)) {
+        $baseurl = $view->get_questionbank()->base_url();
+        $baseurl->remove_params('deleteselected', 'approveselected', 'move');
+        redirect($baseurl, get_string('noquestionsselectedtodoaction', 'studentquiz'),
+            null, \core\output\notification::NOTIFY_WARNING);
+    }
+    if (!has_capability('mod/studentquiz:changestate', $PAGE->context) && optional_param('approveselected', false, PARAM_BOOL)) {
+        redirect(new moodle_url('view.php', array('id' => $cmid)), get_string('nopermissions', 'error',
+            get_string('studentquiz:changestate', 'studentquiz')), null, \core\output\notification::NOTIFY_WARNING);
+    }
+}
+
 // Since this page has 2 forms interacting with each other, all params must be passed in GET, thus
 // $PAGE->url will be as it has recieved the request.
 $PAGE->set_url($view->get_pageurl());
 $PAGE->set_title($view->get_title());
 $PAGE->set_heading($COURSE->fullname);
+$PAGE->set_cm($cm, $course);
+
+utils::require_access_to_a_relevant_group($cm, $context);
 
 // Process actions.
 $view->process_actions();

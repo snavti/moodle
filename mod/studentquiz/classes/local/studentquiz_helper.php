@@ -14,18 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Helper class for StudentQuiz
- *
- * @package mod_studentquiz
- * @author Huong Nguyen <huongnv13@gmail.com>
- * @copyright 2019 HSR (http://www.hsr.ch)
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_studentquiz\local;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Helper class for StudentQuiz
@@ -68,6 +57,16 @@ class studentquiz_helper {
     const STATE_DELETE = 5;
 
     /**
+     * @var int STATE_SHOW state constant for show
+     */
+    const STATE_SHOW = 6;
+
+    /**
+     * @var int STATE_REVIEWABLE state constant for reviewable.
+     */
+    const STATE_REVIEWABLE = 7;
+
+    /**
      * Statename offers string representation for state codes. Probably only use for translation hints.
      * @var array constant to text
      */
@@ -76,6 +75,7 @@ class studentquiz_helper {
         self::STATE_APPROVED => 'approved',
         self::STATE_NEW => 'new',
         self::STATE_CHANGED => 'changed',
+        self::STATE_REVIEWABLE => 'reviewable',
         self::STATE_HIDE => 'hidden',
         self::STATE_DELETE => 'deleted',
     );
@@ -115,4 +115,21 @@ class studentquiz_helper {
         return $DB->count_records_sql($sql, $params);
     }
 
+    /** Get list description of state name.
+     * That is the past participle in singular.
+     *
+     * @return array List descriptions of state name.
+     */
+    public static function get_state_descriptions(): array {
+        return [
+            self::STATE_DISAPPROVED => get_string('state_disapproved', 'studentquiz'),
+            self::STATE_APPROVED => get_string('state_approved', 'studentquiz'),
+            self::STATE_CHANGED => get_string('state_changed', 'studentquiz'),
+            self::STATE_HIDE => get_string('state_hidden', 'studentquiz'),
+            self::STATE_DELETE => get_string('state_deleted', 'studentquiz'),
+            self::STATE_SHOW => get_string('state_shown', 'studentquiz'),
+            self::STATE_NEW => get_string('state_new', 'studentquiz'),
+            self::STATE_REVIEWABLE => get_string('state_reviewable', 'studentquiz'),
+        ];
+    }
 }

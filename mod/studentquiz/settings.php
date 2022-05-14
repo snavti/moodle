@@ -84,6 +84,18 @@ if ($ADMIN->fulltree) {
         $roles
     ));
 
+    // Replace all value to 0 for default value.
+    $defaultroles = array_map(function($val) {
+        return 1;
+    }, $roles);
+
+    $settings->add(new admin_setting_configmulticheckbox('studentquiz/allowedrolestoshow',
+        get_string('settings_allowedrolestoshow', 'studentquiz'),
+        get_string('settings_allowedrolestoshow_help', 'studentquiz'),
+        $defaultroles,
+        $roles
+    ));
+
     // Show a onetime settings option as info, that we'll uninstall the questionbehavior plugin automatically.
     // Will not show this option if this plugin doesn't exist.
     if (array_key_exists('studentquiz', core_component::get_plugin_list('qbehaviour'))) {
@@ -121,6 +133,23 @@ if ($ADMIN->fulltree) {
         '1'
     ));
 
+    $settings->add(new admin_setting_configcheckbox('studentquiz/deleteorphanedquestions',
+        get_string('settingsdeleteorphaned', 'studentquiz'),
+        get_string('settingsdeleteorphaned_help', 'studentquiz'),
+        '0'
+    ));
+
+    $settings->add(new admin_setting_configduration('studentquiz/deleteorphanedtimelimit',
+        get_string('settingsdeleteorphanedtimelimit', 'studentquiz'),
+        get_string('settingsdeleteorphanedtimelimit_help', 'studentquiz'),
+        1 * YEARSECS));
+
+    $settings->add(new admin_setting_heading(
+        'studentquiz/sectioncommenting',
+        get_string('settings_section_header_commenting', 'studentquiz'),
+        ''
+    ));
+
     $settings->add(new admin_setting_configcheckbox('studentquiz/forcecommenting',
         get_string('settings_forcecommenting', 'studentquiz'),
         get_string('settings_forcecommenting_help', 'studentquiz'),
@@ -140,15 +169,17 @@ if ($ADMIN->fulltree) {
             utils::ATTO_TOOLBAR
     ));
 
-    $settings->add(new admin_setting_configcheckbox('studentquiz/deleteorphanedquestions',
-        get_string('settingsdeleteorphaned', 'studentquiz'),
-        get_string('settingsdeleteorphaned_help', 'studentquiz'),
+    $settings->add(new admin_setting_configcheckbox('studentquiz/showprivatecomment',
+        get_string('settings_showprivatecomment', 'studentquiz'),
+        get_string('settings_showprivatecomment_help', 'studentquiz'),
         '0'
     ));
 
-    $settings->add(new admin_setting_configduration('studentquiz/deleteorphanedtimelimit',
-        get_string('settingsdeleteorphanedtimelimit', 'studentquiz'),
-        get_string('settingsdeleteorphanedtimelimit_help', 'studentquiz'),
-        1 * YEARSECS));
+    $settings->add(new admin_setting_configtext(
+        'studentquiz/privatecomment',
+        get_string('settings_privatecomment', 'studentquiz'),
+        get_string('settings_privatecomment_help', 'studentquiz'),
+        get_string('addprivatecomment', 'studentquiz'), PARAM_TEXT
+    ));
 
 }

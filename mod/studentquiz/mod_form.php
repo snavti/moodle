@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 require_once(__DIR__ . '/locallib.php');
+require_once(__DIR__ . '/reportlib.php');
 
 /**
  * Module instance settings form
@@ -138,26 +139,26 @@ class mod_studentquiz_mod_form extends moodleform_mod {
             get_config('studentquiz', 'incorrectanswered'));
 
         // Selection for excluded roles.
-        $defaultexcluderoles = explode(',', get_config('studentquiz', 'excluderoles'));
-        $excluderolesgroup = array();
-        foreach (mod_studentquiz_get_roles() as $role => $name) {
-            $excluderolesgroup[] =& $mform->createElement('checkbox', $role, '', $name);
-            if (in_array($role, $defaultexcluderoles)) {
+        $rolescanbeexculded = mod_studentquiz_report::get_roles_which_can_be_exculded();
+        if (!empty($rolescanbeexculded)) {
+            $excluderolesgroup = [];
+            foreach ($rolescanbeexculded as $role => $roleinfo) {
+                $excluderolesgroup[] = $mform->createElement('checkbox', $role, '', $roleinfo['name']);
                 // Default question types already defined in Administration setting.
                 // This question type was enable by default in Administration setting.
-                $mform->setDefault("excluderoles[" . $role . "]", 1);
+                $mform->setDefault("excluderoles[" . $role . "]", $roleinfo['default']);
             }
+            $mform->addGroup($excluderolesgroup, 'excluderoles', get_string('settings_excluderoles', 'studentquiz'));
+            $mform->addHelpButton('excluderoles', 'settings_excluderoles', 'studentquiz');
         }
-        $mform->addGroup($excluderolesgroup, 'excluderoles', get_string('settings_excluderoles', 'studentquiz'));
-        $mform->addHelpButton('excluderoles', 'settings_excluderoles', 'studentquiz');
 
         $mform->addElement('header', 'sectionquestion', get_string('settings_section_header_question', 'studentquiz'));
 
         // Selection for allowed question types.
         $allowedgroup = array();
-        $allowedgroup[] =& $mform->createElement('checkbox', "ALL", '', get_string('settings_allowallqtypes', 'studentquiz'));
+        $allowedgroup[] = $mform->createElement('checkbox', "ALL", '', get_string('settings_allowallqtypes', 'studentquiz'));
         foreach (mod_studentquiz_get_question_types() as $qtype => $name) {
-            $allowedgroup[] =& $mform->createElement('checkbox', $qtype, '', $name);
+            $allowedgroup[] = $mform->createElement('checkbox', $qtype, '', $name);
             if ($defaultqtypesdefined && in_array($qtype, $defaultqtypes)) {
                 // Default question types already defined in Administration setting.
                 // This question type was enable by default in Administration setting.
@@ -187,6 +188,12 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         $mform->setType('forcecommenting', PARAM_INT);
         $mform->addHelpButton('forcecommenting', 'settings_forcecommenting', 'studentquiz');
         $mform->setDefault('forcecommenting', get_config('studentquiz', 'forcecommenting'));
+
+        // Field enable private commenting.
+        $mform->addElement('checkbox', 'privatecommenting', get_string('settings_privatecommenting', 'studentquiz'));
+        $mform->setType('privatecommenting', PARAM_INT);
+        $mform->addHelpButton('privatecommenting', 'settings_privatecommenting', 'studentquiz');
+        $mform->setDefault('privatecommenting', get_config('studentquiz', 'showprivatecomment'));
 
         // Comment deletion period.
         $mform->addElement('select', 'commentdeletionperiod',
@@ -291,6 +298,9 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         }
         if (!empty($data['reportingemail']) && !$this->validate_emails($data['reportingemail'])) {
             $errors['reportingemail'] = get_string('invalidemail', 'studentquiz');
+        }
+        if ($data['groupmode'] == VISIBLEGROUPS) {
+            $errors['groupmode'] = get_string('visiblegroupnotyetsupport', 'studentquiz');
         }
         return $errors;
     }

@@ -245,9 +245,39 @@ function report_customsql_substitute_user_token($sql, $userid) {
     return str_replace('%%USERID%%', $userid, $sql);
 }
 
-function report_customsql_url($relativeurl) {
-    global $CFG;
-    return $CFG->wwwroot.'/report/customsql/'.$relativeurl;
+/**
+ * Create url to $relativeurl.
+ *
+ * @param string $relativeurl Relative url.
+ * @param array $params Parameter for url.
+ * @return moodle_url the relative url.
+ */
+function report_customsql_url($relativeurl, $params = []) {
+    return new moodle_url('/report/customsql/' . $relativeurl, $params);
+}
+
+/**
+ * Create the download url for the report.
+ *
+ * @param int $reportid The reportid.
+ * @param array $params Parameters for the url.
+ *
+ * @return moodle_url The download url.
+ */
+function report_customsql_downloadurl($reportid, $params = []) {
+    $downloadurl = moodle_url::make_pluginfile_url(
+        context_system::instance()->id,
+        'report_customsql',
+        'download',
+        $reportid,
+        null,
+        null
+    );
+    // Add the params to the url.
+    // Used to pass values for the arbitrary number of params in the sql report.
+    $downloadurl->params($params);
+
+    return $downloadurl;
 }
 
 function report_customsql_capability_options() {
@@ -619,7 +649,7 @@ function report_customsql_validate_users($userids, $capability) {
         // User does not have the chosen access level.
         $context = context_user::instance($user->id);
         $a->userid = $userid;
-        $a->name = fullname($user);
+        $a->name = s(fullname($user));
         if (!has_capability($capability, $context, $user)) {
             return get_string('userhasnothiscapability', 'report_customsql', $a);
         }

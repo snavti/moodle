@@ -14,25 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_studentquiz\bank;
+
 /**
- * Representing rating column
+ * Represent rate column in studentquiz_bank_view
  *
  * @package    mod_studentquiz
  * @copyright  2017 HSR (http://www.hsr.ch)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace mod_studentquiz\bank;
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Represent rate column in studentquiz_bank_view
- *
- * @copyright  2017 HSR (http://www.hsr.ch)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class rate_column extends \core_question\bank\column_base {
+class rate_column extends studentquiz_column_base {
 
     /**
      * Renderer

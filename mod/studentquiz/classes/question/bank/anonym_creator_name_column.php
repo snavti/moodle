@@ -14,17 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Representing anonym creator column
- *
- * @package    mod_studentquiz
- * @copyright  2017 HSR (http://www.hsr.ch)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_studentquiz\bank;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * A column type for the name of the question creator.
@@ -59,6 +49,9 @@ class anonym_creator_name_column extends \core_question\bank\creator_name_column
      */
     protected $renderer;
 
+    /** @var array Extra class names to this column. */
+    protected $extraclasses = [];
+
     /**
      * Loads config of current userid and can see
      */
@@ -79,5 +72,28 @@ class anonym_creator_name_column extends \core_question\bank\creator_name_column
         $output = $this->renderer->render_anonym_creator_name_column(
                 $this->anonymize, $question, $this->currentuserid, $this->anonymousname, $rowclasses);
         echo $output;
+    }
+
+    /**
+     * Output this column.
+     * @param object $question The row from the $question table, augmented with extra information.
+     * @param string $rowclasses CSS class names that should be applied to this row of output.
+     */
+    public function display($question, $rowclasses) {
+        $this->extraclasses = [];
+        if (!empty($question->sq_hidden)) {
+            $this->extraclasses[] = 'dimmed_text';
+        }
+
+        parent::display($question, $rowclasses);
+    }
+
+    /**
+     * Any extra class names to every cell in this column.
+     *
+     * @return array
+     */
+    public function get_extra_classes():array {
+        return $this->extraclasses;
     }
 }

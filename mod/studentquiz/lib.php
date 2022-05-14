@@ -58,6 +58,11 @@ function studentquiz_supports($feature) {
             return true;
         case FEATURE_USES_QUESTIONS:
             return true;
+        case FEATURE_GROUPS:
+            return true;
+        case FEATURE_GROUPINGS:
+            return true;
+
         default:
             return null;
     }
@@ -112,6 +117,10 @@ function studentquiz_add_instance(stdClass $studentquiz, mod_studentquiz_mod_for
 
     if (!isset($studentquiz->forcecommenting)) {
         $studentquiz->forcecommenting = 0;
+    }
+
+    if (!isset($studentquiz->privatecommenting)) {
+        $studentquiz->privatecommenting = 0;
     }
 
     // New StudentQuiz instances use the aggregated mode.
@@ -169,6 +178,10 @@ function studentquiz_update_instance(stdClass $studentquiz, mod_studentquiz_mod_
 
     if (!isset($studentquiz->forcecommenting)) {
         $studentquiz->forcecommenting = 0;
+    }
+
+    if (!isset($studentquiz->privatecommenting)) {
+        $studentquiz->privatecommenting = 0;
     }
 
     if (!isset($studentquiz->commentdeletionperiod)) {
@@ -488,7 +501,8 @@ function mod_studentquiz_output_fragment_commentform($params) {
             'cmid' => $params['cmid'],
             'replyto' => $params['replyto'],
             'forcecommenting' => $params['forcecommenting'],
-            'cancelbutton' => $cancelbutton
+            'cancelbutton' => $cancelbutton,
+            'type' => $params['type']
     ]);
     return $mform->get_html();
 }
@@ -506,7 +520,7 @@ function mod_studentquiz_output_fragment_commenteditform($params) {
     $cancelbutton = isset($params['cancelbutton']) ? $params['cancelbutton'] : false;
 
     list($question, $cm, $context, $studentquiz) = utils::get_data_for_comment_area($params['questionid'], $params['cmid']);
-    $commentarea = new container($studentquiz, $question, $cm, $context);
+    $commentarea = new container($studentquiz, $question, $cm, $context, null, '', $params['type']);
     $comment = $commentarea->query_comment_by_id($params['commentid']);
     if (!$comment) {
         throw new moodle_exception('invalidcomment', 'studentquiz');
@@ -520,6 +534,7 @@ function mod_studentquiz_output_fragment_commenteditform($params) {
             'forcecommenting' => $params['forcecommenting'],
             'cancelbutton' => $cancelbutton,
             'editmode' => true,
+            'type' => $params['type'],
             'formdata' => $formdata
     ]);
 

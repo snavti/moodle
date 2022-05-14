@@ -38,14 +38,20 @@ class report_customsql_edit_form extends moodleform {
         global $CFG;
 
         $mform = $this->_form;
+        $customdata = $this->_customdata;
 
         $categoryoptions = report_customsql_category_options();
         $mform->addElement('select', 'categoryid', get_string('category', 'report_customsql'),
                 $categoryoptions);
-        $catdefault = isset($categoryoptions[1]) ? 1 : key($categoryoptions);
+        if ($customdata['forcecategoryid'] && array_key_exists($customdata['forcecategoryid'], $categoryoptions)) {
+            $catdefault = $customdata['forcecategoryid'];
+        } else {
+            $catdefault = isset($categoryoptions[1]) ? 1 : key($categoryoptions);
+        }
         $mform->setDefault('categoryid', $catdefault);
 
-        $mform->addElement('text', 'displayname', get_string('displayname', 'report_customsql'));
+        $mform->addElement('text', 'displayname',
+                get_string('displayname', 'report_customsql'), ['size' => 80]);
         $mform->addRule('displayname', get_string('displaynamerequired', 'report_customsql'),
                         'required', null, 'client');
         $mform->setType('displayname', PARAM_TEXT);
@@ -64,9 +70,9 @@ class report_customsql_edit_form extends moodleform {
         $mform->registerNoSubmitButton('verify');
 
         $hasparameters = 0;
-        if (count($this->_customdata)) {
+        if ($customdata['queryparams']) {
             $mform->addElement('static', 'params', '', get_string('queryparams', 'report_customsql'));
-            foreach ($this->_customdata as $queryparam => $formparam) {
+            foreach ($customdata['queryparams'] as $queryparam => $formparam) {
                 $type = report_customsql_get_element_type($queryparam);
                 $mform->addElement($type, $formparam, $queryparam);
                 if ($type == 'text') {
@@ -246,10 +252,10 @@ class report_customsql_edit_form extends moodleform {
                     $rs->close();
                 } catch (dml_exception $e) {
                     $errors['querysql'] = get_string('queryfailed', 'report_customsql',
-                    $e->getMessage() . ' ' . $e->debuginfo);
+                            s($e->getMessage() . ' ' . $e->debuginfo));
                 } catch (Exception $e) {
                     $errors['querysql'] = get_string('queryfailed', 'report_customsql',
-                                                     $e->getMessage());
+                            s($e->getMessage()));
                 }
             }
         }
@@ -266,12 +272,12 @@ class report_customsql_edit_form extends moodleform {
             // The path either needs to be a writable directory ...
             if (is_dir($path) ) {
                 if (!is_writable($path)) {
-                    $errors['customdir'] = get_string('customdirnotwritable', 'report_customsql', $path);
+                    $errors['customdir'] = get_string('customdirnotwritable', 'report_customsql', s($path));
                 }
 
             } else if (substr($path, -1) == DIRECTORY_SEPARATOR) {
                 // ... and it must exist...
-                $errors['customdir'] = get_string('customdirmustexist', 'report_customsql', $path);
+                $errors['customdir'] = get_string('customdirmustexist', 'report_customsql', s($path));
 
             } else {
 
@@ -279,16 +285,16 @@ class report_customsql_edit_form extends moodleform {
                 $dir = dirname($path);
 
                 if (!is_dir($dir)) {
-                    $errors['customdir'] = get_string('customdirnotadirectory', 'report_customsql', $dir);
+                    $errors['customdir'] = get_string('customdirnotadirectory', 'report_customsql', s($dir));
                 } else {
 
                     if (file_exists($path)) {
                         if (!is_writable($path)) {
-                            $errors['customdir'] = get_string('filenotwritable', 'report_customsql', $path);
+                            $errors['customdir'] = get_string('filenotwritable', 'report_customsql', s($path));
                         }
                     } else {
                         if (!is_writable($dir)) {
-                            $errors['customdir'] = get_string('customdirmustexist', 'report_customsql', $dir);
+                            $errors['customdir'] = get_string('customdirmustexist', 'report_customsql', s($dir));
                         }
                     }
                 }

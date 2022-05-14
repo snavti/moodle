@@ -116,11 +116,48 @@ $string['layoutstructuretopics'] = 'topics';
 $string['layoutstructureweeks'] = 'weeks';
 $string['layoutstructuredays'] = 'days';
 
-// Coursesetting - Show addtional data for modules
+// Coursesetting - Show addtional data for modules.
+$string['enableadditionalmoddata'] = 'Enable additional information';
+$string['enableadditionalmoddatadesc'] = 'This is a \'Site level\' switch to turn the activity information on or off.  It needs to be \'on\' for the related settings that operate at a course level to take effect.  As this functionality can be computationally expensive, then it is strongly suggested that you undertake full testing before using on a production system.  Note: Purges the cache caches when changed.';
+
 $string['showadditionalmoddata'] = 'Show additional information for: {$a} in the course';
 $string['showadditionalmoddata_help'] = 'Allow all users to see the activity deadline and users with grading permission to see the number of submissions on the course page for activities.';
-$string['defaultshowadditionalmoddata'] = 'Default course \'Show additional information\' if not already set';
+$string['defaultshowadditionalmoddata'] = 'Default course \'Show additional information\'';
 $string['defaultshowadditionalmoddatadesc'] = 'If an activity is set at site level (below) to show additional information then this setting states the default state of the course specific instance of it.';
+$string['resetactivitymeta'] = 'Additional module information';
+$string['resetallactivitymeta'] = 'All additional module information';
+$string['resetactivitymeta_help'] = 'Resets the additional module information to follow the site default value.';
+$string['resetallactivitymeta_help'] = 'Resets all the additional module information to follow the site default value.';
+
+$string['courseadditionalmoddatamaxstudents'] = 'Set the maximum number of students on a course that \'Show additional information\' will apply to';
+$string['courseadditionalmoddatamaxstudentsdesc'] = 'Additional information can take time to calculate, especially on large courses, so here you can set the maximum number of students that a couse can have for the functionality to show on that course.  Above that value, the \'Additional information\' will NOT be calculated or show regardless of the course settings!  A value of \'0\' means \'unlimited\'.  Note: Purges the cache caches when changed.';
+
+$string['courseadditionalmoddatastudentsinfo'] = 'Additional information status:';
+$string['courseadditionalmoddatastudentsinfounlimited'] = 'Additional information will show for the enabled activities for {$a} students.';
+$string['courseadditionalmoddatastudentsinfolimitedshow'] = 'Additional information will show for the enabled activities for {$a->students} students as the number does not exceed the maximum \'{$a->maxstudents}\' set by the administrator on the Collapsed Topics course format setting \'courseadditionalmoddatamaxstudents\'.';
+$string['courseadditionalmoddatastudentsinfolimitednoshow'] = 'Additional information will NOT show for the enabled activities for {$a->students} students as the number exceededs the maximum \'{$a->maxstudents}\' set by the administrator on the Collapsed Topics course format setting \'courseadditionalmoddatamaxstudents\'.';
+
+$string['coursesectionactivityfurtherinformation'] = 'Course page further information';
+$string['coursesectionactivityfurtherinformationassign'] = 'Show assignment information';
+$string['coursesectionactivityfurtherinformationassigndesc'] = 'Allow assignment information to be selected to be shown on a course.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationquiz'] = 'Show quiz information';
+$string['coursesectionactivityfurtherinformationquizdesc'] = 'Allow quiz information to be selected to be shown on a course.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationchoice'] = 'Show choice information';
+$string['coursesectionactivityfurtherinformationchoicedesc'] = 'Allow choice information to be selected to be shown on a course.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationfeedback'] = 'Show feedback information';
+$string['coursesectionactivityfurtherinformationfeedbackdesc'] = 'Allow feedback information to be selected to be shown on a course.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationforum'] = 'Show forum information';
+$string['coursesectionactivityfurtherinformationforumdesc'] = 'Allow forum information to be selected to be shown on a course.  For teachers / admins, show number of contributions when whole forum grading is on.';
+$string['coursesectionactivityfurtherinformationlesson'] = 'Show lesson information';
+$string['coursesectionactivityfurtherinformationlessondesc'] = 'Allow lesson information to be selected to be shown on a course.  For teachers / admins, show number of submissions.';
+$string['coursesectionactivityfurtherinformationdata'] = 'Show database information';
+$string['coursesectionactivityfurtherinformationdatadesc'] = 'Allow data information to be selected to be shown on a course.  For teachers / admins, show number of submissions.';
+
+$string['cachedef_activitystudentrolescache'] = 'Caches the student roles.';
+$string['cachedef_activitymodulecountcache'] = 'Caches the number of students who can access a given module on a given course.';
+$string['cachedef_activitystudentscache'] = 'Caches the ids of the students on a given course.';
+$string['cachedef_activityusercreatedcache'] = 'Caches the ids of the new users on a given course.';
+$string['cannotgetactivitycacheslock'] = 'Cannot get activity caches lock for course id {$a}.';
 
 // Colour enhancement - Moodle Tracker CONTRIB-3529.
 $string['setcolour'] = 'Colour';
@@ -149,16 +186,16 @@ $string['maincoursepage'] = 'Main course page';
 $string['setlayoutelements_help'] = 'How much information about the toggles / sections you wish to be displayed.';
 $string['setlayoutstructure_help'] = "The layout structure of the course.  You can choose between:<br />'Topics' - where each section is presented as a topic in section number order.<br />'Weeks' - where each section is presented as a week in ascending week order from the start date of the course.<br />'Current week first' - which is the same as weeks but the current week is shown at the top and preceding weeks in descending order are displayed below except in editing mode where the structure is the same as 'Weeks'.<br />'Current topic first' - which is the same as 'Topics' except that the current topic is shown at the top if it has been set.<br />'Day' - where each section is presented as a day in ascending day order from the start date of the course.";
 $string['setlayout_help'] = 'Contains the settings to do with the layout of the format within the course.';
-$string['resetlayout_help'] = 'Resets the layout element, structure, columns, toggle all, view single section, icon position, one section and shown section summary to the default values so it will be the same as a course the first time it is in the \'Collapsed Topics\' format.';
-$string['resetalllayout_help'] = 'Resets the layout element, structure, columns, toggle all, view single section, icon position, one section and shown section summary to the default values for all courses so it will be the same as a course the first time it is in the \'Collapsed Topics \'format.';
+$string['resetlayout_help'] = 'Resets the layout element, structure, columns, toggle all, view single section, icon position, one section and shown section summary to follow the site default value.';
+$string['resetalllayout_help'] = 'Resets the layout element, structure, columns, toggle all, view single section, icon position, one section and shown section summary to follow the site default value.';
 // Moodle Tracker CONTRIB-3529.
 $string['setcolour_help'] = 'Contains the settings to do with the colour of the format within the course.';
 $string['settoggleforegroundcolour_help'] = 'Sets the colour of the text on the toggle.';
 $string['settoggleforegroundhovercolour_help'] = 'Sets the colour of the text on the toggle when the mouse moves over it.';
 $string['settogglebackgroundcolour_help'] = 'Sets the background colour of the toggle.';
 $string['settogglebackgroundhovercolour_help'] = 'Sets the background colour of the toggle when the mouse moves over it.';
-$string['resetcolour_help'] = 'Resets the colours and opacities to the default values so it will be the same as a course the first time it is in the \'Collapsed Topics\' format.';
-$string['resetallcolour_help'] = 'Resets the colours and opacities to the default values for all courses so it will be the same as a course the first time it is in the \'Collapsed Topics\' format.';
+$string['resetcolour_help'] = 'Resets the colours and opacities to follow the site default value.';
+$string['resetallcolour_help'] = 'Resets the colours and opacities to follow the site default value.';
 // Columns enhancement.
 $string['setlayoutcolumns_help'] = 'How many columns to use.';
 $string['setlayoutcolumnorientation_help'] = 'Vertical - Sections go top to bottom.<br />Horizontal - Sections go left to right.';
@@ -176,8 +213,8 @@ $string['center'] = 'Centre';
 $string['right'] = 'Right';
 $string['resettogglealignment'] = 'Toggle alignment';
 $string['resetalltogglealignment'] = 'Toggle alignments';
-$string['resettogglealignment_help'] = 'Resets the toggle alignment to the default values so it will be the same as a course the first time it is in the \'Collapsed Topics\' format.';
-$string['resetalltogglealignment_help'] = 'Resets the toggle alignment to the default values for all courses so it will be the same as a course the first time it is in the \'Collapsed Topics\' format.';
+$string['resettogglealignment_help'] = 'Resets the toggle alignment to follow the site default value.';
+$string['resetalltogglealignment_help'] = 'Resets all the toggle alignment to follow the site default value.';
 
 // Icon position - CONTRIB-4470.
 $string['settoggleiconposition'] = 'Icon position';
@@ -206,8 +243,8 @@ $string['sunmoon'] = 'Sun / Moon';
 $string['switch'] = 'Switch';
 $string['resettoggleiconset'] = 'Toggle icon set';
 $string['resetalltoggleiconset'] = 'Toggle icon sets';
-$string['resettoggleiconset_help'] = 'Resets the toggle icon set and toggle all hover to the default values so it will be the same as a course the first time it is in the \'Collapsed Topics\' format.';
-$string['resetalltoggleiconset_help'] = 'Resets the toggle icon set and toggle all hover to the default values for all courses so it will be the same as a course the first time it is in the \'Collapsed Topics\' format.';
+$string['resettoggleiconset_help'] = 'Resets the toggle icon set and toggle all hover to follow the site default value.';
+$string['resetalltoggleiconset_help'] = 'Resets the toggle icon set and toggle all hover to follow the site default value.';
 
 // One section enhancement.
 $string['onesection'] = 'One section';
@@ -365,6 +402,7 @@ $string['topcoll:changelayout'] = 'Change or reset the layout';
 $string['topcoll:changecolour'] = 'Change or reset the colour';
 $string['topcoll:changetogglealignment'] = 'Change or reset the toggle alignment';
 $string['topcoll:changetoggleiconset'] = 'Change or reset the toggle icon set';
+$string['topcoll:changeactivitymeta'] = 'Change or reset the activity meta';
 
 // Instructions.
 $string['instructions'] = 'Instructions: Clicking on the section name will show / hide the section.';
@@ -374,48 +412,22 @@ $string['defaultdisplayinstructions'] = 'Display instructions to users';
 $string['defaultdisplayinstructions_desc'] = "Display instructions to users informing them how to use the toggles.  Can be yes or no.";
 $string['resetdisplayinstructions'] = 'Display instructions';
 $string['resetalldisplayinstructions'] = 'Display instructions';
-$string['resetdisplayinstructions_help'] = 'Resets the display instructions to the default value so it will be the same as a course the first time it is in the Collapsed Topics format.';
-$string['resetalldisplayinstructions_help'] = 'Resets the display instructions to the default value for all courses so it will be the same as a course the first time it is in the Collapsed Topics format.';
+$string['resetdisplayinstructions_help'] = 'Resets the display instructions to follow the site default value.';
+$string['resetalldisplayinstructions_help'] = 'Resets the display instructions to follow the site default value.';
 
 // Activity display *********************************.
-$string['answered'] = 'Answered';
-$string['attempted'] = 'Attempted';
-$string['contributed'] = 'Contributed';
-$string['draft'] = 'Not published to students';
-$string['due'] = 'Due {$a}';
-$string['expired'] = 'Expired';
 $string['feedbackavailable'] = 'Feedback available';
-$string['notanswered'] = 'Not answered';
-$string['notattempted'] = 'Not attempted';
-$string['notcontributed'] = 'Not contributed';
-$string['notopen'] = 'Not open';
-$string['notsubmitted'] = 'Not submitted';
-$string['overdue'] = 'Overdue';
-$string['reopened'] = 'Reopened';
-$string['submitted'] = 'Submitted';
-
 $string['xofyanswered'] = '{$a->completed} of {$a->participants} answered';
 $string['xofyattempted'] = '{$a->completed} of {$a->participants} attempted';
 $string['xofycontributed'] = '{$a->completed} of {$a->participants} contributed';
+$string['xofyposted'] = '{$a->completed} of {$a->participants} posted';
 $string['xofysubmitted'] = '{$a->completed} of {$a->participants} submitted';
+$string['xanswered'] = '{$a->completed} answered';
+$string['xattempted'] = '{$a->completed} attempted';
+$string['xcontributed'] = '{$a->completed} contributed';
+$string['xposted'] = '{$a->completed} posted';
+$string['xsubmitted'] = '{$a->completed} submitted';
 $string['xungraded'] = '{$a} ungraded';
-
-$string['checked'] = 'Checked';
-$string['warning'] = 'Warning';
-
-$string['coursesectionactivityfurtherinformation'] = 'Course page further information';
-$string['coursesectionactivityfurtherinformationassign'] = 'Show assignment information';
-$string['coursesectionactivityfurtherinformationassigndesc'] = 'Show assignment information, such as due date, submission status.  For teachers / admins, show number of submissions.';
-$string['coursesectionactivityfurtherinformationquiz'] = 'Show quiz information';
-$string['coursesectionactivityfurtherinformationquizdesc'] = 'Show quiz information, such as submission status.  For teachers / admins, show number of submissions.';
-$string['coursesectionactivityfurtherinformationchoice'] = 'Show choice information';
-$string['coursesectionactivityfurtherinformationchoicedesc'] = 'Show choice information, such as submission status.  For teachers / admins, show number of submissions.';
-$string['coursesectionactivityfurtherinformationfeedback'] = 'Show feedback information';
-$string['coursesectionactivityfurtherinformationfeedbackdesc'] = 'Show feedback information, such as submission status.  For teachers / admins, show number of submissions.';
-$string['coursesectionactivityfurtherinformationlesson'] = 'Show lesson information';
-$string['coursesectionactivityfurtherinformationlessondesc'] = 'Show lesson information, such as submission status.  For teachers / admins, show number of submissions.';
-$string['coursesectionactivityfurtherinformationdata'] = 'Show database information';
-$string['coursesectionactivityfurtherinformationdatadesc'] = 'Show data information, such as submission status.  For teachers / admins, show number of submissions.';
 
 // Duplicate section.
 $string['creatingsection'] = 'Creating new section';
@@ -434,3 +446,11 @@ $string['privacy:request:preference:toggle'] = 'The course id "{$a->name}" has t
 // Readme.
 $string['readme_title'] = 'Collapsed Topics read-me';
 $string['readme_desc'] = 'Please click on \'{$a->url}\' for lots more information about Collapsed Topics.';
+
+// Toggle Display Blocks.
+$string['defaultdisplayblocks'] = 'Blocks to display';
+$string['defaultdisplayblocks_desc'] = "Choose the blocks to display in the course when it is first created and this format is selected.  Use the 'Ctrl' key in combination with the mouse to select more than one or none.  Note: This setting will only apply at actual course creation and no other time, i.e. changing to Collapsed Topics from another format.";
+$string['defaultdisplayblocksloc'] = 'Block location for display';
+$string['defaultdisplayblocksloc_desc'] = "Choose the location for the blocks chosen above to display, pre or post side.";
+$string['sidepost'] = 'Post';
+$string['sidepre'] = 'Pre';
