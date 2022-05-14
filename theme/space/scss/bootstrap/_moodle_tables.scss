@@ -137,14 +137,10 @@
 
 
       .no-overflow {
-        overflow-x: inherit;
+        overflow-x: auto;
 
         .path-mod-page & {
           overflow-x: inherit;
-        }
-
-        table {
-          min-width: max-content;
         }
       }
 
@@ -274,7 +270,6 @@
     position: relative;
 
     table {
-      min-width: max-content;
       width: 100%;
     }
   }

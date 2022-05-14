@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021121202; // YYYYMMDDVV.
+$plugin->version = 2022022801; // YYYYMMDDVV.
 $plugin->maturity = MATURITY_STABLE;
 $plugin->requires  = 2021051100;// 3.11
 $plugin->component = 'theme_space';
-$plugin->release = '1.13.5 (Build: 2021121202)';
+$plugin->release = '1.14 (Build: 2022022801)';

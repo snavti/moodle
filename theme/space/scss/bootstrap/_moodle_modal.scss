@@ -122,7 +122,8 @@
   outline: 0;
 
   .modal-in-page & {
-    box-shadow: none;
+    padding: 0!important;
+    box-shadow: $box-shadow-sm;
   }
 
   [data-role="flexitour-step"] & {
@@ -171,6 +172,10 @@
   .close {
     // auto on the left force icon to the right even when there is no .modal-title
     margin: -4px -4px -1rem auto;
+  }
+
+  h1, h2, h3, h4 {
+    margin-bottom: 0;
   }
 }
 

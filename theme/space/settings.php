@@ -175,6 +175,13 @@ if ($ADMIN->fulltree) {
             $settings->hide_if('theme_space/coursecarddesclimit',
             'theme_space/cccdlimit', 'notchecked');
 
+            $name = 'theme_space/hidegetaccess';
+            $title = get_string('hidegetaccess', 'theme_space');
+            $description = get_string('hidegetaccess_desc', 'theme_space');
+            $default = 0;
+            $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+            $page->add($setting);
+
             //HR
             $name = 'theme_space/HR52';
             $heading = get_string('HR52', 'theme_space');
@@ -3063,13 +3070,6 @@ if ($ADMIN->fulltree) {
           $setting = new admin_setting_heading($name, $heading, format_text(get_string('HR24_desc', 'theme_space'), FORMAT_MARKDOWN));
           $page->add($setting);
 
-          $name = 'theme_space/topBarOffsetTop';
-          $title = get_string('topBarOffsetTop', 'theme_space');
-          $description = get_string('topBarOffsetTop_desc', 'theme_space');
-          $default = '300';
-          $setting = new admin_setting_configtext($name, $title, $description, $default);
-          $page->add($setting);
-
           $name = 'theme_space/topbarstyle';
           $title = get_string('topbarstyle', 'theme_space');
           $description = get_string('topbarstyle_desc', 'theme_space');
@@ -3628,6 +3628,13 @@ if ($ADMIN->fulltree) {
           $setting = new admin_setting_configtext($name, $title, $description, $default);
           $page->add($setting);
 
+          // Custom Site Name
+          $name = 'theme_space/customfootersitename';
+          $title = get_string('customfootersitename', 'theme_space');
+          $description = get_string('customfootersitename_desc', 'theme_space');
+          $default = '';
+          $setting = new admin_setting_configtext($name, $title, $description, $default);
+          $page->add($setting);
 
 
           //HR

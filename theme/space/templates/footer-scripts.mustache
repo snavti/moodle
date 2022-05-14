@@ -52,29 +52,6 @@ $(".course_category_tree").on("click", "[data-toggle='collapse'], .collapseexpan
   });
 });
 {{/showcoursecarddescheight}}
-
-var h = window.innerHeight;
-var navbar = document.getElementById("topBarContainer");
-var navbarH = navbar.offsetHeight;
-var settingsBtn = document.getElementById("settingsMenu");
-var sticky = navbar.offsetTop + {{#topBarOffsetTop}}{{topBarOffsetTop}}{{/topBarOffsetTop}}{{^topBarOffsetTop}}300{{/topBarOffsetTop}};
-
-window.onscroll = function() {stickyNav()};
-function stickyNav() {
-  if (h > 3 * {{#topBarOffsetTop}}{{topBarOffsetTop}}{{/topBarOffsetTop}}{{^topBarOffsetTop}}300{{/topBarOffsetTop}}) {
-    if (window.pageYOffset > sticky) {
-      navbar.classList.add("sticky-nav");
-      settingsBtn.classList.add("sticky");
-      settingsBtn.style.top = 10 + navbarH + "px";
-    } else {
-      navbar.classList.remove("sticky-nav");
-      settingsBtn.classList.remove("sticky");
-      settingsBtn.style.top = "-15px";
-    }
-  }
-}
-
-
 </script>
 
 {{#js}}

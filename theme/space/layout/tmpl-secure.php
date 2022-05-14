@@ -42,12 +42,10 @@ if (isloggedin()) {
         $navdraweropen = false;
     } else {
         $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+        $extraclasses[] = 'drawer-open-left';
     }
 } else {
-    $navdraweropen = false;
-}
-
-if ($navdraweropen) {
+    $navdraweropen = true;
     $extraclasses[] = 'drawer-open-left';
 }
 

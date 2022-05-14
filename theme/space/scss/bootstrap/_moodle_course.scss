@@ -2177,6 +2177,10 @@ span.editinstructions {
       display: flex;
       align-items: center;
       justify-content: center;
+
+      .editing & {
+          display: none;
+      }
     }
 
     .automatic-completion-conditions,

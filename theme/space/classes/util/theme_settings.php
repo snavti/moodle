@@ -818,7 +818,7 @@ public function block12() {
     }
 
     $topbarcustomblockhtml = [
-      'TopBarText', 'customtopnavhtml', 'topBarOffsetTop'
+      'TopBarText', 'customtopnavhtml'
     ];
 
     foreach ($topbarcustomblockhtml as $setting) {
@@ -910,7 +910,7 @@ public function block12() {
       }
 
       $footersettingshtml = [
-        'website', 'footercustomnav', 'CustomFooterText', 'copyrightText', 'CustomAlertContent', 'CustomAlertButton', 'CustomModalContent', 'CustomAlert', 'additionalfooterhtml', 'CustomModal', 'CustomModalContentHTML'
+        'website', 'footercustomnav', 'CustomFooterText', 'copyrightText', 'CustomAlertContent', 'CustomAlertButton', 'CustomModalContent', 'CustomAlert', 'additionalfooterhtml', 'CustomModal', 'CustomModalContentHTML', 'customfootersitename'
       ];
 
       foreach ($footersettingshtml as $setting) {

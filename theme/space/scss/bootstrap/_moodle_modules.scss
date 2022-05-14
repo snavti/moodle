@@ -1959,3 +1959,20 @@ $grading-content-show-content-button-padding-left: calc(#{map-get($spacers, 2) *
   }
 }
 // End styling for mod_forum.
+
+
+.path-mod-resource .resourcecontent {
+  #resourceobject {
+      width: 100%!important;
+      height: calc(100vh - 80px)!important;
+      border-radius: $border-radius;
+  }
+}
+
+.tbs-4.path-mod-resource .resourcecontent,
+.tbs-5.path-mod-resource .resourcecontent,
+.tbs-6.path-mod-resource .resourcecontent {
+  #resourceobject {
+    height: calc(100vh - 140px)!important;
+  }
+}

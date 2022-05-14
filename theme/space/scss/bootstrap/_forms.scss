@@ -232,15 +232,6 @@ select.form-control-sm {
     font-size: $font-size-sm;
   }
 
-  .col-md-3 {
-    text-align: right;
-    padding-right: $spacer;
-
-    @include media-breakpoint-between(sm,md) {
-      text-align: left;
-    }
-  }
-
   select {
     .form-setting & {
       margin-right: 5px;

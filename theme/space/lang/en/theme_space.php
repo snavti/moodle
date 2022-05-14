@@ -212,9 +212,9 @@ $siteurl = $CFG->wwwroot;
     <strong>Go to:</strong> Dashboard → Site administration → Development → Purge all cache</div>
 	<a class="my-2 btn btn-secondary" href="https://docs.space.rosea.io" target="_blank"><i class="fas fa-book mr-2"></i>  Documentation</a> <a class="my-2 mx-md-2 btn btn-secondary" href="https://themeforest.net/item/space-moodle-template/22579922/support" target="_blank"><i class="far fa-life-ring mr-2"></i>  Theme Support</a>';
     $string['currentinparentheses'] = '(current)';
-    $string['configtitle'] = 'Space (1.13.5)';
+    $string['configtitle'] = 'Space (1.14)';
     $string['nobootswatch'] = 'None';
-    $string['pluginname'] = 'Space (1.13.5)';
+    $string['pluginname'] = 'Space (1.14)';
 
 
     $string['block1settings'] = 'Block #1';
@@ -952,9 +952,6 @@ $siteurl = $CFG->wwwroot;
     ***/
     $string['topbarsettings'] = 'Top Bar';
 
-    $string['topBarOffsetTop'] = 'Top Bar Offset';
-    $string['topBarOffsetTop_desc'] = '<div class="badge badge-danger">Default: 300, without any px, em etc - only numbers.</div>';
-
     $string['ShowTopBarUserName'] = '✓ Show Top Bar User Name';
     $string['ShowTopBarUserName_desc'] = 'Display your user name instead hidden user name inside dropdown.';
     $string['TopBarText'] = 'Top Bar Text';
@@ -1210,6 +1207,8 @@ $siteurl = $CFG->wwwroot;
     $string['CustomFooterText_desc'] = 'You can add custom footer content with html tags.<br /><img src="'.$siteurl.'/theme/space/doc/footer-text.png" class="img-fluid rounded mt-3" />';
     $string['copyrightText'] = 'Copyright Text';
     $string['copyrightText_desc'] = 'Add copyright text e.g All rights reserved or leave this field empty.';
+    $string['customfootersitename'] = 'Custom Footer Site Name';
+    $string['customfootersitename_desc'] = '';
     $string['mobile'] = 'Mobile';
     $string['mobile_desc'] = 'Enter Mobile Number';
     $string['mail'] = 'E-Mail';
@@ -1404,7 +1403,7 @@ $siteurl = $CFG->wwwroot;
     $string['showfpblock12hr'] = 'Show Testimonials<br />Bottom separator';
     $string['showfpblock12hr_desc'] = '';
 
-    $string['hintro'] = '<div class="d-block text-center"><br /><br />Space Moodle Theme<br /><small>by Rosea Themes</small><br /><div class="badge badge-info">version 1.13.5</div>';
+    $string['hintro'] = '<div class="d-block text-center"><br /><br />Space Moodle Theme<br /><small>by Rosea Themes</small><br /><div class="badge badge-info">version 1.14</div>';
     $string['hintro_desc'] = '<div class="col-sm-12 col-md-8 my-sm-2 my-md-5 mx-auto"><a class="btn btn-secondary mb-1" href="https://docs.space.rosea.io" target="_blank"><i class="fas fa-book mr-2"></i>  Documentation</a>
     <a class="mx-2 mb-1 btn btn-secondary" href="https://themeforest.net/item/space-moodle-template/22579922/support" target="_blank"><i class="far fa-life-ring mr-2"></i>  Theme Support</a></div><hr /></div>';
 
@@ -1741,8 +1740,11 @@ $siteurl = $CFG->wwwroot;
     $string['coursecarddescheight'] = 'Course Card<br />Description<br />Content Height';
     $string['coursecarddescheight_desc'] = '<span class="badge badge-secondary"><strong>Example:</strong> 160px</span>';
 
-    $string['showcoursecarddescheight'] = 'Show Card Descirption Scrollbar';
+    $string['showcoursecarddescheight'] = 'Show Card Description Scrollbar';
     $string['showcoursecarddescheight_desc'] = '';
+
+    $string['hidegetaccess'] = 'Hide "Get access" button';
+    $string['hidegetaccess_desc'] = '';
 
     $string['cccdlimit'] = 'Customize Course Card<br />Description';
     $string['cccdlimit_desc'] = '';

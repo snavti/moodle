@@ -1162,8 +1162,11 @@ span + .no-overflow {
 }
 
 .modal.modal-in-page {
-    margin: 0;
-    padding: 0!important;
+    margin: 1rem 0;
+    padding: 2rem!important;
+
+    border-radius: $border-radius;
+    background-color: $gray-100;
 
     width: 100%;
     max-width: 100%;
@@ -1174,28 +1177,16 @@ span + .no-overflow {
         margin: 0;
     }
 
-    .modal-header {
-        padding-left: 0!important;
-    }
-
-    .modal-body {
-        padding-left: 0!important;
-        padding-right: 0!important;
-    }
-
-    .modal-content {
-        padding-left: 0!important;
-        padding-right: 0!important;
-
-        h4 {
-            padding-left: 0!important;
-            font-size: $font-size-base;
-        }
+    .modal-header h4 {
+        font-size: $font-size-sm;
     }
 
     .modal-footer {
+        padding: 0 1rem!important;
+
         & > * {
             margin: 0;
+            display: inline-flex;
         }
     }
 }

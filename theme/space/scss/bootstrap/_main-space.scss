@@ -1,9 +1,5 @@
 
-/* * * * * * * * * * * *
-/*
-/* TYPO & LINKS
-/*
-/* * * * * * * * * * * */
+/* TYPO & LINKS */
 p,
 nav,
 ul,
@@ -101,11 +97,7 @@ a.btn
 }
 
 
-/* * * * * * * * * * * *
-/*
-/* TOP
-/*
-/* * * * * * * * * * * */
+/* TOP */
 
 .s-top {
   background-color: $top-bar-bg;
@@ -114,8 +106,6 @@ a.btn
   padding: 5px 30px 5px 40px;
   width: 100%;
   right: 0;
-
-  transition: all 250ms ease;
 
   @include media-breakpoint-between(sm,md) {
     padding: 0;
@@ -130,23 +120,15 @@ a.btn
     padding-bottom: 0;
   }
 
-  &.s-top--sidebar {
-    width: 100%;
-
-    .drawer-open-left &,
-    .drawer-open-right & {
-      width: $sticky-topbar;
-    }
-  }
-
   .logo {
     img { max-height: 42px; }
   }
 
   @include media-breakpoint-up(md) {
-    position: absolute;
+    position: sticky;
     top: 0;
     left: auto;
+    z-index: $zindex-sticky;
 
     #page-site-index {
       width: 100%;
@@ -335,11 +317,7 @@ a.btn
   }
 }
 
-/* * * * * * * * * * * *
-/*
-/* MAIN CONTENT
-/*
-/* * * * * * * * * * * */
+/* MAIN CONTENT */
 #page-site-index {
 
   .l-container {
@@ -355,6 +333,10 @@ a.btn
   .page-context-header {
     width: 100%;
     margin: 30px 0 100px 0;
+
+    @include media-breakpoint-only(sm) {
+      margin: 80px 0 30px 0;
+    }
   }
 
  .page-header-headings {
@@ -435,19 +417,10 @@ a.btn
 }
 
 .c-user-menu {
-
   @include media-breakpoint-between(sm,md) {
     margin-left: 7px!important;
     margin-right: 55px!important;
     display: block;
-  }
-
-  .dropdown-toggle {
-    padding-right: .5rem!important;
-
-    &:after {
-      display: none;
-    }
   }
 }
 
@@ -534,6 +507,23 @@ a.btn
   width: auto;
   z-index: 5;
 
+  position: fixed;
+  top: 67px;
+  right: 30px;
+
+  #page-my-index & {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-bottom: 20px;
+  }
+
+  .tbs-4 &,
+  .tbs-5 &,
+  .tbs-6 & {
+    top: 132px;
+  }
+
   &:empty {
     display: none;
   }
@@ -554,50 +544,6 @@ a.btn
     }
   }
 
-  @include media-breakpoint-up(md) {
-  position: relative;
-  top: -15px;
-  right: 30px;
-  left: 0;
-
-  #page-site-index & {
-    &:not(.sticky) {
-      position: absolute;
-      top: 20px!important;
-      left: auto;
-      right: 0;
-    }
-  }
-
-  &.sticky {
-    position: fixed;
-    right: 30px;
-    left: auto;
-
-    #page-site-index & {
-    position: fixed;
-    right: 30px;
-
-      @include media-breakpoint-only(sm) {
-      position: fixed;
-      top: 70px;
-      right: 10px;
-      }
-    }
-
-    @include media-breakpoint-only(md) {
-    top: 70px!important;
-    right: 10px;
-    }
-
-    @include media-breakpoint-only(sm) {
-    position: absolute;
-    top: 70px;
-    right: 20px;
-    flex-wrap: wrap;
-    }
-  }
-
   .path-mod-forum & {
     top: 0!important;
     right: 0!important;
@@ -609,21 +555,23 @@ a.btn
     }
   }
 
-  }
-
   @include media-breakpoint-only(sm) {
     flex-wrap: wrap;
     width: 100%;
-    margin: 10px auto 30px;
+    margin: 0 auto 30px;
+
+    position: relative;
+    top: 0;
+    right: 0;
+
+    #page-my-index & {
+      top: 30px;
+    }
 
     #page-site-index & {
       width: auto;
       position: fixed;
-      top: 56px!important;
-
-      .btn {
-        width: auto;
-      }
+      top: 0;
     }
 
     .btn {
@@ -691,11 +639,7 @@ a.btn
   position: relative;
 }
 
-/* * * * * * * * * * * *
-/*
-/* FOOTER
-/*
-/* * * * * * * * * * * */
+/* FOOTER */
 
     .purgecaches,
     .s-footer .helplink,
@@ -1539,6 +1483,7 @@ a.btn
 
     .nav-link {
       padding: 10px;
+      border-radius: $btn-border-radius;
 
       @include media-breakpoint-only(sm) {
         padding: 8px;
@@ -3627,4 +3572,41 @@ a.btn
   right: 0;
   bottom: 0;
   left: 0;
+}
+
+/* Layout Secure */
+.logo-secure {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+
+  font-size: 18px;
+  color: $body-color;
+  font-weight: $font-weight-bold;
+
+  .logo-img {
+    width: auto;
+    height: auto;
+    max-width: 100px;
+  }
+}
+
+
+
+.iframe-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+}
+
+/* Then style the iframe to fit in the container div with full height and width */
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
 }

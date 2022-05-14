@@ -213,7 +213,7 @@ class course_renderer extends \core_course_renderer {
      * @return string
      */
     protected function coursecat_coursebox(coursecat_helper $chelper, $course, $additionalclasses = '') {
-        global $CFG;
+        global $PAGE, $CFG;
 
         $theme = \theme_config::load('space');
 
@@ -248,7 +248,12 @@ class course_renderer extends \core_course_renderer {
             'data-type' => self::COURSECAT_TYPE_COURSE,
         ));
 
-        $content .= html_writer::start_tag('div', ['class' => 'c-course-content row no-gutters']);
+        if($PAGE->theme->settings->hidegetaccess == 1) {
+            $content .= html_writer::start_tag('div', ['class' => 'c-course-content c-course-content-without-fbtn row no-gutters']);
+        } else {
+            $content .= html_writer::start_tag('div', ['class' => 'c-course-content row no-gutters']);
+        }
+        
         $content .= $this->coursecat_coursebox_content($chelper, $course);
 
         $content .= html_writer::end_tag('div'); // End course-content
@@ -384,10 +389,12 @@ class course_renderer extends \core_course_renderer {
 
         $content .= html_writer::start_tag('div', array('class' => 'courses-view-course-item-footer col-12 align-self-end'));
 
-        $content .= html_writer::start_tag('div', array('class' => 'course--btn'));
-        $content .= html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)),
-            get_string('access', 'theme_space'), array('class' => 'btn btn-primary w-100'));
-        $content .= html_writer::end_tag('div'); // End pull-right.
+        if($PAGE->theme->settings->hidegetaccess == 0) {
+            $content .= html_writer::start_tag('div', array('class' => 'course--btn'));
+            $content .= html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)),
+                get_string('access', 'theme_space'), array('class' => 'btn btn-primary w-100'));
+            $content .= html_writer::end_tag('div'); // End pull-right.        
+        }
 
         $content .= html_writer::end_tag('div'); // End card-block.
 

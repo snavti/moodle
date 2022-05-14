@@ -38,13 +38,6 @@ $extraclasses = [];
 $device = core_useragent::get_device_type();
 
 $removesidebar = theme_space_get_setting('removesidebar');
-// don't remove sidebar on the course page and in-course page
-$dscourse = theme_space_get_setting('notremovesidebarcp');
-if(!$dscourse) {
-    $displayremovesidebarcp = false;
-} else {
-    $displayremovesidebarcp = true;
-}
 
 if (!$removesidebar) {
     if (isloggedin()) {
@@ -54,7 +47,8 @@ if (!$removesidebar) {
             $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
         }
     } else {
-        $navdraweropen = false;
+        $navdraweropen = true;
+        $extraclasses[] = 'drawer-open-left';
     }
 
     if ($navdraweropen) {
@@ -64,19 +58,7 @@ if (!$removesidebar) {
     $navdraweropen = false;
 }
 
-//Top bar style
-$topbarstyle = theme_space_get_setting('topbarstyle');
-$pluginsettings = get_config("theme_space");
-if( $topbarstyle == "topbarstyle-1") { $topbarstyle1 = $topbarstyle; } else { $topbarstyle1 = false; }
-if( $topbarstyle == "topbarstyle-2") { $topbarstyle2 = $topbarstyle; } else { $topbarstyle2 = false; }
-if( $topbarstyle == "topbarstyle-3") { $topbarstyle3 = $topbarstyle; } else { $topbarstyle3 = false; }
-if( $topbarstyle == "topbarstyle-4") { $topbarstyle4 = $topbarstyle; } else { $topbarstyle4 = false; }
-if( $topbarstyle == "topbarstyle-5") { $topbarstyle5 = $topbarstyle; } else { $topbarstyle5 = false; }
-if( $topbarstyle == "topbarstyle-6") { $topbarstyle6 = $topbarstyle; } else { $topbarstyle6 = false; }
-if( $topbarstyle == "topbarstyle-7") { $topbarstyle7 = $topbarstyle; } else { $topbarstyle7 = false; }
-//end
 
-$bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $blockshtml = $OUTPUT->blocks('side-pre');
 $blockshtml2 = $OUTPUT->blocks('sidebar');
 $blockshtml3 = $OUTPUT->blocks('maintopwidgets');
@@ -94,10 +76,16 @@ $regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settin
 $topbarstyle = theme_space_get_setting('topbarstyle');
 $pluginsettings = get_config("theme_space");
 for ($i = 1; $i <= 6; $i++) {
-    if( $topbarstyle == "topbarstyle-" . $i) { ${"topbarstyle" . $i} = $topbarstyle; } else { ${"topbarstyle" . $i} = false; }
+    if($topbarstyle == "topbarstyle-" . $i) {
+        ${"topbarstyle" . $i} = $topbarstyle;
+        $extraclasses[] = 'tbs-'.$i;
+    } 
+    else {
+        ${"topbarstyle" . $i} = false;
+    }
 }
 //end
-
+$bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
@@ -113,7 +101,6 @@ $templatecontext = [
     'hassidebartopblocks' => !empty($blockshtml5),
     'navdraweropen' => $navdraweropen,
     'bodyattributes' => $bodyattributes,
-    'navdrawercp' => $displayremovesidebarcp,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'siteurl' => $siteurl
@@ -143,4 +130,5 @@ $templatecontext = array_merge($templatecontext, $themesettings->customnav());
 $templatecontext = array_merge($templatecontext, $themesettings->sidebar_custom_block());
 $templatecontext = array_merge($templatecontext, $themesettings->top_bar_custom_block());
 $templatecontext = array_merge($templatecontext, $themesettings->fonts());
+
 echo $OUTPUT->render_from_template('theme_space/columns2', $templatecontext);

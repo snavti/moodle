@@ -5,14 +5,9 @@
 }
 
 #page {
-  @include media-breakpoint-up(lg) {
-  padding: 85px 30px 0 $box-spacer;
-  }
 
-  @include media-breakpoint-between(sm, md) {
-  padding: 20px 30px 0 $box-spacer;
-  }
-
+  padding: 15px 30px 0 $box-spacer;
+  
   @include media-breakpoint-between(sm, md) {
     .path-user.path-course.path-course-view & {
       overflow: auto;
@@ -34,17 +29,17 @@
   }
 
   #page-site-index & {
-    @include media-breakpoint-up(md) {
-      padding: 80px 0 20px;
+    @include media-breakpoint-up(lg) {
+      padding: 0 0 20px;
     }
 
     @include media-breakpoint-only(sm) {
-      padding: 80px 0 0;
+      padding: 0 0 0;
     }
   }
 
-  #plugins-check-page {
-  padding: 20px 0;
+  #plugins-check-page & {
+  padding: 15px 0;
   }
 }
 
@@ -606,6 +601,7 @@ body.drawer-open-left {
 
           .btn-accordion {
             background-color: $drawer-nav-box-bg;
+            border-radius: $border-radius;
 
             &:hover {
               box-shadow: $box-shadow-sm;

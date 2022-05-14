@@ -1185,12 +1185,17 @@ class core_renderer extends \core_renderer {
      * @return string an url
      */
     public function favicon() {
+        global $CFG;
+
         $theme = theme_config::load('space');
 
         $favicon = $theme->setting_file_url('favicon', 'favicon');
 
         if (!empty(($favicon))) {
-            return $favicon;
+            $urlreplace = preg_replace('|^https?://|i', '//', $CFG->wwwroot);
+            $favicon = str_replace($urlreplace, '', $favicon);
+
+            return new moodle_url($favicon);
         }
 
         return parent::favicon();
@@ -1222,5 +1227,7 @@ class core_renderer extends \core_renderer {
     public function secure_login_info() {
         return $this->login_info(false);
     }
+
+    
 }
 

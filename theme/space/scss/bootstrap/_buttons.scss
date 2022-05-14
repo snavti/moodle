@@ -672,6 +672,7 @@ table .btn,
     .editprofile span a {
       width: 100%;
       margin-bottom: 1rem;
+      border-radius: $border-radius;
     }
 
     @include media-breakpoint-only(sm) {
@@ -920,7 +921,9 @@ table a.btn-primary,
 .moreless-toggler,
 #scorm_toc_toggle_btn
 {
-  @include button-size($btn-padding-y-sm, 1rem, $font-size-xs!important, $btn-line-height-sm!important, $border-radius);
+  padding: $btn-padding-y-sm 1rem;
+  font-size: $font-size-xs!important;
+  line-height: $btn-line-height-sm!important;
 
   .icon {
     font-size: $font-size-xs;
@@ -938,7 +941,9 @@ td .commands a,
 #participants td a[role=button],
 #page-course-management .btn-action
 {
-  @include button-size(.30rem, .45rem, 0.75rem, $btn-line-height-sm, $border-radius);
+  padding: .30rem .45rem;
+  font-size: .75rem;
+  line-height: $btn-line-height-sm;
 
   .icon {
     font-size: $font-size-xs;
@@ -1206,18 +1211,23 @@ table {
 
 
   .c-custom-nav-btn {
-    padding: .85rem 1rem;
+    padding: .85rem;
 
     display: inline-flex;
     align-items: center;
 
-    border-radius: $border-radius;
+    border-radius: $btn-border-radius;
     cursor: pointer;
 
     font-size: $font-size-sm;
     font-weight: $font-weight-sm-bold;
     color: $btn-secondary-text;
     line-height: 1.2;
+
+    i {
+      width: 14px;
+      height: 14px;
+    }
 
     span,
     .c-custom-nav-btn--text {

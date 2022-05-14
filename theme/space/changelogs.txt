@@ -1,6 +1,22 @@
 CHANGELOG
 Space Moodle Theme
 - - - -
+## [1.14] February 17, 2022
+Added:
++ Show/hide "Get access" button (Course Card)
++ New UI for Course contents block, Section links block
+
+Improvements:
+  + Modal window (.modal-in-page) UI improvements
+  + Custom Navigation UI improvements
+
+Fixed: 
+  + Modal Backdrop Issue
+
+
+## [1.13.6] January 12, 2022
++ Minor bug fixes
+
 ## [1.13.5] December 12, 2021
 + Minor bug fixes
 

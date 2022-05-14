@@ -641,21 +641,34 @@ textarea[data-auto-rows] {
 
 /** Display elements under labels in vertical forms regardless of the screen size. */
 .mform.full-width-labels {
-    .fitem.row {
-        margin-left: 0;
-        margin-right: 0;
-        & > .col-md-3,
-        & > .col-md-9 {
-            float: none;
-            width: inherit;
-            padding-right: 0;
-            padding-left: 0;
-        }
-        &.femptylabel > .col-md-3,
-        &.femptylabel > .col-md-2 {
-            display: none;
-        }
-    }
+  .fitem.row {
+      margin-left: 0;
+      margin-right: 0;
+      & > .col-md-3,
+      & > .col-md-9 {
+          flex: 0 0 100%;
+          max-width: 100%;
+          width: inherit;
+          padding-right: 0;
+          padding-left: 0;
+      }
+      &.femptylabel > .col-md-3 {
+          display: none;
+      }
+      .form-control {
+          width: 100%;
+      }
+  }
+}
+
+.mform .col-form-label .form-label-addon {
+  margin-left: 0.25rem;
+}
+
+@include media-breakpoint-up(sm) {
+  .mform:not(.full-width-labels) .col-form-label .form-label-addon {
+      margin-left: auto;
+  }
 }
 
 .femptylabel {
@@ -673,16 +686,16 @@ textarea[data-auto-rows] {
 
 /** Allow wrapping an mform in a div with the form-inline class to have an inline, responsive form. */
 .form-inline {
-    @include media-breakpoint-up(md) {
-        .col-md-9,
-        .col-md-3 {
-            label {
-                margin-left: 1rem;
-            }
-            margin-bottom: 1rem;
-            width: auto;
-        }
-    }
+  @include media-breakpoint-up(md) {
+      .col-md-9,
+      .col-md-3 {
+          label {
+              margin-left: 1rem;
+          }
+          margin-bottom: 1rem;
+          width: auto;
+      }
+  }
 }
 
 // We dont' use the mixin because it's expensive.

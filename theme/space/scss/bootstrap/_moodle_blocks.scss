@@ -200,6 +200,10 @@
         .item-content-wrap {
           width: calc(100% - 50px);
         }
+
+        a {
+          display: inline-flex;
+        }
       }
 
       .block_tree .tree_item.branch,
@@ -466,6 +470,12 @@
 
   hr {
     margin: 1rem 0!important;
+  }
+
+  .block_tree {
+    hr {
+      display: none;
+    }
   }
 
   .footer {
@@ -1188,6 +1198,10 @@ $doughnut-fill-colour: $brand-warning;
       padding: 2rem 1.5rem 95px;
       align-content: flex-start;
 
+      &.c-course-content-without-fbtn {
+        padding-bottom: 1rem;
+      }
+
       a {
         &:focus {
           box-shadow: none;
@@ -1904,16 +1918,6 @@ $doughnut-fill-colour: $brand-warning;
 }
 
 
-/* mod blog */
-.block_globalsearch,
-.block_blog_menu
-{
-  .form-control {
-    display: initial;
-    width: 100%;
-  }
-}
-
 /* Recently accessed items block */
 $card-gutter: 15px;
 
@@ -2041,5 +2045,73 @@ $card-gutter: 15px;
       margin-top: .25rem;
       width: 100%;
     }
+  }
+}
+
+.block_course_contents .badge {
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 20px;
+  height: 20px;
+  background-color: $gray-200;
+
+  font-size: $font-size-xs!important;
+  font-weight: $font-weight-bold;
+  color: $gray-600;
+}
+
+.block_section_links a,
+.block_course_contents a {
+  display: block;
+  padding: 4px 0;
+  color: inherit;
+
+  .section-title {
+    margin-left: .25rem;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.block_section_links,
+.block_course_contents {
+
+  .card-title {
+    #block-region-sidebar-top & {
+      text-align: left;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-sm-bold;
+      color: $drawer-heading;
+    }
+  }
+
+  .card-text {
+    #block-region-sidebar-top & {
+      margin-top: 0!important;
+    }
+  }
+
+  .card-body {
+    #block-region-sidebar-top & {
+      padding: 0;
+    }
+  }
+
+  .list-group-item {
+    padding: .25rem;
+    margin-bottom: .15rem;
+    border-radius: $border-radius;
+    border-bottom: 0;
+  }
+}
+
+.block_course_contents {
+  .list-group {
+      margin-top: 8px;
   }
 }
