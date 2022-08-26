@@ -100,7 +100,7 @@ class publication {
      */
     public function show_intro() {
         if ($this->get_instance()->alwaysshowdescription ||
-                time() > $this->get_instance()->allowsubmissionfromdate) {
+                time() > $this->get_instance()->allowsubmissionsfromdate) {
             return true;
         }
 
@@ -359,7 +359,7 @@ class publication {
         $customusers = '';
 
         if (is_array($users) && count($users) > 0) {
-            $customusers = " and u.id IN (" . implode($users, ', ') . ") ";
+            $customusers = " and u.id IN (" . implode(', ', $users) . ") ";
         } else if ($users === false) {
             return [];
         }
@@ -458,11 +458,11 @@ class publication {
                 html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'page', 'value' => $page]) .
                 html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
 
-        echo html_writer::start_tag('div', ['id' => 'id_allfiles', 'class' => 'clearfix', 'aria-live' => 'polite']);
+        echo html_writer::start_tag('fieldset', ['class' => 'clearfix collapsible', 'id' => 'id_allfiles']);
         $allfiles = get_string('allfiles', 'publication');
         $publicfiles = get_string('publicfiles', 'publication');
         $title = (has_capability('mod/publication:approve', $context)) ? $allfiles : $publicfiles;
-        echo html_writer::tag('div', $title, ['class' => 'legend']);
+        echo html_writer::tag('legend', $title, ['class' => 'ftoggler text-primary']);
         echo html_writer::start_div('fcontainer clearfix');
 
         $f = groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/publication/view.php?id=' . $cm->id, true);
@@ -492,6 +492,9 @@ class publication {
         ], 'id_allowedfiletypes');
         $settingslink = html_writer::link($settingsurl,  get_string('currentlynotapproved', 'publication'));
         echo html_writer::tag('div', $settingslink, ['class' => 'mod-publication-download-link d-none needsapproval-legend text-info']);
+        if ($perpage == 0) {
+            echo '<style> nav.pagination ul.pagination li:only-child { display: none} </style>';
+        }
         $table->out($perpage, true); // Print the whole table.
         echo html_writer::tag('div', $settingslink, ['class' => 'mod-publication-download-link d-none needsapproval-legend text-info']);
 
@@ -572,7 +575,7 @@ class publication {
             </script>" .
                 html_writer::end_div() .
                 html_writer::end_div() .
-                html_writer::end_div() .
+                html_writer::end_tag('fieldset') .
                 html_writer::end_tag('form');
 
         // Mini form for setting user preference.
@@ -1185,7 +1188,7 @@ class publication {
                     }
 
                     $conditions['id'] = $oldpubfile->id;
-                    $dataobject = $DB->get_record('publication_file', ['id' => $conditions['id']->id]);
+                    $dataobject = $DB->get_record('publication_file', ['id' => $conditions['id']]);
                     $cm = $this->coursemodule;
                     \mod_publication\event\publication_file_deleted::create_from_object($cm, $dataobject)->trigger();
                     $DB->delete_records('publication_file', $conditions);
@@ -1364,7 +1367,7 @@ class publication {
                 $file = $fs->get_file_by_hash($pathhash);
                 if (empty($formattedtext)) {
                     // The onlinetext was empty, delete the file!
-                    $dataobject = $DB->get_record('publication_file', ['id' => $conditions['id']->id]);
+                    $dataobject = $DB->get_record('publication_file', ['id' => $conditions['id']]);
                     \mod_publication\event\publication_file_deleted::create_from_object($assigncm, $dataobject)->trigger();
                     $DB->delete_records('publication_file', $conditions);
                     $file->delete();

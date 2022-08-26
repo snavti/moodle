@@ -30,7 +30,7 @@ use popup_action;
 class comment {
 
     /** @var int - Shorten text with maximum length. */
-    const SHORTEN_LENGTH = 160;
+    const SHORTEN_LENGTH = 75;
 
     /** @var string - Allowable tags when shorten text. */
     const ALLOWABLE_TAGS = '<img>';
@@ -379,12 +379,11 @@ class comment {
     }
 
     /**
-     * Convert data to object (use for api response).
+     * Convert comment->data property to object and add extra properties (use for api response).
      *
      * @return \stdClass
      */
     public function convert_to_object() {
-        global $OUTPUT;
 
         $comment = $this->data;
         $container = $this->get_container();
@@ -393,8 +392,12 @@ class comment {
         $object->id = $comment->id;
         $object->questionid = $comment->questionid;
         $object->parentid = $comment->parentid;
-        $object->content = $comment->comment;
-        $object->shortcontent = utils::nice_shorten_text(strip_tags($comment->comment, self::ALLOWABLE_TAGS), self::SHORTEN_LENGTH);
+        $object->content = format_text($comment->comment, FORMAT_HTML);
+        // Because html_to_text will convert escaped html entity to html.
+        // We want to escape the "<" and ">" characters so html entity will display in browser as text for short content.
+        // So we use s() to convert it back.
+        $object->shortcontent = s(content_to_text($comment->comment, FORMAT_HTML));
+        $object->shortcontent = shorten_text($object->shortcontent, self::SHORTEN_LENGTH);
         $object->numberofreply = $this->get_total_replies();
         $object->plural = $this->get_reply_plural_text($object);
         $object->candelete = $this->can_delete();
@@ -533,7 +536,8 @@ class comment {
         $params = [
                 'cmid' => $this->get_container()->get_cmid(),
                 'questionid' => $questiondata->id,
-                'commentid' => $commentid
+                'commentid' => $commentid,
+                'type' => $this->get_container()->get_type()
         ];
         $url = new \moodle_url(self::ABUSE_PAGE, $params);
         return $url->out();

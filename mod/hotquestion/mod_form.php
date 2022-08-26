@@ -31,6 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
+use core_grades\component_gradeitems;
+
 /**
  * Standard base class for mod_hotquestion configuration form.
  *
@@ -43,6 +45,8 @@ class mod_hotquestion_mod_form extends moodleform_mod {
 
     /**
      * Define the Hot Question mod_form used when editing a Hot Question activity.
+     *
+     * @return void
      */
     public function definition() {
 
@@ -187,11 +191,11 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addRule('removelabel', null, 'required', null, 'client');
         $mform->addRule('removelabel', get_string('maximumchars', '', 20), 'maxlength', 20, 'client');
 
-        // 20220410 Allow comments.
+        // 20220410 Allow comments. Modified 20220622
         if ($hotquestionconfig->allowcomments) {
             $mform->addElement('selectyesno', 'comments', get_string('allowcomments', 'hotquestion'));
             $mform->addHelpButton('comments', 'allowcomments', 'hotquestion');
-            $mform->setDefault('comments', 0);
+            $mform->setDefault('comments',  $hotquestionconfig->allowcomments);
         }
 
         // Availability.
@@ -204,6 +208,34 @@ class mod_hotquestion_mod_form extends moodleform_mod {
                            get_string('hotquestionclosetime', 'hotquestion'),
                            array('optional' => true, 'step' => 1));
 
+        // Contrib by ecastro ULPGC.
+        // Add standard grading elements, common to all modules.
+        $this->standard_grading_coursemodule_elements();
+
+        $mform->addElement('text', 'postmaxgrade', get_string('postmaxgrade', 'hotquestion'), ['size' => 3]);
+        $mform->addHelpButton('postmaxgrade', 'postmaxgrade', 'hotquestion');
+        $mform->setType('postmaxgrade', PARAM_INT);
+        $mform->setDefault('postmaxgrade', $hotquestionconfig->heatlimit);
+        $mform->addRule('postmaxgrade', get_string('valueinterror', 'hotquestion'), 'regex', '/^[0-9]+$/', 'client');
+
+        $mform->addElement('text', 'factorpriority', get_string('factorpriority', 'hotquestion'), ['size' => 3]);
+        $mform->addHelpButton('factorpriority', 'factorpriority', 'hotquestion');
+        $mform->setType('factorpriority', PARAM_INT);
+        $mform->setDefault('factorpriority', floor(100 / $hotquestionconfig->heatlimit));
+        $mform->addRule('factorpriority', get_string('valueinterror', 'hotquestion'), 'regex', '/^[0-9]+$/', 'client');
+
+        $mform->addElement('text', 'factorheat', get_string('factorheat', 'hotquestion'), ['size' => 3]);
+        $mform->addHelpButton('factorheat', 'factorheat', 'hotquestion');
+        $mform->setType('factorheat', PARAM_INT);
+        $mform->setDefault('factorheat', floor(100 / $hotquestionconfig->heatlimit));
+        $mform->addRule('factorheat', get_string('valueinterror', 'hotquestion'), 'regex', '/^[0-9]+$/', 'client');
+
+        $mform->addElement('text', 'factorvote', get_string('factorvote', 'hotquestion'), ['size' => 3]);
+        $mform->addHelpButton('factorvote', 'factorvote', 'hotquestion');
+        $mform->setType('factorvote', PARAM_INT);
+        $mform->setDefault('factorvote', floor(100 / $hotquestionconfig->heatlimit));
+        $mform->addRule('factorvote', get_string('valueinterror', 'hotquestion'), 'regex', '/^[0-9]+$/', 'client');
+        // Contrib by ecastro ULPGC.
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
         // Next line was missing. Added Sep 30, 2016.
@@ -211,8 +243,85 @@ class mod_hotquestion_mod_form extends moodleform_mod {
 
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
-
     }
+
+    /**
+     * Add custom completion rules to the form.
+     *
+     * @return array Array of string IDs of added items, empty array if none.
+     */
+    public function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $group = array();
+        $group[] =& $mform->createElement('checkbox', 'completionpostenabled', '', get_string('completionpost', 'hotquestion'));
+        $group[] =& $mform->createElement('text', 'completionpost', '', array('size' => 3));
+        $mform->setType('completionpost', PARAM_INT);
+        $mform->addGroup($group, 'completionpostgroup', get_string('completionpostgroup', 'hotquestion'), array(' '), false);
+        $mform->disabledIf('completionpost', 'completionpostenabled', 'notchecked');
+
+        $group = array();
+        $group[] =& $mform->createElement('checkbox', 'completionvoteenabled', '', get_string('completionvote', 'hotquestion'));
+        $group[] =& $mform->createElement('text', 'completionvote', '', array('size' => 3));
+        $mform->setType('completionvote', PARAM_INT);
+        $mform->addGroup($group, 'completionvotegroup', get_string('completionvotegroup', 'hotquestion'), array(' '), false);
+        $mform->disabledIf('completionvote', 'completionvoteenabled', 'notchecked');
+
+        return array('completionpostgroup', 'completionvotegroup');
+    }
+
+    /**
+     * Called during validation to see whether some module-specific completion rules are selected.
+     *
+     * @param array $data Input data not yet validated.
+     * @return bool True if one or more rules is enabled, false if none are.
+     */
+    public function completion_rule_enabled($data) {
+        return (!empty($data['completionpostenabled']) && $data['completionpost'] != 0) ||
+            (!empty($data['completionvoteenabled']) && $data['completionvote'] != 0);
+    }
+
+    /**
+     * Return submitted data if properly submitted or returns NULL if validation fails or
+     * if there is no submitted data.
+     *
+     * Do not override this method, override data_postprocessing() instead.
+     *
+     * @return object submitted data; NULL if not valid or not submitted or cancelled
+     */
+    public function get_data() {
+        $data = parent::get_data();
+        if ($data) {
+            $itemname = 'hotquestion';
+            $component = 'mod_hotquestion';
+        }
+
+        return $data;
+    }
+
+    /**
+     * Any data processing needed before the form is displayed
+     * (needed to set up draft areas for editor and filemanager elements)
+     * @param array $defaultvalues
+     */
+    public function data_preprocessing(&$defaultvalues) {
+        parent::data_preprocessing($defaultvalues);
+
+        // Set up the completion checkboxes which aren't part of standard data.
+        // We also make the default value (if you turn on the checkbox) for those
+        // numbers to be 1, this will not apply unless checkbox is ticked.
+        $defaultvalues['completionpostenabled'] =
+            !empty($defaultvalues['completionpost']) ? 1 : 0;
+        if (empty($defaultvalues['completionpost'])) {
+            $defaultvalues['completionpost'] = 1;
+        }
+        $defaultvalues['completionvoteenabled'] =
+            !empty($defaultvalues['completionvote']) ? 1 : 0;
+        if (empty($defaultvalues['completionvote'])) {
+            $defaultvalues['completionvote'] = 1;
+        }
+    }
+
 }
 
 /**
@@ -239,14 +348,13 @@ class hotquestion_form extends moodleform {
 
         // 20210218 Changed using a text editor instead of textarea.
         // $mform->addElement('editor', 'text_editor', $temp->submitdirections, 'wrap="virtual" rows="5"');
-        // Changed to format text which allows filters such as Gerico, etc. to work.
-        $mform->addElement('editor'
-                           , 'text_editor'
-                           , format_text($temp->submitdirections
-                           , $format = FORMAT_MOODLE
-                           , $options = null
-                           , $courseiddonotuse = null)
-                           , 'wrap="virtual" rows="5"');
+        // Changed to format text which allows filters such as Generico, etc. to work.
+        $mform->addElement('editor', 'text_editor',
+                           format_text($temp->submitdirections,
+                           $format = FORMAT_MOODLE,
+                           $options = null,
+                           $courseiddonotuse = null),
+                           'wrap="virtual" rows="5"');
         $mform->setType('text_editor', PARAM_RAW);
 
         $mform->addElement('hidden', 'id', $cm->id, 'id="hotquestion_courseid"');
@@ -259,6 +367,5 @@ class hotquestion_form extends moodleform {
             $mform->setType('anonymous', PARAM_BOOL);
         }
         $mform->addGroup($submitgroup);
-
     }
 }

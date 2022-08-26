@@ -223,9 +223,32 @@ function studentquiz_update_instance(stdClass $studentquiz, mod_studentquiz_mod_
 function studentquiz_delete_instance($id) {
     global $DB;
 
-    if (! $studentquiz = $DB->get_record('studentquiz', array('id' => $id))) {
+    if (! $studentquiz = $DB->get_record('studentquiz', ['id' => $id])) {
         return false;
     }
+    $params = ['contextmodule' => CONTEXT_MODULE, 'studentquizid' => $id];
+    $sql = "questionid IN (SELECT q.id
+                             FROM {context} ctx
+                             JOIN {studentquiz} sq ON sq.coursemodule = ctx.instanceid
+                                  AND contextlevel = :contextmodule
+                             JOIN {question_categories} ca ON ca.contextid = ctx.id
+                             JOIN {question} q ON q.category = ca.id
+                            WHERE sq.id = :studentquizid
+                          )";
+
+    $DB->delete_records_select('studentquiz_rate', $sql, $params);
+    $DB->delete_records_select('studentquiz_progress', $sql, $params);
+    $comments = $DB->get_records_select('studentquiz_comment', $sql, $params, '', 'id');
+    if (!empty($comments)) {
+        $commentids = array_column($comments, 'id');
+        list($commentsql, $commentparams) = $DB->get_in_or_equal($commentids, SQL_PARAMS_NAMED);
+        $DB->delete_records_select('studentquiz_comment_history', "commentid $commentsql", $commentparams);
+    }
+    $DB->delete_records_select('studentquiz_comment', $sql, $params);
+    $DB->delete_records_select('studentquiz_state_history', $sql, $params);
+    $DB->delete_records_select('studentquiz_question', $sql, $params);
+    $DB->delete_records('studentquiz_attempt', ['studentquizid' => $id]);
+    $DB->delete_records('studentquiz_notification', ['studentquizid' => $id]);
 
     $role = $DB->get_record('role', array('shortname' => 'student'));
     $context = context_module::instance($studentquiz->coursemodule);
@@ -429,7 +452,7 @@ function studentquiz_extend_settings_navigation(settings_navigation $settingsnav
     $keys = $studentquiznode->get_children_key_list();
     $beforekey = null;
     $i = array_search('modedit', $keys);
-    if ($i === false and array_key_exists(0, $keys)) {
+    if ($i === false && array_key_exists(0, $keys)) {
         $beforekey = $keys[0];
     } else if (array_key_exists($i + 1, $keys)) {
         $beforekey = $keys[$i + 1];
@@ -477,7 +500,7 @@ function mod_studentquiz_question_pluginfile($course, $context, $component,
     $fs = get_file_storage();
     $relativepath = implode('/', $args);
     $fullpath = "/$context->id/$component/$filearea/$relativepath";
-    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) || $file->is_directory()) {
         send_file_not_found();
     }
 

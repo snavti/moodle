@@ -239,18 +239,17 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             // Admin, manager and teachers headings for questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
                 // 20210924 Changed to format_text questionlabel column setting.
-                $table->head = array(format_text($this->hotquestion->instance->questionlabel
-                                     , $format = FORMAT_MOODLE
-                                     , $options = null
-                                     , $courseiddonotuse = null));
+                $table->head = array(format_text($this->hotquestion->instance->questionlabel,
+                                     $format = FORMAT_MOODLE, $options = null,
+                                     $courseiddonotuse = null));
                 // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
                     // Priority column is visible, so show the label.
                     // 20210924 Changed to format_text prioritylabel column setting.
-                    $table->head[] .= format_text($this->hotquestion->instance->teacherprioritylabel
-                                                  , $format = FORMAT_MOODLE
-                                                  , $options = null
-                                                  , $courseiddonotuse = null);
+                    $table->head[] .= format_text($this->hotquestion->instance->teacherprioritylabel,
+                                      $format = FORMAT_MOODLE,
+                                      $options = null,
+                                      $courseiddonotuse = null);
                 } else {
                     // Priority column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
@@ -259,40 +258,41 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 if ($heatvisibility) {
                     // 20210924 Changed to format_text heatlabel column setting.
                     // 20200526 Show heatlimit setting and how many heat/votes remain for current user.
-                    $table->head[] .= format_text($this->hotquestion->instance->heatlabel
-                                                  , $format = FORMAT_MOODLE
-                                                  , $options = null
-                                                  , $courseiddonotuse = null)
-                                   .' '.$this->hotquestion->instance->heatlimit
-                                   .'/'.$temp;
+                    $table->head[] .= format_text($this->hotquestion->instance->heatlabel,
+                                      $format = FORMAT_MOODLE,
+                                      $options = null,
+                                      $courseiddonotuse = null)
+                                      .' '.$this->hotquestion->instance->heatlimit
+                                      .'/'.$temp;
                 } else {
                     // Heat column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
                 }
                     // 20210924 Changed to format_text removelabel column setting.
-                    $table->head[] .= format_text($this->hotquestion->instance->removelabel
-                                                  , $format = FORMAT_MOODLE
-                                                  , $options = null
-                                                  , $courseiddonotuse = null);
+                    $table->head[] .= format_text($this->hotquestion->instance->removelabel,
+                                                  $format = FORMAT_MOODLE,
+                                                  $options = null,
+                                                  $courseiddonotuse = null);
                     // 20210924 Changed to format_text  approvallabel column setting.
-                    $table->head[] .= format_text($this->hotquestion->instance->approvallabel
-                                                  , $format = FORMAT_MOODLE
-                                                  , $options = null
-                                                  , $courseiddonotuse = null);
+                    $table->head[] .= format_text($this->hotquestion->instance->approvallabel,
+                                                  $format = FORMAT_MOODLE,
+                                                  $options = null,
+                                                  $courseiddonotuse = null);
             } else {
                 // Students only see headings for questions, priority, and heat columns.
                 // 20210924 Changed to format_text questionlabel column setting.
-                $table->head = array(format_text($this->hotquestion->instance->questionlabel
-                                                 , $format = FORMAT_MOODLE
-                                                 , $options = null
-                                                 , $courseiddonotuse = null));
+                $table->head = array(format_text($this->hotquestion->instance->questionlabel,
+                                                 $format = FORMAT_MOODLE,
+                                                 $options = null,
+                                                 $courseiddonotuse = null));
                 // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
                     // 20210924 Changed to format_text prioritylabel column setting.
                     // Priority column is visible, so show the label.
-                    $table->head[] .= format_text($this->hotquestion->instance->teacherprioritylabel
-                                                  , $format = FORMAT_MOODLE, $options = null
-                                                  , $courseiddonotuse = null);
+                    $table->head[] .= format_text($this->hotquestion->instance->teacherprioritylabel,
+                                                  $format = FORMAT_MOODLE,
+                                                  $options = null,
+                                                  $courseiddonotuse = null);
                 } else {
                     // Priority column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
@@ -301,12 +301,12 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 if ($heatvisibility) {
                     // 20210924 Changed to format_text heatlabel column setting.
                     // Heat column is visible, so show the label.
-                    $table->head[] .= format_text($this->hotquestion->instance->heatlabel
-                                                  , $format = FORMAT_MOODLE
-                                                  , $options = null
-                                                  , $courseiddonotuse = null)
-                                   .' '.$this->hotquestion->instance->heatlimit
-                                   .'/'.$temp;
+                    $table->head[] .= format_text($this->hotquestion->instance->heatlabel,
+                                                  $format = FORMAT_MOODLE,
+                                                  $options = null,
+                                                  $courseiddonotuse = null)
+                                                  .' '.$this->hotquestion->instance->heatlimit
+                                                  .'/'.$temp;
                 } else {
                     // Heat column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
@@ -353,12 +353,19 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
 
                         // 20220410 Add rating and comments here.
                         $comment = '';
-                        // 20210306 Generate comment box using API.
-                        // 20220410 Got it working.
+                        // 20210306 Generate comment box using API. 20220410 Got it working.
+                        // Added flags so that students can see and make comments only in the current round.
+                        // Teachers, managers, and admin can see and make comments in ANY round.
+                        $f1 = $this->hotquestion->get_currentroundx();
+                        $f2 = $this->hotquestion->get_roundcount();
+
                         if ((($this->hotquestion->instance->comments)
-                              && ($question->approved))
-                              || (($this->hotquestion->instance->comments)
-                              && (has_capability('mod/hotquestion:manageentries', $context)))) {
+                            && ($question->approved)
+                            && (($f1 == $f2)
+                            || (!$f1)) && (has_capability('mod/hotquestion:comment', $context)))
+                            || (($this->hotquestion->instance->comments)
+                            && (has_capability('mod/hotquestion:manageentries', $context)))) {
+
                             list($context, $course, $cm) = get_context_info_array($context->id);
                             // Initialize and then check to see how many comments for this question.
                             require_once($CFG->dirroot  . '/comment/lib.php');
@@ -527,7 +534,6 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         return $output;
     }
 
-
     /**
      * Get the total number of comments for a specific question.
      *
@@ -545,5 +551,30 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         } else {
             return 0;
         }
+    }
+
+    // Contrib by ecastro ULPGC .
+
+    /**
+     * Returns formatted user rating grades.
+     *
+     * @param bool $showrating
+     * @return string
+     */
+    public function current_user_rating(bool $showrating) : string {
+        global $USER;
+
+        $output = '';
+
+        if (!$this->hotquestion->instance->grade || !$showrating) {
+            return '';
+        }
+
+        $count = new stdClass();
+        $count->rawgrade = $this->hotquestion->calculate_user_ratings($USER->id);
+        $count->max = $this->hotquestion->instance->postmaxgrade;
+        $output = html_writer::span(get_string('rawgrade', 'hotquestion', $count), ' rawusergrade ');
+
+        return $output;
     }
 }

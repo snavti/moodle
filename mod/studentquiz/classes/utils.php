@@ -66,6 +66,9 @@ style5 = html';
     /** @var int Hidden question. */
     const HIDDEN  = 1;
 
+    /** @var int default StudentQuiz page size. */
+    const DEFAULT_QUESTIONS_PER_PAGE = 20;
+
     /**
      * Get Comment Area web service comment reply structure.
      *
@@ -104,26 +107,6 @@ style5 = html';
                 'status' => new external_value(PARAM_INT, 'Status of comment.'),
                 'allowselfcommentrating' => new external_value(PARAM_BOOL, 'User can comment in owned question in preview mode.'),
         ];
-    }
-
-    /**
-     * Truncate text.
-     *
-     * @param string $text - Full text.
-     * @param int $length - Max length of text.
-     * @return string
-     */
-    public static function nice_shorten_text($text, $length = 40) {
-        $text = trim($text);
-        // Replace image tag by placeholder text.
-        $text = preg_replace('/<img.*?>/', get_string('image_placeholder', 'mod_studentquiz'), $text);
-        $text = mb_convert_encoding($text, "HTML-ENTITIES", "UTF-8");
-        // Trim the multiple spaces to single space and multiple lines to one line.
-        $text = preg_replace('!\s+!', ' ', $text);
-        $summary = shorten_text($text, $length);
-        $summary = preg_replace('~\s*\.\.\.(<[^>]*>)*$~', '$1', $summary);
-        $dots = $summary != $text ? '...' : '';
-        return $summary . $dots;
     }
 
     /**
@@ -251,7 +234,7 @@ style5 = html';
             ];
             // Send email.
             if (!email_to_user($fakeuser, $from, $subject, null, $mailcontent)) {
-                throw new moodle_exception('error_sendalert', 'studentquiz', $previewurl, $fakeuser->email);
+                throw new \moodle_exception('error_sendalert', 'studentquiz', $previewurl, $fakeuser->email);
             }
         }
     }
@@ -642,12 +625,12 @@ style5 = html';
      * @param int $timecreated The time do action.
      * @return bool|int True or new id
      */
-    public static function question_save_action(int $questionid, int $userid = null, int $state, int $timecreated = null) {
-        global $DB, $USER;
+    public static function question_save_action(int $questionid, ?int $userid, int $state, int $timecreated = null) {
+        global $DB;
 
         $data = new \stdClass();
         $data->questionid = $questionid;
-        $data->userid = isset($userid) ? $userid : $USER->id;
+        $data->userid = $userid;
         $data->state = $state;
         $data->timecreated = isset($timecreated) ? $timecreated : time();
 
@@ -699,7 +682,7 @@ style5 = html';
                         studentquiz_helper::STATE_NEW, $sqquestion->timecreated);
 
                     if (!($sqquestion->state == studentquiz_helper::STATE_NEW)) {
-                        self::question_save_action($sqquestion->questionid, get_admin()->id, $sqquestion->state, null);
+                        self::question_save_action($sqquestion->questionid, null, $sqquestion->state, null);
                     }
                 }
             }
@@ -736,9 +719,10 @@ style5 = html';
 
         $userids = [];
         foreach ($statehistories as $statehistory) {
-            $userids[$statehistory->userid] = 1;
+            if (!empty($statehistory->userid)) {
+                $userids[$statehistory->userid] = 1;
+            }
         }
-
         return $DB->get_records_list('user', 'id', array_keys($userids), '', '*');
     }
 

@@ -97,9 +97,12 @@ class mod_studentquiz_question_bank_filter_form extends moodleform {
         $group[] = $mform->createElement('submit', 'submitbutton', get_string('filter'));
         $group[] = $mform->createElement('submit', 'resetbutton', get_string('reset'));
         $mform->addGroup($group, 'buttons', '', ' ', false);
-
         $mform->addElement('hidden', 'cmid', $this->_customdata['cmid']);
         $mform->setType('cmid', PARAM_RAW);
+        if (!empty($this->_customdata['qperpage'])) {
+            $mform->addElement('hidden', 'qperpage', $this->_customdata['qperpage']);
+            $mform->setType('qperpage', PARAM_INT);
+        }
     }
 
 }
@@ -416,7 +419,7 @@ class user_filter_number extends studentquiz_user_filter_text {
 
         $params = array();
 
-        if ($operator != 5 and $value === '') {
+        if ($operator != 5 && $value === '') {
             return '';
         }
 
@@ -491,7 +494,7 @@ class user_filter_percent extends user_filter_number {
      */
     public function get_sql_filter($data) {
         $val = round($data['value'], 0);
-        if ($val > 100 or $val < 0) {
+        if ($val > 100 || $val < 0) {
             return '';
         }
         if ($val > 1) {

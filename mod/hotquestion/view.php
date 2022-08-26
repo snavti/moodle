@@ -39,7 +39,7 @@ $id = required_param('id', PARAM_INT);                  // Course_module ID.
 $ajax = optional_param('ajax', 0, PARAM_BOOL);          // Asychronous form request.
 $action  = optional_param('action', '', PARAM_ACTION);  // Action(vote, newround).
 $roundid = optional_param('round', -1, PARAM_INT);      // Round id.
-$changegroup = optional_param('group', -1, PARAM_INT);  // Choose the current group.
+$group = optional_param('group', -1, PARAM_INT);  // Choose the current group.
 
 if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
     throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
@@ -108,13 +108,14 @@ if (has_capability('mod/hotquestion:ask', $context)) {
         $timenow = time();
 
         // This will be overwritten after we have the entryid.
+        // Data for all the fields for a question, plus the submit button status.
         $newentry = new stdClass();
         $newentry->hotquestion = $hq->instance->id;
         $newentry->content = $fromform->text_editor['text'];
         $newentry->format = $fromform->text_editor['format'];
         $newentry->userid = $USER->id;
         $newentry->time = $timenow;
-        if ($fromform->anonymous = null) {
+        if (isset($fromform->anonymous)) {
             $newentry->anonymous = $fromform->anonymous;
         } else {
             $newentry->anonymous = 0;
@@ -123,7 +124,8 @@ if (has_capability('mod/hotquestion:ask', $context)) {
         $newentry->tpriority = 0;
         $newentry->submitbutton = $fromform->submitbutton;
 
-        if (!$hq->add_new_question($fromform)) { // Returns 1 if valid question submitted.
+        // From this point, need to process the question and save it.
+        if (!results::add_new_question($newentry, $hq)) { // Returns 1 if valid question submitted.
             redirect('view.php?id='.$hq->cm->id, get_string('invalidquestion', 'hotquestion'));
         }
         if (!$ajax) {
@@ -205,7 +207,10 @@ if (!$ajax) {
     // Added code to include the activity name, 10/05/16.
     $hotquestionname = format_string($hotquestion->name, true, array('context' => $context));
     echo $output->header();
-    echo $OUTPUT->heading($hotquestionname);
+    // 20220716 HQ_882 Skip heading for Moodle 4.0 and higher as it seems to be automatic.
+    if ($CFG->branch < 400) {
+        echo $OUTPUT->heading($hotquestionname);
+    }
     // Allow access at any time to manager and editing teacher but prevent access to students.
     if (!(has_capability('mod/hotquestion:manage', $context))) {
         // Check availability timeopen and timeclose. Added 10/2/16.
@@ -226,7 +231,11 @@ if (!$ajax) {
     $cminfo = cm_info::create($cm);
     $completiondetails = \core_completion\cm_completion_details::get_instance($cminfo, $USER->id);
     $activitydates = \core\activity_dates::get_dates_for_module($cminfo, $USER->id);
-    echo $output->introduction($cminfo, $completiondetails, $activitydates);
+
+    // 20220706 HQ_882 Skip intro for Moodle 4.0 and higher as it seems to be automatic.
+    if ($CFG->branch < 400) {
+        echo $output->introduction($cminfo, $completiondetails, $activitydates);
+    }
 
     // 20211219 Added link to all HotQuestion activities.
     echo '<span style="float:right"><a href="index.php?id='
@@ -234,11 +243,10 @@ if (!$ajax) {
          .'">'
          .get_string('viewallhotquestions', 'hotquestion')
          .'</a></span><br>';
-    echo
 
     // Print group information (A drop down box will be displayed if the user
     // is a member of more than one group, or has access to all groups).
-    groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
+    echo groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
 
     // Print the textarea box for typing submissions in.
     if (has_capability('mod/hotquestion:ask', $context)) {
@@ -249,10 +257,21 @@ if (!$ajax) {
 echo $output->container_start(null, 'questions_list');
 // Print toolbar.
 echo $output->container_start("toolbar");
+// Start contrib by ecastro ULPGC to list the users grade just before the, View grades, button.
+echo $output->current_user_rating(has_capability('mod/hotquestion:ask', $context));
+
+// 20220515 Enabled the view grade button for both managers and students. Student ONLY see their grade.
+// 20220629 The raw rating and button are visible only if grading is setup.
+if (($entriesmanager || $canask) && ($hotquestion->grade <> 0)) {
+    echo ' ';
+    $url = new moodle_url('grades.php', array('id' => $cm->id, 'group' => $group));
+    echo $output->single_button($url, get_string('viewgrades', 'hotquestion'));
+}
+// End contrib by ecastro ULPGC.
 echo $output->toolbar(has_capability('mod/hotquestion:manageentries', $context));
 echo $output->container_end();
 
-// Print questions list from the current round.
+// Print questions list from the current round, function questions is in renderer.php file.
 echo $output->questions(has_capability('mod/hotquestion:vote', $context));
 echo $output->container_end();
 

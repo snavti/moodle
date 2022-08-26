@@ -34,6 +34,7 @@ use \mod_hotquestion\event\add_round;
 use \mod_hotquestion\event\remove_question;
 use \mod_hotquestion\event\remove_round;
 use \mod_hotquestion\event\download_questions;
+use \mod_hotquestion\local\results;
 
 defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 define('HOTQUESTION_EVENT_TYPE_OPEN', 'open');
@@ -81,6 +82,10 @@ class mod_hotquestion {
         $this->course    = $DB->get_record('course', array('id' => $this->cm->course), '*', MUST_EXIST);
         $this->instance  = $DB->get_record('hotquestion', array('id' => $this->cm->instance), '*', MUST_EXIST);
         $this->set_currentround($roundid);
+
+        // Contrib by ecastro ULPGC, for grades callbacks.
+        $this->instance->cmid = $cmid;
+        $this->instance->cmidumber = $this->cm->idnumber;
     }
 
     /**
@@ -97,60 +102,6 @@ class mod_hotquestion {
             $user = $USER->id;
         }
         return $DB->record_exists('hotquestion_votes', array('question' => $question, 'voter' => $user));
-    }
-
-    /**
-     * Add a new question to current round.
-     *
-     * @param object $fromform From ask form.
-     */
-    public function add_new_question($fromform) {
-        global $USER, $CFG, $DB;
-        $data = new StdClass();
-        $data->hotquestion = $this->instance->id;
-
-        // ...$data->content = trim($fromform->question);...
-        // ...print_object($fromform->question2);...
-        // 20210218 Switched code to use text editor instead of text area.
-        $data->content = ($fromform->text_editor['text']);
-        $data->format = ($fromform->text_editor['format']);
-
-        $data->userid = $USER->id;
-        $data->time = time();
-        $data->tpriority = 0;
-        // Check if approval is required for this HotQuestion activity.
-        if (!($this->instance->approval)) {
-            // If approval is NOT required, then auto approve the question so everyone can see it.
-            $data->approved = 1;
-        } else {
-            // If approval is required, then mark as not approved so only teachers can see it.
-            $data->approved = 0;
-        }
-        $context = context_module::instance($this->cm->id);
-        // If marked anonymous and anonymous is allowed then change from actual userid to guest.
-        if (isset($fromform->anonymous) && $fromform->anonymous && $this->instance->anonymouspost) {
-            $data->anonymous = $fromform->anonymous;
-            // Assume this user is guest.
-            $data->userid = $CFG->siteguest;
-        }
-        if (!empty($data->content)) {
-            // If there is some actual content, then create a new record.
-            $DB->insert_record('hotquestion_questions', $data);
-            if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
-                $params = array(
-                    'objectid' => $this->cm->id,
-                    'context' => $context,
-                );
-                $event = add_question::create($params);
-                $event->trigger();
-            } else {
-                add_to_log($this->course->id, "hotquestion", "add question"
-                    , "view.php?id={$this->cm->id}", $data->content, $this->cm->id);
-            }
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -187,6 +138,9 @@ class mod_hotquestion {
                 $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
         }
+        // Contrib by ecastro ULPGC, update grades for questions author and voters.
+        // 20220623 Moved so entering viewgrades.php page always updates to the latest grade.
+        $this->update_users_grades([$question->userid, $USER->id]);
     }
 
     /**
@@ -222,6 +176,8 @@ class mod_hotquestion {
             } else {
                 $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
+            // Contrib by ecastro ULPGC, update grades for question author and voters.
+            $this->update_users_grades([$question->userid, $USER->id]);
         }
     }
 
@@ -282,7 +238,7 @@ class mod_hotquestion {
                    AND hqq.time > hqr.starttime
                    AND hqr.endtime = 0
                    AND hqv.voter = ?
-               GROUP BY hqq.id, hqr.id, hqv.voter, hqq.hotquestion, hqq.content,
+              GROUP BY hqq.id, hqr.id, hqv.voter, hqq.hotquestion, hqq.content,
                         hqq.userid, hqv.voter, hqq.time, hqq.anonymous, hqq.tpriority,
                         hqq.approved
               ORDER BY hqq.hotquestion ASC, tpriority DESC, heat DESC";
@@ -478,11 +434,22 @@ class mod_hotquestion {
 
         if (null !== (required_param('q', PARAM_INT))) {
             $questionid = required_param('q', PARAM_INT);
+            $itemid = required_param('q', PARAM_INT);
             $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
+
+            // Contrib by ecastro ULPGC.
+            $users = $this->get_question_voters($questionid);
+            $users[] = $dbquestion->userid;
+            // Contrib by ecastro ULPGC.
             $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
-            // Get an array of all votes on the question that was just deleted, then delete them.
-            $dbvote = $DB->get_records('hotquestion_votes', array('question' => $questionid));
+            // 20220510 Deleted $dbvote line of code.
+            // Delete all votes on the question that was just deleted.
             $DB->delete_records('hotquestion_votes', array('question' => $dbquestion->id));
+            // 20220510 Delete all comments on the question that was just deleted.
+            $DB->delete_records('comments', array('itemid' => $itemid, 'component' => 'mod_hotquestion'));
+
+            // Contrib by ecastro ULPGC, update grades for question author and voters.
+            $this->update_users_grades($users);
         }
         return $this->currentround;
     }
@@ -534,10 +501,17 @@ class mod_hotquestion {
             foreach ($questions as $q) {
                 $questionid = $q->id; // Get id of first question on the page to delete.
                 $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
+                // Contrib by ecastro ULPGC.
+                $users = $this->get_question_voters($questionid);
+                $users[] = $dbquestion->userid;
+                // Contrib by ecastro ULPGC.
                 $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
                 // Get an array of all votes on the question that was just deleted, then delete them.
                 $dbvote = $DB->get_records('hotquestion_votes', array('question' => $questionid));
                 $DB->delete_records('hotquestion_votes', array('question' => $dbquestion->id));
+
+                // Contrib by ecastro ULPGC, update grades for question author and voters.
+                $this->update_users_grades($users);
             }
             // Now that all questions and votes are gone, remove the round.
             $dbround = $DB->get_record('hotquestion_rounds', array('id' => $roundid));
@@ -580,6 +554,7 @@ class mod_hotquestion {
         require_once($CFG->libdir.'/csvlib.class.php');
 
         $context = context_module::instance($this->cm->id);
+
         // Trigger download_questions event.
         if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
             $params = array(
@@ -597,67 +572,36 @@ class mod_hotquestion {
         // Add filename details based on course and HQ activity name.
         $csv = new csv_export_writer();
         $strhotquestion = get_string('hotquestion', 'hotquestion');
-
         $fields = array();
 
         if (is_siteadmin($USER->id)) {
-            // Add fields with HQ default labels since admin will list ALL site questions.
-            $fields = array(get_string('firstname'),
-                            get_string('lastname'),
-                            get_string('userid', 'hotquestion'),
-                            get_string('hotquestion', 'hotquestion').' ID',
-                            get_string('question', 'hotquestion').' ID',
-                            get_string('time', 'hotquestion'),
-                            get_string('anonymous', 'hotquestion'),
-                            get_string('teacherpriority', 'hotquestion'),
-                            get_string('heat', 'hotquestion'),
-                            get_string('approvedyes', 'hotquestion'),
-                            get_string('content', 'hotquestion')
-                            );
-            // For admin we want every hotquestion activity.
+            // For an admin, we want every hotquestion activity.
             $whichhqs = ('AND hq.hotquestion > 0');
             $csv->filename = clean_filename(get_string('exportfilenamep1', 'hotquestion'));
-
-            // 20200524 Add info to our data array and denote this is ALL site questions.
-            $activityinfo = array(null, null, null, null, null,
-                                  null, null, null, null, null,
-                                  get_string('exportfilenamep1', 'hotquestion').
-                                  get_string('exportfilenamep2', 'hotquestion').
-                                  gmdate("Ymd_Hi").get_string('for', 'hotquestion').
-                                  $CFG->wwwroot);
-            $csv->add_data($activityinfo);
         } else {
-            // Add fields with the column labels for ONLY the current HQ activity.
-            $fields = array(get_string('firstname'),
-                            get_string('lastname'),
-                            get_string('userid', 'hotquestion'),
-                            get_string('hotquestion', 'hotquestion').' ID',
-                            get_string('question', 'hotquestion').' ID',
-                            get_string('time', 'hotquestion'),
-                            get_string('anonymous', 'hotquestion'),
-                            $this->instance->teacherprioritylabel,
-                            $this->instance->heatlabel,
-                            $this->instance->approvallabel,
-                            $this->instance->questionlabel,
-                            );
-
+            // For a teacher, we want only the current hotquestion activity.
             $whichhqs = ('AND hq.hotquestion = ');
             $whichhqs .= (':thisinstid');
 
             $csv->filename = clean_filename(($this->course->shortname).'_');
             $csv->filename .= clean_filename(($this->instance->name));
-            // 20200513 Add the course shortname and the HQ activity name to our data array.
-            $activityinfo = array(get_string('course').': '
-                                  .$this->course->shortname,
-                                  get_string('activity').': '
-                                  .$this->instance->name);
-            $csv->add_data($activityinfo);
         }
-
+            // Add fields with the column labels for ONLY the current HQ activity.
+        $fields = array(get_string('firstname'),
+                        get_string('lastname'),
+                        get_string('userid', 'hotquestion'),
+                        get_string('hotquestion', 'hotquestion').' ID',
+                        get_string('question', 'hotquestion').' ID',
+                        get_string('time', 'hotquestion'),
+                        get_string('anonymous', 'hotquestion'),
+                        $this->instance->teacherprioritylabel,
+                        $this->instance->heatlabel,
+                        $this->instance->approvallabel,
+                        $this->instance->questionlabel,
+                        get_string('comments')
+                        );
         $csv->filename .= clean_filename(get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv');
 
-        // Add the column headings to our data array.
-        $csv->add_data($fields);
         // Now add this instance id that's needed in the sql for teachers and managers downloads.
         $fields = array($fields, 'thisinstid' => $this->instance->id);
 
@@ -676,9 +620,15 @@ class mod_hotquestion {
                            hq.anonymous AS anonymous,
                            hq.tpriority AS tpriority,
                            COUNT(hv.voter) AS heat,
-                           hq.approved AS approved
+                           hq.approved AS approved,
+                           h.course AS course,
+                           h.teacherprioritylabel AS teacherprioritylabel,
+                           h.heatlabel AS heatlabel,
+                           h.approvallabel AS approvallabel,
+                           h.questionlabel AS questionlabel
                      FROM {hotquestion_questions} hq
                 LEFT JOIN {hotquestion_votes} hv ON hv.question=hq.id
+                     JOIN {hotquestion} h ON h.id = hq.hotquestion
                      JOIN {user} u ON u.id = hq.userid
                     WHERE hq.userid > 0 ";
         } else {
@@ -696,27 +646,94 @@ class mod_hotquestion {
                            hq.anonymous AS anonymous,
                            hq.tpriority AS tpriority,
                            COUNT(hv.voter) AS heat,
-                           hq.approved AS approved
+                           hq.approved AS approved,
+                           h.course AS course,
+                           h.teacherprioritylabel AS teacherprioritylabel,
+                           h.heatlabel AS heatlabel,
+                           h.approvallabel AS approvallabel,
+                           h.questionlabel AS questionlabel
                      FROM {hotquestion_questions} hq
-                LEFT JOIN {hotquestion_votes} hv ON hv.question=hq.id
+                LEFT JOIN {hotquestion_votes} hv ON hv.question = hq.id
+                     JOIN {hotquestion} h ON h.id = hq.hotquestion
                      JOIN {user} u ON u.id = hq.userid
                     WHERE hq.userid > 0 ";
         }
 
         $sql .= ($whichhqs);
         $sql .= " GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id, hq.content,
-                            hq.userid, hq.time, hq.anonymous, hq.tpriority, hq.approved
-                  ORDER BY hq.hotquestion ASC, hq.id ASC, tpriority DESC, heat";
+                            hq.userid, hq.time, hq.anonymous, hq.tpriority, hq.approved,
+                            h.course, h.teacherprioritylabel, h.heatlabel, h.approvallabel,h.questionlabel
+                  ORDER BY hq.hotquestion ASC, u.lastname ASC, u.firstname ASC, hq.id ASC, tpriority DESC, heat";
 
         // Add the list of users and HotQuestions to our data array.
         if ($hqs = $DB->get_records_sql($sql, $fields)) {
+            $firstrowflag = 1;
+            if (is_siteadmin($USER->id)) {
+                $currenthqhotquestion = $hqs[1]->hotquestion;
+            } else {
+                $currenthqhotquestion = '';
+            }
             foreach ($hqs as $q) {
-                $output = array($q->firstname, $q->lastname, $q->userid, $q->hotquestion, $q->question,
-                    $q->time, $q->anonymous, $q->tpriority, $q->heat, $q->approved, $q->content);
+                $fields2 = array(get_string('firstname'),
+                                 get_string('lastname'),
+                                 get_string('userid', 'hotquestion'),
+                                 get_string('hotquestion', 'hotquestion').' ID',
+                                 get_string('question', 'hotquestion').' ID',
+                                 get_string('time', 'hotquestion'),
+                                 get_string('anonymous', 'hotquestion'),
+                                 $q->teacherprioritylabel,
+                                 $q->heatlabel,
+                                 $q->approvallabel,
+                                 $q->questionlabel,
+                                 get_string('comments')
+                                );
+                // 20220818 Initialize variable for any comments for the next question.
+                $comment = '';
+                // 20220818 If there are any, get the comments for each question to in the export file.
+                if ($cmts = $DB->get_records('comments', ['itemid' => $q->question], 'userid, content, timecreated')) {
+                    $temp = count($cmts);
+                    $comment .= '('.$temp.' '.get_string('comments').') ';
+                    foreach ($cmts as $cmt) {
+                        $comment .= get_string('user').' '.$cmt->userid.' commented: '.$cmt->content.' | ';
+                    }
+                }
+                // 20220819 Split admins output into sections by HotQuestions activities.
+                if ((($currenthqhotquestion <> $q->hotquestion) && (is_siteadmin($USER->id))) || ($firstrowflag)) {
+                    $currenthqhotquestion = $q->hotquestion;
+                    // 20220819 Add the course shortname and the HQ activity name to our data array.
+                    $currentcrsname = $DB->get_record('course', ['id' => $q->course], 'shortname');
+                    $currenthqname = $DB->get_record('hotquestion', ['id' => $q->hotquestion], 'name');
+                    $blankrow = array(' ', null);
+
+                    // 20220820 Only include filename, date, and URL only on the first row of the export.
+                    // 20220820 Add a blank line before each HQ activity output, except for the first HQ activity.
+                    if (!$firstrowflag) {
+                        $csv->add_data($blankrow);
+                        $activityinfo = array(get_string('course').': '.$currentcrsname->shortname,
+                            get_string('activity').': '.$currenthqname->name);
+                    } else {
+                        $activityinfo = array(null, null, null, null, null, null, null, null, null, null,
+                                              get_string('exportfilenamep2', 'hotquestion').
+                                              gmdate("Ymd_Hi").get_string('for', 'hotquestion').
+                                              $CFG->wwwroot);
+                        $csv->add_data($activityinfo);
+                        $activityinfo = array(get_string('course').': '.$currentcrsname->shortname,
+                                              get_string('activity').': '.$currenthqname->name);
+                    }
+                    $csv->add_data($activityinfo);
+                    $csv->add_data($fields2);
+                    $firstrowflag = 0;
+                }
+                // 20220821 Cleaning the content to remove all the paragraph tags to make things easier to read.
+                $cleanedcontent = format_string($q->content,
+                                                $striplinks = true,
+                                                $options = null);
+                $output = array($q->firstname, $q->lastname, $q->userid, $q->hotquestion, $q->question, $q->time,
+                                $q->anonymous, $q->tpriority, $q->heat, $q->approved, $cleanedcontent, $comment);
                 $csv->add_data($output);
             }
         }
-        // Download the completed array.
+        // Download the completed array of questions and comments.
         $csv->download_file();
         exit;
     }
@@ -741,14 +758,15 @@ class mod_hotquestion {
             $question->approved = '1';
             $DB->update_record('hotquestion_questions', $question);
         }
+        $this->update_users_grades([$question->userid, $USER->id]);
         return;
     }
 
     /**
      * Set teacher priority of current question in current round.
      *
-     * @param int $u the priority up or down flag.
-     * @param int $question the question id
+     * @param int $u The priority up(1) or down(0) flag.
+     * @param int $question The question id to change the teacher priority for.
      */
     public function tpriority_change($u, $question) {
         global $CFG, $DB, $USER;
@@ -765,12 +783,126 @@ class mod_hotquestion {
             $question->tpriority = --$question->tpriority;
             $DB->update_record('hotquestion_questions', $question);
         }
+        $this->update_users_grades([$question->userid, $USER->id]);
     }
 
+    // Contrib by ecastro ULPGC.
 
+    /**
+     * Get the user rating in this activity, by posts and heat/votes.
+     *
+     * Function is called ONLY when a user is on view.php but via renderer.php page.
+     *
+     * @param int $userid The single user to calculate the rating for.
+     * @return float $rating number
+     */
+    public function calculate_user_ratings($userid = null) : float {
+        global $DB, $USER;
+
+        if (!$userid) {
+            $userid = $USER->id;
+        }
+        // Get any questions by this user and any votes if they have some.
+        $sql = "SELECT q.id, q.approved, q.tpriority, count(v.voter) as votes
+                  FROM {hotquestion_questions} q
+             LEFT JOIN {hotquestion_votes} v ON v.question = q.id
+                 WHERE q.hotquestion = ? AND q.userid = ? AND q.anonymous = 0
+              GROUP BY q.id ";
+        $params = [$this->instance->id, $userid];
+        $questions = $DB->get_records_sql($sql, $params);
+        $grade = 0;
+        // If the user added any questions, add to the current user rating.
+        foreach ($questions as $question) {
+            // 20220623 Add to the current user rating only if the question is approved.
+            if ($question->approved) {
+                // Add/subtract to the current user rating based on teacher priority.
+                $qrate = ($question->tpriority) ? $question->tpriority : $this->instance->factorpriority / 100;
+
+                // Add/subtract to the current user rating based on teacher priority and heat given.
+                $grade += $qrate + $question->votes * $this->instance->factorheat / 100;
+            }
+        }
+        // Get any votes made by this user.
+        $sql = "SELECT COUNT(v.id)
+                  FROM {hotquestion_votes} v
+                  JOIN {hotquestion_questions} q ON v.question = q.id
+                 WHERE q.hotquestion = ? AND v.voter = ? ";
+        $params = [$this->instance->id, $userid];
+        $votes = $DB->count_records_sql($sql, $params);
+        // If the user voted, add to the current user rating.
+        if ($votes > 0) {
+            // Add/subtract to the current user rating based on heat received.
+            $grade += $votes * $this->instance->factorvote / 100;
+        }
+
+        return $grade;
+    }
+
+    /**
+     * Gets the users that had voted a given question.
+     *
+     * @param int $questionid The question id.
+     * @return array Array of int userids or empty if none.
+     */
+    public function get_question_voters(int $questionid) : array {
+        global $DB;
+
+        $voters = $DB->get_records_menu('hotquestion_votes', ['question' => $questionid], 'id, voter');
+
+        if ($voters) {
+            return array_values($voters);
+        }
+        return [];
+    }
+
+    /**
+     * Recalculates ratings and grades for users related to a question.
+     * The author of the question and the voters.
+     *
+     * @param array $users The userids of users to update.
+     */
+    public function update_users_grades(array $users) {
+        global $DB;
+
+        if (empty($users)) {
+            return false;
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($users);
+        $select = "userid $insql AND hotquestion = ? ";
+        $params[] = $this->instance->id;
+        $grades = $DB->get_records_select('hotquestion_grades',
+                                          $select,
+                                          $params,
+                                          '',
+                                          'userid,
+                                          id,
+                                          hotquestion,
+                                          rawrating,
+                                          timemodified');
+
+        $now = time();
+        $newgrade = new stdClass();
+        $newgrade->hotquestion = $this->instance->id;
+        $newgrade->timemodified = $now;
+        foreach ($users as $userid) {
+            $rating = $this->calculate_user_ratings($userid);
+            if (isset($grades[$userid])) {
+                // Existing user grade, update if changed.
+                $grade = $grades[$userid];
+                if ($rating != $grade->rawrating) {
+                    $grade->rawrating = $rating;
+                    $grade->timemodified = $now;
+                    $DB->update_record('hotquestion_grades', $grade);
+                }
+            } else {
+                // New user grade, create.
+                $newgrade->rawrating = $rating;
+                $newgrade->userid = $userid;
+                $DB->insert_record('hotquestion_grades', $newgrade);
+            }
+            // Calling the function in lib.php at about line 807.
+            hotquestion_update_grades($this->instance, $userid);
+        }
+    }
 }
-
-
-
-
-

@@ -4,6 +4,19 @@ moodle-local_staticpage
 Changes
 -------
 
+### v3.11-r3
+
+* 2022-07-11 - Bugfix: Static page was crippled if the HTML code did not contain a plain body tag, solves #64 and several older issues.
+* 2022-07-11 - Add links to README to the language pack, solves #61
+* 2022-07-10 - Add Visual checks section to UPGRADE.md
+
+### v3.11-r2
+
+* 2022-06-26 - Make codechecker happy again
+* 2022-06-26 - Updated Moodle Plugin CI to latest upstream recommendations
+* 2022-06-26 - Add UPGRADE.md as internal upgrade documentation
+* 2022-06-26 - Update maintainers and copyrights in README.md.
+
 ### v3.11-r1
 
 * 2021-12-08 - Prepare compatibility for Moodle 3.11.

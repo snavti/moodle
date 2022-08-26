@@ -36,6 +36,7 @@ use context_module;
 use calendar_event;
 use comment;
 use \mod_hotquestion\event\comments_viewed;
+use \mod_hotquestion\event\add_question;
 
 /**
  * Utility class for Hot Question results.
@@ -212,10 +213,10 @@ class results {
                           JOIN {user} u ON u.id = g.userid
                      LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
                          WHERE hq.hotquestion = :hqid
-                               AND g.groupid = :gidid
-                               AND hr.endtime=0
-                               AND hq.time>=hr.starttime
-                               AND hq.userid>0";
+                           AND g.groupid = :gidid
+                           AND hr.endtime=0
+                           AND hq.time>=hr.starttime
+                           AND hq.userid>0";
                 $params = array();
                 $params = ['hqid' => $hotquestion->id] + ['gidid' => $gid->id];
                 $hotquestions = $DB->get_records_sql($sql, $params);
@@ -230,9 +231,9 @@ class results {
                       JOIN {user} u ON u.id = hq.userid
                  LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
                      WHERE hq.hotquestion = :hqid
-                           AND hr.endtime = 0
-                           AND hq.time >= hr.starttime
-                           AND hq.userid = :userid";
+                       AND hr.endtime = 0
+                       AND hq.time >= hr.starttime
+                       AND hq.userid = :userid";
 
             $params = array();
             $params = ['hqid' => $hotquestion->id] + ['userid' => $USER->id];
@@ -245,9 +246,9 @@ class results {
                       JOIN {user} u ON u.id = hq.userid
                  LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
                      WHERE hq.hotquestion = :hqid
-                           AND hr.endtime = 0
-                           AND hq.time >= hr.starttime
-                           AND hq.userid > 0";
+                       AND hr.endtime = 0
+                       AND hq.time >= hr.starttime
+                       AND hq.userid > 0";
             $params = array();
             $params = ['hqid' => $hotquestion->id];
             $hotquestions = $DB->get_records_sql($sql, $params);
@@ -271,6 +272,7 @@ class results {
      * Added 20210307.
      * @param object $question
      * @param object $cm
+     * @param object $course
      * @return string
      */
     public static function hotquestion_get_question_comment_count($question, $cm, $course) {
@@ -292,10 +294,10 @@ class results {
      * Added 20210313.
      * @param object $question
      * @param object $cm
+     * @param object $context
      * @param object $course
      */
     public static function hotquestion_display_question_comments($question, $cm, $context, $course) {
-        // 20210313 Not in use yet. Part of future development.
         global $CFG, $USER, $OUTPUT, $DB;
         $html = '';
         if (($question->approved) || (has_capability('mod/hotquestion:manageentries', $context))) {
@@ -344,10 +346,6 @@ class results {
      * @param stdClass $course Course object.
      * @param stdClass $context Context object.
      * @param stdClass $entry Entry object.
-     * @param stdClass $action Action object.
-     * @param stdClass $firstkey Firstkey object.
-     * @return array $editoroptions Array containing the editor and attachment options.
-     * @return array $attachmentoptions Array containing the editor and attachment options.
      */
     public static function hotquestion_get_editor_and_attachment_options($course, $context, $entry) {
         $maxfiles = 99; // TODO: add some setting.
@@ -375,49 +373,45 @@ class results {
     /**
      * Add a new question to current round.
      *
-     * @param object $fromform From ask form.
+     * @param object $newentry
+     * @param object $hq
      */
-    public static function add_new_question($fromform) {
+    public static function add_new_question($newentry, $hq) {
         global $USER, $CFG, $DB;
-        $data = new StdClass();
-        $data->hotquestion = $fromform->instance->id;
 
-        // 20210218 Switched code to use text editor instead of text area.
-        $data->content = ($fromform->text_editor['text']);
-        $data->format = ($fromform->text_editor['format']);
-
-        $data->userid = $USER->id;
-        $data->time = time();
-        $data->tpriority = 0;
         // Check if approval is required for this HotQuestion activity.
-        if (!($fromform->instance->approval)) {
+        if (!($newentry->approved)) {
             // If approval is NOT required, then auto approve the question so everyone can see it.
-            $data->approved = 1;
+            $newentry->approved = 1;
         } else {
             // If approval is required, then mark as not approved so only teachers can see it.
-            $data->approved = 0;
+            $newentry->approved = 0;
         }
-        $context = context_module::instance($fromform->cm->id);
+        $context = context_module::instance($hq->cm->id);
         // If marked anonymous and anonymous is allowed then change from actual userid to guest.
         if (isset($fromform->anonymous) && $fromform->anonymous && $fromform->instance->anonymouspost) {
-            $data->anonymous = $fromform->anonymous;
+            $newentry->anonymous = $fromform->anonymous;
             // Assume this user is guest.
-            $data->userid = $CFG->siteguest;
+            $newentry->userid = $CFG->siteguest;
         }
-        if (!empty($data->content)) {
+        if (!empty($newentry->content)) {
             // If there is some actual content, then create a new record.
-            $DB->insert_record('hotquestion_questions', $data);
+            $DB->insert_record('hotquestion_questions', $newentry);
             if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
                 $params = array(
-                    'objectid' => $fromform->cm->id,
+                    'objectid' => $hq->cm->id,
                     'context' => $context,
                 );
                 $event = add_question::create($params);
                 $event->trigger();
             } else {
                 add_to_log($fromform->course->id, "hotquestion", "add question"
-                    , "view.php?id={$fromform->cm->id}", $data->content, $fromform->cm->id);
+                    , "view.php?id={$fromform->cm->id}", $newentry->content, $fromform->cm->id);
             }
+
+            // Contrib by ecastro ULPGC update grades for question author.
+            // ...$newentry->update_users_grades([$USER->id]);...
+            $hq->update_users_grades([$USER->id]);
             return true;
         } else {
             return false;
