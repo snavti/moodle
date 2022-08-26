@@ -36,7 +36,7 @@
     Example context (json):
     { "message": "Your pants are on fire!", "closebutton": 1, "announce": 1, "extraclasses": "foo bar"}
 }}
-<div class="alert alert-success alert-block fade in {{ extraclasses }}" {{!
+<div class="mt-2 mb-4 alert alert-success alert-block {{# closebutton }}alert--close{{/ closebutton }} fade in {{ extraclasses }}" {{!
     }}{{# announce }} role="alert" data-aria-autofocus="true"{{/ announce }}{{!
     }}>
     {{# closebutton }}<button type="button" class="close" data-dismiss="alert"></button>{{/ closebutton }}

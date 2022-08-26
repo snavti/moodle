@@ -37,7 +37,7 @@
 {{#noncontacts}}
     <a
         href="#"
-        class="p-2 d-flex list-group-item list-group-item-action align-items-center"
+        class="py-3 pl-3 pr-2 d-flex list-group-item list-group-item-action align-items-start"
         data-route="view-conversation"
         {{#conversationid}}
             data-route-param-1="{{.}}"
@@ -56,7 +56,7 @@
         role="button"
     >
         <img
-            class="rounded-circle"
+            class="rounded"
             src="{{{profileimageurl}}}"
             alt="{{fullname}}"
             aria-hidden="true"

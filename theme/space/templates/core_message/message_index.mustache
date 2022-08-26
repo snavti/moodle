@@ -41,9 +41,9 @@
         data-region="message-index"
         role="region"
 >
-    <div class="container-fluid">
-        <div class="row-fluid h-100 no-gutters">
-            <div class="col-sm-12 col-md-5 d-flex flex-column">
+    <div class="container-fluid px-0">
+        <div class="d-flex w-100 mt-4">
+            <div class="d-flex flex-column conversationcontainer">
                 <div class="border-right h-100 pr-sm-0 pr-md-4">
                     <div class="panel-header-container" data-region="panel-header-container">
                         {{> core_message/message_drawer_view_overview_header }}
@@ -55,7 +55,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-12 col-md-7 d-flex flex-column">
+            <div class="d-flex flex-column col">
                 <div class="header-container row no-gutters ml-sm-0 ml-md-4" data-region="header-container">
                     {{> core_message/message_drawer_view_contacts_header }}
                     {{> core_message/message_drawer_view_conversation_header }}
@@ -68,7 +68,7 @@
                     {{> core_message/message_drawer_view_group_info_body }}
                     {{> core_message/message_drawer_view_settings_body }}
                 </div>
-                <div class="footer-container position-relative ml-sm-0 ml-md-4" data-region="footer-container">
+                <div class="rui-message-footer-container position-relative ml-sm-0 ml-md-4" data-region="footer-container">
                     {{> core_message/message_drawer_view_conversation_footer }}
                     {{> core_message/message_drawer_view_overview_footer }}
                 </div>

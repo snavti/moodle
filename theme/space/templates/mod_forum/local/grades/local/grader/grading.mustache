@@ -41,7 +41,7 @@
                 <div class="header-container">
                     <div class="info-container d-flex align-items-center" data-region="grading-info-container">
                         <button
-                            class="btn btn-sm btn-link"
+                            class="btn btn-sm btn-secondary"
                             data-action="collapse-grading-drawer"
                             aria-controls="grading-drawer-{{uniqid}}"
                             aria-expanded="true"
@@ -94,28 +94,40 @@
             </div>
             <div class="body-container position-relative d-flex flex-column overflow-auto" data-region="body-container">
                 <div class="grader-grading-panel-display pt-3 overflow-auto" data-region="grading-panel-container">
-                    
+
                     <div class="grade-grade-box">
-                        <h4 class="mb-0 h5">
-                            {{#pix}} i/grading, core {{/pix}}
+                        <h4 class="mb-3 d-inline-flex w-100 align-items-center">
+                            <svg class="mr-2" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"></path>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.25 19.25H13.75"></path>
+                            </svg>
+                            {{#str}} gradingmodulename, core_grades, {{moduleName}} {{/str}}
                         </h4>
-                        <div data-region="grade" class="pt-3 grade-form">
+                        <div data-region="grade" class="grade-form">
                             {{> mod_forum/local/grades/local/grader/grade_placeholder }}
                         </div>
                     </div>
-                     
+
                     <div class="grade-notifications-box mt-2">
-                        <h4 id="send-student-notifications-setting" class="h6">
-                            <i class="far fa-bell mx-2"></i>{{#str}}notifications, core{{/str}}
-                        </h4>
-                        <div data-region="notification" class="pt-1 small" role="radiogroup" aria-labelledby="send-student-notifications-setting">
-                            <label class="form-check px-0">
-                                <input class="form-check-input" type="radio" name="sendstudentnotifications" value="1"{{#defaultsendnotifications}} checked{{/defaultsendnotifications}}/>
-                                {{#str}}sendstudentnotificationsyes, mod_forum{{/str}}
+                        <h5 id="send-student-notifications-setting">
+                            <i class="far fa-bell mr-2"></i>{{#str}}notifications, core{{/str}}
+                        </h5>
+                        <div data-region="notification" class="mx-2" role="radiogroup" aria-labelledby="send-student-notifications-setting">
+                            <label class="form-check-inline form-check-label mb-0">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input class="custom-control-input" type="radio" name="sendstudentnotifications" value="1"{{#defaultsendnotifications}} checked{{/defaultsendnotifications}}/>
+                                    <label class="custom-control-label ml-1" for="{{element.id}}">
+                                    {{#str}}sendstudentnotificationsyes, mod_forum{{/str}}
+                                    </label>
+                                </div>
                             </label>
-                            <label class="form-check px-0">
-                                <input class="form-check-input" type="radio" name="sendstudentnotifications" value="0"{{^defaultsendnotifications}} checked{{/defaultsendnotifications}}/>
-                                {{#str}}sendstudentnotificationsno, mod_forum{{/str}}
+                            <label class="form-check-inline form-check-label mb-0">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input class="custom-control-input" type="radio" name="sendstudentnotifications" value="0"{{^defaultsendnotifications}} checked{{/defaultsendnotifications}}/>
+                                    <label class="custom-control-label ml-1" for="{{element.id}}">
+                                    {{#str}}sendstudentnotificationsno, mod_forum{{/str}}
+                                    </label>
+                                </div>
                             </label>
                             {{#helpicon}}
                                 {{>core/help_icon}}

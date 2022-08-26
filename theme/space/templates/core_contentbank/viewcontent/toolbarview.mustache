@@ -34,17 +34,59 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
     Example context (json):
     {
         "usercanedit" : true,
+        "heading" : "This is a heading",
         "editcontenturl" : "http://something/contentbank/edit.php?contextid=1&plugin=h5p&id=1",
-        "closeurl" : "http://moodle.test/h5pcb/moodle/contentbank/index.php"
+        "closeurl" : "http://moodle.test/h5pcb/moodle/contentbank/index.php",
+        "actionmenu": {
+            "options": [
+                {
+                    "url": "www.google.com",
+                    "label": "Google",
+                    "attributes": [
+                        {
+                            "name": "data-attrib",
+                            "value": "1"
+                        }
+                    ]
+                }
+            ]
+        }
     }
 }}
+
+{{#heading}}<h4 class=" rui-main-content-title rui-main-content-title--h4">{{heading}}</h4>{{/heading}}
 {{#usercanedit}}
-<div class="cb-toolbar-container mb-2">
-    <a href="{{editcontenturl}}" class="btn btn-primary btn-sm" data-action="edit-content">
-        {{#str}}edit{{/str}}
-    </a>
-    <a href="{{closeurl}}" class="btn btn-reset btn-sm" data-action="close-content">
-        {{#str}}close, core_contentbank{{/str}}
-    </a>
+<div class="cb-toolbar-container w-100 m-0 text-right">
+    <div class="d-inline-flex">
+        <a href="{{editcontenturl}}" class="btn btn-primary" data-action="edit-content">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"></path>
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.25 19.25H13.75"></path>
+            </svg>
+            <span class="ml-1">{{#str}}edit{{/str}}</span>
+        </a>
+        {{#actionmenu}}
+        <div class="mx-2">
+            {{> core_contentbank/contentbankmenu }}
+        </div>
+        {{/actionmenu}}
+
+        <div class="ml-auto">
+            <a href="{{closeurl}}" class="btn btn-secondary ml-4" data-action="close-content">
+                <span class="mr-1">{{#str}}exit, core_contentbank{{/str}}</span>
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 8.75L19.25 12L15.75 15.25"></path>
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 12H10.75"></path>
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.25 4.75H6.75C5.64543 4.75 4.75 5.64543 4.75 6.75V17.25C4.75 18.3546 5.64543 19.25 6.75 19.25H15.25"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
 </div>
+{{/usercanedit}}
+
+{{^usercanedit}}
+    {{#actionmenu}}
+        {{> core_contentbank/contentbankmenu }}
+    {{/actionmenu}}
 {{/usercanedit}}

@@ -30,9 +30,11 @@
         "descriptionformatted": "Stilton, Cheddar, Edam"
     }
 }}
-{{#title}}
-    <h3 class="main">{{{title}}}</h3>
-{{/title}}
-{{#description}}
-    <div class="box generalbox formsettingheading">{{{descriptionformatted}}}</div>
-{{/description}}
+<div class="rui-setting-heading-wrapper {{#description}}rui-setting-heading--desc{{/description}} ">
+    {{#title}}
+        <h4 class="rui-setting-heading mb-1">{{{title}}}</h4>
+    {{/title}}
+    {{#description}}
+        <div class="rui-setting-desc">{{{descriptionformatted}}}</div>
+    {{/description}}
+</div>

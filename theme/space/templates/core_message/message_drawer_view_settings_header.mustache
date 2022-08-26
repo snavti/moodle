@@ -34,17 +34,17 @@
 
 }}
 
-<div class="hidden mt-1" aria-hidden="true" data-region="view-settings">
-    <div class="row no-gutters justify-content-between align-items-center w-100 py-2">
+<div class="hidden rui-message-header-margin" aria-hidden="true" data-region="view-settings">
+    <div class="d-flex align-items-center w-100">
         {{#isdrawer}}
-        <div class="align-self-stretch" >
-            <a class="h-100 py-3 d-flex mr-2 align-items-center btn btn-sm" href="#" data-route-back role="button">
+        <div class="align-self-stretch">
+            <a class="ml-3 d-flex align-items-center btn-msg" href="#" data-route-back role="button">
                 {{> core_message/message_drawer_icon_back }}
             </a>
         </div>
         {{/isdrawer}}
-        <div class="mt-0 p-2 h3 my-0 h6">
+        <h4 class="rui-message-heading ml-3">
             {{#str}} settings, core {{/str}}
-        </div>
+        </h4>
     </div>
 </div>

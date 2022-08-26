@@ -17,15 +17,15 @@
 /**
  * space.
  *
- * @package    theme_space
- * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
- * @license    Commercial https://themeforest.net/licenses
+ * @package   theme_space
+ * @copyright 2022 Marcin Czaja (https://rosea.io)
+ * @license   Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2022022801; // YYYYMMDDVV.
+$plugin->version   = 2022080906;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->requires  = 2021051100;// 3.11
+$plugin->requires  = 2022041200; // Moodle 4.0
 $plugin->component = 'theme_space';
-$plugin->release = '1.14 (Build: 2022022801)';
+$plugin->release = '2.1.2 (Build: 2022080906)';

@@ -37,10 +37,14 @@
     {{#discussions}}
         <div class="discussion-container">
             <div class="p-4">
-                <h3 class="d-inline-block m-0 h6">{{#str}} discussionstartedby, mod_forum, {{authorfullname}} {{/str}}</h3>
-                <p class="d-inline-block badge badge-light">
-                    {{#userdate}} {{timecreated}}, {{#str}} strftimedate, core_langconfig {{/str}} {{/userdate}}
-                </p>
+                <div class="d-block">
+                    <h6 class="mb-3">{{#str}} discussionstartedby, mod_forum, {{authorfullname}} {{/str}}</h6>
+                    <p class="d-inline-block badge-sm badge-light">
+                        <i class="icon mr-2 far fa-calendar"></i>
+                        {{#userdate}} {{timecreated}}, {{#str}} strftimedate, core_langconfig {{/str}} {{/userdate}}
+                    </p>
+                </div>
+
                 <h2 class="pt-2 mb-4">{{name}}</h2>
 
                 {{#posts}}
@@ -48,7 +52,7 @@
                         {{#parent}}
                             <div class="parent-container">
                                 <button
-                                    class="badge badge-secondary border-0 show-content-button collapsed mb-2"
+                                    class="show-content-button collapsed btn btn-secondary btn-sm mb-2"
                                     data-target="#parent-post-content-{{id}}"
                                     aria-expanded="false"
                                     aria-controls="parent-post-content-{{id}}"
@@ -68,7 +72,7 @@
                                 {{^experimentaldisplaymode}}{{> mod_forum/forum_discussion_nested_post }}{{/experimentaldisplaymode}}
                             </div>
                             <button
-                                class="view-context-button btn btn-link border"
+                                class="view-context-button btn btn-outline-primary"
                                 type="button"
                                 data-action="view-context"
                                 data-discussionid="{{discussionid}}"
@@ -77,9 +81,10 @@
                                 data-experimental-display-mode="{{experimentaldisplaymode}}"
                             >
                                 {{#str}} viewconversation, forum {{/str}}
+                                <i class="icon ml-2 fas fa-external-link-alt"></i>
                             </button>
                         {{/post}}
-                        <hr class="w-75 mx-auto my-5">
+                        <hr class="w-25 mx-auto my-5">
                     </div>
                 {{/posts}}
             </div>

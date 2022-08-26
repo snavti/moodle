@@ -57,7 +57,7 @@
                 {{#author}}
                     {{#urls.profileimage}}
                         <img
-                            class="rounded-circle"
+                            class="rounded"
                             style="width: 36px; height: 36px;"
                             src="{{{.}}}"
                             alt="{{#str}} pictureof, core, {{author.fullname}} {{/str}}"
@@ -135,7 +135,7 @@
                                             </a>
                                         {{/urls.group}}
                                         {{^urls.group}}
-                                            <img class="rounded-circle group-image"
+                                            <img class="rounded group-image"
                                                 src="{{{urls.image}}}"
                                                 alt="{{#str}} pictureof, core, {{name}} {{/str}}"
                                                 title="{{#str}} pictureof, core, {{name}} {{/str}}"
@@ -332,7 +332,7 @@
                         <div class="d-flex mt-3">
                             {{#capabilities.reply}}
                                 <button
-                                    class="btn btn-primary btn-sm"
+                                    class="btn btn-success btn-sm"
                                     data-href="{{{urls.reply}}}"
                                     data-post-id="{{id}}"
                                     data-action="create-inpage-reply"

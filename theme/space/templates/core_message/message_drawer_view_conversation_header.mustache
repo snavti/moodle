@@ -35,7 +35,7 @@
 }}
 
 <div
-    class="hidden c-message-header w-100"
+    class="hidden rui-message-header w-100"
     aria-hidden="true"
     data-region="view-conversation"
 >
@@ -43,12 +43,12 @@
     <div class="hidden" data-region="header-edit-mode">
         {{> core_message/message_drawer_view_conversation_header_edit_mode }}
     </div>
-    <div data-region="header-placeholder">
+    <div data-region="header-placeholder" class="px-3">
         {{> core_message/message_drawer_view_conversation_header_placeholder }}
     </div>
     <div
         class="hidden position-absolute"
         data-region="confirm-dialogue-container"
-        style="top: 0; bottom: -1px; right: 0; left: 0; background: rgba(255, 255, 255, 0.84);"
+        style="top: 0; bottom: -1px; right: 0; left: 0; z-index: 3; background: rgba(0, 0, 0, 0.3);"
     ></div>
 </div>

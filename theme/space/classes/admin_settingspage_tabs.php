@@ -24,8 +24,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * @package   theme_space
- * @copyright 2016 Ryan Wyllie
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2022 Marcin Czaja (https://rosea.io)
+ * @license   Commercial https://themeforest.net/licenses
  */
 class theme_space_admin_settingspage_tabs extends admin_settingpage {
 
@@ -97,3 +97,4 @@ class theme_space_admin_settingspage_tabs extends admin_settingpage {
     }
 
 }
+

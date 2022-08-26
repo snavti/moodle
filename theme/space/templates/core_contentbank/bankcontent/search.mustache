@@ -22,31 +22,12 @@
     }
 
 }}
-<div class="searchbar d-inline-flex mr-1" role="search">
-    <label for="searchinput">
-        <span class="sr-only">{{#str}} searchcontentbankbyname, contentbank {{/str}}</span>
-    </label>
-    <input type="text"
-           id="searchinput"
-           class="form-control-xs"
-           placeholder="{{#str}} search, core {{/str}}"
-           name="search"
-           autocomplete="off"
-    >
-    <div class="input-group-append">
 
-            <div class="search-icon">
-                <button class="btn btn-secondary btn-sm mx-1" data-action="searchcontent"
-                    aria-label="{{#str}} search, core {{/str}}">
-                    <span class="d-flex" aria-hidden="true">{{#pix}} a/search, core {{/pix}}</span>
-                </button>
-            </div>
-            <div class="clear-icon d-none">
-                <button class="btn btn-reset btn-sm mx-1" data-action="clearsearchcontent"
-                    aria-label="{{#str}} clearsearch, core {{/str}}">
-                    <span class="d-flex" aria-hidden="true">{{#pix}} e/cancel_solid_circle, core {{/pix}}</span>
-                </button>
-            </div>
-
-    </div>
-</div>
+{{< core/search_input_auto }}
+    {{$label}}{{#str}}
+        searchcontentbankbyname, contentbank
+    {{/str}}{{/label}}
+    {{$placeholder}}{{#str}}
+        search, core
+    {{/str}}{{/placeholder}}
+{{/ core/search_input_auto }}

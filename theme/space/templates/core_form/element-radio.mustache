@@ -18,7 +18,7 @@
             </label>
         {{/text}}
     </div>
-    <div class="col-md-9 checkbox">
+    <div class="col-md-9 checkbox px-0">
         <div class="form-check">
         <span>
             <label class="form-check-label">
@@ -39,8 +39,8 @@
                     {{{label}}}
                 {{/text}}
             </label>
-            {{#required}}<abbr class="initialism text-danger" title="{{#str}}required{{/str}}">{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}</abbr>{{/required}}
-            {{#advanced}}<abbr class="initialism text-info" title="{{#str}}advanced{{/str}}">!</abbr>{{/advanced}}
+            {{#required}}<span class="initialism text-danger" title="{{#str}}required{{/str}}">{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}</span>{{/required}}
+            {{#advanced}}<span class="initialism text-info" title="{{#str}}advanced{{/str}}">!</span>{{/advanced}}
             {{{helpbutton}}}
             </span>
         </div>

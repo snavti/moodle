@@ -36,11 +36,11 @@
         }
     }
 }}
-<div class="nav-tabs-container w-100 m-b-1 mr-auto">
-    <ul class="nav nav-tabs" role="tablist">
+<div class="d-md-inline-flex w-100 mt-4">
+    <ul class="rui-nav--admin nav nav-column flex-md-column" role="tablist">
     <!-- First the top most node and immediate children -->
         <li class="nav-item">
-            <a class="nav-link active" href="#link{{node.key}}" data-toggle="tab" role="tab">{{node.text}}</a>
+            <a class="nav-link active" href="#link{{node.key}}" data-toggle="tab" role="tab" aria-selected="true">{{node.text}}</a>
         </li>
     <!-- Now the first level children with sub nodes -->
     {{#node.children}}
@@ -48,101 +48,101 @@
             {{#display}}
                 {{^is_short_branch}}
                     <li class="nav-item">
-                        <a class="nav-link" href="#link{{key}}" data-toggle="tab" role="tab">{{text}}</a>
+                        <a class="nav-link" href="#link{{key}}" data-toggle="tab" role="tab" aria-selected="false" tabindex="-1">{{text}}</a>
                     </li>
                 {{/is_short_branch}}
             {{/display}}
         {{/children.count}}
     {{/node.children}}
     </ul>
-</div>
 
-<div class="tab-content mt-5">
-    <div class="tab-pane active" id="link{{node.key}}" role="tabpanel">
-        <div>
-            <div class="row">
-                <div class="col-sm-12 col-md-3">
-                </div>
-                <div class="col">
-                    <ul class="list-unstyled">
-                        {{#node.children}}
-                            {{^children.count}}
-                                {{#display}}
-                                    <li><a href="{{{action}}}">{{text}}</a></li>
-                                {{/display}}
-                            {{/children.count}}
-                        {{/node.children}}
-                    </ul>
-                </div>
-            </div>
-
-            {{#node.children}}
-                {{#display}}
-                    {{#children.count}}
-                        {{#is_short_branch}}
-                            <hr class="hr" />
-                            <div class="row justify-content-start">
-                                <div class="col-sm-12 col-md-3">
-                                    {{#action}}<h4><a href="{{action}}">{{text}}</a><h4>{{/action}}
-                                    {{^action}}<h4>{{text}}<h4>{{/action}}
-                                </div>
-                                <div class="col-sm-12 col-md-9">
-                                    <ul class="list-unstyled">
-                                        {{#children}}
-                                            {{> core/settings_link_page_single }}
-                                        {{/children}}
-                                    </ul>
-                                </div>
-                            </div>
-                        {{/is_short_branch}}
-                    {{/children.count}}
-                {{/display}}
-            {{/node.children}}
-        </div>
-    </div>
-    {{#node.children}}
-        {{#children.count}}
-            <div class="tab-pane" id="link{{key}}" role="tabpanel">
-                <div>
-                    <div class="row">
-                        <div class="col-sm-12 col-md-3">
-                            {{#action}}<h4><a href="{{action}}">{{text}}</a><h4>{{/action}}
-                            {{^action}}<h4>{{text}}<h4>{{/action}}
-                        </div>
-                        <div class="col-sm-12 col-md-9">
-                            <ul class="list-unstyled">
-                                {{#children}}
-                                    {{#display}}
-                                        {{^children.count}}
-                                            <li><a href="{{{action}}}">{{text}}</a></li>
-                                        {{/children.count}}
-                                    {{/display}}
-                                {{/children}}
-                            </ul>
-                        </div>
+    <div class="col tab-content px-0">
+        <div class="tab-pane active" id="link{{node.key}}" role="tabpanel">
+            <div class="container rui-settings-container ml-md-4 px-sm-2 px-md-0">
+                <div class="row">
+                    <div class="col-sm-12 col-md-3 pt-5">
                     </div>
-                    {{#children}}
-                        {{#display}}
-                            {{#children.count}}
-                                <hr class="hr" />
+                    <div class="col">
+                        <ul class="list-unstyled rui-list-admin-links">
+                            {{#node.children}}
+                                {{^children.count}}
+                                    {{#display}}
+                                        <li><a href="{{{action}}}">{{text}}</a></li>
+                                    {{/display}}
+                                {{/children.count}}
+                            {{/node.children}}
+                        </ul>
+                    </div>
+                </div>
+
+                {{#node.children}}
+                    {{#display}}
+                        {{#children.count}}
+                            {{#is_short_branch}}
+                                <hr>
                                 <div class="row">
                                     <div class="col-sm-12 col-md-3">
-                                        {{#action}}<h4><a href="{{action}}">{{text}}</a><h4>{{/action}}
-                                        {{^action}}<h4>{{text}}<h4>{{/action}}
+                                        {{#action}}<h4><a class="badge badge-light" href="{{action}}">{{text}}</a></h4>{{/action}}
+                                        {{^action}}<h4 class="badge badge-light">{{text}}</h4>{{/action}}
                                     </div>
-                                    <div class="col-sm-12 col-md-9">
-                                        <ul class="list-unstyled">
+                                    <div class="col">
+                                        <ul class="list-unstyled rui-list-admin-links">
                                             {{#children}}
                                                 {{> core/settings_link_page_single }}
                                             {{/children}}
                                         </ul>
                                     </div>
                                 </div>
-                            {{/children.count}}
-                        {{/display}}
-                    {{/children}}
-                </div>
+                            {{/is_short_branch}}
+                        {{/children.count}}
+                    {{/display}}
+                {{/node.children}}
             </div>
-        {{/children.count}}
-    {{/node.children}}
+        </div>
+        {{#node.children}}
+            {{#children.count}}
+                <div class="tab-pane" id="link{{key}}" role="tabpanel">
+                    <div class="container rui-settings-container ml-md-4 px-sm-2 px-md-0">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-3 mt-1">
+                                {{#action}}<h4><a class="badge badge-light" href="{{action}}">{{text}}</a></h4>{{/action}}
+                                {{^action}}<h4 class="badge badge-light">{{text}}</h4>{{/action}}
+                            </div>
+                            <div class="col-sm-12 col-md-9">
+                                <ul class="list-unstyled rui-list-admin-links">
+                                    {{#children}}
+                                        {{#display}}
+                                            {{^children.count}}
+                                                <li><a href="{{{action}}}">{{text}}</a></li>
+                                            {{/children.count}}
+                                        {{/display}}
+                                    {{/children}}
+                                </ul>
+                            </div>
+                        </div>
+                        {{#children}}
+                            {{#display}}
+                                {{#children.count}}
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-3 mt-1">
+                                            {{#action}}<h4><a class="badge badge-light" href="{{action}}">{{text}}</a></h4>{{/action}}
+                                            {{^action}}<h4 class="badge badge-light">{{text}}</h4>{{/action}}
+                                        </div>
+                                        <div class="col-sm-12 col-md-9">
+                                            <ul class="list-unstyled rui-list-admin-links">
+                                                {{#children}}
+                                                    {{> core/settings_link_page_single }}
+                                                {{/children}}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                {{/children.count}}
+                            {{/display}}
+                        {{/children}}
+                    </div>
+                </div>
+            {{/children.count}}
+        {{/node.children}}
+    </div>
 </div>

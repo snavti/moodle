@@ -33,13 +33,39 @@
     {}
 
 }}
-
 {{< core/drawer}}
     {{$drawercontent}}
     <div id="message-drawer-{{uniqid}}" class="message-app" data-region="message-drawer" role="region">
-        <div class="header-container row no-gutters justify-content-between mb-2" data-region="header-container">
-            <button class="message-drawer-toggle"><i class="fas fa-times"></i></button>
-            {{> core_message/message_drawer_view_overview_header }}
+        <div class="header-container" data-region="header-container">
+            <div class="rui-message-header-container row no-gutters justify-content-between w-100">
+                <button class="message-drawer-toggle btn-msg-danger">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.25 6.75L6.75 17.25"></path>
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6.75 6.75L17.25 17.25"></path>
+                    </svg>
+                </button>
+                {{> core_message/message_drawer_view_overview_header }}
+            </div>
+
+            <div class="d-block w-100">
+                <hr class="rui-message-hr" />
+                <div aria-hidden="false" data-region="view-overview">
+                    <div class="d-flex align-items-center">
+                        <div class="input-group">
+
+                            <input
+                                type="text"
+                                class="form-control rui-message-search-input my-2 mx-3"
+                                placeholder="{{#str}} search, core_search {{/str}}"
+                                aria-label="{{#str}} search, core_search {{/str}}"
+                                data-region="view-overview-search-input"
+                            >
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
             {{> core_message/message_drawer_view_search_header }}
             {{> core_message/message_drawer_view_settings_header }}
             {{> core_message/message_drawer_view_contacts_header }}
@@ -54,7 +80,7 @@
             {{> core_message/message_drawer_view_search_body }}
             {{> core_message/message_drawer_view_settings_body }}
         </div>
-        <div class="footer-container position-relative" data-region="footer-container">
+        <div class="position-relative" data-region="footer-container">
             {{> core_message/message_drawer_view_conversation_footer }}
         </div>
 

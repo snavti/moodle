@@ -15,131 +15,219 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Course layout for the space theme.
+ * A two column layout for the space theme.
  *
- * @package    theme_space
- * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
- * @license    Commercial https://themeforest.net/licenses
+ * @package   theme_space
+ * @copyright 2022 Marcin Czaja (https://rosea.io)
+ * @license   Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
-
 user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
-require_once($CFG->libdir . '/behat/lib.php');
-// MODIFICATION Start: Require own locallib.php.
-require_once($CFG->dirroot . '/theme/space/locallib.php');
-// MODIFICATION END.
+user_preference_allow_ajax_update('sidepre-open', PARAM_ALPHA);
+user_preference_allow_ajax_update('darkmode-on', PARAM_ALPHA);
+user_preference_allow_ajax_update('drawer-open-index', PARAM_BOOL);
+user_preference_allow_ajax_update('drawer-open-block', PARAM_BOOL);
 
-$bodyattributes = $OUTPUT->body_attributes([]);
-$siteurl = $CFG->wwwroot;
+require_once($CFG->libdir . '/behat/lib.php');
+require_once($CFG->dirroot . '/course/lib.php');
+
+$draweropenright = false;
 $extraclasses = [];
 
-//for mobile view
-$device = core_useragent::get_device_type();
-
-$removesidebar = theme_space_get_setting('removesidebar');
-// don't remove sidebar on the course page and in-course page
-$dscourse = theme_space_get_setting('notremovesidebarcp');
-if(!$dscourse) {
-    $displayremovesidebarcp = false;
+// Moodle 4.0 - Add block button in editing mode.
+$addblockbutton = $OUTPUT->addblockbutton();
+if (isloggedin()) {
+    $courseindexopen = (get_user_preferences('drawer-open-index', true) == true);
+    $blockdraweropen = (get_user_preferences('drawer-open-block') == true);
 } else {
-    if($removesidebar == 1) {
-        $displayremovesidebarcp = true;
-    }
+    $courseindexopen = false;
+    $blockdraweropen = false;
 }
 
-if (!$removesidebar) {
-    if (isloggedin()) {
-        if ($device == 'mobile' ) {
-            $navdraweropen = false;
-        } else {
-            $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
-        }
-    } else {
-        $navdraweropen = true;
-        $extraclasses[] = 'drawer-open-left';
-    }
+if (defined('BEHAT_SITE_RUNNING')) {
+    $blockdraweropen = true;
+}
 
-    if ($navdraweropen) {
-        $extraclasses[] = 'drawer-open-left';
+$extraclasses = ['uses-drawers'];
+// End.
+
+// Hidden sidebar
+if (theme_space_get_setting('turnoffsidebarcourse') == '1') {
+    $hiddensidebar = true;
+    $navdraweropen = false;
+    $extraclasses[] = 'hidden-sidebar'; 
+} else {
+    $hiddensidebar = false;
+}
+// End.
+
+// Dark mode
+if (isloggedin()) {
+    $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+    $draweropenright = (get_user_preferences('sidepre-open', 'true') == 'true');
+    
+    if (theme_space_get_setting('darkmodetheme') == '1') {
+        $darkmodeon = (get_user_preferences('darkmode-on', 'false') == 'true'); //return 1
+        if($darkmodeon) {
+            $extraclasses[] = 'theme-dark'; 
+        }
+    }
+    else {
+        $darkmodeon = false;
     }
 } else {
     $navdraweropen = false;
 }
 
-$blockshtml = $OUTPUT->blocks('side-pre');
-$blockshtml2 = $OUTPUT->blocks('sidebar');
-$blockshtml3 = $OUTPUT->blocks('maintopwidgets');
-$blockshtml4 = $OUTPUT->blocks('mainfwidgets');
-$blockshtml5 = $OUTPUT->blocks('sidebar-top');
-$hasblocks = strpos($blockshtml, 'data-block=') !== false;
+if ($navdraweropen && !$hiddensidebar) {
+    $extraclasses[] = 'drawer-open-left';
+}
+
 $siteurl = $CFG->wwwroot;
 
+$blockshtml = $OUTPUT->blocks('side-pre');
+$sidecourseblocks = $OUTPUT->blocks('sidecourseblocks');
+$hassidecourseblocks = strpos($sidecourseblocks, 'data-block=') !== false;
 
-$buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions();
+$blockstopsidebar = $OUTPUT->blocks('sidebartopblocks');
+$blocksbottomsidebar = $OUTPUT->blocks('sidebarbottomblocks');
+$ctopbl = $OUTPUT->blocks('ctopbl');
+$cbottombl = $OUTPUT->blocks('cbottombl');
+$cstopbl = $OUTPUT->blocks('cstopbl');
+$csbottombl = $OUTPUT->blocks('csbottombl');
+
+$forceblockdraweropen = $OUTPUT->firstview_fakeblocks();
+
+// Moodle 4.0
+$courseindex = core_course_drawer();
+if (!$courseindex) {
+    $courseindexopen = false;   
+}
+if($courseindexopen == false) {
+    $extraclasses[] = 'drawer-open-index--closed';
+} else {
+    $extraclasses[] = 'drawer-open-index--open';
+}
+$hasblocks = (strpos($blockshtml, 'data-block=') !== false);
+$PAGE->set_secondary_navigation(false);
+$renderer = $PAGE->get_renderer('core');
+
+$header = $PAGE->activityheader;
+$headercontent = $header->export_for_template($renderer);
+
+// Don't display new moodle 4.0 secondary menu if old settings region is available
+$secondarynavigation = false;
+$overflow = '';
+
+if ($PAGE->has_secondary_navigation()) {
+    $tablistnav = $PAGE->has_tablist_secondary_navigation();
+    $moremenu = new \core\navigation\output\more_menu($PAGE->secondarynav, 'nav-tabs', true, $tablistnav);
+    $secondarynavigation = $moremenu->export_for_template($OUTPUT);
+    $overflowdata = $PAGE->secondarynav->get_overflow_menu_data();
+    if (!is_null($overflowdata)) {
+        $overflow = $overflowdata->export_for_template($OUTPUT);
+    }
+}
+// End.
+
+if(!isloggedin()) {
+    $isnotloggedin = true;
+} else {
+    $isnotloggedin = false;
+}
+
+// Default moodle setting menu
+$buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions() && !$PAGE->has_secondary_navigation();
 // If the settings menu will be included in the header then don't add it here.
 $regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settings_menu() : false;
 
-//Top bar style
-$topbarstyle = theme_space_get_setting('topbarstyle');
-$pluginsettings = get_config("theme_space");
-for ($i = 1; $i <= 6; $i++) {
-    if($topbarstyle == "topbarstyle-" . $i) {
-        ${"topbarstyle" . $i} = $topbarstyle;
-        $extraclasses[] = 'tbs-'.$i;
-    } 
-    else {
-        ${"topbarstyle" . $i} = false;
-    }
+// Start - Course Image Position (theme settings)
+$courseimage = theme_space_get_setting('ipcourseimage');
+$couseimagesettings = theme_space_get_setting('setcourseimage');
+$courseimagecontent = false;
+$courseimagefw = false;
+if ($couseimagesettings == 1) {
+    $courseimagefw = true;
+} elseif ($couseimagesettings == 2) {
+    $courseimagecontent = true;
 }
-//end
+// End.
+
+if ($draweropenright && $hasblocks) {
+    $extraclasses[] = 'drawer-open-right';
+}
+
+if ($hassidecourseblocks) {
+    $extraclasses[] = 'page-has-blocks';
+}
+
+if ($PAGE->course->enablecompletion == '1') {
+    $extraclasses[] = 'rui-course--enablecompletion';
+}
+
+if ($PAGE->course->showactivitydates == '1') {
+    $extraclasses[] = 'rui-course--showactivitydates';
+}
+
+if ($PAGE->course->visible == '1') {
+    $extraclasses[] = 'rui-course--visible';
+}
+
+$iscoursepage = true;
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
+
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
-    'sidepreblocks' => $blockshtml,
-    'sidebarblocks' => $blockshtml2,
-    'maintopwidgets' => $blockshtml3,
-    'mainfwidgets' => $blockshtml4,
-    'sidebartopblocks' => $blockshtml5,
-    'hasblocks' => $hasblocks,
-    'hasmaintopwidgets' => !empty($blockshtml3),
-    'hasmainfwidgets' => !empty($blockshtml4),
-    'hassidebarblocks' => !empty($blockshtml2),
-    'hassidebartopblocks' => !empty($blockshtml5),
-    'navdraweropen' => $navdraweropen,
-    'navdrawercp' => $displayremovesidebarcp,
     'bodyattributes' => $bodyattributes,
+    'darkmodeon' => !empty($darkmodeon),
+    'siteurl' => $siteurl,
+    'sidepreblocks' => $blockshtml,
+    'hasblocks' => $hasblocks,
+    'sidebartopblocks' => $blockstopsidebar,
+    'sidebarbottomblocks' => $blocksbottomsidebar,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
-    'siteurl' => $siteurl
+    'hiddensidebar' => $hiddensidebar,
+    'navdraweropen' => $navdraweropen,
+    'draweropenright' => $draweropenright,
+    'ctopbl' => $ctopbl,
+    'cbottombl' => $cbottombl,
+    'cstopbl' => $cstopbl,
+    'csbottombl' => $csbottombl,
+    'hasctopbl' => !empty($ctopbl),
+    'hascbottombl' => !empty($cbottombl),
+    'hascstopbl' => !empty($cstopbl),
+    'hascsbottombl' => !empty($csbottombl),
+    'sidecourseblocks' => $sidecourseblocks,
+    'hassidecourseblocks' => $hassidecourseblocks,
+    'ipcourseimage' => $courseimage,
+    'iscoursepage' => $iscoursepage,
+    // Moodle 4.0
+    'courseindexopen' => $courseindexopen,
+    'blockdraweropen' => $blockdraweropen,
+    'courseindex' => $courseindex,
+    'secondarymoremenu' => $secondarynavigation ?: false,
+    'headercontent' => $headercontent,
+    'overflow' => $overflow,
+    'addblockbutton' => $addblockbutton,
+    //Theme Settings
+    'courseimagefw' => $courseimagefw,
+    'courseimagecontent' => $courseimagecontent
 ];
 
-// Top bar Styles - add element to the array
-for ($i = 1; $i <= 6; $i++) {
-    $n = "topbarstyle" . $i;
-    $templatecontext[$n] = ${"topbarstyle" . $i};
-    $extraclasses[] = "tbs-'.$i.'";
+// Get and use the course page information banners HTML code, if any course page hints are configured.
+$coursepageinformationbannershtml = theme_space_get_course_information_banners();
+if ($coursepageinformationbannershtml) {
+    $templatecontext['coursepageinformationbanners'] = $coursepageinformationbannershtml;
 }
-//End
+// End.
 
-// Improve space navigation.
-$boostfumblingnav = theme_space_get_setting('boostfumblingnav');
-if (!$boostfumblingnav) {
-    theme_space_extend_flat_navigation($PAGE->flatnav);
-}
-$nav = $PAGE->flatnav;
-$templatecontext['flatnavigation'] = $nav;
-$templatecontext['firstcollectionlabel'] = $nav->get_collectionlabel();
-
+// Load theme settings
 $themesettings = new \theme_space\util\theme_settings();
+$templatecontext = array_merge($templatecontext, $themesettings->global_settings());
+$templatecontext = array_merge($templatecontext, $themesettings->footer_settings());
 
-$templatecontext = array_merge($templatecontext, $themesettings->head_elements());
-$templatecontext = array_merge($templatecontext, $themesettings->footer_items());
-$templatecontext = array_merge($templatecontext, $themesettings->customnav());
-$templatecontext = array_merge($templatecontext, $themesettings->sidebar_custom_block());
-$templatecontext = array_merge($templatecontext, $themesettings->top_bar_custom_block());
-$templatecontext = array_merge($templatecontext, $themesettings->fonts());
-
-
+$PAGE->requires->js_call_amd('theme_space/rui', 'init');
 echo $OUTPUT->render_from_template('theme_space/tmpl-course', $templatecontext);

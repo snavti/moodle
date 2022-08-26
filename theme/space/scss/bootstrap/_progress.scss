@@ -1,53 +1,80 @@
-@keyframes progress-bar-stripes {
-  from { background-position: $progress-height 0; }
-  to { background-position: 0 0; }
+// Disable animation if transitions are disabled
+@if $enable-transitions {
+  @keyframes progress-bar-stripes {
+    from { background-position: $progress-height 0; }
+    to { background-position: 0 0; }
+  }
 }
 
-.progress {
+.rui-progress {
   display: flex;
   height: $progress-height;
   overflow: hidden; // force rounded corners by cropping it
-  font-size: $progress-font-size;
+  line-height: 0;
+  @include font-size($progress-font-size);
   background-color: $progress-bg;
-  border-radius: $progress-border-radius;
+  @include border-radius($progress-border-radius);
   @include box-shadow($progress-box-shadow);
+
+  .theme-dark & {
+    background-color: $dm-progress-bg;
+  }
 }
 
-.progress-bar {
+.rui-progress-bar {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: hidden;
   color: $progress-bar-color;
   text-align: center;
-  border-radius: $progress-border-radius;
-  background-color: $progress-bar-bg;
+  white-space: nowrap;
+  background: $blue-600;
+  background: linear-gradient(90deg, rgba($blue-600,1) 0%, rgba($green-400,1) 100%);
+
   @include transition($progress-bar-transition);
+  border-radius: $border-radius;
 }
 
-.progress-bar-striped {
+.rui-progress-bar-striped {
   @include gradient-striped();
   background-size: $progress-height $progress-height;
-  font-weight: $font-weight-sm-bold;
-  font-size: 11px;
-  color: $white;
 }
 
-.progress-bar-animated {
-  animation: progress-bar-stripes $progress-bar-animation-timing;
+@if $enable-transitions {
+  .rui-progress-bar-animated {
+    animation: $progress-bar-animation-timing progress-bar-stripes;
+
+    @if $enable-prefers-reduced-motion-media-query {
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
 }
 
-.progress-sm {
-  height: 10px;
+.rui-progress--value--100 {
+  left: auto!important;
+  right: 5px;
 }
 
-.progress-bar-text {  
-  margin-top: 5px;
+.rui-course-progressbar {
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.rui-progress-count {
+  margin: 0 0 0 10px;
+  display: inline-flex;
+  align-items: center;
+
   font-size: $font-size-xs;
   font-weight: $font-weight-bold;
-}
+  color: $blue-600;
 
-table {
-  .progress {
-    margin: 0;
+  .rui-progress-count-total {
+    margin-left: .25rem;
+    opacity: .6;
   }
 }

@@ -41,10 +41,17 @@
         }
 
 }}
-<div class="btn-group mr-1" role="group">
-    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" data-action="{{name}}-content"
+<div class="mr-1" role="group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" data-action="{{name}}-content"
             aria-haspopup="true" aria-expanded="false" {{^contenttypes}}title="{{#str}}nocontenttypes, core_contentbank{{/str}}"
             disabled{{/contenttypes}}>
+        <span class="mr-2">
+        <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.75 12C4.75 7.99594 7.99594 4.75 12 4.75V4.75C16.0041 4.75 19.25 7.99594 19.25 12V12C19.25 16.0041 16.0041 19.25 12 19.25V19.25C7.99594 19.25 4.75 16.0041 4.75 12V12Z"></path>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8.75003V15.25"></path>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.25 12L8.75 12"></path>
+        </svg>
+        </span>
         {{#name}} {{name}} {{/name}}
     </button>
     <div class="dropdown-menu dropdown-scrollable dropdown-menu-right">

@@ -1,5 +1,3 @@
-// stylelint-disable selector-no-qualifying-type
-
 .fade {
   @include transition($transition-fade);
 
@@ -8,29 +6,9 @@
   }
 }
 
-
 .collapse {
-  display: none;
-
-  transition: $general-transition;
-  &.show {
-    display: block;
-  }
-
   &:not(.show) {
     display: none;
-  }
-}
-
-tr {
-  &.collapse.show {
-    display: table-row;
-  }
-}
-
-tbody {
-  &.collapse.show {
-    display: table-row-group;
   }
 }
 

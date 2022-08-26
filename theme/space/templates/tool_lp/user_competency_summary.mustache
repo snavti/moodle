@@ -51,9 +51,9 @@
             {{/isstatusinreview}}
 
             {{#isrequestreviewallowed}}<button class="btn btn-sm btn-secondary" data-action="request-review">{{#str}}requestreview, tool_lp{{/str}}</button>{{/isrequestreviewallowed}}
-            {{#iscancelreviewrequestallowed}}<button class="btn btn-sm btn-reset" data-action="cancel-review-request">{{#str}}cancelreviewrequest, tool_lp{{/str}}</button>{{/iscancelreviewrequestallowed}}
+            {{#iscancelreviewrequestallowed}}<button class="btn btn-sm btn-danger" data-action="cancel-review-request">{{#str}}cancelreviewrequest, tool_lp{{/str}}</button>{{/iscancelreviewrequestallowed}}
             {{#isstartreviewallowed}}<button class="btn btn-sm btn-primary" data-action="start-review">{{#str}}startreview, tool_lp{{/str}}</button>{{/isstartreviewallowed}}
-            {{#isstopreviewallowed}}<button class="btn btn-sm btn-reset" data-action="stop-review">{{#str}}stopreview, tool_lp{{/str}}</button>{{/isstopreviewallowed}}
+            {{#isstopreviewallowed}}<button class="btn btn-sm btn-danger" data-action="stop-review">{{#str}}stopreview, tool_lp{{/str}}</button>{{/isstopreviewallowed}}
         </dd>
         <dt>{{#str}}proficient, tool_lp{{/str}}</dt>
         <dd>
@@ -89,15 +89,13 @@
             {{>tool_lp/comment_area}}
         {{/canpostorhascomments}}
     {{/commentarea}}
-    <dl data-region="evidence-listing">
-        <dt>{{#str}}evidence, tool_lp{{/str}}</dt>
-        <dd>
+    <fieldset data-region="evidence-listing">
+        <legend>{{#str}}evidence, tool_lp{{/str}}</legend>
             {{#evidence}}
                 {{> tool_lp/evidence_summary }}
             {{/evidence}}
             {{^evidence}}
                 <p>{{#str}}noevidence, tool_lp{{/str}}</p>
             {{/evidence}}
-        </dd>
-    </dl>
+    </fieldset>
 </div>

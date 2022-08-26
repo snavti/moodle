@@ -32,22 +32,22 @@
 
 <div id="discussion-container-{{uniqid}}" data-content="forum-discussion">
 {{#html}}
-    {{#hasanyactions}}
-    <div class="d-flex flex-wrap flex-row-reverse mb-3 text-right" data-container="discussion-tools">
-        <div class="pl-1">
-            <div class="discussion-settings-menu">
-                {{> mod_forum/forum_action_menu}}
-            </div>
-        </div>
-    </div>
-    {{/hasanyactions}}
-    {{{neighbourlinks}}}
-
-    <div class="discussion-container-adv d-flex flex-wrap mb-4">
+    <div class="d-flex flex-wrap mb-4 position-relative">
         <div>{{{exportdiscussion}}}</div>
         <div class="{{#exportdiscussion}}ml-2{{/exportdiscussion}}">{{{modeselectorform}}}</div>
-        <div class="ml-sm-0 mt-sm-1 mt-md-0 ml-md-2">{{{movediscussion}}}</div>
+        <div class="mt-sm-3 mt-md-0 ml-md-2">{{{movediscussion}}}</div>
+
+        <div class="ml-auto">
+            {{#hasanyactions}}
+            <div class="d-flex flex-wrap flex-row-reverse mb-3 position-relative" data-container="discussion-tools">
+                <div class="discussion-settings-menu">
+                    {{> mod_forum/forum_action_menu}}
+                </div>
+            </div>
+            {{/hasanyactions}}    
+        </div>
     </div>
+    {{{neighbourlinks}}}    
 {{/html}}
 
 {{#notifications}}

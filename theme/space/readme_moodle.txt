@@ -1,21 +1,35 @@
- Addons:
-Siema - Lightweight and simple carousel in pure JavaScript
-https://pawelgrzybek.github.io/siema/
+Description of Twitter bootstrap import into Moodle
 
-Automatically add a progress bar to your site. #hubspot-open-source
-https://github.hubspot.com/pace/docs/welcome/
+Twitter bootstrap
+-----------------
 
-A javascript scrollbar plugin which hides native scrollbars, provides custom styleable overlay scrollbars and keeps the native functionality and feeling.
-https://github.com/KingSora/OverlayScrollbars
+Sass:
+This theme uses Bootstrap version 4.5.0
+The Bootstrap repository is available on:
 
-FontAwesome
-https://fontawesome.com
+https://github.com/twitter/bootstrap.git
 
-GoogleFonts
-https://fonts.google.com
+To update to the latest release of twitter bootstrap:
 
-Bootstrap Cookie Alert by Wruczek
-https://github.com/Wruczek/Bootstrap-Cookie-Alert
+* download bootstrap to your home folder
+* remove folder theme/space/scss/bootstrap
+* copy the scss files from ~/bootstrap/scss to theme/space/scss/bootstrap
+* comment out left: 0; from .popover {} in scss/bootstrap/_popover.scss. In RTL mode this prevents popovers from showing and it is not required in LTR mode.
+* comment out this line in theme/space/scss/_print.scss
+    @page {
+       size: $print-page-size;
+    }
+  It breaks when compiled with phpscss.
+* update ./thirdpartylibs.xml
 
-Bootstrap 4 Multi level dropdown navigation
-https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
+Javascript:
+
+* copy the js files from ~/bootstrap/js/src to theme/space/amd/src/bootstrap (including the subfolder)
+* Moodle core includes the popper.js library, make sure each of the new Bootstrap js files
+includes the 'core/popper' library instead of 'popper.js'. For version 4.5.0 these files were: tooltip.js and dropdown.js
+* update ./thirdpartylibs.xml to include all new Bootstrap js files
+* run "Grunt ignorefiles" to prevent linting errors appearing from the new Bootstrap js files.
+* in folder theme/space run "Grunt amd" to compile the bootstrap JS
+
+
+

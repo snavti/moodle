@@ -65,7 +65,7 @@
       <div class="d-flex flex-wrap align-items-center">
 
         <button
-            class="btn btn-sm btn-secondary w-100 mb-2"
+            class="btn btn-sm btn-info d-inline-flex w-100 mb-2 justify-content-between align-items-center"
             aria-controls="gradingform_guide-{{uniqid}}-criteria-{{id}}-description"
             aria-expanded="false"
             data-target="#gradingform_guide-{{uniqid}}-criteria-{{id}}-description"
@@ -73,7 +73,23 @@
             type="button"
           >
             {{#str}}informationforcriterion, gradingform_guide, {{name}}{{/str}}
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+              <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+              <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+            </svg>
         </button>
+        <div class="collapse w-100" id="gradingform_guide-{{uniqid}}-criteria-{{id}}-description">
+            <div class="border p-3 mb-2 rounded">
+                {{{description}}}
+                {{#descriptionmarkers}}
+                    <hr>
+                    {{{descriptionmarkers}}}
+                {{/descriptionmarkers}}
+            </div>
+        </div>
+
+        <hr />
         <button class="criterion-toggle btn btn-sm btn-secondary d-inline-flex w-100 justify-content-between align-items-center"
                 type="button"
                 data-toggle="collapse"
@@ -81,72 +97,77 @@
                 aria-expanded="true"
                 aria-controls="criteria-{{id}}">
                 <span>{{name}}</span>
+                <span class="collapsed-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 15.25L16.25 9.75H7.75L12 15.25Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                    <span class="sr-only">{{#str}} expandcriterion, core_grades {{/str}}</span>
+                </span>
                 <span class="expanded-icon">
-                    {{#pix}} t/expanded, core {{/pix}}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 9.75L16.25 15.25H7.75L12 9.75Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
                     <span class="sr-only">{{#str}} collapsecriterion, core_grades {{/str}}</span>
                 </span>
         </button>
-      </div>
-      <div class="collapse" id="gradingform_guide-{{uniqid}}-criteria-{{id}}-description">
-          <div class="border p-3 mb-3 bg-white rounded">
-              {{{description}}}
-              {{#descriptionmarkers}}
-                  <hr>
-                  {{{descriptionmarkers}}}
-              {{/descriptionmarkers}}
+        <div class="collapse show border px-3 mt-2 w-100 rounded" id="criteria-{{id}}">
+          <div class="form-group">
+            <label for="gradingform_guide-{{uniqid}}-criteria-{{id}}-score">{{#str}}outof, gradingform_guide, {{maxscore}}{{/str}}</label>
+            <input class="form-control" type="number" name="advancedgrading[criteria][{{id}}][score]" value="{{score}}"
+              id="gradingform_guide-{{uniqid}}-criteria-{{id}}-score"
+              aria-describedby="gradingform_guide-{{uniqid}}-help-{{id}}-score"
+              min="0" max="{{maxscore}}"
+              aria-label="{{#str}}scoreforcriterion, gradingform_guide, {{name}}{{/str}}" style="width: 100px;">
+            <span id="gradingform_guide-{{uniqid}}-help-{{id}}-score" aria-hidden="true" class="sr-only">{{!
+              }}{{#str}}score_help, gradingform_guide, { "criterion":  {{# quote }}{{ name }}{{/ quote }}, "maxscore": {{# quote }}{{ maxscore }}{{/ quote }} }{{/str}}
+            </span>
           </div>
-      </div>
-      <div class="collapse show px-3" id="criteria-{{id}}">
-        <div class="form-group">
-          <label for="gradingform_guide-{{uniqid}}-criteria-{{id}}-score">{{#str}}outof, gradingform_guide, {{maxscore}}{{/str}}</label>
-          <input class="form-control" type="number" name="advancedgrading[criteria][{{id}}][score]" value="{{score}}"
-            id="gradingform_guide-{{uniqid}}-criteria-{{id}}-score"
-            aria-describedby="gradingform_guide-{{uniqid}}-help-{{id}}-score"
-            min="0" max="{{maxscore}}"
-            aria-label="{{#str}}scoreforcriterion, gradingform_guide, {{name}}{{/str}}">
-          <span id="gradingform_guide-{{uniqid}}-help-{{id}}-score" aria-hidden="true" class="sr-only">{{!
-            }}{{#str}}score_help, gradingform_guide, { "criterion":  {{# quote }}{{ name }}{{/ quote }}, "maxscore": {{# quote }}{{ maxscore }}{{/ quote }} }{{/str}}
-          </span>
-        </div>
-        <div class="form-group ">
-          <label for="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark">{{#str}}additionalcomments, gradingform_guide{{/str}}</label>
-          <div class="input-group mb-3 form-inset form-inset-right">
-            <textarea class="form-control" type="text" name="advancedgrading[criteria][{{id}}][remark]"
-                id="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark"
-                aria-describedby="gradingform_guide-{{uniqid}}-help-{{id}}-remark"
-                aria-label="{{#str}}additionalcommentsforcriterion, gradingform_guide, {{name}}{{/str}}"
-                data-gradingform-guide-role="remark"
-                rows="2"
-                data-max-rows="5"
-                data-auto-rows
-                >{{remark}}</textarea>
+          <div class="form-group ">
+            <label for="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark">{{#str}}additionalcomments, gradingform_guide{{/str}}</label>
+            <div class="input-group mb-3 form-inset form-inset-right">
+              <textarea class="form-control" type="text" name="advancedgrading[criteria][{{id}}][remark]"
+                  id="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark"
+                  aria-describedby="gradingform_guide-{{uniqid}}-help-{{id}}-remark"
+                  aria-label="{{#str}}additionalcommentsforcriterion, gradingform_guide, {{name}}{{/str}}"
+                  data-gradingform-guide-role="remark"
+                  rows="2"
+                  data-max-rows="5"
+                  data-auto-rows
+                  >{{remark}}</textarea>
+              {{#hascomments}}
+                <button
+                  class="btn btn-sm btn-info d-inline-flex w-100 mt-2 justify-content-between align-items-center text-left collapsed"
+                  aria-controls="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark-frequent-comments"
+                  aria-expanded="false"
+                  data-toggle="collapse"
+                  data-target="#gradingform_guide-{{uniqid}}-criteria-{{id}}-remark-frequent-comments"
+                  type="button"
+                >
+                    <span>{{#str}}commentpickerforcriterion, gradingform_guide, {{name}}{{/str}}</span>
+                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                      <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                      <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                    </svg>
+                </button>
+              {{/hascomments}}
+            </div>
             {{#hascomments}}
-              <button
-                class="btn btn-sm btn-secondary w-100 mt-2 collapsed"
-                aria-controls="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark-frequent-comments"
-                aria-expanded="false"
-                data-toggle="collapse"
-                data-target="#gradingform_guide-{{uniqid}}-criteria-{{id}}-remark-frequent-comments"
-                type="button"
-              >
-                  {{#str}}commentpickerforcriterion, gradingform_guide, {{name}}{{/str}}
-              </button>
-            {{/hascomments}}
-          </div>
-          {{#hascomments}}
-            <div class="collapse" id="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark-frequent-comments">
-              <div data-gradingform_guide-frequent-comments="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark">
-                  <h6>{{#str}}comments, gradingform_guide{{/str}}</h6>
-                <div class="list-group">
-                  {{#comments}}
-                    <button type="button" class="btn btn-xs btn-secondary" data-gradingform_guide-role="frequent-comment">{{description}}</button>
-                  {{/comments}}
+              <div class="collapse" id="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark-frequent-comments">
+                <div data-gradingform_guide-frequent-comments="gradingform_guide-{{uniqid}}-criteria-{{id}}-remark">
+                  <h5 class="mb-1">{{#str}}comments, gradingform_guide{{/str}}</h5>
+                  <div class="list-group">
+                    {{#comments}}
+                      <button type="button" class="list-group-item list-group-item-action" data-gradingform_guide-role="frequent-comment">{{description}}</button>
+                    {{/comments}}
+                  </div>
                 </div>
               </div>
-            </div>
-          {{/hascomments}}
-          <span id="gradingform_guide-{{uniqid}}-help-{{id}}-remark" aria-hidden="true" class="sr-only">{{#str}}remark_help, gradingform_guide{{/str}}</span>
+            {{/hascomments}}
+            <span id="gradingform_guide-{{uniqid}}-help-{{id}}-remark" aria-hidden="true" class="sr-only">{{#str}}remark_help, gradingform_guide{{/str}}</span>
+          </div>
         </div>
+
       </div>
     </div>
   {{/criterion}}

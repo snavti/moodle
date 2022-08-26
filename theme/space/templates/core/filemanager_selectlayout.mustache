@@ -24,52 +24,54 @@
 }}
 <div class="file-picker fp-select">
     <div class="fp-select-loading">
-        <span class="sr-only">{{#str}}loadinghelp{{/str}}</span>
-        {{#pix}}i/loading_small{{/pix}}
+            <span class="sr-only">{{#str}}loadinghelp{{/str}}</span>
+            <svg class="spinner" viewBox="0 0 50 50">
+                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
     </div>
-    <div class="container">
+    <div class="fp-container">
         <form>
-            <fieldset class="form-group row no-gutters">
-                <div class="form-check fp-linktype-2 pl-0">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="radio">
-                        {{#str}}makefileinternal, repository{{/str}}
-                    </label>
+            <div class="alert alert-secondary px-4">
+                <div class="form-check fp-linktype-2 custom-control custom-radio custom-control-inline">
+                    <div class="form-check-label">
+                        <input class="form-check-input custom-control-input" type="radio">
+                        <label class="custom-control-label ml-2">{{#str}}makefileinternal, repository{{/str}}</label>
+                    </div>
                 </div>
-                <div class="form-check fp-linktype-1 pl-0">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="radio">
-                        {{#str}}makefilelink, repository{{/str}}
-                    </label>
+                <div class="form-check fp-linktype-1 custom-control custom-radio custom-control-inline">
+                    <div class="form-check-label">
+                        <input class="form-check-input custom-control-input" type="radio">
+                        <label class="custom-control-label ml-2">{{#str}}makefilelink, repository{{/str}}</label>
+                    </div>
                 </div>
-                <div class="form-check fp-linktype-4 pl-0">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="radio">
-                        {{#str}}makefilereference, repository{{/str}}
-                    </label>
+                <div class="form-check fp-linktype-4 custom-control custom-radio custom-control-inline">
+                    <div class="form-check-label">
+                        <input class="form-check-input custom-control-input" type="radio">
+                        <label class="custom-control-label ml-2">{{#str}}makefilereference, repository{{/str}}</label>
+                    </div>
                 </div>
-                <div class="form-check fp-linktype-8 pl-0">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="radio">
-                        {{#str}}makefilecontrolledlink, repository{{/str}}
-                    </label>
+                <div class="form-check fp-linktype-8 custom-control custom-radio custom-control-inline">
+                    <div class="form-check-label">
+                        <input class="form-check-input custom-control-input" type="radio">
+                        <label class="custom-control-label ml-2">{{#str}}makefilecontrolledlink, repository{{/str}}</label>
+                    </div>
                 </div>
-            </fieldset>
+            </div>
             <div class="fp-saveas form-group row no-gutters">
-                <label class="col-form-label">{{#str}}saveas, repository{{/str}}</label>
-                <input class="form-control" type="text">
+                <label class="form-control-label my-0 mr-2 col-4">{{#str}}saveas, repository{{/str}}</label>
+                <div class="col"><input class="form-control" type="text"></div>
             </div>
             <div class="fp-setauthor form-group row no-gutters">
-                <label class="col-form-label">{{#str}}author, repository{{/str}}</label>
-                <input class="form-control" type="text">
+                <label class="form-control-label my-0 mr-2 col-4">{{#str}}author, repository{{/str}}</label>
+                <div class="col"><input class="form-control" type="text"></div>
             </div>
             <div class="fp-setlicense form-group row no-gutters">
                 {{>core/filemanager_chooselicense}}
             </div>
-            <div class="form-group row no-gutters">
-                <div class="fp-select-buttons">
-                    <button class="fp-select-confirm btn-primary btn mr-2">{{#str}}getfile, repository{{/str}}</button>
-                    <button class="fp-select-cancel btn-secondary btn ml-2">{{#str}}cancel{{/str}}</button>
+            <div class="form-group row">
+                <div class="fp-select-buttons form-group mb-0 w-100 d-inline-flex">
+                    <button class="fp-select-cancel btn-secondary btn mb-1 col-4">{{#str}}cancel{{/str}}</button>
+                    <button class="fp-select-confirm btn-primary btn ml-2 mb-1 col justify-content-bettween">{{#str}}getfile, repository{{/str}}</button>
                 </div>
             </div>
         </form>
@@ -77,15 +79,16 @@
     <hr />
     <div class="fp-info clearfix d-inline-flex align-items-start col-12 p-0">
         <div class="row no-gutters w-100">
-                <div class="fp-thumbnail col m-0"></div>
-                <div class="col m-0 px-4 py-3 alert alert-warning fp-fileinfo">
-                <div class="fp-datemodified"><strong>{{#str}}lastmodified, repository{{/str}}</strong><span class="fp-value"></span></div>
-                <div class="fp-datecreated"><strong>{{#str}}datecreated, repository{{/str}}</strong><span class="fp-value"></span></div>
-                <div class="fp-size"><strong>{{#str}}size, repository{{/str}}</strong><span class="fp-value"></span></div>
-                <div class="fp-license"><strong>{{#str}}license, repository{{/str}}</strong><span class="fp-value"></span></div>
-                <div class="fp-author"><strong>{{#str}}author, repository{{/str}}</strong><span class="fp-value"></span></div>
-                <div class="fp-dimensions"><strong>{{#str}}dimensions, repository{{/str}}</strong><span class="fp-value" dir="ltr"></span></div>
+            <div class="fp-thumbnail col"></div>
+            <div class="col fp-fileinfo">
+                <div class="fp-datemodified"><strong>{{#str}}lastmodified, repository{{/str}}</strong><br /><span class="fp-value"></span></div>
+                <div class="fp-datecreated"><strong>{{#str}}datecreated, repository{{/str}}</strong><br /><span class="fp-value"></span></div>
+                <div class="fp-size"><strong>{{#str}}size, repository{{/str}}</strong><br /><span class="fp-value"></span></div>
+                <div class="fp-license"><strong>{{#str}}license, repository{{/str}}</strong><br /><span class="fp-value"></span></div>
+                <div class="fp-author"><strong>{{#str}}author, repository{{/str}}</strong><br /><span class="fp-value"></span></div>
+                <div class="fp-dimensions"><strong>{{#str}}dimensions, repository{{/str}}</strong><br /><span class="fp-value" dir="ltr"></span></div>
             </div>
         </div>
     </div>
+
 </div>

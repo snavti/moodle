@@ -36,19 +36,19 @@
         ]
     }
 }}
-<div class="nav-tabs-container w-100 m-b-1 mr-auto">
-<ul class="nav nav-tabs" role="tablist">
-    {{#tabs}}
-        <li class="nav-item">
-            <a href="#{{name}}" class="nav-link {{#active}}active{{/active}}" data-toggle="tab" role="tab">{{displayname}}</a>
-        </li>
-    {{/tabs}}
-</ul>
-</div>
-<div class="tab-content mt-3">
-    {{#tabs}}
-        <div class="tab-pane {{#active}}active{{/active}}" id="{{name}}" role="tabpanel">
-            {{{html}}}
-        </div>
-    {{/tabs}}
+<div class="d-md-inline-flex w-100">
+    <ul class="rui-nav--admin nav nav-column flex-md-column" role="tablist">
+        {{#tabs}}
+            <li class="nav-item" data-settings-name="{{name}}">
+                <a href="#{{name}}" class="nav-link {{#active}}active{{/active}}" data-toggle="tab" role="tab">{{displayname}}</a>
+            </li>
+        {{/tabs}}
+    </ul>
+    <div class="col tab-content px-0">
+        {{#tabs}}
+            <div class="tab-pane {{#active}}active{{/active}}" id="{{name}}" role="tabpanel">
+                {{{html}}}
+            </div>
+        {{/tabs}}
+    </div>
 </div>

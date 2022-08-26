@@ -22,10 +22,19 @@
     Example context (json):
     {}
 }}
-<li class="list-group-item my-1 p-0 shadow-none">
+<li class="list-group-item mt-3 p-0 border-0">
+    <div class="w-50 bg-pulse-grey mb-2" style="height: 20px"></div>
     <div>
-        <ul class="px-0 py-0 my-0 list-group list-group-flush">
+        <ul class="pl-0 list-group list-group-flush">
+            {{> block_timeline/placeholder-event-list-item }}
+            {{> block_timeline/placeholder-event-list-item }}
+            {{> block_timeline/placeholder-event-list-item }}
+            {{> block_timeline/placeholder-event-list-item }}
             {{> block_timeline/placeholder-event-list-item }}
         </ul>
+        <div class="pt-3 d-flex justify-content-between">
+            <div class="w-25 bg-pulse-grey" style="height: 35px"></div>
+            <div class="w-25 bg-pulse-grey" style="height: 35px"></div>
+        </div>
     </div>
 </li>

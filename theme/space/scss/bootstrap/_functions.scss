@@ -51,6 +51,9 @@
 }
 
 // See https://codepen.io/kevinweber/pen/dXWoRw
+//
+// Requires the use of quotes around data URIs.
+
 @function escape-svg($string) {
   @if str-index($string, "data:image/svg+xml") {
     @each $char, $encoded in $escaped-characters {
@@ -72,7 +75,7 @@
   $g: green($color);
   $b: blue($color);
 
-  $yiq: (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+  $yiq: (($r * 299) + ($g * 587) + ($b * 114)) * 0.001;
 
   @if ($yiq >= $yiq-contrasted-threshold) {
     @return $dark;

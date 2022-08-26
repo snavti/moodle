@@ -38,50 +38,58 @@
         }]
     }
 }}
-<div class="container-fluid p-0">
-    <div class="row m-b-2">
-        <div class="col m-t-2 lead">{{#str}}bulkactivitydetail, core_completion{{/str}}</div>
-    </div>
+
+<fieldset class="fieldset-styled">
+    <legend>{{#str}}bulkactivitydetail, core_completion{{/str}}</legend>
+
     <form method="post" action="editbulkcompletion.php" class="mform" id="theform">
-        <div class="row m-b-2">
+        <div class="row">
             <div class="col">
-                <input type="submit" value="{{#str}}edit{{/str}}" class="btn btn-primary" name="submitbutton" aria-label="{{#str}}updateactivities, completion{{/str}}" disabled/>
+                <input type="submit" value="{{#str}}edit{{/str}}" class="btn btn-sm btn-outline-primary" name="submitbutton" aria-label="{{#str}}updateactivities, completion{{/str}}" disabled/>
             </div>
         </div>
-        <div class="row m-b-1">
-            <div class="col-xs-6 span6">
-                <input type="checkbox" class="mastercheck m-r-1" aria-label="{{#str}}checkall, completion{{/str}}">
-                <label class="font-weight-bold">{{#str}}activitieslabel, core_completion{{/str}}</label>
+        <div class="row no-gutters mt-3 pt-3 border-top">
+            <div class="col-6">
+                <label class="custom-control ios-switch">
+                    <input type="checkbox" class="mastercheck ios-switch-control-input form-check-input" aria-label="{{#str}}checkall, completion{{/str}}">
+
+                    <span class="ios-switch-control-indicator"></span>
+                    <span class="text ml-3 font-weight-bold">{{#str}}activitieslabel, core_completion{{/str}}</span>
+                </label>
             </div>
-            <div class="col-xs-6 span6">
+            <div class="col-6 px-0">
                 <label class="font-weight-bold">{{#str}}completion, core_completion{{/str}}</label>
                 <span>{{{helpicon}}}</span>
             </div>
         </div>
-        <hr class="row">
+
         <div class="topics">
             {{#sections}}
-                    <div class="m-b-1">
-                        <div class="row m-b-1 row-fluid">
-                            <div class="col-sm-12">
-                                <input type="checkbox" data-section-master="{{sectionnumber}}" class="m-r-1" aria-label="{{#str}}checkallsection, completion, {{{name}}}{{/str}}">
-                                <h3 class="d-inline-block">{{{name}}}</h3>
+                    <div class="mb-1">
+                        <div class="row mb-1">
+                            <div class="col-sm-12 align-items-center py-2 mt-4">
+                                <label class="custom-control ios-switch my-0">
+                                    <input type="checkbox" data-section-master="{{sectionnumber}}" class="ios-switch-control-input form-check-input" aria-label="{{#str}}checkallsection, completion, {{{name}}}{{/str}}">
+                                    <span class="ios-switch-control-indicator"></span>
+
+                                    <span class="text bold ml-3">{{{name}}}</span>
+                                </label>
                             </div>
                         </div>
                         {{> core_course/activityinstance}}
                     </div>
-                    <hr class="row">
+
             {{/sections}}
         </div>
         <input type="hidden" name="id" value="{{courseid}}" />
         <input type="hidden" name="sesskey" value="{{sesskey}}" />
-        <div class="row">
+        <div class="row no-gutters mt-3">
             <div class="col">
-                <input type="submit" value="{{#str}}edit{{/str}}" class="btn btn-primary" name="submitbutton" disabled/>
+                <input type="submit" value="{{#str}}edit{{/str}}" class="btn btn-sm btn-outline-primary" name="submitbutton" disabled/>
             </div>
         </div>
     </form>
-</div>
+</fieldset>
 
 {{#js}}
 require([

@@ -24,12 +24,17 @@
     }
 }}
 <div class="w-100 d-flex justify-content-between" data-region="chooser-option-summary-actions-container">
-    <button data-action="close-chooser-option-summary" class="closeoptionsummary btn btn-secondary mr-2 col" tabindex="0" data-modname="{{componentname}}_{{link}}">
-        <i class="fas fa-arrow-left mr-2"></i>
-        {{#str}} back {{/str}}
+    <button data-action="close-chooser-option-summary" class="closeoptionsummary btn btn-outline-secondary" tabindex="0" data-modname="{{componentname}}_{{link}}">
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.25 6.75L4.75 12L10.25 17.25"></path>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.25 12H5"></path>
+        </svg>
     </button>
-    <a href="{{link}}" title="{{#str}} addnew, moodle, {{title}} {{/str}}" data-action="add-chooser-option" class="addoption btn btn-primary ml-2 col" tabindex="0">
-        {{#str}} add {{/str}}
-        <i class="fas fa-plus ml-2"></i>
+    <a href="{{link}}" title="{{#str}} addnew, moodle, {{title}} {{/str}}" data-action="add-chooser-option" class="addoption btn btn-primary" tabindex="0">
+        <span class="mr-2">{{#str}} add {{/str}}</span>
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5.75V18.25"></path>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.25 12L5.75 12"></path>
+        </svg>
     </a>
 </div>

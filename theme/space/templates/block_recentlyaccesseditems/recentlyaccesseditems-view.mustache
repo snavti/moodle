@@ -21,7 +21,7 @@
 
     Example context (json):
     {
-        "noitemsimgurl": "https://moodlesite/theme/image.php/space/block_recentactivities/1535727318/items"
+        "noitemsimgurl": "https://moodlesite/theme/image.php/boost/block_recentactivities/1535727318/items"
     }
 }}
 <div id="recentlyaccesseditems-view-{{uniqid}}"
@@ -29,12 +29,12 @@
      data-noitemsimgurl="{{noitemsimgurl}}">
     <div data-region="recentlyaccesseditems-view-content">
         <div data-region="recentlyaccesseditems-loading-placeholder">
-            <div class="card-deck dashboard-card-scroll row justify-content-start">
-                {{> block_recentlyaccesseditems/placeholder-item }}
-                {{> block_recentlyaccesseditems/placeholder-item }}
-                {{> block_recentlyaccesseditems/placeholder-item }}
-                {{> block_recentlyaccesseditems/placeholder-item }}
-            </div>
+        <div class="rui-loading-placeholder">
+            <svg class="spinner" viewBox="0 0 50 50">
+                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
+        </div>
         </div>
     </div>
 </div>
+

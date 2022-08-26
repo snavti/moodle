@@ -53,28 +53,44 @@
 }}
 <div data-region="competencylinktree">
 {{^singleFramework}}
-<h3 class="mb-2">{{#str}}competencyframeworks, tool_lp{{/str}}</h3>
+<h5 class="mb-2">{{#str}}competencyframeworks, tool_lp{{/str}}</h5>
 <select data-action="chooseframework" class="custom-select">
 {{#frameworks}}
 <option value="{{id}}" {{#selected}}selected="selected"{{/selected}}>{{{shortname}}} <em>{{idnumber}}</em></option>
 {{/frameworks}}
 </select>
 {{/singleFramework}}
-<h3 class="mt-3 mb-2">{{#str}}locatecompetency, tool_lp{{/str}}</h3>
+<h5 class="mt-3 mb-0">{{#str}}locatecompetency, tool_lp{{/str}}</h5>
 
-<form data-region="filtercompetencies" class="form-inline" data-frameworkid="{{framework.id}}">
-    <div class="form-group row no-gutters w-100">
-        <div class="col mr-2">
+<div class="simplesearchform">
+    <form data-region="filtercompetencies" class="form-inline" data-frameworkid="{{framework.id}}">
+        <div class="search-input-group d-inline-flex justify-content-between w-100">
             <label class="accesshide" for="filter{{uniqid}}">{{#str}}search, tool_lp{{/str}}</label>
-            <input type="text" class="form-control w-100 m-0" id="filter{{uniqid}}" placeholder="{{#str}}search, tool_lp{{/str}}" value="{{search}}">
-        </div>
-        <div class="col-2">
-            <button class="btn btn-secondary w-100">
-                <i class="icon fas fa-search fa-fw " aria-hidden="true" title="{{#str}}search{{/str}}" aria-label="{{#str}}search{{/str}}"></i>
+            <span class="search-input-icon">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                </svg>
+            </span>
+            <input type="text"
+            id="filter{{uniqid}}"
+            class="search-input w-100"
+            placeholder="{{#str}}search, tool_lp{{/str}}"
+            aria-label="{{#str}}search, tool_lp{{/str}}"
+            name="{{ inputname }}"
+            data-region="input"
+            autocomplete="off"
+            value="{{ search }}"
+            >
+            <button type="submit" class="search-input-btn">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.75 6.75L19.25 12L13.75 17.25"></path>
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H4.75"></path>
+                </svg>
+                <span class="sr-only">{{ searchstring }}</span>
             </button>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 <ul data-enhance="linktree" style="display: none;" class="mt-1 mx-0 p-3 competency-tree">
     <li><span>{{{framework.shortname}}}</span>
         <ul class="pl-2">
@@ -84,9 +100,9 @@
         </ul>
     </li>
 </ul>
-<div data-region="link-buttons" class="mt-1 float-sm-right">
-    <input type="button" class="btn btn-primary" data-action="add" value="{{#str}}add{{/str}}"/>
-    <input type="button" class="btn btn-secondary" data-action="cancel" value="{{#str}}cancel{{/str}}"/>
+<div data-region="link-buttons" class="row px-3">
+    <input type="button" class="col btn btn-secondary" data-action="cancel" value="{{#str}}cancel{{/str}}"/>
+    <input type="button" class="col btn btn-primary" data-action="add" value="{{#str}}add{{/str}}"/>
 </div>
 <div class="clearfix"></div>
 </div>

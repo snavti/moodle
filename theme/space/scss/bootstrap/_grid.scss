@@ -2,27 +2,48 @@
 //
 // Set the container width, and override it for fixed navbars in media queries.
 
-/* @if $enable-grid-classes {
-  .container {
-    @include make-container();
-    @include make-container-max-widths();
-  }
-} */
-
-// Fluid container
-//
-// Utilizes the mixin meant for fixed width containers, but with 100% width for
-// fluid, full width layouts.
-
 @if $enable-grid-classes {
+  // Single container class with breakpoint max-widths
+  .container,
+  // 100% wide container at all breakpoints
   .container-fluid {
     @include make-container();
   }
+
+  // Responsive containers that are 100% wide until a breakpoint
+  @each $breakpoint, $container-max-width in $container-max-widths {
+    .container-#{$breakpoint} {
+      @extend .container-fluid;
+    }
+
+    @include media-breakpoint-up($breakpoint, $grid-breakpoints) {
+      %responsive-container-#{$breakpoint} {
+        max-width: $container-max-width;
+      }
+
+      // Extend each breakpoint which is smaller or equal to the current breakpoint
+      $extend-breakpoint: true;
+
+      @each $name, $width in $grid-breakpoints {
+        @if ($extend-breakpoint) {
+          .container#{breakpoint-infix($name, $grid-breakpoints)} {
+            @extend %responsive-container-#{$breakpoint};
+          }
+
+          // Once the current breakpoint is reached, stop extending
+          @if ($breakpoint == $name) {
+            $extend-breakpoint: false;
+          }
+        }
+      }
+    }
+  }
 }
+
 
 // Row
 //
-// Rows contain and clear the floats of your columns.
+// Rows contain your columns.
 
 @if $enable-grid-classes {
   .row {
@@ -49,61 +70,4 @@
 
 @if $enable-grid-classes {
   @include make-grid-columns();
-}
-
-.row.wide-gutter {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-@include media-breakpoint-up(lg) {
-  .row.wide-gutter [class*='col-']:not(:first-child):not(:last-child),
-  .row.wide-gutter [class*='col-']:not(:nth-of-type(n + 3)) {
-    padding-right: 20px;
-    padding-left: 20px;
-  }
-}
-
-@include media-breakpoint-up(md) {
-  .row.wide-gutter [class*='col-']:not(:first-child):not(:last-child),
-  .row.wide-gutter [class*='col-']:not(:nth-of-type(n + 2)) {
-    padding-right: 20px;
-    padding-left: 20px;
-  }
-}
-
-
-.col-sep {
-  position: relative;
-
-  &:before {
-    content: '';
-
-    background-color: $gray-400;
-    width: 1px;
-    height: 100%;
-
-    position: absolute;
-    top: 0;
-    left: calc(50% - 0.5px);
-  }
-
-}
-
-.section-padding {
-  padding: $section-padding 0;
-
-  @include media-breakpoint-down(md) {
-    padding: $section-padding-sm 0;
-  }
-}
-
-.c-container {
-  width: 100%;
-
-  #page-site-index & {
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
 }

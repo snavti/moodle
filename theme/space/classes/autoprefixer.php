@@ -55,8 +55,8 @@ use Sabberworm\CSS\Value\ValueList;
  * Very basic implementation covering simple needs for Bootstrap 4.
  *
  * @package    theme_space
- * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes (oryginal 2016 Frédéric Massart - FMCorz.net)
- * @license    Commercial https://themeforest.net/licenses
+ * @copyright  2016 Frédéric Massart - FMCorz.net
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class autoprefixer {
 
@@ -82,15 +82,13 @@ class autoprefixer {
         'appearance' => ['-webkit-', '-moz-'],
         'backface-visibility' => ['-webkit-'],
         'background-clip' => ['-webkit-'],
+        'backdrop-filter' => ['-webkit-'],
         'background-size' => ['-webkit-'],
         'column-count' => ['-webkit-', '-moz-'],
         'column-gap' => ['-webkit-', '-moz-'],
         'perspective' => ['-webkit-'],
         'touch-action' => ['-ms-'],
         'transform' => ['-webkit-', '-moz-', '-ms-'],
-        'transition-timing-function' => ['-webkit-', '-o-'],
-        'transition-duration' => ['-webkit-', '-o-'],
-        'transition-property' => ['-webkit-', '-o-'],
         'user-select' => ['-webkit-', '-moz-', '-ms-'],
     ];
 
@@ -100,6 +98,8 @@ class autoprefixer {
      * @param Document $tree The CSS tree.
      */
     public function __construct(Document $tree) {
+        debugging('theme_space\autoprefixer() is deprecated. Required prefixes for Bootstrap ' .
+            'are now in theme/space/scss/moodle/prefixes.scss', DEBUG_DEVELOPER);
         $this->tree = $tree;
 
         $pseudos = array_map(function($pseudo) {

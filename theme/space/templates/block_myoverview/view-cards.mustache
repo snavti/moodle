@@ -29,7 +29,7 @@
                 "fullname": "course 3",
                 "hasprogress": true,
                 "progress": 10,
-                "coursecategory": "Miscellaneous",
+                "coursecategory": "Category 1",
                 "visible": true
             }
         ]
@@ -42,12 +42,22 @@
     {{/menu}}
     {{$progress}}
         {{#hasprogress}}
-                {{> block_myoverview/progress-bar}}
+        <div class="rui-course-card-progress-bar">
+            {{> block_myoverview/progress-bar}}
+        </div>
         {{/hasprogress}}
     {{/progress}}
     {{$coursename}}
         <span class="multiline">
-            {{#shortentext}}50, {{{fullname}}} {{/shortentext}}
+            {{{fullname}}}
         </span>
     {{/coursename}}
+    {{$coursecategory}}
+        {{#showcoursecategory}}
+            <span class="sr-only">
+                {{#str}}aria:coursecategory, core_course{{/str}}
+            </span>
+            {{{coursecategory}}}
+        {{/showcoursecategory}}
+    {{/coursecategory}}
 {{/ core_course/coursecards }}

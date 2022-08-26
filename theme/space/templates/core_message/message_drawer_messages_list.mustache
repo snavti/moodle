@@ -37,7 +37,7 @@
 {{#messages}}
     <a
         href="#"
-        class="p-2 d-flex list-group-item list-group-item-action align-items-center"
+        class="py-3 pl-3 pr-2 d-flex list-group-item list-group-item-action align-items-start"
         data-route="view-conversation"
         {{#conversationid}}
             data-route-param-1="{{.}}"
@@ -57,7 +57,7 @@
         role="button"
     >
         <img
-            class="rounded-circle"
+            class="rounded"
             src="{{{profileimageurl}}}"
             alt="{{fullname}}"
             aria-hidden="true"
@@ -66,32 +66,46 @@
         {{#showonlinestatus}}
             <span class="contact-status {{#isonline}}online{{/isonline}}"></span>
         {{/showonlinestatus}}
-        <div class="w-100 text-truncate ml-2">
-            <div class="d-flex">
-                <strong class="h6 m-0">
+        <div class="w-100 ml-2">
+            <div class="d-flex align-items-center">
+                <h5 class="message-title m-0 text-truncate">
                     {{fullname}}
-
-                    <span class="{{^isblocked}}hidden{{/isblocked}}" data-region="contact-icon-blocked">
-                        {{#pix}} t/block, core, {{#str}} contactblocked, message {{/str}} {{/pix}}
-                    </span>
-                </strong>
+                </h5>
+                <span class="{{#isblocked}}rui-contact-icon-blocked ml-1{{/isblocked}} {{^isblocked}}hidden{{/isblocked}}" data-region="contact-icon-blocked">
+                    {{#pix}} t/block, core, {{#str}} contactblocked, message {{/str}} {{/pix}}
+                </span>
                 <div
-                    class="ml-auto small {{^lastmessagedate}}hidden{{/lastmessagedate}}"
+                    class="rui-last-message-date ml-auto align-items-center {{^lastmessagedate}}hidden{{/lastmessagedate}}"
                     data-region="last-message-date"
                 >
                     {{#lastmessagedate}}
+                    <span class="rui-last-message-date-icon">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-width="2"></circle>
+                            <path stroke="currentColor" stroke-width="2" d="M12 8V12L14 14"></path>
+                        </svg>
+                    </span>
+                    <span class="rui-last-message-date-text">
                         {{#userdate}} {{.}}, {{#str}} strftimedatefullshort, core_langconfig  {{/str}} {{/userdate}}
+                    </span>
                     {{/lastmessagedate}}
                 </div>
             </div>
-            <p class="m-0 small text-truncate" data-region="last-message">
-                {{#sentfromcurrentuser}}{{#str}} you, core_message {{/str}}{{/sentfromcurrentuser}}
-                <span>{{{lastmessage}}}</span>
-            </p>
+
+            <div class="mt-1 pr-2 rui-last-message message-txt" data-region="last-message">
+                <div class="rui-last-message-user-you" title="{{#str}} you, core_message {{/str}}">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.25 15.25V6.75H8.75"></path>
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 7L6.75 17.25"></path>
+                    </svg>
+                </div>
+                <span class="rui-last-message-text">{{#shortentext}} 100, {{{lastmessage}}}{{/shortentext}}</span>
+            </div>
+
         </div>
 
         <span
-            class="badge badge-danger {{^unreadcount}}hidden{{/unreadcount}}"
+            class="rui-unreadcount {{^unreadcount}}hidden{{/unreadcount}}"
             data-region="unread-count"
         >
             {{unreadcount}}

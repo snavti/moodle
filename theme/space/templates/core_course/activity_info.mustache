@@ -49,30 +49,49 @@
         ]
     }
 }}
-<div data-region="activity-information" data-activityname="{{activityname}}" class="activity-information">
+<div class="rui-activity-wrapper {{#hasdates}}rui-activity--hasdates{{/hasdates}} {{#hascompletion}}rui-activity--hascompletion{{/hascompletion}} {{^hascompletion}}rui-activity--hasnotcompletion{{/hascompletion}}">
     {{#hasdates}}
-    <div data-region="activity-dates" class="mt-2 activity-dates">
-        {{#activitydates}}
-            {{>core_course/activity_date}}
-        {{/activitydates}}
+    <div data-region="activity-information" data-activityname="{{activityname}}" class="rui-activity-information">
+        <div data-region="activity-dates" class="rui-activity-dates">
+            <svg class="d-none d-md-flex mr-2" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.75 4.75V19.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M8.75 12H19.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M15.75 8.75L19.25 12L15.75 15.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            {{#activitydates}}
+                {{>core_course/activity_date}}
+            {{/activitydates}}
+        </div>
     </div>
     {{/hasdates}}
+
     {{#hascompletion}}
+    <div class="rui-completion-info">
         {{#uservisible}}
-            <div data-region="completion-info" class="completion-info mt-2 mb-3">
+            <div data-region="completion-info">
                 {{#isautomatic}}
-                    <div class="automatic-completion-conditions" data-region ="completionrequirements" role="list" aria-label="{{#str}}completionrequirements, core_course, {{activityname}}{{/str}}">
+                    <div class="rui-completion-badges automatic-completion-conditions" data-region ="completionrequirements" role="list" aria-label="{{#str}}completionrequirements, core_course, {{activityname}}{{/str}}">
                         {{#completiondetails}}
                             {{> core_course/completion_automatic }}
                         {{/completiondetails}}
                     </div>
                 {{/isautomatic}}
-                {{^isautomatic}}
+            </div>
+        {{/uservisible}}
+    </div>
+    {{/hascompletion}}
+
+    {{#hascompletion}}
+        {{^isautomatic}}
+            {{#uservisible}}
+            <div class="{{^isautomatic}}rui-completion-info--manual{{/isautomatic}}">
+                <div data-region="completion-info">
                     {{#showmanualcompletion}}
                         {{> core_course/completion_manual }}
                     {{/showmanualcompletion}}
-                {{/isautomatic}}
+                </div>
             </div>
-        {{/uservisible}}
+            {{/uservisible}}
+        {{/isautomatic}}
     {{/hascompletion}}
 </div>

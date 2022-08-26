@@ -30,41 +30,43 @@
 
     This template uses ajax functionality, so it cannot be shown in the template library.
 }}
-
-<div class="col-12 row px-0 no-gutters align-items-center justify-content-end">
-  <div class="row align-items-center">
-    <a href="#previous" data-action="previous-user" class="pull-left mr-1"><i class="icon fas fa-caret-left"></i></a>
+<div class="mr-2">
+    <a href="#previous" data-action="previous-user" class="btn btn-sm btn-icon icon-no-margin">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8.75 12L14.25 7.75V16.25L8.75 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+    </a>
         <span data-region="input-field">
             <select data-action="change-user" data-currentuserid="{{currentuserid}}" data-assignmentid="{{assignmentid}}" data-groupid="{{groupid}}"></select>
         </span>
-    <a href="#next" data-action="next-user" class="pull-right ml-1"><i class="icon fas fa-caret-right"></i></a>
-  </div>
+    <a href="#next" data-action="next-user" class="btn btn-sm btn-icon icon-no-margin">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.25 12L8.75 7.75V16.25L14.25 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+    </a>
 
-  <div data-region="user-count" class="col-1 mr-3 ml-3 text-center">
-    <small>
-        <span data-region="user-count-summary">{{#str}}xofy, mod_assign, { "x": "{{index}}", "y": "{{count}}" }{{/str}}</span>
-    </small>
-  </div>
+    <span data-region="user-count" class="px-2 mx-2 border-left border-right">
+            <span data-region="user-count-summary" class="badge badge-light">{{#str}}xofy, mod_assign, { "x": "{{index}}", "y": "{{count}}" }{{/str}}</span>
+    </span>
 
-  <div>
-    <span data-region="configure-filters" id="filter-configuration-{{uniqid}}" class="card card-large p-2">
-        <form>
-            <span class="row px-3 py-1">
-                <label class="text-right w-25 p-2 m-0" for="filter-general-{{uniqid}}">
+    <div data-region="configure-filters" id="filter-configuration-{{uniqid}}" class="p-2">
+        <form class="text-left">
+            <span>
+                <label class="font-weight-bold my-0 mr-2 d-block" for="filter-general-{{uniqid}}">
                     {{#str}}filter, mod_assign{{/str}}
                 </label>
-                <select name="filter" class="custom-select w-50" id="filter-general-{{uniqid}}">
+                <select name="filter" class="custom-select custom-select-sm" id="filter-general-{{uniqid}}">
                 {{#filters}}
                     <option value="{{key}}" {{#active}}selected="selected"{{/active}} > {{name}} </option>
                 {{/filters}}
                 </select>
             </span>
             {{#hasmarkingallocation}}
-            <span class="row px-3 py-1">
-                <label class="text-right w-25 p-2 m-0" for="filter-marker-{{uniqid}}">
+            <span>
+                <label class="font-weight-bold my-0 mr-2 d-block" for="filter-marker-{{uniqid}}">
                     {{#str}}markerfilter, mod_assign{{/str}}
                 </label>
-                <select name="markerfilter" class="custom-select w-50" id="filter-marker-{{uniqid}}">
+                <select name="markerfilter" class="custom-select custom-select-sm" id="filter-marker-{{uniqid}}">
                 {{#markingallocationfilters}}
                     <option value="{{key}}" {{#active}}selected="selected"{{/active}} > {{name}} </option>
                 {{/markingallocationfilters}}
@@ -72,11 +74,11 @@
             </span>
             {{/hasmarkingallocation}}
             {{#hasmarkingworkflow}}
-            <span class="row px-3 py-1">
-                <label class="text-right w-25 p-2 m-0" for="filter-workflow-{{uniqid}}">
+            <span>
+                <label class="font-weight-bold my-0 mr-2 d-block" for="filter-workflow-{{uniqid}}">
                     {{#str}}workflowfilter, mod_assign{{/str}}
                 </label>
-                <select name="workflowfilter" class="custom-select w-50" id="filter-workflow-{{uniqid}}">
+                <select name="workflowfilter" class="custom-select custom-select-sm" id="filter-workflow-{{uniqid}}">
                 {{#markingworkflowfilters}}
                     <option value="{{key}}" {{#active}}selected="selected"{{/active}} > {{name}} </option>
                 {{/markingworkflowfilters}}
@@ -84,9 +86,9 @@
             </span>
             {{/hasmarkingworkflow}}
         </form>
-    </span>
+    </div>
 
-    <a href="#" class="btn btn-sm btn-secondary" data-region="user-filters" title="{{#str}}changefilters, mod_assign{{/str}}" aria-expanded="false" aria-controls="filter-configuration-{{uniqid}}">
+    <a href="#" class="btn btn-sm btn-secondary icon-no-margin" data-region="user-filters" title="{{#str}}changefilters, mod_assign{{/str}}" aria-expanded="false" aria-controls="filter-configuration-{{uniqid}}">
         <span class="accesshide">
             {{#filters}}
                 {{filtername}}
@@ -97,6 +99,4 @@
         </span>
         {{#pix}}i/filter{{/pix}}
     </a>
-
-  </div>
 </div>

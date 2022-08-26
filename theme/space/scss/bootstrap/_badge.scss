@@ -6,63 +6,109 @@
 .badge {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
+
   padding: $badge-padding-y $badge-padding-x;
-  margin: 1px 4px 1px 1px;
-  font-size: $badge-font-size!important;
+  @include font-size($badge-font-size);
   font-weight: $badge-font-weight;
-  line-height: 1.2;
-  text-align: left;
+  vertical-align: baseline;
   @include border-radius($badge-border-radius);
+  @include transition($badge-transition);
+
+  .dir-rtl & {
+    border: none!important;
+  }
+
+
+  @at-root a#{&} {
+    @include hover-focus() {
+      text-decoration: none;
+    }
+  }
+
+  a {
+    color: inherit;
+  }
+
+  + .badge {
+    margin-left: .35rem;
+  }
 
   // Empty badges collapse automatically
   &:empty {
     display: none;
   }
 
+  .bage--remove-icon {
+    font-size: 0.6875rem; //11px
+  }
+
   .icon {
-    font-size: 0.85rem;
-    margin-right: 0.25rem;
-  }
-
-  img {
-    margin-right: 0.5rem!important;
-  }
-
-  p {
-    white-space: normal;
-    text-align: left;
-    line-height: 1.5;
-  }
-
-  .btn-icon {
-    width: 26px;
-    padding: 0 5px;
-    margin-left: 0.25rem;
-  }
-
-  span {
-    margin-right: 0.5rem;
+    width: auto;
+    height: auto;
+    font-size: $badge-font-size;
   }
 }
 
-.badge-link {
-  cursor: pointer;
-  transition: $general-transition;
+.badge-sq {
+  display: inline-flex;
+  align-items: center;
+  padding: $badge-padding-y $badge-padding-x;
+  @include font-size($badge-font-size);
+  font-weight: $badge-font-weight;
+  vertical-align: baseline;
+  border-radius: $border-radius;
 
-  &:hover {
-    text-decoration: none;
+  a {
+    font-weight: $font-weight-bold;
+    color: inherit;
+    opacity: .7;
+    margin-left: .35rem;
   }
+}
 
-  &:before {
-    display: none;
+.badge-sm {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  padding: .3rem .85rem;
+  @include font-size($badge-font-size);
+  font-weight: $badge-font-weight;
+  vertical-align: baseline;
+  @include border-radius($badge-border-radius);
+  @include transition($badge-transition);
+
+  @at-root a#{&} {
+    @include hover-focus() {
+      text-decoration: none;
+    }
   }
 
   a {
-    &:hover {
-      text-decoration: none;
-      opacity: 0.8;
-    }
+    color: inherit;
   }
+
+  // Empty badges collapse automatically
+  &:empty {
+    display: none;
+  }
+
+  .bage--remove-icon {
+    font-size: 0.6875rem; //11px
+  }
+
+  .icon {
+    width: auto;
+    height: auto;
+    font-size: $badge-font-size;
+  }
+}
+
+.badge-xs {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: $badge-font-weight;
 }
 
 // Quick fix for badges in buttons
@@ -84,133 +130,169 @@
 // Colors
 //
 // Contextual variations (linked badges get darker on :hover).
+
 .badge-primary {
-  background-color: $theme-color-3;
-  color: $theme-color-9;
+  background-color: $primary-color-100;
+  color: $primary-color-700;
 
-  &.badge-link {
-    &:hover {
-      background-color: $theme-color-4;
-      color: $theme-color-9;
-    }
+  .theme-dark & {
+    background-color: $primary-color-600;
+    color: $primary-color-100;
   }
 }
 
-.badge-notice,
 .badge-secondary {
-  background-color: $theme-color-9;
-  color: $theme-color-3;
+  background-color: $gray-100;
+  color: $gray-800;
 
-  &.badge-link {
-    &:hover {
-      background-color: $theme-color-8;
-      color: $theme-color-3;
-    }
+  .theme-dark & {
+    background-color: $gray-800;
+    color: $gray-100;
   }
 }
 
-.badge-success,
-.label-success {
-  background-color: $green-200!important;
-  color: $green-800!important;
+.badge-success {
+  background-color: $green-100;
+  color: $green-600;
 
-  &.badge-link {
-    &:hover {
-      background-color: $green-100!important;
-      color: $green-800!important;
-    }
+  .theme-dark & {
+    background-color: $green-700;
+    color: $green-100;
   }
 }
 
-.badge-danger,
-.label-important {
-  background-color: $red-600;
-  color: $red-100;
+.badge-danger {
+  background-color: $red-100;
+  color: $red-600;
 
-  &.badge-link {
-    &:hover {
-      background-color: $red-700;
-      color: $red-100;
-    }
+  .theme-dark & {
+    background-color: $red-800;
+    color: $red-100;
   }
 }
 
-.badge-warning,
-.label-warning {
+.badge-warning {
   background-color: $yellow-200;
   color: $yellow-900;
 
-  &.badge-link {
-    &:hover {
-      background-color: $yellow-300;
-      color: $yellow-900;
-    }
+  .theme-dark & {
+    background-color: $yellow-900;
+    color: $yellow-100;
   }
 }
 
-.badge-info,
-.label-info,
-.label-default {
-  background-color: $green-700;
-  color: $green-100!important;
+.badge-info {
+  background-color: $blue-100;
+  color: $blue-600;
 
-  &.badge-link {
-    &:hover {
-      background-color: $green-800;
-      color: $green-100!important;
-    }
+  .theme-dark & {
+    background-color: $blue-600;
+    color: $blue-100;
   }
 }
 
 .badge-light {
   background-color: $gray-100;
-  color: $gray-900;
+  color: $gray-600;
 
-  &.badge-link {
-    &:hover {
-      background-color: $gray-200;
-      color: $gray-900;
-    }
+  .theme-dark & {
+    background-color: $dm-gray-300;
+    color: $dm-gray-800;
   }
 }
 
 .badge-dark {
-  background-color: $gray-900;
+  background-color: $black;
   color: $white;
-}
 
-.badge-icon {
-  padding-left: 35px;
-  position: relative;
-
-  &:after {
-    @extend %fa-icon;
-    @extend .fas;
-
-    position: absolute;
-    top: calc(50% - 6px);
-    left: 12px;
-
-    font-size: 12px;
-    color: inherit;
-    opacity: 0.6;
+  .theme-dark & {
+    background-color: $black;
+    color: $white;
   }
 }
 
-.badge-icon--permalink {
-  &:after {
-   content: fa-content($fa-var-link);
+.badge-link {
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:before {
+    display: none;
+  }
+
+  a {
+    &:hover {
+      text-decoration: none;
+      opacity: 0.8;
+    }
   }
 }
 
-.badge-icon--edit {
-  &:after {
-    content: fa-content($fa-var-pen);
-  }
-}
 
-.badge-icon--delete {
-  &:after {
-    content: fa-content($fa-var-trash-alt);
-  }
-}
+      // Mod Quiz
+      .badge {
+        h5 {
+          color: inherit;
+        }
+      }
+
+      // ---- URL:  /report/outline/index.php?id=10
+      .loginfo {
+        margin-top: 1rem;
+
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
+
+        padding: $badge-padding-y $badge-padding-x;
+        @include font-size($badge-font-size);
+        font-weight: $badge-font-weight;
+        vertical-align: baseline;
+        @include border-radius($badge-border-radius);
+
+        @extend .badge-info;
+      }
+
+
+      #page-badges-mybadges {
+        #fgroup_id_searchgroup {
+          .col-md-3 {
+            display: none;
+          }
+        }
+      }
+
+      .rui-badge-box {
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: $border-radius;
+        border: 1px solid $border-color;
+
+        position: relative;
+
+        .theme-dark & {
+          border: 1px solid $dm-border-color;
+        }
+
+        &:last-child,
+        &:only-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .rui-badge-not-available {
+        border: 1px solid $red-300;
+      }
+
+      .rui-badge-overview-actions {
+        margin: 0 -20px 20px;
+        padding: 0 20px 20px;
+        border-bottom: 1px solid $border-color;
+
+        .theme-dark & {
+          border-bottom: 1px solid $dm-border-color;
+        }
+      }

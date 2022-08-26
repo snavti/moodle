@@ -3,55 +3,41 @@
 //
 // Textual form controls
 //
-label {
-  line-height: 1.3;
-}
-
-label:not(:empty) + select {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-
-  #page-mod-forum-discuss & {
-    @include media-breakpoint-only(sm) {
-    margin: 0;
-    }
-  }
-}
-
-input[type="radio"], input[type="checkbox"] {
-  margin: 10px!important;
-}
 
 .form-control,
-input[type=text],
-input[type=email],
-#add_section_numsections,
-.path-grade-report-grader .gradeparent .text,
-textarea {
+select[size], select[multiple],
+.comment-area textarea,
+textarea.quickgrade,
+[name="subject"],
+.idnumber,
+.usp-search-field
+{
   display: block;
   width: 100%;
+  height: $input-height;
   padding: $input-padding-y $input-padding-x;
-  font-size: 0.85 * $font-size-base;
+  font-family: $input-font-family;
+  @include font-size($input-font-size);
+  font-weight: $input-font-weight;
   line-height: $input-line-height;
   color: $input-color;
   background-color: $input-bg;
   background-clip: padding-box;
   border: $input-border-width solid $input-border-color;
 
-  box-shadow: inset 0px 1px 3px 0 rgba(0,0,0,.13), inset 0 2px 1px 0 rgba(0,0,0,.05);
-  cursor: auto!important;
+  box-shadow: inset 0 2px 3px 0 rgba(0,0,0,0.11);
 
   // Note: This has no effect on <select>s in some browsers, due to the limited stylability of `<select>`s in CSS.
-  @if $enable-rounded {
-    // Manually use the if/else instead of the mixin to account for iOS override
-    border-radius: $input-border-radius;
-  } @else {
-    // Otherwise undo the iOS default
-    border-radius: 0;
-  }
+  border-radius: $border-radius;
 
   @include box-shadow($input-box-shadow);
   @include transition($input-transition);
+
+  .theme-dark & {
+    color: $dm-input-color;
+    background-color: $dm-input-bg;
+    border: $input-border-width solid $dm-input-border-color;
+  }
 
   // Unstyle the caret on `<select>`s in IE10+.
   &::-ms-expand {
@@ -59,14 +45,24 @@ textarea {
     border: 0;
   }
 
+  // Remove select outline from select box in FF
+  &:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 $input-color;
+
+    .theme-dark & {text-shadow: 0 0 0 $dm-input-color;}
+  }
+
   // Customize the `:focus` state to imitate native WebKit styles.
-  @include form-control-focus();
+  @include form-control-focus($ignore-warning: true);
 
   // Placeholder
   &::placeholder {
     color: $input-placeholder-color;
     // Override Firefox's unusual default opacity; see https://github.com/twbs/bootstrap/pull/11526.
     opacity: 1;
+
+    .theme-dark & {color: $dm-input-placeholder-color;}
   }
 
   // Disabled and read-only inputs
@@ -79,19 +75,39 @@ textarea {
     background-color: $input-disabled-bg;
     // iOS fix for unreadable disabled content; see https://github.com/twbs/bootstrap/issues/11655.
     opacity: 1;
-    box-shadow: none;
+
+    .theme-dark & {
+      background-color: $dm-input-disabled-bg;
+    }
   }
 }
 
-select.form-control[multiple],
-select.form-control[size],
-textarea.form-control {
-  width: 100%;
-  height: auto;
-  transition: $general-transition;
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"] {
+  &.form-control {
+    appearance: none; // Fix appearance for date inputs in Safari
+  }
 }
 
+select[size], select[multiple],
 select.form-control {
+
+  option {
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+    border-radius: $border-radius;
+
+    &[disabled="disabled"] {
+      display: none;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
   &:focus::-ms-value {
     // Suppress the nested default white text on blue background highlight given to
     // the selected option text when the (still closed) <select> receives focus
@@ -100,6 +116,11 @@ select.form-control {
     // See https://github.com/twbs/bootstrap/issues/19398.
     color: $input-color;
     background-color: $input-bg;
+
+    .theme-dark & {
+      color: $dm-input-color;
+      background-color: $dm-input-bg;
+    }
   }
 }
 
@@ -119,34 +140,25 @@ select.form-control {
 // text to align with the form controls.
 .col-form-label {
   margin-bottom: 0; // Override the `<label>/<legend>` default
-  font-size: inherit; // Override the `<legend>` default
+  @include font-size(inherit); // Override the `<legend>` default
+  font-weight: $font-weight-medium;
   line-height: $input-line-height;
-
-  .icon {
-    color: $gray-700;
-  }
 }
 
 .col-form-label-lg {
-  padding-top: calc(#{$input-padding-y-lg} + #{$input-border-width});
-  padding-bottom: calc(#{$input-padding-y-lg} + #{$input-border-width});
-  font-size: $font-size-lg;
+  padding-top: add($input-padding-y-lg, $input-border-width);
+  padding-bottom: add($input-padding-y-lg, $input-border-width);
+  @include font-size($input-font-size-lg);
+  font-weight: $font-weight-medium;
   line-height: $input-line-height-lg;
-
-  .icon {
-    color: $gray-700;
-  }
 }
 
 .col-form-label-sm {
-  padding-top: calc(#{$input-padding-y-sm} + #{$input-border-width});
-  padding-bottom: calc(#{$input-padding-y-sm} + #{$input-border-width});
-  font-size: $font-size-sm;
+  padding-top: add($input-padding-y-sm, $input-border-width);
+  padding-bottom: add($input-padding-y-sm, $input-border-width);
+  @include font-size($input-font-size-sm);
+  font-weight: $font-weight-medium;
   line-height: $input-line-height-sm;
-
-  .icon {
-    color: $gray-700;
-  }
 }
 
 
@@ -158,13 +170,18 @@ select.form-control {
 .form-control-plaintext {
   display: block;
   width: 100%;
-  padding-top: $input-padding-y;
-  padding-bottom: $input-padding-y;
+  padding: $input-padding-y 0;
   margin-bottom: 0; // match inputs if this class comes on inputs with default margins
+  @include font-size($input-font-size);
   line-height: $input-line-height;
+  color: $input-plaintext-color;
   background-color: transparent;
   border: solid transparent;
   border-width: $input-border-width 0;
+
+  .theme-dark & {
+    color: $dm-input-plaintext-color;
+  }
 
   &.form-control-sm,
   &.form-control-lg {
@@ -179,36 +196,31 @@ select.form-control {
 // Build on `.form-control` with modifier classes to decrease or increase the
 // height and font-size of form controls.
 //
-// The `.form-group-* form-control` variations are sadly duplicated to avoid the
-// issue documented in https://github.com/twbs/bootstrap/issues/15074.
-
-.form-control-sm {
-  padding: $input-padding-y-sm $input-padding-x-sm!important;
-  font-size: $font-size-sm!important;
-  line-height: $input-line-height-sm!important;
-  @include border-radius($input-border-radius);
-}
-
-.form-control-xs {
-  padding: 0.54rem!important;
-  font-size: $font-size-xs!important;
-  line-height: $input-line-height-sm!important;
-  @include border-radius($input-border-radius);
-}
-
-select.form-control-sm {
-  &:not([size]):not([multiple]) {
-    height: $input-height-sm;
-  }
-}
-
+// Repeated in `_input_group.scss` to avoid Sass extend issues.
 .form-control-lg {
+  height: $input-height-lg;
   padding: $input-padding-y-lg $input-padding-x-lg;
-  font-size: $font-size-lg;
+  @include font-size($input-font-size-lg);
   line-height: $input-line-height-lg;
   @include border-radius($input-border-radius-lg);
 }
 
+// stylelint-disable-next-line no-duplicate-selectors
+select.form-control {
+  &[size],
+  &[multiple] {
+    height: auto;
+  }
+}
+
+textarea.form-control {
+  width: 100%;
+  height: auto;
+}
+
+.form-inline textarea.form-control {
+  width: 100%;
+}
 
 // Form groups
 //
@@ -216,29 +228,14 @@ select.form-control-sm {
 // horizontal forms, use the predefined grid classes.
 
 .form-group {
-  margin-bottom: $form-group-margin-bottom;
-  display: flex;
+  margin: .35rem 0;
   align-items: center;
-  flex-wrap: wrap;
-
-  .custom-select {
-    .form-inline & {
-      margin-bottom: 0;
-    }
-  }
+  position: relative;
 
   label {
-    margin-bottom: $form-group-margin-bottom;
     font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
   }
-
-  select {
-    .form-setting & {
-      margin-right: 5px;
-      margin-bottom: 5px;
-    }
-  }
-
 }
 
 .form-text {
@@ -246,15 +243,6 @@ select.form-control-sm {
   margin-top: $form-text-margin-top;
 }
 
-.fdate_selector {
-  align-items: baseline;
-
-  [name="datefrom[calendar]"],
-  [name="datetill[calendar]"]
-  {
-    margin: 0 10px;
-  }
-}
 
 // Form grid
 //
@@ -263,13 +251,13 @@ select.form-control-sm {
 .form-row {
   display: flex;
   flex-wrap: wrap;
-  margin-right: -5px;
-  margin-left: -5px;
+  margin-right: -$form-grid-gutter-width * 0.5;
+  margin-left: -$form-grid-gutter-width * 0.5;
 
   > .col,
   > [class*="col-"] {
-    padding-right: 5px;
-    padding-left: 5px;
+    padding-right: $form-grid-gutter-width * 0.5;
+    padding-left: $form-grid-gutter-width * 0.5;
   }
 }
 
@@ -280,61 +268,35 @@ select.form-control-sm {
 
 .form-check {
   position: relative;
-  display: inline-flex;
-  align-items: center;
+  display: block;
   padding-left: $form-check-input-gutter;
-
-  .btn-icon {
-    margin-left: 10px;
-  }
 }
-
-  .checkbox {
-    .form-check {
-      background-color: $gray-100;
-      padding: 0.5rem 1rem;
-
-      border-radius: $border-radius;
-
-      font-size: $font-size-sm;
-
-      label {
-        display: inline-flex;
-        align-items: center;
-        margin: 0;
-
-        a {
-          margin: 0 10px;
-          color: $link-color;
-        }
-      }
-    }
-  }
 
 .form-check-input {
   position: relative;
+  margin-top: $form-check-input-margin-y;
+  margin-left: -$form-check-input-gutter;
 
+  // Use [disabled] and :disabled for workaround https://github.com/twbs/bootstrap/issues/28247
+  &[disabled] ~ .form-check-label,
   &:disabled ~ .form-check-label {
     color: $text-muted;
+
+    .theme-dark & {color: $dm-text-muted;}
   }
 }
 
 .form-check-label {
   margin-bottom: 0; // Override default `<label>` bottom margin
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
 }
 
 .form-check-inline {
   display: inline-flex;
   align-items: center;
   padding-left: 0; // Override base .form-check
-  margin-right: 2 * $spacer;
-
-  font-size: $font-size-sm;
-
-  label {
-    display: inline-flex;
-    align-items: center;
-  }
+  margin-right: $form-check-inline-margin-x;
 
   // Undo .form-check-input defaults and add some `margin-right`.
   .form-check-input {
@@ -342,6 +304,7 @@ select.form-control-sm {
     margin-top: 0;
     margin-right: $form-check-inline-input-margin-x;
     margin-left: 0;
+    margin-bottom: 0;
   }
 }
 
@@ -353,8 +316,9 @@ select.form-control-sm {
 // pseudo-classes but also includes `.is-invalid` and `.is-valid` classes for
 // server side validation.
 
-@include form-validation-state("valid", $form-feedback-valid-color);
-@include form-validation-state("invalid", $form-feedback-invalid-color);
+@each $state, $data in $form-validation-states {
+  @include form-validation-state($state, map-get($data, color), map-get($data, icon));
+}
 
 // Inline forms
 //
@@ -365,12 +329,6 @@ select.form-control-sm {
 // Requires wrapping inputs and labels with `.form-group` for proper display of
 // default HTML form controls and our custom form controls (e.g., input groups).
 
-.advanced-search-form .form-inline {
-    select {
-      margin-right: 0.5rem; //advanced search page
-    }
-}
-
 .form-inline {
   display: flex;
   flex-flow: row wrap;
@@ -380,16 +338,26 @@ select.form-control-sm {
   // doesn't occupy the full-width (which is what we want for xs grid tier),
   // so we force that here.
   .form-check {
-    margin: 1rem 0; //user enrollment user/index.php
+    width: 100%;
   }
 
+  select, input {
+    margin-right: 0.25rem;
+  }
+
+  + h2 {
+    margin-top: 2rem;
+  }
 
   // Kick in the inline
   @include media-breakpoint-up(sm) {
     label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 0;
-      padding: 5px 0;
-      font-weight: $font-weight-sm-bold;
+
+      font-weight: $font-weight-medium;
     }
 
     // Inline-block all the things for "inline"
@@ -413,25 +381,31 @@ select.form-control-sm {
       display: inline-block;
     }
 
-    .input-group {
+    .input-group,
+    .custom-select {
       width: auto;
+    }
+
+    .custom-select {
+      width: auto;
+      max-width: 260px;
     }
 
     // Remove default margin on radios/checkboxes that were used for stacking, and
     // then undo the floating of radios and checkboxes to match.
     .form-check {
       display: flex;
+      align-items: center;
+      justify-content: flex-start;
       width: auto;
       padding-left: 0;
-      align-items: center;
-      line-height: 1;
     }
     .form-check-input {
       position: relative;
+      flex-shrink: 0;
       margin-top: 0;
       margin-right: $form-check-input-margin-x;
       margin-left: 0;
-      height: 15px;
     }
 
     .custom-control {
@@ -439,169 +413,57 @@ select.form-control-sm {
       justify-content: center;
     }
     .custom-control-label {
+      line-height: 1.8;
       margin-bottom: 0;
     }
   }
 }
 
-.form-defaultinfo {
-  margin: $spacer 0;
-  font-size: $font-size-sm;
-}
 
-#page-grade-edit-letter-index {
-  #id_gradeletters {
-    .form-inline .form-group {
-      &:nth-of-type(2n + 1) {
-        margin-right: $spacer;
-      }
-      &:nth-of-type(2n) {
-        margin-right: $spacer;
-        margin-left: $spacer;
-      }
-    }
+/* THEME */
 
-    .form-control {
-      text-align: center;
-    }
-  }
-}
-
-
-/* Mod for survay textarea and select form */
-.questioncell {
-  .form-control,
-  .custom-select {
-    width: 100%;
-  }
-}
-
-.sign-up-form {
-  border-radius: 0;
-
-  max-width: 600px;
-
-  padding: 2rem;
-
-  .collapsible-actions {
-    display: none!important;
-  }
-
-  .ftoggler {
-    margin: 2rem 0;
-    font-size: $font-size-base;
-    font-weight: $font-weight-bold;
-  }
-
-  fieldset {
+ .checkbox {
+  .form-check {
+    padding: 0.5rem 1rem;
     margin: 0;
-    padding: 1rem 0;
-  }
 
-  .col-form-label {
+    align-items: center;
+    display: inline-flex;
+
+    background-color: $gray-100;
+    border-radius: $border-radius;
+
     font-size: $font-size-sm;
-  }
 
-  .fcontainer {
-    margin: 0;
-  }
+    .theme-dark & {background-color: $dm-gray-100;}
 
-  input {
-    width: 100%!important;
-  }
-
-  .logo {
-    width: auto;
-    height: auto;
-    max-width: 300px;
-
-    @include media-breakpoint-down(md) {
-      max-width: 100%;
-    }
-  }
-
-  [data-fieldtype="group"] {
-    .btn {
-      @include media-breakpoint-only(sm) {
-        margin: 0.5rem 0;
-        width: 100%;
-      }
+    .btn-link {
+      margin-left: 0.5rem;
     }
 
+    label {
+      display: inline-flex;
+      align-items: center;
+      margin: 0;
 
-    &.form-inline .form-group {
-      @include media-breakpoint-only(sm) {
-      display: block!important;
-      width: 100%!important;
+      a {
+        margin: 0 10px;
+        color: $link-color;
+
+        .theme-dark & {
+          color: $dm-link-color;
+        }
       }
     }
   }
-
 }
 
-#page-login-index {
-  #signup {
-    .btn {
+
+// Contact form page
+#page-user-contactsitesupport {
+  .mform {
+    .form-control {
       width: 100%;
     }
   }
-}
-
-
-.moodle-dialogue-bd {
-
-  .usp-search form {
-    @extend .row;
-    @extend .no-gutters;
-
-    [type=submit] {
-      margin-left: 0.5rem;
-    }
-  }
-
-  .usp-search-field {
-    display: inline-flex;
-    width: auto!important;
-
-    @extend .col;
-  }
-
-  [type=submit] {
-    @extend .col;
-  }
-
-  .usp-results-count {
-    margin-top: 1rem;
-
-    position: relative;
-    padding: $alert-padding-y 5rem $alert-padding-y $alert-padding-x;
-    margin-bottom: 2rem;
-    border: $alert-border-width solid transparent;
-
-    font-size: $font-size-sm;
-    text-align: left;
-
-    @include border-radius($alert-border-radius);
-
-    @extend .alert-info;
-  }
-}
-
-legend.ftoggler {
-  &:empty {
-    margin: 0;
-  }
-}
-
-[data-content="inpage-reply-content"] {
-  margin-top: $spacer;
-  padding-left: 60px;
-
-  @include media-breakpoint-only(sm) {
-  padding-left: 0;
-  }
-}
-
-.form-setting .editor_atto_wrap {
-  width: inherit;
 }

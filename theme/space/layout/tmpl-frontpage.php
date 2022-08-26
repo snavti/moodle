@@ -15,218 +15,190 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A two column layout for the space theme.
+ * A front page layout for the space theme.
  *
- * @package    theme_space
- * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
- * @license    Commercial https://themeforest.net/licenses
+ * @package   theme_space
+ * @copyright 2022 Marcin Czaja (https://rosea.io)
+ * @license   Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
-
 user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
+user_preference_allow_ajax_update('sidepre-open', PARAM_ALPHA);
+user_preference_allow_ajax_update('darkmode-on', PARAM_ALPHA);
+user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
+user_preference_allow_ajax_update('drawer-open-block', PARAM_BOOL);
+
 require_once($CFG->libdir . '/behat/lib.php');
-// MODIFICATION Start: Require own locallib.php.
-require_once($CFG->dirroot . '/theme/space/locallib.php');
-// MODIFICATION END.
 
+$draweropenright = false;
 $extraclasses = [];
-$frontpagenavdrawer = theme_space_get_setting('displaynavdrawerfp');
-$device = core_useragent::get_device_type();
+// Moodle 4.0 - Add block button in editing mode.
+$addblockbutton = $OUTPUT->addblockbutton();
+if (isloggedin()) {
+    $blockdraweropen = (get_user_preferences('drawer-open-block') == true);
+} else {
+    $blockdraweropen = false;
+}
 
-$removesidebar= theme_space_get_setting('removesidebar');
-if (!$removesidebar) {
-    if ($frontpagenavdrawer == 0) {
-        $navdraweropen = false;
-        $extraclasses[] = 'drawer-open-hidden';
-    } else {
-        if (isloggedin()) {
-            if ($device == 'mobile' ) {
-                $navdraweropen = false;
-            } else {
-                $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
-            }
-        } else {
-            $navdraweropen = false;
+if (defined('BEHAT_SITE_RUNNING')) {
+    $blockdraweropen = true;
+}
+
+$extraclasses = ['uses-drawers'];
+// End.
+
+// Hidden sidebar
+if (theme_space_get_setting('turnoffsidebarfp') == '1' || !isloggedin()) {
+    $hiddensidebar = true;
+    $navdraweropen = false;
+    $extraclasses[] = 'hidden-sidebar'; 
+} else {
+    $hiddensidebar = false;
+}
+// End.
+
+// Dark mode
+if (isloggedin()) {
+    $navdraweropen = (get_user_preferences('drawer-open-nav', 'false') == 'false');
+    $draweropenright = (get_user_preferences('sidepre-open', 'true') == 'true');
+    
+    if (theme_space_get_setting('darkmodetheme') == '1') {
+        $darkmodeon = (get_user_preferences('darkmode-on', 'false') == 'true'); //return 1
+        if($darkmodeon) {
+            $extraclasses[] = 'theme-dark'; 
         }
+    }
+    else {
+        $darkmodeon = false;
     }
 } else {
     $navdraweropen = false;
 }
 
-$teammember = theme_space_get_setting('teammemberno');
-if ($teammember == 1) {
-    $teammemberperrow = ' col-md-4 col-lg-2';
-}
-if ($teammember == 2) {
-    $teammemberperrow = ' col-md-4 col-lg-3';
-}
-if ($teammember == 3) {
-    $teammemberperrow = ' col-md-4 col-lg-4';
+if ($navdraweropen && !$hiddensidebar) {
+    $extraclasses[] = 'drawer-open-left';
 }
 
-$logos = theme_space_get_setting('logosperrow');
-if ($logos == 1) {
-    $logosno = 'col-md-4 col-lg-2';
-}
-if ($logos == 2) {
-    $logosno = 'col-md-4 col-lg-3';
-}
-if ($logos == 3) {
-    $logosno = 'col-md-4 col-lg-4';
-}
+$siteurl = $CFG->wwwroot;
 
-$isslider = false;
-if (theme_space_get_setting('sliderenabled', true) == true || theme_space_get_setting('fpblock11', true) == true || theme_space_get_setting('fpblock12', true) == true || theme_space_get_setting('fpblock13', true) == true || theme_space_get_setting('FPLogos', true) == true || theme_space_get_setting('FPTeam', true) == true) {
-    $isslider = true;
-}
+$blockshtml = $OUTPUT->blocks('side-pre');
+$hasblocks = strpos($blockshtml, 'data-block=') !== false;
 
-//Simple content builder
-$elements = 14;
-$pluginsettings = get_config("theme_space");
-for ($i = 1; $i <= $elements; $i++) {
-    ${"slotblock". $i} = theme_space_get_setting("slotblock" . $i);
+$sidecourseblocks = $OUTPUT->blocks('sidecourseblocks');
+$hassidecourseblocks = strpos($sidecourseblocks, 'data-block=') !== false;
+
+$blockstopsidebar = $OUTPUT->blocks('sidebartopblocks');
+$blocksbottomsidebar = $OUTPUT->blocks('sidebarbottomblocks');
+
+if ($draweropenright && $hasblocks) {
+    $extraclasses[] = 'drawer-open-right';
 }
 
-$showfpblock1hr = theme_space_get_setting('showfpblock1hr');
-$showfpblock2hr = theme_space_get_setting('showfpblock2hr');
-$showfpblock4hr = theme_space_get_setting('showfpblock4hr');
-$showfpblock6hr = theme_space_get_setting('showfpblock6hr');
-$showfpblock7hr = theme_space_get_setting('showfpblock7hr');
-$showfpblock8hr = theme_space_get_setting('showfpblock8hr');
-$showfpblock10hr = theme_space_get_setting('showfpblock10hr');
-$showfpblock11hr = theme_space_get_setting('showfpblock11hr');
-$showfpblock12hr = theme_space_get_setting('showfpblock12hr');
-$showfpblockteamhr = theme_space_get_setting('showfpblockteamhr');
-
-$heroshadowtype = $pluginsettings->heroshadowtype;
-if ($heroshadowtype == 1) {
-    $heroshadowstyle = 'c-hero-shadow-gradient';
-}
-if ($heroshadowtype == 2) {
-    $heroshadowstyle = 'c-hero-shadow-img';
+// Start - Simple Content Builder
+$ruiscb = '';
+$total = 23;
+for ($i = 0; $i <= $total; $i++) {
+    ${"block" . $i} = theme_space_get_setting("block" . $i);
 }
 
-//Simple content builder
-for ($i = 1; $i <= $elements; $i++) {
-    ${"slotblock". $i} = $pluginsettings->{"slotblock" . $i};
+$array = array();
 
-    for ($j = 1; $j <= $elements; $j++) {
-        if( ${"slotblock" . $j} == "$i")
-        {
-            ${"slot" . $i . "block" . $j} = true;
-        } else
-        {
-            ${"slot" . $i . "block" . $j}  = false;
-        }
+for ($i = 0; $i <= $total; $i++) {
+    if(theme_space_get_setting("displayblock" . $i) == '1') {
+        $array[$i] = ${"block" . $i};
+    }
+    $array[0] = $block0;
+}
 
+asort($array);
+foreach($array as $key => $value) {
+    $ruiscb .= $OUTPUT->theme_part('block'.$key);
+}
+// End - Simple Content Builder
+
+$forceblockdraweropen = $OUTPUT->firstview_fakeblocks();
+
+
+// Moodle 4.0
+$hasblocks = (strpos($blockshtml, 'data-block=') !== false || !empty($addblockbutton));
+$PAGE->set_secondary_navigation(false);
+$renderer = $PAGE->get_renderer('core');
+
+$header = $PAGE->activityheader;
+$headercontent = $header->export_for_template($renderer);
+
+// Don't display new moodle 4.0 secondary menu if old settings region is available
+$secondarynavigation = false;
+$overflow = '';
+
+if ($PAGE->has_secondary_navigation()) {
+    $tablistnav = $PAGE->has_tablist_secondary_navigation();
+    $moremenu = new \core\navigation\output\more_menu($PAGE->secondarynav, 'nav-tabs', true, $tablistnav);
+    $secondarynavigation = $moremenu->export_for_template($OUTPUT);
+    $overflowdata = $PAGE->secondarynav->get_overflow_menu_data();
+    if (!is_null($overflowdata)) {
+        $overflow = $overflowdata->export_for_template($OUTPUT);
     }
 }
-//End
+// End.
 
-//Top bar style
-$topbarstyle = theme_space_get_setting('topbarstyle');
-$pluginsettings = get_config("theme_space");
-for ($i = 1; $i <= 6; $i++) {
-    if( $topbarstyle == "topbarstyle-" . $i) { ${"topbarstyle" . $i} = $topbarstyle; } else { ${"topbarstyle" . $i} = false; }
+if ($PAGE->pagetype == 'site-index') {
+    $isfrontpage = true;
+} else {
+    $isfrontpage = false;
 }
-//end
 
-$siteurl = $CFG->wwwroot;
+if(!isloggedin()) {
+    $isnotloggedin = true;
+} else {
+    $isnotloggedin = false;
+}
 
-$bodyattributes = $OUTPUT->body_attributes($extraclasses);
-$blockshtml = $OUTPUT->blocks('side-pre');
-$blockshtml2 = $OUTPUT->blocks('sidebar');
-$blockshtml3 = $OUTPUT->blocks('maintopwidgets');
-$blockshtml4 = $OUTPUT->blocks('mainfwidgets');
-$blockshtml5 = $OUTPUT->blocks('sidebar-top');
-$hasblocks = strpos($blockshtml, 'data-block=') !== false;
-$siteurl = $CFG->wwwroot;
-
-
-$buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions();
+// Default moodle setting menu
+$buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions() && !$PAGE->has_secondary_navigation();
 // If the settings menu will be included in the header then don't add it here.
 $regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settings_menu() : false;
-
+$bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
-    'navdraweropen' => $navdraweropen,
-    'teammemberperrow' => $teammemberperrow,
-    'logosno' => $logosno,
-    'showfpblock1hr' => $showfpblock1hr,
-    'showfpblock2hr' => $showfpblock2hr,
-    'showfpblock4hr' => $showfpblock4hr,
-    'showfpblock6hr' => $showfpblock6hr,
-    'showfpblock7hr' => $showfpblock7hr,
-    'showfpblock8hr' => $showfpblock8hr,
-    'showfpblock11hr' => $showfpblock11hr,
-    'showfpblock12hr' => $showfpblock12hr,
-    'showfpblock10hr' => $showfpblock10hr,
-    'showfpblockteamhr' => $showfpblockteamhr,
-    'heroshadowstyle' => $heroshadowstyle,
-    'isslider' => $isslider,
-    'sidepreblocks' => $blockshtml,
-    'sidebarblocks' => $blockshtml2,
-    'maintopwidgets' => $blockshtml3,
-    'mainfwidgets' => $blockshtml4,
-    'sidebartopblocks' => $blockshtml5,
-    'hasblocks' => $hasblocks,
-    'hasmaintopwidgets' => !empty($blockshtml3),
-    'hasmainfwidgets' => !empty($blockshtml4),
-    'hassidebarblocks' => !empty($blockshtml2),
-    'hassidebartopblocks' => !empty($blockshtml5),
-    'navdraweropen' => $navdraweropen,
     'bodyattributes' => $bodyattributes,
+    'darkmodeon' => !empty($darkmodeon),
+    'siteurl' => $siteurl,
+    'sidepreblocks' => $blockshtml,
+    'hasblocks' => $hasblocks,
+    'sidebartopblocks' => $blockstopsidebar,
+    'sidebarbottomblocks' => $blocksbottomsidebar,
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
-    'siteurl' => $siteurl
+    'ruiscb' => $ruiscb,
+    'hiddensidebar' => $hiddensidebar,
+    'navdraweropen' => $navdraweropen,
+    'draweropenright' => $draweropenright,
+    'isnotloggedin' => $isnotloggedin,
+    'isfrontpage' => $isfrontpage,
+    // Moodle 4.0
+    'blockdraweropen' => $blockdraweropen,
+    'secondarymoremenu' => $secondarynavigation ?: false,
+    'headercontent' => $headercontent,
+    'overflow' => $overflow,
+    'addblockbutton' => $addblockbutton
 ];
 
-// Top bar Styles - add element to the array
-for ($i = 1; $i <= 6; $i++) {
-    $n = "topbarstyle" . $i;
-    $templatecontext[$n] = ${"topbarstyle" . $i};
+// Get and use the course page information banners HTML code, if any course page hints are configured.
+$coursepageinformationbannershtml = theme_space_get_course_information_banners();
+if ($coursepageinformationbannershtml) {
+    $templatecontext['coursepageinformationbanners'] = $coursepageinformationbannershtml;
 }
-//End
+// End.
 
-// Content Builder - add element to the array
-for ($i = 1; $i <= $elements; $i++) {
-    for ($j = 1; $j <= $elements; $j++) {
-        $n = "slot" . $i . "block" . $j;
-        $templatecontext[$n] = ${"slot" . $i . "block" . $j};
-    }
-}
-//End content buidler
-
-// Improve space navigation.
-$boostfumblingnav = theme_space_get_setting('boostfumblingnav');
-if (!$boostfumblingnav) {
-    theme_space_extend_flat_navigation($PAGE->flatnav);
-}
-$templatecontext['flatnavigation'] = $PAGE->flatnav;
-
-
+// Load theme settings
 $themesettings = new \theme_space\util\theme_settings();
 
-$templatecontext = array_merge($templatecontext, $themesettings->frontpage_elements());
-$templatecontext = array_merge($templatecontext, $themesettings->footer_items());
-$templatecontext = array_merge($templatecontext, $themesettings->hero());
-$templatecontext = array_merge($templatecontext, $themesettings->blockcategories());
-$templatecontext = array_merge($templatecontext, $themesettings->block1());
-$templatecontext = array_merge($templatecontext, $themesettings->block2());
-$templatecontext = array_merge($templatecontext, $themesettings->block3());
-$templatecontext = array_merge($templatecontext, $themesettings->block4());
-$templatecontext = array_merge($templatecontext, $themesettings->block10());
-$templatecontext = array_merge($templatecontext, $themesettings->block11());
-$templatecontext = array_merge($templatecontext, $themesettings->block12());
-$templatecontext = array_merge($templatecontext, $themesettings->team());
-$templatecontext = array_merge($templatecontext, $themesettings->logos());
-$templatecontext = array_merge($templatecontext, $themesettings->customnav());
-$templatecontext = array_merge($templatecontext, $themesettings->sidebar_custom_block());
-$templatecontext = array_merge($templatecontext, $themesettings->top_bar_custom_block());
-$templatecontext = array_merge($templatecontext, $themesettings->siemaSlider());
-$templatecontext = array_merge($templatecontext, $themesettings->head_elements());
-$templatecontext = array_merge($templatecontext, $themesettings->fonts());
+$templatecontext = array_merge($templatecontext, $themesettings->global_settings());
+$templatecontext = array_merge($templatecontext, $themesettings->footer_settings());
 
-echo $OUTPUT->render_from_template('theme_space/frontpage', $templatecontext);
+$PAGE->requires->js_call_amd('theme_space/rui', 'init');
+
+echo $OUTPUT->render_from_template('theme_space/tmpl-frontpage', $templatecontext);

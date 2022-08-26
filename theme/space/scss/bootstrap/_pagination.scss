@@ -1,86 +1,54 @@
-.pagination {
-  display: inline-flex;
+.pagination,
+.comment-paging {
+  margin: 1rem 0;
+  display: flex;
   @include list-unstyled();
   @include border-radius();
-
-  margin-bottom: 2rem!important;
-
-  background: $pagination-bg;
-  border: 1px solid $pagination-border-color;
-  box-shadow: $box-shadow-sm;
-
-  li {
-    margin-bottom: 0!important;
-  }
-
-  &.pagination-letter {
-    margin-bottom: 0.5rem!important
-  }
-
-  .icon {
-    font-size: $font-size-xs;
-  }
 }
 
-.pagination-list {
-  list-style: none;
-  display: inline-flex;
-}
-
-.page-link {
+.page-link,
+.comment-paging a {
   position: relative;
-  display: block;
-  background-color: transparent;
-  padding: $pagination-padding-x $pagination-padding-y;
-  margin-left: -$pagination-border-width;
-  font-weight: $font-weight-sm-bold;
+  display: flex;
+  padding: $pagination-padding-y $pagination-padding-x;
+  margin-left: $pagination-border-width;
   line-height: $pagination-line-height;
+  font-weight: $font-weight-medium;
   color: $pagination-color;
-
+  text-decoration: if($link-decoration == none, null, none);
   border-radius: $border-radius;
 
-  .pagination-letter & {
-    padding: $pagination-padding-x;
+  .theme-dark & {
+    color: $dm-pagination-color;
   }
 
-  &:before {
-    display: none;
+  &:hover {
+    z-index: 2;
+    color: $pagination-hover-color;
+    text-decoration: none;
+    background-color: $pagination-hover-bg;
+
+    .theme-dark & {
+      color: $dm-pagination-hover-color;
+      background-color: $dm-pagination-hover-bg;
+    }
   }
 
-  // Opinionated: add "hand" cursor to non-disabled .page-link elements
-  &:not(:disabled):not(.disabled) {
-    cursor: pointer;
+  &:focus {
+    z-index: 3;
   }
 }
 
 .page-item {
-
-  border-right: 1px solid $pagination-border-color;
-
-  &:hover {
-    background-color: $gray-100;
-  }
-
-  &:first-child {
-    border-radius: $border-radius 0 0 $border-radius;
-  }
-
-  &:last-child {
-    border-radius: 0 $border-radius $border-radius 0;
-    border-right: none;
-  }
-
-  &:first-child {
-    .page-link {
-      margin-left: 0;
-    }
-  }
-
   &.active .page-link {
-    z-index: 1;
-    color: $pagination-active-color!important;
+    z-index: 3;
+    color: $pagination-active-color;
     background-color: $pagination-active-bg;
-    border-color: $pagination-active-border-color;
+
+    .theme-dark & {
+      color: $dm-pagination-active-color;
+      background-color: $dm-pagination-active-bg;
+    }
   }
 
   &.disabled .page-link {
@@ -90,108 +58,40 @@
     cursor: auto;
     background-color: $pagination-disabled-bg;
     border-color: $pagination-disabled-border-color;
-  }
-}
 
-[data-region="paging-bar"] {
-  display: inline-flex;
-}
+    opacity: .3;
 
-.listing-pagination,
-.paging {
-  display: inline-flex;
-  align-items: center;
-  width: auto;
-
-  font-size: $font-size-xs!important;
-
-  p {
-    @extend .row;
-    @extend .no-gutters;
-
-    text-align: center;
-    align-items: center;
-
-    font-size: $font-size-xs!important;
-    line-height: 1.5!important;
-  }
-
-  a, b {
-    width: auto;
-    margin: 0 0.15rem;
-
-    display: block;
-    background-color: transparent;
-    padding: 9px 14px;
-    margin-left: -1px;
-    font-weight: 500;
-    line-height: 1.25;
-    color: $body-color;
-    border-radius: $border-radius;
-
-    &.active-page {
-      color: $gray-400;
-      background-color: $gray-100;
+    .theme-dark & {
+      color: $dm-pagination-disabled-color;
+      background-color: $dm-pagination-disabled-bg;
+      border-color: $dm-pagination-disabled-border-color;
     }
+  }
+}
 
-    &:hover {
-      color: $blue-500;
-      background-color: $blue-100;
+  //Comments pagination
+  .comment-pagination {
+    margin-bottom: 1rem;
+  }
 
-      text-decoration: none;
+  .curpage {
+    color: $pagination-active-color;
+    background-color: $pagination-active-bg;
+
+    .theme-dark & {
+      color: $dm-pagination-active-color;
+      background-color: $dm-pagination-active-bg;
     }
   }
 
-  b {
-    color: $gray-700;
-  }
+//
+// Sizing
+//
 
-  br {
-    display: none;
-  }
+.pagination-lg {
+  @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, $font-size-lg, $line-height-lg, $pagination-border-radius-lg);
 }
 
-  .listing-pagination {
-    margin: 0.5rem 0;
-  }
-
-
-
-  #frontpage-course-list,
-  #frontpage-available-course-list {
-    .paging {
-      display: flow-root;
-      width: 250px;
-      margin: 0 auto;
-      padding: 0;
-
-      @include media-breakpoint-between(sm,md) {
-        width: 100%;
-      }
-
-      a {
-        display: block;
-        padding: $btn-padding-y $btn-padding-x;
-
-        font-size: $btn-font-size;
-        font-weight: $btn-font-weight;
-        line-height: 180%;
-        color: $btn-secondary-text;
-
-        &:hover {
-          text-decoration: none;
-        }
-      }
-    }
-  }
-
-#page-mod-data-view {
-  .pagination {
-    margin-top: 2rem!important;
-  }
-}
-
-.paging-morelink {
-  display: block;
-  margin: 1rem 0;
+.pagination-sm {
+  @include pagination-size(10px, 10px, $font-size-sm, $line-height-sm, $pagination-border-radius-sm);
 }

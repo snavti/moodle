@@ -33,10 +33,10 @@
     }
 
 }}
-<li class="popover-region collapsed {{$classes}}{{/classes}}"
+<div class="popover-region collapsed {{$classes}}{{/classes}}"
     {{$attributes}}{{/attributes}}
     data-region="popover-region">
-    <div class="popover-region-toggle nav-link"
+    <div class="popover-region-toggle rui-topbar-special-btn"
         data-region="popover-region-toggle"
         role="button"
         aria-controls="popover-region-container-{{uniqid}}"
@@ -54,24 +54,26 @@
         aria-label="{{$containerlabel}}{{/containerlabel}}"
         role="region">
         <div class="popover-region-header-container">
-            <h3 class="popover-region-header-text" data-region="popover-region-header-text">{{$headertext}}{{/headertext}}</h3>
+            <h4 class="popover-region-header-text" data-region="popover-region-header-text">{{$headertext}}{{/headertext}}</h4>
             <div class="popover-region-header-actions" data-region="popover-region-header-actions">{{$headeractions}}{{/headeractions}}</div>
         </div>
-        <div class="popover-region-content-container" data-region="popover-region-content-container">
+        <div class="popover-region-content-container mt-2" data-region="popover-region-content-container">
             <div class="popover-region-content" data-region="popover-region-content">
                 {{$content}}{{/content}}
             </div>
-
+            {{> core/loading }}
         </div>
         {{$anchor}}
             {{#urls.seeall}}
-                <a class="see-all-link btn btn-sm btn-primary"
+                <a class="see-all-link d-inline-flex align-items-center w-100 justify-content-end"
                     href="{{{.}}}">
-                    <div class="popover-region-footer-container">
-                        <div class="popover-region-seeall-text">{{#str}} seeall, message {{/str}}</div>
-                    </div>
+                    {{#str}} seeall, message {{/str}}
+                    <svg class="ml-2" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.75 6.75L19.25 12L13.75 17.25"></path>
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 12H4.75"></path>
+                    </svg>
                 </a>
             {{/urls.seeall}}
         {{/anchor}}
     </div>
-</li>
+</div>

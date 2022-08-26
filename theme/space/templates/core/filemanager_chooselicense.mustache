@@ -28,12 +28,12 @@
         "columns": true
     }
 }}
-
-<label class="form-control-label col-4" for="choose-license-{{uniqid}}">
-    {{#str}}chooselicense, repository{{/str}}
-</label>
-{{#licensehelpicon}}{{>core/help_icon}}{{/licensehelpicon}}
-
-<div class="col-8">
-    <select id="choose-license-{{uniqid}}" class="form-control"></select>
+<div class="form-control-label my-0 mr-2 col-4">
+    <label for="choose-license-{{uniqid}}">
+        {{#str}}chooselicense, repository{{/str}}
+    </label>
+    {{#licensehelpicon}}{{>core/help_icon}}{{/licensehelpicon}}
+</div>
+<div class="col">
+    <select id="choose-license-{{uniqid}}" class="form-control custom-select"></select>
 </div>

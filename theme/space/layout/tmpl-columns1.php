@@ -17,56 +17,199 @@
 /**
  * A one column layout for the space theme.
  *
- * @package    theme_space
- * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
- * @license    Commercial https://themeforest.net/licenses
+ * @package   theme_space
+ * @copyright 2022 Marcin Czaja (https://rosea.io)
+ * @license   Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
-
 user_preference_allow_ajax_update('drawer-open-nav', PARAM_ALPHA);
-require_once($CFG->libdir . '/behat/lib.php');
-// MODIFICATION Start: Require own locallib.php.
-require_once($CFG->dirroot . '/theme/space/locallib.php');
-// MODIFICATION END.
+user_preference_allow_ajax_update('sidepre-open', PARAM_ALPHA);
+user_preference_allow_ajax_update('darkmode-on', PARAM_ALPHA);
+user_preference_allow_ajax_update('drawer-open-index', PARAM_BOOL);
+user_preference_allow_ajax_update('drawer-open-block', PARAM_BOOL);
 
-$bodyattributes = $OUTPUT->body_attributes([]);
+require_once($CFG->libdir . '/behat/lib.php');
+require_once($CFG->dirroot . '/course/lib.php');
+
+$draweropenright = false;
+$extraclasses = [];
+
+// Moodle 4.0 - Add block button in editing mode.
+$addblockbutton = $OUTPUT->addblockbutton();
+if (isloggedin()) {
+    $courseindexopen = (get_user_preferences('drawer-open-index', true) == true);
+    $blockdraweropen = (get_user_preferences('drawer-open-block') == true);
+} else {
+    $courseindexopen = false;
+    $blockdraweropen = false;
+}
+
+if (defined('BEHAT_SITE_RUNNING')) {
+    $blockdraweropen = true;
+}
+
+$extraclasses = ['uses-drawers'];
+if ($courseindexopen) {
+    $extraclasses[] = 'drawer-open-index';
+}
+// End.
+
+// Hidden sidebar
+if (theme_space_get_setting('turnoffsidebarcourse') == '1' || !isloggedin()) {
+    $hiddensidebar = true;
+    $navdraweropen = false;
+    $extraclasses[] = 'hidden-sidebar'; 
+} else {
+    $hiddensidebar = false;
+}
+// End.
+
+// Dark mode
+if (isloggedin()) {
+    $navdraweropen = (get_user_preferences('drawer-open-nav', 'true') == 'true');
+    $draweropenright = (get_user_preferences('sidepre-open', 'true') == 'true');
+    
+    if (theme_space_get_setting('darkmodetheme') == '1') {
+        $darkmodeon = (get_user_preferences('darkmode-on', 'false') == 'true'); //return 1
+        if($darkmodeon) {
+            $extraclasses[] = 'theme-dark'; 
+        }
+    }
+    else {
+        $darkmodeon = false;
+    }
+} else {
+    $navdraweropen = false;
+}
+
+if ($navdraweropen && !$hiddensidebar) {
+    $extraclasses[] = 'drawer-open-left';
+}
+
 $siteurl = $CFG->wwwroot;
 
-//Top bar style
-$topbarstyle = theme_space_get_setting('topbarstyle');
-$pluginsettings = get_config("theme_space");
-for ($i = 1; $i <= 6; $i++) {
-    if( $topbarstyle == "topbarstyle-" . $i) { ${"topbarstyle" . $i} = $topbarstyle; } else { ${"topbarstyle" . $i} = false; }
-}
-//end
+$blockshtml = $OUTPUT->blocks('side-pre');
+$hasblocks = strpos($blockshtml, 'data-block=') !== false;
 
+$sidecourseblocks = $OUTPUT->blocks('sidecourseblocks');
+$hassidecourseblocks = strpos($sidecourseblocks, 'data-block=') !== false;
+
+$blockstopsidebar = $OUTPUT->blocks('sidebartopblocks');
+$blocksbottomsidebar = $OUTPUT->blocks('sidebarbottomblocks');
+$ctopbl = $OUTPUT->blocks('ctopbl');
+$cbottombl = $OUTPUT->blocks('cbottombl');
+$cstopbl = $OUTPUT->blocks('cstopbl');
+$csbottombl = $OUTPUT->blocks('csbottombl');
+
+if ($draweropenright && $hasblocks) {
+    $extraclasses[] = 'drawer-open-right';
+}
+
+if ($PAGE->course->enablecompletion == '1') {
+    $extraclasses[] = 'rui-course--enablecompletion';
+}
+
+if ($PAGE->course->showactivitydates == '1') {
+    $extraclasses[] = 'rui-course--showactivitydates';
+}
+
+if ($PAGE->course->visible == '1') {
+    $extraclasses[] = 'rui-course--visible';
+}
+
+$forceblockdraweropen = $OUTPUT->firstview_fakeblocks();
+
+
+// Moodle 4.0
+$courseindex = core_course_drawer();
+if (!$courseindex) {
+    $courseindexopen = false;
+}
+$hasblocks = (strpos($blockshtml, 'data-block=') !== false || !empty($addblockbutton));
+$PAGE->set_secondary_navigation(false);
+$renderer = $PAGE->get_renderer('core');
+
+$header = $PAGE->activityheader;
+$headercontent = $header->export_for_template($renderer);
+
+// Don't display new moodle 4.0 secondary menu if old settings region is available
+$secondarynavigation = false;
+$overflow = '';
+
+if ($PAGE->has_secondary_navigation()) {
+    $tablistnav = $PAGE->has_tablist_secondary_navigation();
+    $moremenu = new \core\navigation\output\more_menu($PAGE->secondarynav, 'nav-tabs', true, $tablistnav);
+    $secondarynavigation = $moremenu->export_for_template($OUTPUT);
+    $overflowdata = $PAGE->secondarynav->get_overflow_menu_data();
+    if (!is_null($overflowdata)) {
+        $overflow = $overflowdata->export_for_template($OUTPUT);
+    }
+}
+// End.
+
+if(!isloggedin()) {
+    $isnotloggedin = true;
+} else {
+    $isnotloggedin = false;
+}
+
+// Default moodle setting menu
+$buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions() && !$PAGE->has_secondary_navigation();
+// If the settings menu will be included in the header then don't add it here.
+$regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settings_menu() : false;
+
+// End.
+$bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
     'bodyattributes' => $bodyattributes,
-    'siteurl' => $siteurl
+    'darkmodeon' => !empty($darkmodeon),
+    'siteurl' => $siteurl,
+    'sidepreblocks' => $blockshtml,
+    'hasblocks' => $hasblocks,
+    'sidebartopblocks' => $blockstopsidebar,
+    'sidebarbottomblocks' => $blocksbottomsidebar,
+    'regionmainsettingsmenu' => $regionmainsettingsmenu,
+    'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
+    'hiddensidebar' => $hiddensidebar,
+    'navdraweropen' => $navdraweropen,
+    'draweropenright' => $draweropenright,
+    'ctopbl' => $ctopbl,
+    'cbottombl' => $cbottombl,
+    'cstopbl' => $cstopbl,
+    'csbottombl' => $csbottombl,
+    'hasctopbl' => !empty($ctopbl),
+    'hascbottombl' => !empty($cbottombl),
+    'hascstopbl' => !empty($cstopbl),
+    'hascsbottombl' => !empty($csbottombl),
+    'sidecourseblocks' => $sidecourseblocks,
+    'hassidecourseblocks' => $hassidecourseblocks,
+    'isnotloggedin' => $isnotloggedin,
+    // Moodle 4.0
+    'courseindexopen' => $courseindexopen,
+    'blockdraweropen' => $blockdraweropen,
+    'courseindex' => $courseindex,
+    'secondarymoremenu' => $secondarynavigation ?: false,
+    'headercontent' => $headercontent,
+    'overflow' => $overflow,
+    'addblockbutton' => $addblockbutton
 ];
 
-// Top bar Styles - add element to the array
-for ($i = 1; $i <= 6; $i++) {
-    $n = "topbarstyle" . $i;
-    $templatecontext[$n] = ${"topbarstyle" . $i};
+// Get and use the course page information banners HTML code, if any course page hints are configured.
+$coursepageinformationbannershtml = theme_space_get_course_information_banners();
+if ($coursepageinformationbannershtml) {
+    $templatecontext['coursepageinformationbanners'] = $coursepageinformationbannershtml;
 }
-//End
+// End.
 
-
+// Load theme settings
 $themesettings = new \theme_space\util\theme_settings();
-$templatecontext = array_merge($templatecontext, $themesettings->hero());
-$templatecontext = array_merge($templatecontext, $themesettings->blockcategories());
-$templatecontext = array_merge($templatecontext, $themesettings->block1());
-$templatecontext = array_merge($templatecontext, $themesettings->block2());
-$templatecontext = array_merge($templatecontext, $themesettings->block3());
-$templatecontext = array_merge($templatecontext, $themesettings->block4());
-$templatecontext = array_merge($templatecontext, $themesettings->team());
-$templatecontext = array_merge($templatecontext, $themesettings->logos());
-$templatecontext = array_merge($templatecontext, $themesettings->customnav());
-$templatecontext = array_merge($templatecontext, $themesettings->head_elements());
-$templatecontext = array_merge($templatecontext, $themesettings->fonts());
 
-echo $OUTPUT->render_from_template('theme_space/columns1', $templatecontext);
+$templatecontext = array_merge($templatecontext, $themesettings->global_settings());
+$templatecontext = array_merge($templatecontext, $themesettings->footer_settings());
+
+$PAGE->requires->js_call_amd('theme_space/rui', 'init');
+
+echo $OUTPUT->render_from_template('theme_space/tmpl-columns1', $templatecontext);

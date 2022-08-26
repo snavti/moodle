@@ -47,10 +47,10 @@
 {{!
     Setting.
 }}
-<div class="form-item row" id="{{id}}">
-    <div class="form-label col-sm-12 col-md-3 text-sm-left text-md-right">
+<div class="form-item rui-settings-item" id="{{id}}">
+    <div class="form-label rui-settings-label">
         {{#customcontrol}}
-            <label {{#labelfor}}id="{{labelfor}}_label"{{/labelfor}}>
+            <label class="d-inline-flex" {{#labelfor}}id="{{labelfor}}_label"{{/labelfor}}>
                 {{{title}}}
                 {{#override}}
                     <div class="alert alert-info">{{override}}</div>
@@ -61,7 +61,7 @@
             </label>
         {{/customcontrol}}
         {{^customcontrol}}
-        <label {{#labelfor}}for="{{labelfor}}"{{/labelfor}}>
+        <label class="d-inline-flex" {{#labelfor}}for="{{labelfor}}"{{/labelfor}}>
             {{{title}}}
             {{#override}}
                 <div class="form-overridden">{{override}}</div>
@@ -71,19 +71,19 @@
             {{/warning}}
         </label>
         {{/customcontrol}}
-        <span class="form-shortname d-block small text-muted">{{{name}}}</span>
+        <span class="d-inline-flex form-shortname rui-settings-shortname ml-3">{{{name}}}</span>
     </div>
-    <div class="form-setting col-sm-12 col-md-9 my-sm-2 my-md-0">
-        <div class="d-inline-flex align-items-center row col-12 p-0 no-gutters">
+    <div class="form-setting rui-settings-setting">
+        <div class="d-inline-flex flex-wrap align-items-center w-100">
         {{#error}}
             <div><span class="error">{{error}}</span></div>
         {{/error}}
         {{{element}}}
         {{#default}}
-            <div class="form-defaultinfo badge badge-light mx-0 my-1 {{#forceltr}}text-ltr{{/forceltr}}">{{{default}}}</div>
+            <div class="form-defaultinfo badge-sq badge-primary mx-1 my-1 {{#forceltr}}text-ltr{{/forceltr}}">{{{default}}}</div>
         {{/default}}
         </div>
-        <div class="form-description mt-3">{{{description}}}</div>
+        <div class="form-description mt-2">{{{description}}}</div>
         {{#dependenton}}<div class="form-dependenton mb-4 text-muted">{{{.}}}</div>{{/dependenton}}
     </div>
 </div>

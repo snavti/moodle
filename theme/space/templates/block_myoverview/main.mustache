@@ -25,14 +25,18 @@
 
 <div id="block-myoverview-{{uniqid}}" class="block-myoverview block-cards" data-region="myoverview" role="navigation">
 
-            <div data-region="filter" class="d-flex align-items-center flex-wrap mb-2" aria-label="{{#str}} aria:controls, block_myoverview {{/str}}">
-                {{> block_myoverview/nav-grouping-selector }}
-
-                {{> block_myoverview/nav-sort-selector }}
-                {{#displaydropdown}}
-                    {{> block_myoverview/nav-display-selector }}
-                {{/displaydropdown}}
-            </div>
+    <div data-region="filter" class="d-flex align-items-center flex-wrap" aria-label="{{#str}} aria:controls, block_myoverview {{/str}}">
+        <div class="d-inline-flex justify-content-between flex-wrap w-100">
+        {{> block_myoverview/nav-grouping-selector }}
+        {{> block_myoverview/nav-sort-selector }}
+        {{#displaydropdown}}
+            {{> block_myoverview/nav-display-selector }}
+        {{/displaydropdown}}
+        </div>
+        <div class="mt-2 w-100">
+        {{> block_myoverview/nav-search-widget }}
+        </div>
+    </div>
 
     <div class="container-fluid p-0">
         {{> block_myoverview/courses-view }}

@@ -49,7 +49,8 @@
     Template statistics template.
 }}
 {{#competencycount}}
-<div data-region="coursecompetencystatistics" class="my-2">
+<hr class="hr-small" />
+<div data-region="coursecompetencystatistics" class="mt-4 wrapper-fw">
     {{#canbegradedincourse}}
         {{< tool_lp/progress_bar}}
             {{$progresstext}}
@@ -70,7 +71,7 @@
             {{#leastproficient}}
                 <li class="mr-4">
                 <a href="#competency-info-link-{{id}}" class="d-block my-2">
-                <div class="d-inline-flex"><h4><span class="shortname py-1 mr-2">{{{shortname}}}</span><div class="badge badge-info">{{idnumber}}</div></h4></div>
+                <div class="d-inline-flex"><h4 class="mb-0"><span class="shortname py-1 mr-2">{{{shortname}}}</span><div class="badge badge-info">{{idnumber}}</div></h4></div>
                 </a>
                 </li>
             {{/leastproficient}}

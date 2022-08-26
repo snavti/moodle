@@ -76,51 +76,53 @@
     }
 }}
 <form id="groupeditform" action="index.php" method="post">
-    <div class="container-fluid groupmanagementtable m-t-2">
-        <div class="row no-gutters row-fluid rtl-compatible">
-            <div class="col-md-6 span6 m-b-1 p-r-2">
+    <div class="container-fluid groupmanagementtable">
+        <div class="row rtl-compatible justify-items-between">
+            <div class="col-md-6 mb-1 pl-0">
                 <input type="hidden" name="id" value="{{courseid}}">
                 <div class="form-group">
                     <label for="groups">
-                        <span id="groupslabel">{{#str}}groups{{/str}}</span>
+                        <span id="groupslabel" class="badge badge-secondary">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.78168 19.25H13.2183C13.7828 19.25 14.227 18.7817 14.1145 18.2285C13.804 16.7012 12.7897 14 9.5 14C6.21031 14 5.19605 16.7012 4.88549 18.2285C4.773 18.7817 5.21718 19.25 5.78168 19.25Z"></path>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 14C17.8288 14 18.6802 16.1479 19.0239 17.696C19.2095 18.532 18.5333 19.25 17.6769 19.25H16.75"></path>
+                                <circle cx="9.5" cy="7.5" r="2.75" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.75 10.25C16.2688 10.25 17.25 9.01878 17.25 7.5C17.25 5.98122 16.2688 4.75 14.75 4.75"></path>
+                            </svg>
+                            <span class="ml-1">{{#str}}groups{{/str}}</span>
+                        </span>
                         <span id="thegrouping">&nbsp;</span>
                     </label>
-                    <select name="groups[]" multiple="multiple" id="groups" size="15" class="form-control input-block-level m-0 w-100">
+                    <select name="groups[]" multiple="multiple" id="groups" size="15" class="form-control input-block-level">
                         {{#groups}}
                             <option value="{{value}}" {{#selected}}selected="selected"{{/selected}} title="{{{text}}}">{{{text}}}</option>
                         {{/groups}}
                     </select>
                 </div>
-
-                <div class="col-12 row justify-content-start">
-                  <div class="form-group mr-1">
-                      <input type="submit" name="act_updatemembers" id="updatemembers" value="{{#str}}showmembersforgroup, group{{/str}}" class="btn btn-default" />
-                  </div>
-                  <div class="form-group mr-1">
-                      <input type="submit" name="act_showgroupsettingsform" id="showeditgroupsettingsform" value="{{#str}}editgroupsettings, group{{/str}}" {{#editgroupsettingsdisabled}}disabled="disabled"{{/editgroupsettingsdisabled}} class="btn btn-default" />
-                  </div>
-                  <div class="form-group mr-1">
-                      <input type="submit" name="act_deletegroup" id="deletegroup" value="{{#str}}deleteselectedgroup, group{{/str}}" {{#deletegroupdisabled}}disabled="disabled"{{/deletegroupdisabled}} class="btn btn-default" />
-                  </div>
-                  <div class="form-group mr-1">
-                      <input type="submit" name="act_showcreateorphangroupform" id="showcreateorphangroupform" value="{{#str}}creategroup, group{{/str}}" class="btn btn-default" />
-                  </div>
-                  <div class="form-group mr-1">
-                      <input type="submit" name="act_showautocreategroupsform" id="showautocreategroupsform" value="{{#str}}autocreategroups, group{{/str}}" class="btn btn-default" />
-                  </div>
-                  <div class="form-group mr-1">
-                      <input type="submit" name="act_showimportgroups" id="showimportgroups" value="{{#str}}importgroups, group{{/str}}" class="btn btn-default" />
-                  </div>
+                <div class="form-group d-inline">
+                    <input type="submit" name="act_updatemembers" id="updatemembers" value="{{#str}}showmembersforgroup, group{{/str}}" class="mb-2 mr-1 btn btn-secondary" />
+                    <input type="submit" name="act_showgroupsettingsform" id="showeditgroupsettingsform" value="{{#str}}editgroupsettings, group{{/str}}" {{#editgroupsettingsdisabled}}disabled="disabled"{{/editgroupsettingsdisabled}} class="mb-2 mr-1 btn btn-secondary" />
+                    <input type="submit" name="act_deletegroup" id="deletegroup" value="{{#str}}deleteselectedgroup, group{{/str}}" {{#deletegroupdisabled}}disabled="disabled"{{/deletegroupdisabled}} class="mb-2 mr-1 btn btn-danger" />
+                    <input type="submit" name="act_showcreateorphangroupform" id="showcreateorphangroupform" value="{{#str}}creategroup, group{{/str}}" class="mb-2 mr-1 btn btn-primary" />
+                    <input type="submit" name="act_showautocreategroupsform" id="showautocreategroupsform" value="{{#str}}autocreategroups, group{{/str}}" class="mb-2 mr-1 btn btn-secondary" />
+                    <input type="submit" name="act_showimportgroups" id="showimportgroups" value="{{#str}}importgroups, group{{/str}}" class="mb-2 mr-1 btn btn-secondary" />
                 </div>
-
             </div>
-            <div class="col-md-6 span6 m-b-1">
+            <div class="col-md-6 mb-1 pr-0">
                 <div class="form-group">
-                    <label for="members">
-                        <span id="memberslabel">{{#str}}membersofselectedgroup, group{{/str}}</span>
-                        <span id="thegroup">{{{selectedgroup}}}</span>
+                    <label for="members" class="d-inline-flex">
+                        <span id="memberslabel" class="badge badge-secondary">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                <circle cx="12" cy="8" r="3.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12.25 19.25H6.94953C5.77004 19.25 4.88989 18.2103 5.49085 17.1954C6.36247 15.7234 8.23935 14 12.25 14"></path>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 14.75V19.25"></path>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 17L14.75 17"></path>
+                            </svg>
+                            <span class="ml-1">{{#str}}membersofselectedgroup, group{{/str}}</span>
+                        </span>
+                        <span id="thegroup" class="badge">{{{selectedgroup}}}</span>
                     </label>
-                    <select size="15" multiple="multiple" class="form-control input-block-level m-0 w-100" id="members" name="user">
+                    <select size="15" multiple="multiple" class="form-control input-block-level" id="members" name="user">
                         {{#members}}
                             <optgroup label="{{role}}">
                                 {{#rolemembers}}

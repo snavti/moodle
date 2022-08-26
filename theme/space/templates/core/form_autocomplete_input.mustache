@@ -38,7 +38,11 @@
 {{#showSuggestions}}
 <div class="d-md-inline-block mr-md-2 position-relative">
     <input type="text" id="{{inputId}}" class="form-control" list="{{suggestionsId}}" placeholder="{{placeholder}}" role="combobox" aria-expanded="false" autocomplete="off" autocorrect="off" autocapitalize="off" aria-autocomplete="list" aria-owns="{{suggestionsId}} {{selectionId}}" {{#tags}}data-tags="1"{{/tags}}/>
-    <span class="form-autocomplete-downarrow" id="{{downArrowId}}"><i class="icon fas fa-caret-down"></i></span>
+    <span class="form-autocomplete-downarrow" id="{{downArrowId}}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 15.25L16.25 9.75H7.75L12 15.25Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </span>
 </div>
 {{/showSuggestions}}
 {{^showSuggestions}}

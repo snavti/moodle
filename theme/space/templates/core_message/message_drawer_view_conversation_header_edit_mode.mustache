@@ -35,12 +35,15 @@
 
 }}
 
-<div class="d-flex align-items-center">
-    <div class="col">
-      <span class="text-bold">{{#str}} messagesselected:, core_message {{/str}}</span>
-      <span class="m-x-1" data-region="message-selected-court">1</span>
+<div class="rui-messageselected d-flex align-items-center justify-content-between my-3 mx-3 hidden" data-action="confirm-delete-selected-messages">
+    <div class="badge mr-3">
+      <span>{{#str}} messagesselected:, core_message {{/str}}</span>
+      <span class="ml-2" data-region="message-selected-court">1</span>
     </div>
-    <button type="button" class="btn btn-msg btn-msg-gray" aria-label="{{#str}} cancelselection, core_message {{/str}}" data-action="cancel-edit-mode">
-        <span aria-hidden="true"><i class="fas fa-times"></i></span>
+    <button type="button" class="btn-msg" aria-label="{{#str}} cancelselection, core_message {{/str}}" data-action="cancel-edit-mode">
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L6.75 17.25"></path>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 6.75L17.25 17.25"></path>
+        </svg>
     </button>
 </div>

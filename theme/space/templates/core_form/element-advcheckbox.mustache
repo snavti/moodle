@@ -1,13 +1,13 @@
-<div class="form-group row no-gutters {{#error}}has-danger{{/error}} fitem {{#advanced}}advanced{{/advanced}} {{{element.extraclasses}}}">
-    <div class="col-md-3">
+<div class="form-group row {{#error}}has-danger{{/error}} fitem {{#advanced}}advanced{{/advanced}} {{{element.extraclasses}}}">
+    <div class="col-md-3 text-md-right mb-sm-2 mb-md-0">
         {{#text}}
             <label for="{{element.id}}">
                 {{{label}}}
             </label>
         {{/text}}
     </div>
-    <div class="col-md-9 checkbox">
-        <div class="form-check form-checkbox defaultsnext custom-controls-stacked">
+    <div class="col-md-9 checkbox px-0">
+        <div class="form-check form-checkbox defaultsnext custom-controls-stacked mx-0">
             <label class="custom-control ios-switch">
             {{^element.hardfrozen}}
                 {{^element.frozen}}
@@ -32,7 +32,7 @@
                     disabled
                 {{/element.frozen}}
                 {{{element.attributes}}} >
-        
+
                 <span class="ios-switch-control-indicator"></span>
                 <span class="text">
                 {{#text}}
@@ -44,7 +44,7 @@
                 </span>
             </label>
             <span class="text-nowrap">
-                {{#advanced}}<abbr class="initialism text-info" title="{{#str}}advanced{{/str}}">!</abbr>{{/advanced}}
+                {{#advanced}}<span class="initialism text-info" title="{{#str}}advanced{{/str}}">!</span>{{/advanced}}
                 {{{helpbutton}}}
             </span>
         </div>

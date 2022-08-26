@@ -36,7 +36,7 @@
 }}
 
 <div
-    class="hidden position-relative"
+    class="hidden rui-message-footer-container position-relative"
     aria-hidden="true"
     data-region="view-conversation"
     data-enter-to-send="{{settings.entertosend}}"
@@ -50,7 +50,7 @@
     <div class="hidden alert alert-warning m-0" data-region="content-messages-footer-require-contact-container">
         {{> core_message/message_drawer_view_conversation_footer_require_contact }}
     </div>
-    <div class="hidden alert alert-warning m-0" data-region="content-messages-footer-require-unblock-container">
+    <div class="hidden alert alert-light m-0" data-region="content-messages-footer-require-unblock-container">
         {{> core_message/message_drawer_view_conversation_footer_require_unblock }}
     </div>
     <div class="hidden alert alert-warning m-0" data-region="content-messages-footer-unable-to-message">
@@ -60,8 +60,8 @@
         {{> core_message/message_drawer_view_conversation_footer_placeholder }}
     </div>
     <div
-        class="hidden position-absolute"
+        class="hidden position-absolute z-index-1"
         data-region="confirm-dialogue-container"
-        style="top: -1px; bottom: 0; right: 0; left: 0; background: rgba(0,0,0,0.3);"
+        style="top: -1px; bottom: 0; right: 0; left: 0;"
     ></div>
 </div>

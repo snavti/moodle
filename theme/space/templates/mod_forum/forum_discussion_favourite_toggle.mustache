@@ -33,10 +33,22 @@
     {{$role}}button{{/role}}
     {{$favouritecontent}}
         {{#userstate.favourited}}
-            {{#pix}}t/star, mod_forum, {{#str}}removefromfavourites, mod_forum{{/str}}{{/pix}}
+        <span class="text-success btn btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4.75V19.25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M18.2501 8.74994L5.75 15.2501" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M18.2498 15.2503L5.74976 8.75012" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        </span>
         {{/userstate.favourited}}
         {{^userstate.favourited}}
-            {{#pix}}t/emptystar, core, {{#str}}addtofavourites, mod_forum{{/str}}{{/pix}}
+        <span class="text-light btn btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4.75V19.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M18.2501 8.74994L5.75 15.2501" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M18.2498 15.2503L5.74976 8.75012" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        </span>
         {{/userstate.favourited}}
     {{/favouritecontent}}
 {{/ mod_forum/discussion_favourite_toggle }}

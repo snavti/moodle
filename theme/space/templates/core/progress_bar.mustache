@@ -25,11 +25,11 @@
         "width": "500"
     }
 }}
-<div id="{{id}}" class="row progressbar_container">
-    <div class="w-100">
-        <div id="{{id}}_status" class="alert alert-info"></div>
-        <progress id="{{id}}_bar" class="progress progress-striped progress-animated w-100" value="0" max="100"></progress>
-        <p id="{{id}}_estimate" class="mt-1 font-weight-bold"></p>
+<div id="{{id}}" class="row progressbar_container rui-progressbar_container">
+    <div class="col push-md-3 p-0">
+        <p id="{{id}}_status" class="rui-progressbar-status m-0"></p>
+        <progress id="{{id}}_bar" class="rui-progress rui-progress-striped rui-progress-animated" value="0" max="100"></progress>
+        <p id="{{id}}_estimate" class="rui-progressbar-estimate mt-1 mb-0"></p>
     </div>
 </div>
 

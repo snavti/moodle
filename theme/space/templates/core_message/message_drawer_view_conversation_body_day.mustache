@@ -37,10 +37,9 @@
         "currentyear": false,
         "messages": []
     }
-
 }}
-<div class="mt-4" data-region="day-container" data-day-id="{{timestamp}}">
-    <h6 class="text-center mb-1 font-weight-normal day">
+<div class="mt-3 rui-day-container" data-region="day-container" data-day-id="{{timestamp}}">
+    <h6 class="rui-message-date">
         {{#currentyear}}
             {{#userdate}} {{timestamp}}, {{#str}} strftimedateshort, core_langconfig {{/str}} {{/userdate}}
         {{/currentyear}}

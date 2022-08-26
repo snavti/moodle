@@ -32,11 +32,11 @@
         }
     }
 }}
-<p class="mt-4 px-3 pb-1">{{#str}} resultsfound, core, {{searchresultsnumber}} {{/str}}</p>
-<div class="bg-light searchresultitemscontainer-wrapper border">
-<div class="searchresultitemscontainer d-flex flex-wrap mw-100 position-relative p-1" role="menubar" data-region="search-result-items-container">
-    {{#searchresults}}
-        {{>core_course/local/activitychooser/item}}
-    {{/searchresults}}
-</div>
+<span class="badge badge-light my-2">{{#str}} resultsfound, core, {{searchresultsnumber}} {{/str}}</span>
+<div class="searchresultitemscontainer-wrapper rui-activitychooser-bg tab-content flex-fill">
+    <div class="searchresultitemscontainer d-flex flex-wrap mw-100 position-relative p-1" role="menubar" data-region="search-result-items-container">
+        {{#searchresults}}
+            {{>core_course/local/activitychooser/item}}
+        {{/searchresults}}
+    </div>
 </div>

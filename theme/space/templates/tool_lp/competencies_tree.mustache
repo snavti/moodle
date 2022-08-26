@@ -49,14 +49,14 @@
         }]
     }
 }}
-<li data-id="{{id}}" class="p-2 small">
+<li data-id="{{id}}" class="m-1">
     {{#canmanage}}
-    <span draggable="true">
+    <span draggable="true" class="p-2">
         {{{shortname}}}
     </span>
     {{/canmanage}}
     {{^canmanage}}
-    <span>
+    <span class="p-2">
         {{{shortname}}}
     </span>
     {{/canmanage}}

@@ -25,54 +25,79 @@
         {{/plan.canbeedited}}
     </h2>
     {{#plan.canbeedited}}
-    <div data-region="actions" class="clearfix">
-        <div class="float-left">
+    <div data-region="actions" class="clearfix my-4">
+        <div class="float-left my-3">
             <!-- Button to add competencies to the plan -->
             <button class="btn btn-secondary" data-action="add">{{#pix}}t/add, core,{{/pix}} {{#str}}addcompetency, tool_lp{{/str}}</button>
         </div>
     </div>
     {{/plan.canbeedited}}
     <div data-region="plan-summary" class="mt-1">
-        {{{plan.description}}}
-        <dl>
-            <dt>{{#str}}status, tool_lp{{/str}}</dt>
-            <dd>
-                {{plan.statusname}}
+        <div class="lead my-3">{{{plan.description}}}</div>
 
-                {{#plan.isinreview}}
-                    - {{plan.reviewer.fullname}}
-                {{/plan.isinreview}}
+        <div class="rui-info-container my-2">
 
-                {{#plan.iscompleteallowed}}
-                    (<a data-action="plan-complete" href="#">{{#str}}completeplan, tool_lp{{/str}}</a>)
-                {{/plan.iscompleteallowed}}
-                {{#plan.isreopenallowed}}
-                    (<a data-action="plan-reopen" href="#">{{#str}}reopenplan, tool_lp{{/str}}</a>)
-                {{/plan.isreopenallowed}}
-                {{#plan.isrequestreviewallowed}}
-                    (<a data-action="plan-request-review" href="#">{{#str}}requestreview, tool_lp{{/str}}</a>)
-                {{/plan.isrequestreviewallowed}}
-                {{#plan.iscancelreviewrequestallowed}}
-                    (<a data-action="plan-cancel-review-request" href="#">{{#str}}cancelreviewrequest, tool_lp{{/str}}</a>)
-                {{/plan.iscancelreviewrequestallowed}}
-                {{#plan.isstartreviewallowed}}
-                    (<a data-action="plan-start-review" href="#">{{#str}}startreview, tool_lp{{/str}}</a>)
-                {{/plan.isstartreviewallowed}}
-                {{#plan.isstopreviewallowed}}
-                    (<a data-action="plan-stop-review" href="#">{{#str}}stopreview, tool_lp{{/str}}</a>)
-                {{/plan.isstopreviewallowed}}
-                {{#plan.isapproveallowed}}
-                    (<a data-action="plan-approve" href="#">{{#str}}planapprove, tool_lp{{/str}}</a>)
-                {{/plan.isapproveallowed}}
-                {{#plan.isunapproveallowed}}
-                    (<a data-action="plan-unapprove" href="#">{{#str}}planunapprove, tool_lp{{/str}}</a>)
-                {{/plan.isunapproveallowed}}
+            <div class="rui-infobox rui-infobox--status">
+                <h5 class="rui-infobox-title">{{#str}}status, tool_lp{{/str}}</h5>
+                <div class="rui-infobox-content--small">
+                    {{#plan.isinreview}}
+                        - {{plan.reviewer.fullname}}
+                    {{/plan.isinreview}}
 
-            </dd>
+                    <ul>
+                        {{#plan.iscompleteallowed}}
+                            <li><a data-action="plan-complete" href="#">{{#str}}completeplan, tool_lp{{/str}}</a></li>
+                        {{/plan.iscompleteallowed}}
+                        {{#plan.isreopenallowed}}
+                            <li><a data-action="plan-reopen" href="#">{{#str}}reopenplan, tool_lp{{/str}}</a></li>
+                        {{/plan.isreopenallowed}}
+                        {{#plan.isrequestreviewallowed}}
+                            <li><a data-action="plan-request-review" href="#">{{#str}}requestreview, tool_lp{{/str}}</a></li>
+                        {{/plan.isrequestreviewallowed}}
+                        {{#plan.iscancelreviewrequestallowed}}
+                            <li><a data-action="plan-cancel-review-request" href="#">{{#str}}cancelreviewrequest, tool_lp{{/str}}</a></li>
+                        {{/plan.iscancelreviewrequestallowed}}
+                        {{#plan.isstartreviewallowed}}
+                            <li><a data-action="plan-start-review" href="#">{{#str}}startreview, tool_lp{{/str}}</a></li>
+                        {{/plan.isstartreviewallowed}}
+                        {{#plan.isstopreviewallowed}}
+                            <li><a data-action="plan-stop-review" href="#">{{#str}}stopreview, tool_lp{{/str}}</a></li>
+                        {{/plan.isstopreviewallowed}}
+                        {{#plan.isapproveallowed}}
+                            <li><a data-action="plan-approve" href="#">{{#str}}planapprove, tool_lp{{/str}}</a></li>
+                        {{/plan.isapproveallowed}}
+                        {{#plan.isunapproveallowed}}
+                            <li><a data-action="plan-unapprove" href="#">{{#str}}planunapprove, tool_lp{{/str}}</a></li>
+                        {{/plan.isunapproveallowed}}
+                    </ul>
+
+                </div>
+            </div>
+
             {{#plan.duedate}}
-                <dt>{{#str}}duedate, tool_lp{{/str}}</dt>
-                <dd>{{plan.duedateformatted}}</dd>
+            <div class="rui-infobox rui-infobox--duedate">
+                <h5 class="rui-infobox-title">{{#str}}duedate, tool_lp{{/str}}</h5>
+                <div class="rui-infobox-content">{{plan.duedateformatted}}</div>
+            </div>
             {{/plan.duedate}}
+
+            <div class="rui-infobox rui-infobox--progress">
+                <h5 class="rui-infobox-title">{{#str}}progress, tool_lp{{/str}}</h5>
+                <div class="rui-infobox-content--small">
+                {{< tool_lp/progress_bar}}
+                    {{$progresstext}}
+                        {{#str}}xcompetenciesproficientoutofy, tool_lp, { "x": "{{proficientcompetencycount}}", "y": "{{competencycount}}" }{{/str}}
+                    {{/progresstext}}
+                    {{$percentage}}{{proficientcompetencypercentage}}{{/percentage}}
+                    {{$percentlabel}}{{proficientcompetencypercentageformatted}}&nbsp;%{{/percentlabel}}
+                {{/tool_lp/progress_bar}}
+                </div>
+            </div>
+
+        </div>
+        <dl>
+
+
             {{#plan.template}}
                 <dt>{{#str}}template, tool_lp{{/str}}</dt>
                 <dd>
@@ -89,28 +114,21 @@
                 <dt>{{#str}}description{{/str}}</dt>
                 <dd>{{{plan.description}}}</dd>
             {{/description}}
-            <dt>{{#str}}progress, tool_lp{{/str}}</dt>
-            <dd>
-            {{< tool_lp/progress_bar}}
-                {{$progresstext}}
-                    {{#str}}xcompetenciesproficientoutofy, tool_lp, { "x": "{{proficientcompetencycount}}", "y": "{{competencycount}}" }{{/str}}
-                {{/progresstext}}
-                {{$percentage}}{{proficientcompetencypercentage}}{{/percentage}}
-                {{$percentlabel}}{{proficientcompetencypercentageformatted}}&nbsp;%{{/percentlabel}}
-            {{/tool_lp/progress_bar}}
-            </dd>
+
         </dl>
     </div>
+
     {{#plan.commentarea}}
         {{#canpostorhascomments}}
-            <div data-region="comments" class="mt-1">
+            <div data-region="comments" class="mt-2 mb-4">
                 {{>tool_lp/comment_area}}
             </div>
         {{/canpostorhascomments}}
     {{/plan.commentarea}}
-    <div data-region="plan-competencies" class="mt-1">
-        <h3>{{#str}}learningplancompetencies, tool_lp{{/str}}</h3>
-        <table class="generaltable fullwidth managecompetencies">
+
+    <fieldset data-region="plan-competencies" class="mt-4 pt-3 fieldset-styled">
+        <legend>{{#str}}learningplancompetencies, tool_lp{{/str}}</legend>
+        <table class="generaltable fullwidth managecompetencies my-0 pb-0">
             <thead>
                 <tr>
                     <th scope="col">{{#str}}shortname, tool_lp{{/str}}</th>
@@ -165,7 +183,9 @@
                                         {{/usercompetency.iscancelreviewrequestallowed}}
                                         {{#plan.canbeedited}}
                                             <li class="dropdown-item">
-                                                <a href="#" data-action="delete-competency-link" data-id="{{competency.id}}">{{#pix}}t/delete, core{{/pix}} {{#str}}delete{{/str}}</a>
+                                                <a href="#" data-action="delete-competency-link" data-id="{{competency.id}}">
+                                                {{#pix}}t/delete, core{{/pix}} {{#str}}delete{{/str}}
+                                                </a>
                                             </li>
                                         {{/plan.canbeedited}}
                                         <li class="dropdown-item">
@@ -185,7 +205,7 @@
                 {{#str}}nocompetenciesinlearningplan, tool_lp{{/str}}
             </p>
         {{/competencies}}
-    </div>
+    </fieldset>
 </div>
 {{#js}}
 require(['tool_lp/competencies', 'tool_lp/planactions', 'tool_lp/user_competency_workflow', 'tool_lp/user_competency_plan_popup'], function(mod, actionsMod, UserCompWorkflow, Popup) {

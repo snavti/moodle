@@ -67,7 +67,7 @@
                     },
                     {
                         "name": "src",
-                        "value": "http://localhost/stable_master/theme/image.php?theme=space&component=core&image=help"
+                        "value": "http://localhost/stable_master/theme/image.php?theme=boost&component=core&image=help"
                     }
                 ]
             },
@@ -93,173 +93,351 @@
         "logintoken": "randomstring",
         "maintenance": "For full access to this site, you need to login in as an admin."
     }
+
+
 }}
 
-<div class="row no-gutters s-login-box">
+        <div class="rui-login-layout {{#loginlayoutimg}}rui-login-layout-img{{/loginlayoutimg}} {{^loginlayoutimg}}rui-login-layout-simple{{/loginlayoutimg}} {{#loginlayout1}}rui-login-layout--1{{/loginlayout1}}{{#loginlayout2}}rui-login-layout--2{{/loginlayout2}}{{#loginlayout3}}rui-login-layout--3{{/loginlayout3}}{{#loginlayout4}}rui-login-layout--4{{/loginlayout4}}{{#loginlayout5}}rui-login-layout--5{{/loginlayout5}}">
 
-    <div class="login-box-block w-100">
-
-        {{#customloginlogo}}
-        <a href="{{{ config.wwwroot }}}"><h2 class="login-box-header text-center" ><img src="{{customloginlogo}}" title="{{sitename}}" alt="{{sitename}}"/></h2></a>
-        {{/customloginlogo}}
-
-        {{^customloginlogo}}
-        {{#logourl}}
-        <a href="{{{ config.wwwroot }}}"><h2 class="login-box-header text-center" ><img src="{{logourl}}" title="{{sitename}}" alt="{{sitename}}"/></h2></a>
-        {{/logourl}}
-
-        {{^logourl}}
-        <a href="{{{ config.wwwroot }}}"><h2 class="login-box-header text-center">{{sitename}}</h2></a>
-        {{/logourl}}
-        {{/customloginlogo}}
-
-        <div class="login-box-body">
+            {{^logincreateainbox}}
             {{#cansignup}}
-                <div class="sr-only">
-                    <a href="{{signupurl}}">{{#str}} tocreatenewaccount {{/str}}</a>
-                </div>
+            {{#customsignupoutside}}
+            <div class="rui-login-createaccount--top">
+                <form action="{{signupurl}}" method="get" id="signup">
+                    {{#stringca}}<span class="rui-login-calabel">{{{stringca}}}</span>{{/stringca}} <button type="submit" class="btn-link--clean">{{#str}}startsignup{{/str}}</button>
+                </form>
+            </div>
+            {{/customsignupoutside}}
             {{/cansignup}}
+            {{/logincreateainbox}}
 
-            {{#error}}
-                <div class="loginerrors">
-                    <a href="#" id="loginerrormessage" class="accesshide">{{error}}</a>
-                    <div class="alert alert-danger pr-4" role="alert">{{error}}</div>
-                </div>
-            {{/error}}
+            {{#loginlayoutimg}}
+            <div class="rui-login-wrapper">
+                <div class="rui-login-top-wrapper">
+            {{/loginlayoutimg}}
 
-            <div class="row justify-content-md-center">
-                <div class="col-12">
-                    <form action="{{loginurl}}" method="post" id="login">
-                        <input id="anchor" type="hidden" name="anchor" value="">
-                        <script>document.getElementById('anchor').value = location.hash;</script>
-                        <input type="hidden" name="logintoken" value="{{logintoken}}">
-                        <div class="form-group">
-                            <div class="username-input-box w-100">
-                                <label for="username" class="sr-only">
-                                    {{^canloginbyemail}}
-                                        {{#str}} username {{/str}}
-                                    {{/canloginbyemail}}
-                                    {{#canloginbyemail}}
-                                        {{#str}} usernameemail {{/str}}
-                                    {{/canloginbyemail}}
-                                </label>
-                                <input type="text" name="username" id="username"
-                                    class="form-control"
-                                    value="{{username}}"
-                                    placeholder={{#quote}}{{^canloginbyemail}}{{#str}}username{{/str}}{{/canloginbyemail}}{{#canloginbyemail}}{{#str}}usernameemail{{/str}}{{/canloginbyemail}}{{/quote}}>
-                            </div>
+                    <div class="rui-login-logo">
+                    {{#loginlogooutside}}
+                    {{#loginlayoutimg}}<div class="rui-login-top">{{/loginlayoutimg}}
+                        <div class="mb-3">
+                        {{#customloginlogo}}
+                        <a href="{{{ config.wwwroot }}}"><img src="{{customloginlogo}}" title="{{sitename}}" alt="{{sitename}}" class="rui-login-logo img-fluid"/></a>
+                        {{/customloginlogo}}
+
+                        {{^customloginlogo}}
+                            {{#logourl}}
+                            <a href="{{{ config.wwwroot }}}"><img src="{{logourl}}" title="{{sitename}}" alt="{{sitename}}" class="rui-login-logo img-fluid"/></a>
+                            {{/logourl}}
+
+                            {{^logourl}}
+                            <a href="{{{ config.wwwroot }}}"><h1 class="rui-login-logo-name">{{sitename}}</h1></a>
+                            {{/logourl}}
+                        {{/customloginlogo}}
                         </div>
-                        <div class="form-group mb-1">
-                            <div class="password-input-box w-100">
-                                <label for="password" class="sr-only">{{#str}} password {{/str}}</label>
-                                <input type="password" name="password" id="password" value=""
-                                    class="form-control"
-                                    placeholder={{#quote}}{{#str}}password{{/str}}{{/quote}}>
-                            </div>
+                    {{#loginlayoutimg}}</div>{{/loginlayoutimg}}
+                    {{/loginlogooutside}}
+
+                    {{#loginlayoutimg}}
+                        {{#loginhtmlcontent1}}
+                        <div class="rui-login-top--content rui-topbar">                           
+                            {{{loginhtmlcontent1}}}
                         </div>
+                        {{/loginhtmlcontent1}}
+                    {{/loginlayoutimg}}
+                    </div>
 
-                        {{^hideforgotpassword}}
-                        <div class="forgetpass text-right">
-                            <p><a href="{{forgotpasswordurl}}" class="small dimmed">{{#str}}forgotten{{/str}}</a></p>
-                        </div>
-                        {{/hideforgotpassword}}
-
-                        {{{logininfobox}}}
-
-                        <button type="submit" class="btn btn-primary btn-block mt-3" id="loginbtn">{{#str}}login{{/str}}</button>
-
-                        {{#rememberusername}}
-                            <div class="rememberpass mt-3 text-right">
-                            <label class="d-inline-flex align-items-center custom-control ios-switch mb-0">
-                                <input type="checkbox" name="rememberusername" id="rememberusername" class="form-check-input ios-switch-control-input" value="1" {{#username}}checked="checked"{{/username}} />
-                                <span class="ios-switch-control-indicator"></span>
-                                <span class="small">{{#str}} rememberusername, admin {{/str}}</span>
-                            </div>
-                            </label>
-                        {{/rememberusername}}
-                    </form>
-
-                    <hr class="hr--loginform" />
-                </div>
-
-                <div class="col-12">
-
-
-                      {{#hasidentityproviders}}
-                        <h6 class="text-center m-t-1">{{#str}} potentialidps, auth {{/str}}</h6>
-                        <div class="potentialidplist row p-0" class="mt-3">
-                            {{#identityproviders}}
-                                <div class="potentialidp col-sm-12 col-md-6">
-                                    <a href="{{url}}" title={{#quote}}{{name}}{{/quote}} class="btn btn-secondary m-t-1 w-100">
-                                        {{#iconurl}}
-                                            <img src="{{iconurl}}" alt="" width="14" class="mr-2"/>
-                                        {{/iconurl}}
-                                        <span>{{name}}</span>
-                                    </a>
-                                </div>
-                            {{/identityproviders}}
-                        </div>
-                        <hr class="hr--hasidentityproviders"/>
-                      {{/hasidentityproviders}}
-
-                      {{#canloginasguest}}
-                      <div class="loginasguest-box">
-                          <h6 class="text-center m-t-1">{{#str}}someallowguest{{/str}}</h6>
-                          <form action="{{loginurl}}" method="post" id="guestlogin">
-                              <input type="hidden" name="logintoken" value="{{logintoken}}">
-                              <input type="hidden" name="username" value="guest" />
-                              <input type="hidden" name="password" value="guest" />
-                              <button class="btn btn-secondary btn-block m-t-1" type="submit">{{#str}}loginguest{{/str}}</button>
-                          </form>
-                      </div>
-                      <hr class="hr--canloginasguest"/>
-                      {{/canloginasguest}}
-
-                      {{#hasinstructions}}
-                      <div class="login-msg alert-warning mt-3 mb-4 p-4">
-                          <h6 class="font-weight-bold">{{#str}}firsttime{{/str}}</h6>
-                          {{{instructions}}}
-                      </div>
-                      {{/hasinstructions}}
-
-                      {{{logininfobox2}}}
-
-                      {{#maintenance}}
-                      <div class="login-msg alert-danger mt-5 mb-4 p-4">
-                            <h6 class="font-weight-bold">{{#str}}sitemaintenance, core_admin{{/str}}</h6>
-                            <div>
-                                {{{maintenance}}}
-                            </div>
-                       </div>
-                      {{/maintenance}}
-
-                      {{#cansignup}}
-                      <form action="{{signupurl}}" method="get" id="signup">
-                          <button type="submit" class="btn btn-special">{{#str}}startsignup{{/str}}</button>
-                      </form>
-                      {{/cansignup}}
+            {{#loginlayoutimg}}    
                 </div>
             </div>
-        </div>
-    </div>
+            {{/loginlayoutimg}}
 
-</div>
+            {{#loginlayoutimg}}
+            <div class="rui-login-wrapper row no-gutters align-items-center justify-content-center w-100">
+                <div class="rui-login-container row no-gutters">
+
+            {{/loginlayoutimg}}
+
+                    <div class="rui-login-box">
+                        {{#cansignup}}
+                            <div class="sr-only">
+                                <a href="{{signupurl}}">{{#str}} tocreatenewaccount {{/str}}</a>
+                            </div>
+                        {{/cansignup}}
+
+                        <div class="rui-loginpage-intro">
+                            {{^loginlogooutside}}
+                            <div class="rui-loginpage-intro-logo">
+                                {{#customloginlogo}}
+                                <a href="{{{ config.wwwroot }}}"><h2><img src="{{customloginlogo}}" title="{{sitename}}" alt="{{sitename}}" class="rui-login-logo img-fluid"/></h2></a>
+                                {{/customloginlogo}}
+
+                                {{^customloginlogo}}
+                                    {{#logourl}}
+                                    <a href="{{{ config.wwwroot }}}"><h2><img src="{{logourl}}" title="{{sitename}}" alt="{{sitename}}" class="rui-login-logo img-fluid"/></h2></a>
+                                    {{/logourl}}
+
+                                    {{^logourl}}
+                                    <a href="{{{ config.wwwroot }}}"><h2>{{sitename}}</h2></a>
+                                    {{/logourl}}
+                                {{/customloginlogo}}
+                            </div>
+                            {{/loginlogooutside}}
+
+                            {{#loginintrotext}}
+                            <div class="rui-loginpage-intro-content">
+                                {{{loginintrotext}}}
+                            </div>
+                            {{/loginintrotext}}
+
+                            {{^loginlayoutimg}}
+                                {{#loginhtmlcontent1}}
+                                <div class="rui-login-html-2">                           
+                                    {{{loginhtmlcontent1}}}
+                                </div>
+                                {{/loginhtmlcontent1}}
+                                {{#loginhtmlcontent2}}
+                                    <div class="rui-login-html-2">
+                                    {{{loginhtmlcontent2}}}
+                                    </div>
+                                {{/loginhtmlcontent2}}
+                            {{/loginlayoutimg}}
+                        </div>
+
+                        {{#error}}
+                            <div class="loginerrors mt-3">
+                                <a href="#" id="loginerrormessage" class="accesshide">{{error}}</a>
+                                <div class="alert alert-danger" role="alert" data-aria-autofocus="true">{{error}}</div>
+                            </div>
+                        {{/error}}
+
+                        {{#loginidprovtop}}
+                        {{#hasidentityproviders}}
+                            <div class="rui-potentialidplist mt-3 text-center">
+                                <h5 class="mb-2">{{#str}} potentialidps, auth {{/str}}</h5>
+                                <div class="row no-gutters mt-3">
+                                {{#identityproviders}}
+                                    <div class="rui-potentialidp w-100 mt-1">
+                                        <a href="{{url}}" title={{#quote}}{{name}}{{/quote}} class="btn btn-outline-secondary mt-1 w-100">
+                                            {{#iconurl}}
+                                                <img src="{{iconurl}}" alt="" width="24" height="24"/>
+                                            {{/iconurl}}
+                                            <span class="rui-potentialidp--name ml-3">{{name}}</span>
+                                        </a>
+                                    </div>
+                                {{/identityproviders}}
+                                </div>
+                                <hr class="hr-small" />
+                            </div>
+                        {{/hasidentityproviders}}
+                        {{/loginidprovtop}}
+                        
+                        <div class="rui-login-form">
+                            
+                            <form action="{{loginurl}}" method="post" id="login">
+                                <input id="anchor" type="hidden" name="anchor" value="">
+                                <script>document.getElementById('anchor').value = location.hash;</script>
+                                <input type="hidden" name="logintoken" value="{{logintoken}}">
+                                <div class="form-group my-0">
+                                    <label for="username" class="sr-only">
+                                        {{^canloginbyemail}}
+                                            {{#str}} username {{/str}}
+                                        {{/canloginbyemail}}
+                                        {{#canloginbyemail}}
+                                            {{#str}} usernameemail {{/str}}
+                                        {{/canloginbyemail}}
+                                    </label>                                
+                                    <input type="text" name="username" id="username"
+                                        class="form-control form-control--username"
+                                        value="{{username}}"
+                                        placeholder={{#quote}}{{^canloginbyemail}}{{#str}}username{{/str}}{{/canloginbyemail}}{{#canloginbyemail}}{{#str}}usernameemail{{/str}}{{/canloginbyemail}}{{/quote}}
+                                        autocomplete="username">
+
+
+                                    {{#rememberusername}}
+                                        <div class="rui-rememberpass mt-1 text-right">
+                                            <label class="custom-control ios-switch pr-0">
+                                                <input class="ios-switch-control-input form-check-input" type="checkbox" name="rememberusername" id="rememberusername" value="1" {{#username}}checked="checked"{{/username}} />
+                                                <span class="ios-switch-control-indicator"></span>
+                                                <label class="rui-rememberusername-text my-0" for="rememberusername">{{#str}} rememberusername, admin {{/str}}</label>
+                                            </label>
+                                        </div>
+                                    {{/rememberusername}}
+
+                                </div>
+                                <div class="form-group my-1">
+                                    <label for="password" class="sr-only">{{#str}} password {{/str}}</label>
+                                    <input type="password" name="password" id="password" value=""
+                                        class="form-control form-control--password"
+                                        placeholder={{#quote}}{{#str}}password{{/str}}{{/quote}}
+                                        autocomplete="current-password">
+                                </div>
+                                {{^hideforgotpassword}}
+                                <div class="w-100 text-right">
+                                    <a class="rui-login-forgot-btn" href="{{forgotpasswordurl}}">{{#str}}forgotten{{/str}}</a>
+                                </div>
+                                {{/hideforgotpassword}}
+                                {{{logininfobox}}}
+                                <button type="submit" class="btn btn-lg btn-primary btn-block mt-3" id="loginbtn">{{#str}}login{{/str}}</button>
+                            </form>
+                        </div><!-- .rui-login-form -->
+
+                        {{^loginidprovtop}}
+                        {{#hasidentityproviders}}
+                            <div class="rui-potentialidplist mt-3 text-center">
+                                <hr class="hr-small" />
+                                <h5 class="mb-2">{{#str}} potentialidps, auth {{/str}}</h5>
+                                <div class="row no-gutters mt-3">
+                                {{#identityproviders}}
+                                    <div class="rui-potentialidp w-100 mt-1">
+                                        <a href="{{url}}" title={{#quote}}{{name}}{{/quote}} class="btn btn-outline-secondary mt-1 w-100">
+                                            {{#iconurl}}
+                                                <img src="{{iconurl}}" alt="" width="24" height="24"/>
+                                            {{/iconurl}}
+                                            <span class="rui-potentialidp--name ml-3">{{name}}</span>
+                                        </a>
+                                    </div>
+                                {{/identityproviders}}
+                                </div>
+                                <hr class="hr-small" />
+                            </div>
+                        {{/hasidentityproviders}}
+                        {{/loginidprovtop}}
+
+                        <div class="rui-login-additional-btns">
+                            {{#canloginasguest}}
+                            <div class="rui-canloginasguest mt-2" title="{{#str}}someallowguest{{/str}}">
+                                <hr />
+                                <p class="small text-center mb-3">{{#str}}someallowguest{{/str}}</p>
+                                <form action="{{loginurl}}" method="post" id="guestlogin">
+                                    <input type="hidden" name="logintoken" value="{{logintoken}}">
+                                    <input type="hidden" name="username" value="guest" />
+                                    <input type="hidden" name="password" value="guest" />
+                                    <button class="btn btn-sm btn-info w-100" type="submit">{{#str}}loginguest{{/str}}</button>
+                                </form>
+                            </div>
+                            {{/canloginasguest}}
+                        </div><!-- .rui-additional-btns -->
+                        
+                        {{^logincreateainbox}}
+                        {{#cansignup}}
+                        {{#customsignupoutside}}
+                        <div class="rui-login-createaccount--top">
+                            <form action="{{signupurl}}" method="get" id="signup">
+                                {{#stringca}}<span class="rui-login-calabel">{{{stringca}}}</span>{{/stringca}} <button type="submit" class="btn-link--clean">{{#str}}startsignup{{/str}}</button>
+                            </form>
+                        </div>
+                        {{/customsignupoutside}}
+                        {{/cansignup}}
+                        {{/logincreateainbox}}
+
+                        {{^customsignupoutside}}
+                        <div class="rui-login-createaccount my-4 text-center">
+                            <hr class="hr-small" />
+                            <form action="{{signupurl}}" method="get" id="signup">
+                                {{#stringca}}<p class="small mb-3">{{{stringca}}}</p>{{/stringca}}
+                                <button type="submit" class="btn btn-secondary w-100">{{#str}}startsignup{{/str}}</button>
+                            </form>
+                        </div>
+                        {{/customsignupoutside}}
+
+                        {{#loginhtmlblockbottom}}
+                            <div class="rui-login-bottom-block">
+                            {{{loginhtmlblockbottom}}}
+                            </div>
+                        {{/loginhtmlblockbottom}}                        
+
+                        {{#instructions}}
+                            <div class="rui-hasinstructions-desc alert alert-warning">
+                                {{{instructions}}}
+                            </div><!-- .rui-hasinstructions-desc -->
+                        {{/instructions}}
+
+                        {{^loginlayoutimg}}
+                            {{#loginhtmlcontent3}}
+                            <div class="rui-login-html-3">
+                                {{{loginhtmlcontent3}}}
+                            </div>
+                            {{/loginhtmlcontent3}}
+
+                            {{#loginfootercontent}}
+                            <div class="rui-login-footer-content text-center small">
+                            <hr class="hr-small" />
+                            {{{loginfootercontent}}}
+                            </div>
+                            {{/loginfootercontent}}
+                        {{/loginlayoutimg}}
+                    </div><!-- .rui-login-box -->
+
+                    {{#loginlayoutimg}}
+                    <div class="rui-login-bg-container" style="background-image: url('{{loginbg}}');">
+                        {{#loginhtmlcontent2}}
+                            <div class="rui-login-additional-content">
+                            {{{loginhtmlcontent2}}}
+                            </div>
+                        {{/loginhtmlcontent2}}
+                    </div>
+                    {{/loginlayoutimg}}
+               
+            {{#loginlayoutimg}}
+                </div>
+            </div>
+            {{/loginlayoutimg}}
+
+            {{#loginlayoutimg}}
+            <div class="rui-login-wrapper">
+                {{#loginhtmlcontent3}}
+                <div class="rui-login-footer rui-login-footer-content">
+                    {{{loginhtmlcontent3}}}
+                </div>
+                {{/loginhtmlcontent3}}
+
+                {{#loginfootercontent}}
+                <div class="rui-login-footer">
+                {{{loginfootercontent}}}
+                </div>
+                {{/loginfootercontent}}
+                
+            </div>
+            {{/loginlayoutimg}}
+
+            <button type="button" class="btn btn-xs btn-dark btn--cookie" {{!
+        }} data-modal="alert"{{!
+        }} data-modal-title-str='["cookiesenabled", "core"]' {{!
+        }} data-modal-content-str='["cookiesenabled_help_html", "core"]'{{!
+        }}>
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+            </svg>
+
+            <span class="ml-1">{{#str}}cookiesnotice{{/str}}</span></button>
+
+        </div><!-- .login layout -->
+
+        {{#maintenance}}
+        <div class="rui-maintenance">
+            <h2>{{#str}}sitemaintenance, core_admin{{/str}}</h2>
+            <div class="rui-maintenance-desc">
+                {{{maintenance}}}
+            </div>
+        </div>
+        {{/maintenance}}
 
 {{#js}}
-    {{#error}}
-        require(['jquery'], function($) {
-            $('#loginerrormessage').focus();
-        });
-    {{/error}}
     {{^error}}
         {{#autofocusform}}
-            require(['jquery'], function($) {
-                if ($('#username').val()) {
-                    $('#password').focus();
-                } else {
-                    $('#username').focus();
-                }
-            });
+            var userNameField = document.getElementById('username');
+            if (userNameField.value.length == 0) {
+                userNameField.focus();
+            } else {
+                document.getElementById('password').focus();
+            }
         {{/autofocusform}}
     {{/error}}
+    {{#error}}
+        document.getElementById('loginerrormessage').focus();
+    {{/error}}
 {{/js}}
+
+{{{logincustomfooterhtml}}}

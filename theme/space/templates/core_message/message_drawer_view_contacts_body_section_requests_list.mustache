@@ -37,7 +37,7 @@
 {{#requests}}
     <a
         href="#"
-        class="p-2 d-flex list-group-item list-group-item-action border-0 align-items-center"
+        class="py-3 pl-3 pr-2 d-flex list-group-item list-group-item-action align-items-start"
         data-route="view-conversation"
         {{#conversationid}}
             data-route-param-1="{{.}}"
@@ -52,21 +52,19 @@
         role="button"
     >
         <img
-            class="rounded-circle"
+            class="rounded"
             src="{{{profileimageurl}}}"
             alt="{{fullname}}"
             aria-hidden="true"
             style="height: 40px"
         >
-        <div class="w-100 text-truncate ml-2">
+        <div class="w-100 ml-2 align-self-center">
             <div class="d-flex">
-                <strong class="h6 m-0">
+                <h5 class="message-title mt-1 mb-0 text-truncate">
                     {{fullname}}
-                </strong>
+                </h5>
             </div>
-            <p class="m-0 small text-truncate">
-                {{#str}} wouldliketocontactyou, core_message {{/str}}
-            </p>
+            <span class="rui-last-message-text">{{#str}} wouldliketocontactyou, core_message {{/str}}</span>
         </div>
     </a>
 {{/requests}}

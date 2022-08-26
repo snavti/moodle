@@ -44,11 +44,11 @@
     {{$notification}}
         {{#overview.notification}}
             <div class="text-center p-2">
-                <p class="text-center small my-2">{{.}}</p>
+                <p class="text-center small">{{.}}</p>
             </div>
         {{/overview.notification}}
     {{/notification}}
     {{$emptymessage}}
-        <p class="text-muted mt-2">{{#str}} noindividualconversations, core_message {{/str}}</p>
+        <p>{{#str}} noindividualconversations, core_message {{/str}}</p>
     {{/emptymessage}}
 {{/ core_message/message_drawer_view_overview_section }}

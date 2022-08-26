@@ -24,17 +24,20 @@
 }}
 
 <div id="block-timeline-{{uniqid}}" class="block-timeline" data-region="timeline">
-    <div class="block-timeline-bar container px-sm-2 px-md-4 mb-0 pt-sm-2 pt-md-3 pb-2">
+    <div class="container p-0 pb-3 border-bottom">
         <div class="row no-gutters">
-            <div class="col-sm d-flex justify-content-start p-0">
+            <div class="col-sm d-flex justify-content-start">
                 {{> block_timeline/nav-day-filter }}
             </div>
-            <div class="col-sm d-flex justify-content-end p-0">
+            <div class="col-sm d-flex justify-content-end">
                 {{> block_timeline/nav-view-selector }}
+            </div>
+            <div class="col-12 mt-2 mb-1 d-flex justify-content-end nav-search">
+                {{> block_timeline/nav-search }}
             </div>
         </div>
     </div>
-    <div class="container pt-0 pb-3 px-sm-2 px-md-4">
+    <div class="container p-0">
         {{> block_timeline/view }}
     </div>
 </div>

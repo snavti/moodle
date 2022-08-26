@@ -31,7 +31,7 @@
 }}
 <article
     id="p{{id}}"
-    class="forum-post-container mb-2"
+    class="forum-post-container my-2"
     data-post-id="{{id}}"
     data-region="post"
     data-target="{{id}}-target"
@@ -41,20 +41,20 @@
 >
     {{! The firstpost and starter classes below aren't used for anything other than to identify the first post in behat. }}
     <div
-        class="mb-2 forumpost focus-target {{#unread}}unread{{/unread}} {{#firstpost}}firstpost starter{{/firstpost}}"
+        class="mb-2 forum-post focus-target {{#unread}}unread{{/unread}} {{#firstpost}}firstpost starter{{/firstpost}}"
         aria-label='{{#str}} postbyuser, mod_forum, {"post": "{{subject}}", "user": "{{author.fullname}}"} {{/str}}'
         data-post-id="{{id}}" data-content="forum-post"
     >
         {{#isfirstunread}}<a id="unread" aria-hidden="true"></a>{{/isfirstunread}}
 
         <div class="d-flex flex-column w-100"  data-region-content="forum-post-core">
-            <header id="post-header-{{id}}-{{uniqid}}" class="mb-2 pb-2 header row d-flex align-items-center">
+            <header id="post-header-{{id}}-{{uniqid}}" class="mb-2 pb-2 forum-post-header d-flex align-items-center">
                 {{^isdeleted}}
                     {{#author}}
-                        <div class="mb-sm-3 mb-md-0 mr-3" style="width: 43px;">
+                        <div class="mb-sm-3 mb-md-0 mr-3" style="width: 60px;">
                             {{#urls.profileimage}}
                                 <img
-                                    class="rounded-circle w-100"
+                                    class="rounded w-100"
                                     src="{{{.}}}"
                                     alt="{{#str}} pictureof, core, {{author.fullname}} {{/str}}"
                                     aria-hidden="true"
@@ -69,14 +69,20 @@
                         <span class="sr-only">{{#str}} inreplyto, mod_forum, {{.}} {{/str}}</span>
                     {{/parentauthorname}}
                     {{$subjectheading}}
-                        <h3 {{!
-                            }}class="h6 {{#unread}}font-weight-bold{{/unread}} mb-0" {{!
+                    {{#subject}}
+                        <div {{!
+                            }}class="{{#unread}}forum-post-unread font-weight-bold{{/unread}} my-1 forum-post-core-subject" {{!
                             }}data-region-content="forum-post-core-subject" {{!
                             }}data-reply-subject="{{replysubject}}" {{!
-                            }}>{{$subject}}{{{subject}}}{{/subject}}</h3>
+                            }}>
+
+                                {{$subject}}<h5 class="my-0" title="{{{subject}}}"><span class="d-inline-block text-truncate font-weight-bold" style="max-width: 600px;" title="{{subject}}">{{{subject}}}</span></h5>{{/subject}}
+
+                            </div>
+                    {{/subject}}
                     {{/subjectheading}}
                     {{^isdeleted}}
-                        <div class="small mt-1 mb-0" tabindex="-1">
+                        <div class="forum-post-details" tabindex="-1">
                             {{#html.authorsubheading}}{{{.}}}{{/html.authorsubheading}}
                             {{^html.authorsubheading}}
                                 {{< core/time_element }}
@@ -98,9 +104,9 @@
                 </div>
             </header>
 
-            <div class="d-flex flex-wrap body-content-container">
+            <div class="d-flex body-content-container">
 
-                <div class="mr-3 d-sm-none d-md-block" style="width: 45px; flex-shrink: 0"></div>
+                <div class="mr-3 d-sm-none d-md-block" style="width: 60px; flex-shrink: 0"></div>
 
                 <div class="w-100 content-alignment-container">
                     <div id="post-content-{{id}}" class="post-content-container mb-2">
@@ -109,7 +115,7 @@
 
                     {{^isdeleted}}
                         {{#haswordcount}}
-                            <p class="mt-3 mb-0 badge"><small>{{#str}} numwords, core, {{wordcount}} {{/str}}</small></p>
+                            <p class="mt-3 mb-0 badge badge-info"><small>{{#str}} numwords, core, {{wordcount}} {{/str}}</small></p>
                         {{/haswordcount}}
 
                         {{#attachments}}
@@ -162,7 +168,7 @@
                                 {{/html.rating}}
                                 {{$actions}}
                                     <div
-                                        class="w-100 post-actions d-flex align-items-center justify-content-md-end justify-content-lg-start flex-wrap mx-0 mt-2 mb-3"
+                                        class="w-100 post-actions d-flex align-items-center justify-content-md-end justify-content-lg-start flex-wrap mx-0 mt-2 mb-0"
                                         data-region="post-actions-container"
                                         role="menubar"
                                         aria-label='{{#str}} postbyuser, mod_forum, {"post": "{{subject}}", "user": "{{author.fullname}}"} {{/str}}'
@@ -174,12 +180,16 @@
                                                 <a
                                                     data-region="post-action"
                                                     href="{{{urls.view}}}"
-                                                    class="btn btn-secondary btn-sm my-1 mr-1"
+                                                    class="btn btn-secondary btn-sm"
                                                     title="{{#str}} permanentlinktopost, mod_forum {{/str}}"
                                                     aria-label="{{#str}} permanentlinktopost, mod_forum {{/str}}"
                                                     role="menuitem"
                                                 >
-                                                    <i class="fas fa-link mr-1"></i>
+                                                    <svg class="mr-2" width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.75 13.25L18 12C19.6569 10.3431 19.6569 7.65685 18 6V6C16.3431 4.34315 13.6569 4.34315 12 6L10.75 7.25"></path>
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.25 10.75L6 12C4.34315 13.6569 4.34315 16.3431 6 18V18C7.65685 19.6569 10.3431 19.6569 12 18L13.25 16.75"></path>
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.25 9.75L9.75 14.25"></path>
+                                                    </svg>
                                                     {{#str}} permalink, mod_forum {{/str}}
                                                 </a>
                                             {{/view}}
@@ -188,10 +198,10 @@
                                                     <a
                                                         data-region="post-action"
                                                         href="{{{urls.markasread}}}"
-                                                        class="btn btn-primary btn-sm my-1 mr-1"
+                                                        class="btn btn-primary btn-sm"
                                                         role="menuitem"
                                                     >
-                                                        <i class="fas fa-book-reader mr-1"></i>
+                                                        <i class="fas fa-book-reader mr-3"></i>
                                                         {{#str}} markread, mod_forum {{/str}}
                                                     </a>
                                                 {{/unread}}
@@ -199,10 +209,10 @@
                                                     <a
                                                         data-region="post-action"
                                                         href="{{{urls.markasunread}}}"
-                                                        class="btn btn-secondary btn-sm my-1 mr-1"
+                                                        class="btn btn-secondary btn-sm"
                                                         role="menuitem"
                                                     >
-                                                        <i class="fas fa-book-reader mr-1"></i>
+                                                        <i class="fas fa-book-reader mr-3"></i>
                                                         {{#str}} markunread, mod_forum {{/str}}
                                                     </a>
                                                 {{/unread}}
@@ -211,36 +221,52 @@
                                                 <a
                                                     data-region="post-action"
                                                     href="{{{.}}}"
-                                                    class="btn btn-secondary btn-sm my-1 mr-1"
+                                                    class="btn btn-secondary btn-sm"
                                                     title="{{#str}} permanentlinktoparentpost, mod_forum {{/str}}"
                                                     aria-label="{{#str}} permanentlinktoparentpost, mod_forum {{/str}}"
                                                     role="menuitem"
                                                 >
-                                                    <i class="fas fa-stream mr-1"></i>
+                                                    <svg class="mr-2" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M4.75 19.25H19.25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        <path d="M12 15.25V4.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        <path d="M15.25 8.25L12 4.75L8.75 8.25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                    </svg>
                                                     {{#str}} parent, mod_forum {{/str}}
                                                 </a>
                                             {{/urls.viewparent}}
                                             </div>
-                                            <div class="pl-md-3 ml-md-3 mb-2 border-md-left c-forum-edit-buttons">
+
                                             {{#edit}}
+                                            <div class="pl-md-3 ml-md-3 mb-2 rui-forum-border-left rui-forum-edit-buttons">
+
                                                 <a
                                                     data-region="post-action"
                                                     href="{{{urls.edit}}}"
-                                                    class="btn btn-secondary btn-sm my-1 mr-1"
+                                                    class="btn btn-outline-secondary btn-sm"
                                                     role="menuitem"
                                                 >
-                                                    <i class="fas fa-pen mr-1"></i>
+                                                    <svg class="mr-2" width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.75 19.25L9 18.25L18.2929 8.95711C18.6834 8.56658 18.6834 7.93342 18.2929 7.54289L16.4571 5.70711C16.0666 5.31658 15.4334 5.31658 15.0429 5.70711L5.75 15L4.75 19.25Z"></path>
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.25 19.25H13.75"></path>
+                                                    </svg>
+
                                                     {{#str}} edit, mod_forum {{/str}}
                                                 </a>
                                             {{/edit}}
+
                                             {{#split}}
                                                 <a
                                                     data-region="post-action"
                                                     href="{{{urls.split}}}"
-                                                    class="btn btn-secondary btn-sm my-1 mr-1"
+                                                    class="btn btn-outline-secondary btn-sm"
                                                     role="menuitem"
                                                 >
-                                                    <i class="fas fa-cut mr-1"></i>
+                                                    <svg class="mr-2" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M9.25 8C9.25 9.24264 8.24264 10.25 7 10.25C5.75736 10.25 4.75 9.24264 4.75 8C4.75 6.75736 5.75736 5.75 7 5.75C8.24264 5.75 9.25 6.75736 9.25 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        <path d="M9.25 16C9.25 17.2426 8.24264 18.25 7 18.25C5.75736 18.25 4.75 17.2426 4.75 16C4.75 14.7574 5.75736 13.75 7 13.75C8.24264 13.75 9.25 14.7574 9.25 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        <path d="M9 15L19.25 6.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        <path d="M9 9L19.25 16.25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                    </svg>
                                                     {{#str}} prune, mod_forum {{/str}}
                                                 </a>
                                             {{/split}}
@@ -248,30 +274,40 @@
                                                 <a
                                                     data-region="post-action"
                                                     href="{{{urls.delete}}}"
-                                                    class="btn btn-secondary btn-sm my-1 mr-1"
+                                                    class="btn btn-outline-danger btn-sm"
                                                     role="menuitem"
                                                 >
-                                                    <i class="far fa-trash-alt mr-1"></i> {{#str}} delete, mod_forum {{/str}}
+                                                    <svg class="mr-2" width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 7.75L7.59115 17.4233C7.68102 18.4568 8.54622 19.25 9.58363 19.25H14.4164C15.4538 19.25 16.319 18.4568 16.4088 17.4233L17.25 7.75"></path>
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 7.5V6.75C9.75 5.64543 10.6454 4.75 11.75 4.75H12.25C13.3546 4.75 14.25 5.64543 14.25 6.75V7.5"></path>
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7.75H19"></path>
+                                                    </svg>
+                                                    {{#str}} delete, mod_forum {{/str}}
                                                 </a>
                                             {{/delete}}
-                                            </div>
 
+                                            {{#edit}}
+                                            </div>
+                                            {{/edit}}
 
                                             {{#reply}}
-                                            <div class="pl-md-3 ml-md-3 mb-2 border-left c-forum-edit-buttons">
+                                            <div class="pl-md-3 ml-md-3 mb-2 rui-forum-border-left">
                                                 {{$replyoutput}}
                                                     <a
                                                         data-region="post-action"
                                                         href="{{{urls.reply}}}"
-                                                        class="btn btn-primary btn-sm my-1 mr-1"
+                                                        class="btn btn-success btn-sm"
                                                         data-post-id="{{id}}"
                                                         data-action="collapsible-link"
                                                         data-can-reply-privately="{{canreplyprivately}}"
                                                         title="{{#str}} reply, mod_forum {{/str}}"
                                                         role="menuitem"
                                                     >
+                                                        <svg class="mr-2" width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 15.25V6.75H8.75"></path>
+                                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 7L6.75 17.25"></path>
+                                                        </svg>
                                                         {{#str}} reply, mod_forum {{/str}}
-                                                        <i class="fas fa-reply ml-1"></i>
                                                     </a>
                                                 {{/replyoutput}}
                                             </div>
@@ -281,14 +317,14 @@
                                                     {{$replyoutput}}
                                                         <a
                                                             href="{{{urls.reply}}}"
-                                                            class="btn btn-primary btn-sm my-1 mr-1"
+                                                            class="btn btn-primary btn-sm mb-2"
                                                             data-post-id="{{id}}"
                                                             data-can-reply-privately="{{canreplyprivately}}"
                                                             title="{{#str}} reply, mod_forum {{/str}}"
                                                             role="menuitem"
                                                         >
                                                             {{#str}} reply, mod_forum {{/str}}
-                                                            <i class="fas fa-reply ml-1"></i>
+                                                            <i class="fas fa-reply ml-3"></i>
                                                         </a>
                                                     {{/replyoutput}}
                                                 {{/selfenrol}}
@@ -297,7 +333,7 @@
                                                 <a
                                                     data-region="post-action"
                                                     href="{{{urls.export}}}"
-                                                    class="btn btn-secondary btn-sm my-1 mr-1"
+                                                    class="btn btn-secondary btn-sm"
                                                     role="menuitem"
                                                 >
                                                     {{#str}} addtoportfolio, core_portfolio {{/str}}
@@ -318,11 +354,11 @@
 
                         {{#groups}}
                                     {{#urls.group}}
-                                    <div class="w-100 mb-2 pt-2 border-top">
+                                    <div class="mb-2 pt-2 border-top">
                                         {{#urls.image}}
                                             <a href="{{urls.group}}" class="badge badge-link badge-light" role="button" aria-label="{{#str}} memberofgroup, group, {{name}}{{/str}}" title="{{#str}} memberofgroup, group, {{name}}{{/str}}">
                                                 <img
-                                                    class="rounded-circle icon mr-1"
+                                                    class="rounded icon mr-3"
                                                     src="{{{.}}}"
                                                     alt="{{#str}} pictureof, core, {{name}} {{/str}}"
                                                     aria-hidden="true"
@@ -333,9 +369,9 @@
                                         {{/urls.image}}
                                     {{/urls.group}}
                                     {{^urls.group}}
-                                        <div class="badge badge-light">
+                                        <div class="badge badge-info">
                                         {{#urls.image}}
-                                            <img class="rounded-circle icon mr-1"
+                                            <img class="rounded icon mr-3"
                                                 src="{{{.}}}"
                                                 alt="{{#str}} pictureof, core, {{name}} {{/str}}"
                                                 title="{{#str}} pictureof, core, {{name}} {{/str}}"

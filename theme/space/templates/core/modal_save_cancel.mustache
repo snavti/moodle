@@ -40,7 +40,9 @@
 
 {{< core/modal }}
     {{$footer}}
-        <button type="button" class="btn btn-primary col mr-1" data-action="save">{{#str}} savechanges {{/str}}</button>
-        <button type="button" class="btn btn-secondary col ml-1" data-action="cancel">{{#str}} cancel {{/str}}</button>
+    <div class="w-100 d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary" data-action="cancel">{{#str}} cancel {{/str}}</button>
+        <button type="button" class="btn btn-primary" data-action="save">{{#str}} savechanges {{/str}}</button>
+    </div>
     {{/footer}}
 {{/ core/modal }}

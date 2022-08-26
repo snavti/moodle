@@ -33,32 +33,35 @@
     }
 }}
 {{#activities}}
-<div class="row m-b-1 row-fluid">
-    <div class="activityinstance col">
+<div class="row my-1 py-2 no-gutters border-bottom">
+    <div class="activityinstance col-6">
         <div class="mod-indent-outer"></div>
         <div>
             {{#canmanage}}
             <label class="accesshide" for="selectactivity_{{cmid}}">{{#str}}select, completion{{/str}} {{modname}}</label>
-            <input type="checkbox" id="selectactivity_{{cmid}}" class="m-r-1" name="cmid[]" data-section="{{sectionnumber}}" value="{{cmid}}" aria-label="{{#str}}checkactivity, completion, {{{modname}}}{{/str}}">
+
+            <label class="custom-control ios-switch my-0">
+                <input type="checkbox" id="selectactivity_{{cmid}}" class="ios-switch-control-input form-check-input" name="cmid[]" data-section="{{sectionnumber}}" value="{{cmid}}" aria-label="{{#str}}checkactivity, completion, {{{modname}}}{{/str}}">
+                <span class="ios-switch-control-indicator"></span>
+            </label>
             {{/canmanage}}
-            <a href="{{url}}">
-            <img src="{{icon}}" class="iconlarge activityicon" alt=" " role="presentation" />
-            <span class="instancename m-l-1">{{{modname}}}</span>
+            <a href="{{url}}" class="activityinstance-title">
+                <img src="{{icon}}" class="activityicon" alt=" " role="presentation" />
+                <span class="activity-name ml-2">{{{modname}}}</span>
             </a>
         </div>
     </div>
-    <div class="activity-completionstatus col row align-items-center" id="completionstatus_{{cmid}}">
-        <div class="col-1">
+    <div class="activity-completionstatus col-6" id="completionstatus_{{cmid}}">
+        <div class="d-inline-flex align-items-center">
             {{#completionstatus.icon}}
                 {{{completionstatus.icon}}}
             {{/completionstatus.icon}}
             {{^completionstatus.icon}}
-                <span class="m-r-3"></span>
+                <span class="ml-3"></span>
             {{/completionstatus.icon}}
-        </div>
-        <div class="col">
-            <span class="text-muted muted">{{{completionstatus.string}}}</span>
+            <span class="text-muted muted ml-2">{{{completionstatus.string}}}</span>
         </div>
     </div>
 </div>
 {{/activities}}
+

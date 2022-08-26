@@ -22,31 +22,14 @@
     Example context (json):
     {}
 }}
-<div class="searchbar input-group" role="search">
-    <label for="searchinput">
-        <span class="sr-only">{{#str}} searchactivities, core {{/str}}</span>
-    </label>
-    <input type="text"
-           data-action="search"
-           id="searchinput"
-           class="form-control searchinput h-auto rounded px-3 py-2"
-           placeholder="{{#str}} search, core {{/str}}"
-           name="search"
-           autocomplete="off"
-    >
-    <div class="input-group-append">
-        <div class="p-0">
-            <div class="search-icon badge badge-light badge-link border-0 icon-no-margin ml-2">
-                {{#pix}} a/search, core {{/pix}}
-            </div>
-            <div class="clear d-none">
-                <button class="badge badge-danger badge-link border-0" data-action="clearsearch">
-                    <span class="d-flex" aria-hidden="true">{{#pix}} e/cancel_solid_circle, core {{/pix}}</span>
-                    <span class="sr-only">{{#str}} clearsearch, core {{/str}}</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+{{< core/search_input_auto }}
+    {{$label}}{{#str}}
+        searchactivities, core
+    {{/str}}{{/label}}
+    {{$placeholder}}{{#str}}
+        search, core
+    {{/str}}{{/placeholder}}
+{{/ core/search_input_auto }}
+
 <div class="searchresultscontainer" data-region="search-results-container" hidden="hidden" aria-live="polite">
 </div>

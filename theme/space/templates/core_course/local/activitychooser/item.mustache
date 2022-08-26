@@ -29,17 +29,17 @@
         "icon": "<img class='icon' src='http://urltooptionicon'>"
     }
 }}
-<div role="menuitem" tabindex="-1" aria-label="{{title}}" class="option-item {{#favourite}}option-item-favourite{{/favourite}}" data-region="chooser-option-container" data-internal="{{name}}" data-modname="{{componentname}}_{{link}}">
-    <div class="optioninfo card-body d-flex flex-column text-center p-2" data-region="chooser-option-info-container">
-        <a class="d-flex flex-column justify-content-between flex-fill" href="{{link}}" title="{{#str}} addnew, moodle, {{title}} {{/str}}" tabindex="-1" data-action="add-chooser-option">
-            <div class="optionicon">
+<div role="menuitem" tabindex="-1" aria-label="{{title}}" class="option border-0 card m-1" data-region="chooser-option-container" data-internal="{{name}}" data-modname="{{componentname}}_{{link}}">
+    <div class="optioninfo p-2 d-inline-flex align-items-center justify-content-between" data-region="chooser-option-info-container">
+        <a class="d-inline-flex align-items-center" href="{{link}}" title="{{#str}} addnew, moodle, {{title}} {{/str}}" tabindex="-1" data-action="add-chooser-option">
+            <div class="rui-optionicon">
                 {{{icon}}}
             </div>
-            <h5 class="optionname my-2">{{title}}</h5>
+            <div class="rui-optionname clamp-2">{{title}}</div>
         </a>
         <div class="optionactions d-flex justify-content-center" role="group" data-region="chooser-option-actions-container">
             {{^legacyitem}}
-                <button class="btn btn-sm btn-secondary mr-1 optionaction {{#favourite}}text-primary{{/favourite}}"
+                <button class="btn btn-sm btn-link btn-icon--xs icon-no-margin optionaction {{#favourite}}text-primary{{/favourite}}{{^favourite}}text-muted{{/favourite}}"
                         data-action="manage-module-favourite"
                         data-favourited="{{favourite}}"
                         data-id="{{id}}"
@@ -54,21 +54,17 @@
                         aria-label="{{#str}} aria:modulefavourite, core_course, {{title}} {{/str}}"
                         tabindex="-1"
                 >
-                    {{#favourite}}
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.75L13.75 10.25H19.25L14.75 13.75L16.25 19.25L12 15.75L7.75 19.25L9.25 13.75L4.75 10.25H10.25L12 4.75Z"></path>
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.75L13.75 10.25H19.25L14.75 13.75L16.25 19.25L12 15.75L7.75 19.25L9.25 13.75L4.75 10.25H10.25L12 4.75Z"></path>
                     </svg>
-
-                    {{/favourite}}
-                    {{^favourite}}
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.75L13.75 10.25H19.25L14.75 13.75L16.25 19.25L12 15.75L7.75 19.25L9.25 13.75L4.75 10.25H10.25L12 4.75Z"></path>
-                    </svg>
-                    {{/favourite}}
                 </button>
             {{/legacyitem}}
-            <button class="btn btn-sm btn-secondary ml-1 optionaction" data-action="show-option-summary" tabindex="-1">
-                <span aria-hidden="true">{{#pix}} docs, core {{/pix}}</span>
+            <button class="btn btn-sm btn-icon--xs btn-link icon-no-margin optionaction ml-1" data-action="show-option-summary" tabindex="-1">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                    <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                </svg>
                 <span class="sr-only">{{#str}} informationformodule, core_course, {{title}} {{/str}}</span>
             </button>
         </div>

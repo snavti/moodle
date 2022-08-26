@@ -24,13 +24,23 @@
   padding: $navbar-padding-y $navbar-padding-x;
 
   // Because flex properties aren't inherited, we need to redeclare these first
-  // few properities so that content nested within behave properly.
-  > .container,
-  > .container-fluid {
+  // few properties so that content nested within behave properly.
+  %container-flex-properties {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .container,
+  .container-fluid {
+    @extend %container-flex-properties;
+  }
+
+  @each $breakpoint, $container-max-width in $container-max-widths {
+    > .container#{breakpoint-infix($breakpoint, $container-max-widths)} {
+      @extend %container-flex-properties;
+    }
   }
 }
 
@@ -41,56 +51,18 @@
 
 .navbar-brand {
   display: inline-block;
-  font-size: $navbar-brand-font-size;
+  padding-top: $navbar-brand-padding-y;
+  padding-bottom: $navbar-brand-padding-y;
+  margin-right: 25px;
+  @include font-size($navbar-brand-font-size);
   line-height: inherit;
+  white-space: nowrap;
 
-
-  @include hover-focus {
+  @include hover-focus() {
     text-decoration: none;
   }
-
 }
 
-
-  .c-logo {
-    margin: 0;
-  }
-
-
-  .site-name {
-    margin: 0.8rem 0!important;
-    font-size: 18px!important;
-
-    @include media-breakpoint-between(sm,md) {
-      max-width: 80%;
-      margin: 0.8rem 60px!important;
-      font-size: 12px!important;
-      font-weight: $font-weight-bold;
-      color: $top-bar-text;
-      text-align: center;
-    }
-
-    #nav-drawer & {
-        margin-bottom: 16px!important;
-        margin-top: 4px!important;
-
-        @include media-breakpoint-between(sm,md) {
-          margin-top: 8px!important;
-        }
-    }
-  }
-
-
-  .has-logo {
-
-    &:focus {
-      box-shadow: none;
-    }
-
-    .hidden {
-      display: none!important;
-    }
-  }
 
 // Navbar nav
 //
@@ -98,25 +70,14 @@
 
 .navbar-nav {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column; // cannot use `inherit` to get the `.navbar`s value
   padding-left: 0;
   margin-bottom: 0;
   list-style: none;
 
-  .nav-item {
-    position: relative;
-  }
-
-  .dropdown-menu {
-    position: absolute;
-    float: none;
-    top: auto;
-
-    @include media-breakpoint-between(sm,md) {
-    position: relative;
-    top: 0!important;
-    left: 0!important;
-    }
+  .nav-link {
+    padding-right: 0;
+    padding-left: 0;
   }
 }
 
@@ -138,7 +99,7 @@
 // Powered by the collapse Bootstrap JavaScript plugin.
 
 // When collapsed, prevent the toggleable navbar contents from appearing in
-// the default flexbox row orienation. Requires the use of `flex-wrap: wrap`
+// the default flexbox row orientation. Requires the use of `flex-wrap: wrap`
 // on the `.navbar` parent.
 .navbar-collapse {
   flex-basis: 100%;
@@ -151,18 +112,14 @@
 // Button for toggling the navbar when in its collapsed state
 .navbar-toggler {
   padding: $navbar-toggler-padding-y $navbar-toggler-padding-x;
+  @include font-size($navbar-toggler-font-size);
   line-height: 1;
   background-color: transparent; // remove default button style
   border: $border-width solid transparent; // remove default button style
   @include border-radius($navbar-toggler-border-radius);
 
-  @include hover-focus {
+  @include hover-focus() {
     text-decoration: none;
-  }
-
-  // Opinionated: add "hand" cursor to non-disabled .navbar-toggler elements
-  &:not(:disabled):not(.disabled) {
-    cursor: pointer;
   }
 }
 
@@ -187,10 +144,20 @@
 
     &#{$infix} {
       @include media-breakpoint-down($breakpoint) {
-        > .container,
-        > .container-fluid {
+        %container-navbar-expand-#{$breakpoint} {
           padding-right: 0;
           padding-left: 0;
+        }
+
+        > .container,
+        > .container-fluid {
+          @extend %container-navbar-expand-#{$breakpoint};
+        }
+
+        @each $size, $container-max-width in $container-max-widths {
+          > .container#{breakpoint-infix($size, $container-max-widths)} {
+            @extend %container-navbar-expand-#{$breakpoint};
+          }
         }
       }
 
@@ -203,15 +170,6 @@
 
           .dropdown-menu {
             position: absolute;
-
-            @include media-breakpoint-between(sm,md) {
-            position: relative;
-            }
-          }
-
-          .dropdown-menu-right {
-            right: 0;
-            left: auto; // Reset the default from `.dropdown-menu`
           }
 
           .nav-link {
@@ -221,13 +179,27 @@
         }
 
         // For nesting containers, have to redeclare for alignment purposes
-        > .container,
-        > .container-fluid {
+        %container-nesting-#{$breakpoint} {
           flex-wrap: nowrap;
         }
 
+        > .container,
+        > .container-fluid {
+          @extend %container-nesting-#{$breakpoint};
+        }
+
+        @each $size, $container-max-width in $container-max-widths {
+          > .container#{breakpoint-infix($size, $container-max-widths)} {
+            @extend %container-nesting-#{$breakpoint};
+          }
+        }
+
+        .navbar-nav-scroll {
+          overflow: visible;
+        }
+
         .navbar-collapse {
-          display: flex !important;  // stylelint-disable-line declaration-no-important
+          display: flex !important; // stylelint-disable-line declaration-no-important
 
           // Changes flex-bases to auto because of an IE10 bug
           flex-basis: auto;
@@ -236,134 +208,6 @@
         .navbar-toggler {
           display: none;
         }
-
-        .dropup {
-          .dropdown-menu {
-            top: auto;
-            bottom: 100%;
-          }
-        }
-      }
-    }
-  }
-}
-
-
-// Navbar themes
-//
-// Styles for switching between navbars with light or dark background.
-
-// Dark links against a light background
-.navbar-light {
-  .navbar-brand {
-    color: $navbar-light-active-color;
-
-    @include hover-focus {
-      color: $navbar-light-active-color;
-    }
-  }
-
-  .navbar-nav {
-    .nav-link {
-      color: $navbar-light-color;
-
-      @include hover-focus {
-        color: $navbar-light-hover-color;
-      }
-
-      &.disabled {
-        color: $navbar-light-disabled-color;
-      }
-    }
-
-    .show > .nav-link,
-    .active > .nav-link,
-    .nav-link.show,
-    .nav-link.active {
-      color: $navbar-light-active-color;
-    }
-  }
-
-  .navbar-toggler {
-    color: $navbar-light-color;
-    border-color: $navbar-light-toggler-border-color;
-  }
-
-  .navbar-toggler-icon {
-    background-image: $navbar-light-toggler-icon-bg;
-  }
-
-  .navbar-text {
-    color: $navbar-light-color;
-    a {
-      color: $navbar-light-active-color;
-
-      @include hover-focus {
-        color: $navbar-light-active-color;
-      }
-    }
-  }
-}
-
-// White links against a dark background
-.navbar-dark {
-  .navbar-brand {
-    color: $navbar-dark-active-color;
-
-    @include hover-focus {
-      color: $navbar-dark-active-color;
-    }
-  }
-
-  .navbar-nav {
-    .nav-link {
-      color: $navbar-dark-color;
-
-      @include hover-focus {
-        color: $navbar-dark-hover-color;
-      }
-
-      &.disabled {
-        color: $navbar-dark-disabled-color;
-      }
-    }
-
-    .show > .nav-link,
-    .active > .nav-link,
-    .nav-link.show,
-    .nav-link.active {
-      color: $navbar-dark-active-color;
-    }
-  }
-
-  .navbar-toggler {
-    color: $navbar-dark-color;
-    border-color: $navbar-dark-toggler-border-color;
-
-    .icon {
-      transform: rotate(0);
-      transition: $general-transition;
-      transform-origin: center;
-    }
-
-    &[aria-expanded="true"] .icon {
-      transform-origin: center;
-      transform: rotate(180deg)!important;
-    }
-
-  }
-
-  .navbar-toggler-icon {
-    background-image: $navbar-dark-toggler-icon-bg;
-  }
-
-  .navbar-text {
-    color: $navbar-dark-color;
-    a {
-      color: $navbar-dark-active-color;
-
-      @include hover-focus {
-        color: $navbar-dark-active-color;
       }
     }
   }

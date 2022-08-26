@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
+/**
  * space config.
  *
- * @package    theme_space
- * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
- * @license    Commercial https://themeforest.net/licenses
+ * @package   theme_space
+ * @copyright 2022 Marcin Czaja (https://rosea.io)
+ * @license   Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -39,57 +39,63 @@ $THEME->layouts = [
     // Most backwards compatible layout without the blocks - this is the layout used by default.
     'base' => array(
         'file' => 'tmpl-columns2.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
         'defaultregion' => 'side-pre',
     ),
     // Standard layout with blocks, this is recommended for most pages with general information.
     'standard' => array(
         'file' => 'tmpl-columns2.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
         'defaultregion' => 'side-pre',
     ),
     // Main course page.
     'course' => array(
         'file' => 'tmpl-course.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'regions' => array('side-pre', 'sidecourseblocks', 'ctopbl', 'cbottombl', 'cstopbl', 'csbottombl', 'sidebartopblocks', 'sidebarbottomblocks'),
         'defaultregion' => 'side-pre',
         'options' => array('langmenu' => true),
     ),
     'coursecategory' => array(
         'file' => 'tmpl-columns2.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
         'defaultregion' => 'side-pre',
     ),
     // Part of course, typical for modules - default page layout if $cm specified in require_login().
     'incourse' => array(
-        'file' => 'tmpl-course.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'file' => 'tmpl-incourse.php',
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
         'defaultregion' => 'side-pre',
     ),
     // The site home page.
     'frontpage' => array(
         'file' => 'tmpl-frontpage.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
         'defaultregion' => 'side-pre',
         'options' => array('nonavbar' => true),
     ),
     // Server administration scripts.
     'admin' => array(
-        'file' => 'tmpl-course.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'file' => 'tmpl-admin.php',
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
+        'defaultregion' => 'side-pre',
+    ),
+    // Moodle 4.0 - My courses page.
+    'mycourses' => array(
+        'file' => 'tmpl-columns2.php',
+        'regions' => array('side-pre'),
         'defaultregion' => 'side-pre',
     ),
     // My dashboard page.
     'mydashboard' => array(
-        'file' => 'tmpl-columns2.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'file' => 'tmpl-dashboard.php',
+        'regions' => array('side-pre', 'dleftblocks', 'dmiddleblocks', 'drightblocks', 'dtopblocks', 'dbottomblocks', 'sidebartopblocks', 'sidebarbottomblocks'),
         'defaultregion' => 'side-pre',
         'options' => array('nonavbar' => true, 'langmenu' => true, 'nocontextheader' => true),
     ),
     // My public page.
     'mypublic' => array(
-        'file' => 'tmpl-columns2.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'file' => 'tmpl-mypublic.php',
+        'regions' => array(),
         'defaultregion' => 'side-pre',
     ),
     'login' => array(
@@ -98,22 +104,36 @@ $THEME->layouts = [
         'options' => array('langmenu' => true),
     ),
 
-    // Pages that appear in pop-up windows - no navigation, no blocks, no header.
+    // Pages that appear in pop-up windows - no navigation, no blocks, no header and bare activity header.
     'popup' => array(
-        'file' => 'tmpl-columns1.php',
+        'file' => 'tmpl-popup.php',
         'regions' => array(),
-        'options' => array('nofooter' => true, 'nonavbar' => true),
+        'options' => array(
+            'nofooter' => true,
+            'nonavbar' => true,
+            'activityheader' => [
+                'notitle' => true,
+                'nocompletion' => true,
+                'nodescription' => true
+            ]
+        )
     ),
     // No blocks and minimal footer - used for legacy frame layouts only!
     'frametop' => array(
         'file' => 'tmpl-columns1.php',
         'regions' => array(),
-        'options' => array('nofooter' => true, 'nocoursefooter' => true),
+        'options' => array(
+            'nofooter' => true,
+            'nocoursefooter' => true,
+            'activityheader' => [
+                'nocompletion' => true
+            ]
+        ),
     ),
     // Embeded pages, like iframe/object embeded in moodleform - it needs as much space as possible.
     'embedded' => array(
-        'file' => 'tmpl-embedded.php',
-        'regions' => array(),
+        'file' => 'embedded.php',
+        'regions' => array()
     ),
     // Used during upgrade and install, and for the 'This site is undergoing maintenance' message.
     // This must not have any blocks, links, or API calls that would lead to database or cache interaction.
@@ -126,30 +146,29 @@ $THEME->layouts = [
     'print' => array(
         'file' => 'tmpl-columns1.php',
         'regions' => array(),
-        'options' => array('nofooter' => true, 'nonavbar' => false),
+        'options' => array('nofooter' => true, 'nonavbar' => false, 'noactivityheader' => true),
     ),
     // The pagelayout used when a redirection is occuring.
     'redirect' => array(
-        'file' => 'tmpl-embedded.php',
+        'file' => 'embedded.php',
         'regions' => array(),
     ),
     // The pagelayout used for reports.
     'report' => array(
-        'file' => 'tmpl-columns2.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
+        'file' => 'tmpl-report.php',
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
         'defaultregion' => 'side-pre',
     ),
     // The pagelayout used for safebrowser and securewindow.
     'secure' => array(
-        'file' => 'tmpl-secure.php',
-        'regions' => array('side-pre', 'sidebar', 'sidebar-top', 'maintopwidgets', 'mainfwidgets'),
-        'defaultregion' => 'side-pre',
+        'file' => 'secure.php',
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
+        'defaultregion' => 'side-pre'
     )
 ];
 
 $THEME->parents = [];
 $THEME->enable_dock = false;
-$THEME->csstreepostprocessor = 'theme_space_css_tree_post_processor';
 $THEME->extrascsscallback = 'theme_space_get_extra_scss';
 $THEME->prescsscallback = 'theme_space_get_pre_scss';
 $THEME->precompiledcsscallback = 'theme_space_get_precompiled_css';
@@ -157,8 +176,10 @@ $THEME->yuicssmodules = array();
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 $THEME->requiredblocks = '';
 $THEME->addblockposition = BLOCK_ADDBLOCK_POSITION_DEFAULT;
-$THEME->iconsystem = '\\theme_space\\output\\icon_system_fontawesome';
-$THEME->rarrow ='';
-$THEME->larrow ='';
-$THEME->uarrow ='';
-$THEME->darrow ='';
+//$THEME->iconsystem = '\\theme_space\\output\\icon_system_fontawesome';
+$THEME->haseditswitch = true;
+$THEME->usescourseindex = true;
+// By default, all boost theme do not need their titles displayed.
+$THEME->activityheaderconfig = [
+    'notitle' => true
+];

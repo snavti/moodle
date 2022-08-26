@@ -42,21 +42,37 @@
     }
 }}
 <div data-region="competencylinktree">
-<h3 class="competencylinktree-modal-heading mb-2">{{#str}}locatecompetency, tool_lp{{/str}}</h3>
+<h5 class="competencylinktree-modal-heading">{{#str}}locatecompetency, tool_lp{{/str}}</h5>
 
-<form data-region="filtercompetencies" class="form-inline" data-frameworkid="{{framework.id}}">
-    <div class="form-group row no-gutters w-100">
-        <div class="col mr-2">
+<div class="simplesearchform">
+    <form data-region="filtercompetencies" class="form-inline" data-frameworkid="{{framework.id}}">
+        <div class="search-input-group d-inline-flex justify-content-between w-100">
             <label class="accesshide" for="filter{{uniqid}}">{{#str}}search, tool_lp{{/str}}</label>
-            <input type="text" class="form-control w-100 m-0" id="filter{{uniqid}}" placeholder="{{#str}}search, tool_lp{{/str}}" value="{{search}}">
-        </div>
-        <div class="col-2">
-            <button class="btn btn-secondary w-100">
-                <i class="icon fas fa-search fa-fw " aria-hidden="true" title="{{#str}}search{{/str}}" aria-label="{{#str}}search{{/str}}"></i>
+            <span class="search-input-icon">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                </svg>
+            </span>
+            <input type="text"
+            id="filter{{uniqid}}"
+            class="search-input w-100"
+            placeholder="{{#str}}search, tool_lp{{/str}}"
+            aria-label="{{#str}}search, tool_lp{{/str}}"
+            name="{{ inputname }}"
+            data-region="input"
+            autocomplete="off"
+            value="{{ search }}"
+            >
+            <button type="submit" class="search-input-btn">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.75 6.75L19.25 12L13.75 17.25"></path>
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H4.75"></path>
+                </svg>
+                <span class="sr-only">{{ searchstring }}</span>
             </button>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 <ul data-enhance="linktree" style="display: none;" class="mt-2 mx-0 p-3 competency-tree">
     <li data-id="0"><span>{{{framework.shortname}}}</span>
         <ul class="pl-2">

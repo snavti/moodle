@@ -17,23 +17,31 @@
 /**
  * A maintenance layout for the space theme.
  *
- * @package    theme_space
- * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
- * @license    Commercial https://themeforest.net/licenses
+ * @package   theme_space
+ * @copyright 2022 Marcin Czaja (https://rosea.io)
+ * @license   Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
+
+$buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions();
+// If the settings menu will be included in the header then don't add it here.
+$regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settings_menu() : false;
 $siteurl = $CFG->wwwroot;
 $templatecontext = [
     // We cannot pass the context to format_string, this layout can be used during
     // installation. At that stage database tables do not exist yet.
     'sitename' => format_string($SITE->shortname, true, ["escape" => false]),
     'output' => $OUTPUT,
-    'siteurl' => $siteurl
+    'siteurl' => $siteurl,
+    'regionmainsettingsmenu' => $regionmainsettingsmenu,
+    'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
 ];
-
+// Load theme settings
 $themesettings = new \theme_space\util\theme_settings();
-$templatecontext = array_merge($templatecontext, $themesettings->head_elements());
-$templatecontext = array_merge($templatecontext, $themesettings->fonts());
+$templatecontext = array_merge($templatecontext, $themesettings->global_settings());
+$templatecontext = array_merge($templatecontext, $themesettings->footer_settings());
 
-echo $OUTPUT->render_from_template('theme_space/maintenance', $templatecontext);
+$PAGE->requires->js_call_amd('theme_space/rui', 'init');
+
+echo $OUTPUT->render_from_template('theme_space/tmpl-maintenance', $templatecontext);

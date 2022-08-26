@@ -35,66 +35,71 @@
         }]
     }
 }}
-<div class="container col no-gutters p-0">
-    <div class="row m-b-2">
-        <div class="col m-t-2 lead">{{#str}}bulkactivitydetail, core_completion{{/str}}</div>
-    </div>
-    <form method="post" action="editdefaultcompletion.php" class="mform" id="theform">
-        <div class="row m-b-2">
+
+<fieldset class="fieldset-styled">
+    <legend>{{#str}}bulkactivitydetail, core_completion{{/str}}</legend>
+
+    <form method="post" action="editdefaultcompletion.php" class="mform mt-3 pt-3 border-top" id="theform">
+
+        <div class="row">
             <div class="col">
-                <input type="submit" value="{{#str}}edit{{/str}}" class="btn btn-primary" name="submitbutton" aria-label="{{#str}}updateactivities, completion{{/str}}" disabled/>
+                <input type="submit" value="{{#str}}edit{{/str}}" class="btn btn-sm btn-outline-primary" name="submitbutton" aria-label="{{#str}}updateactivities, completion{{/str}}" disabled/>
             </div>
         </div>
-        <div class="row m-b-1">
-            <div class="col-xs-6 span6">
-                <input type="checkbox" class="mastercheck m-r-1" aria-label="{{#str}}checkall, completion{{/str}}">
-                <label class="font-weight-bold">{{#str}}activitieslabel, core_completion{{/str}}</label>
+
+        <div class="row mb-1">
+            <div class="col-6">
+                <label class="custom-control ios-switch">
+                    <input type="checkbox" class="mastercheck ios-switch-control-input form-check-input" aria-label="{{#str}}checkall, completion{{/str}}">
+                    <span class="ios-switch-control-indicator"></span>
+                    <strong class="text ml-3">{{#str}}activitieslabel, core_completion{{/str}}</strong>
+                </label>
             </div>
-            <div class="col-xs-6 span6">
+            <div class="col-6 px-0">
                 <label class="font-weight-bold">{{#str}}completion, core_completion{{/str}}</label>
                 <span>{{{helpicon}}}</span>
             </div>
         </div>
-        <hr class="row">
+
         <div class="modules">
             {{#modules}}
                 {{#canmanage}}
-                <div class="m-b-1">
-                    <div class="row m-b-1 row-fluid">
-                        <div class="col-xs-6 span6">
-                            <label class="accesshide" for="modtype_{{id}}">{{#str}}select, core_completion{{/str}} {{formattedname}}</label>
-                            <input id="modtype_{{id}}" type="checkbox" class="m-r-1" name="modids[]" value="{{id}}" aria-label="{{#str}}checkactivity, completion, {{{formattedname}}}{{/str}}">
-                            <img class="iconlarge activityicon" src="{{icon}}" alt=" " role="presentation" />
-                            <span class="m-l-1">{{{formattedname}}}</span>
+                <div class="mb-1">
+                    <div class="row no-gutters my-2 py-2 border-bottom">
+                        <div class="col-6 align-items-center d-inline-flex">
+                            <label class="custom-control ios-switch">
+                                <input id="modtype_{{id}}" type="checkbox" class="ios-switch-control-input form-check-input" name="modids[]" value="{{id}}" aria-label="{{#str}}checkactivity, completion, {{{formattedname}}}{{/str}}">
+                                <span class="ios-switch-control-indicator"></span>
+                            </label>
+                            <img class="iconlarge activityicon mr-2" src="{{icon}}" alt=" " role="presentation" />
+                            <span>{{{formattedname}}}</span>
                         </div>
-                        <div class="activity-completionstatus col row align-items-center">
-                            <div class="col-1">
+                        <div class="activity-completionstatus col-6">
+                            <div class="d-inline-flex align-items-center">
                                 {{#completionstatus.icon}}
                                     {{{completionstatus.icon}}}
                                 {{/completionstatus.icon}}
                                 {{^completionstatus.icon}}
-                                    <span class="m-r-3"></span>
+                                    <span class="mr-3"></span>
                                 {{/completionstatus.icon}}
-                            </div>
-                            <div class="col">
-                                <span class="text-muted muted">{{{completionstatus.string}}}</span>
+                                <span class="text-muted muted ml-2">{{{completionstatus.string}}}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <hr class="row">
                 {{/canmanage}}
             {{/modules}}
         </div>
         <input type="hidden" name="id" value="{{courseid}}" />
         <input type="hidden" name="sesskey" value="{{sesskey}}" />
-        <div class="row">
+        <div class="row no-gutters mt-3">
             <div class="col">
-                <input type="submit" value="{{#str}}edit{{/str}}" class="btn btn-primary" name="submitbutton" disabled/>
+                <input type="submit" value="{{#str}}edit{{/str}}" class="btn btn-sm btn-outline-primary" name="submitbutton" disabled/>
             </div>
         </div>
     </form>
-</div>
+
+</fieldset>
 
 {{#js}}
 require([

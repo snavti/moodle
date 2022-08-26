@@ -34,21 +34,22 @@
     {}
 
 }}
-<div class="hidden row no-gutters justify-content-between align-items-center w-100 py-2" aria-hidden="true" data-region="view-contacts">
+<div class="hidden rui-message-header-margin w-100" aria-hidden="true" data-region="view-contacts">
+    <div class="d-flex align-items-center w-100">
         {{#isdrawer}}
-        <div class="align-self-stretch mt-1">
-            <a class="h-100 d-flex py-3 mr-2 align-items-center btn btn-sm" href="#" data-route-back role="button">
+        <div class="align-self-stretch">
+            <a class="ml-3 d-flex align-items-center btn-msg" href="#" data-route-back role="button">
                 {{> core_message/message_drawer_icon_back }}
             </a>
         </div>
         {{/isdrawer}}
-        <div class="mt-0 p-2 h3 my-0 h6">
+        <h4 class="rui-message-heading ml-3">
             {{#str}} contacts, core_message {{/str}}
-        </div>
-        <div class="mt-1 ml-auto">
-            <a href="#" data-route="view-search" class="btn btn-msg btn-msg-gray" role="button" aria-label="{{#str}} search, core_search {{/str}}">
-                {{#pix}} a/search, core {{/pix}}
+        </h4>
+        <div class="mr-3 ml-auto">
+            <a href="#" data-route="view-search" class="btn-msg" role="button" aria-label="{{#str}} search, core_search {{/str}}">
+                <svg height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="m14.5 14.5-3.75-3.75m-10.75-4.5c0-3.45178 2.79822-6.25 6.25-6.25 3.4518 0 6.25 2.79822 6.25 6.25 0 3.4518-2.7982 6.25-6.25 6.25-3.45178 0-6.25-2.7982-6.25-6.25z" fill="none" stroke="#626262" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(.75 .75)"/></svg>
             </a>
         </div>
-
+    </div>
 </div>

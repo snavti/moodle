@@ -33,9 +33,9 @@
     }
 }}
 <div class="optionsummary" tabindex="-1" data-region="chooser-option-summary-container" aria-labelledby="optionsummary_label" aria-describedby="optionsumary_desc">
-    <div class="content text-left mb-2 p-0" data-region="chooser-option-summary-content-container">
-        <div class="heading mb-4">
-            <h5 id="optionsummary_label-{{uniqid}}" class="summary-header" data-region="summary-header" tabindex="0">
+    <div class="content text-left p-2 px-sm-5 py-sm-4" data-region="chooser-option-summary-content-container">
+        <div class="heading d-inline-flex align-items-center justify-content-start w-100 mb-4">
+            <h5 id="optionsummary_label-{{uniqid}}" class="rui-summary-activity-title" data-region="summary-header" tabindex="0">
                 {{{icon}}}
                 {{title}}
             </h5>
@@ -45,7 +45,7 @@
         </div>
     </div>
     {{^showFooter}}
-        <div class="mt-3 mb-0 pt-3 pb-0 border-top modal-footer">
+        <div class="fixed-bottom position-absolute py-3 px-4 border-top modal-footer">
             {{>core_course/local/activitychooser/footer_partial}}
         </div>
     {{/showFooter}}

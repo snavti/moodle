@@ -7,7 +7,7 @@
   // Our parent element can be arbitrary since tooltips are by default inserted as a sibling of their target element.
   // So reset our font and text properties to avoid inheriting weird values.
   @include reset-text();
-  font-size: $tooltip-font-size;
+  @include font-size($tooltip-font-size);
   // Allow breaking very long words so they don't overflow the tooltip's bounds
   word-wrap: break-word;
   opacity: 0;
@@ -37,8 +37,10 @@
 
     &::before {
       top: 0;
-      border-width: $tooltip-arrow-height ($tooltip-arrow-width / 2) 0;
+      border-width: $tooltip-arrow-height ($tooltip-arrow-width * 0.5) 0;
       border-top-color: $tooltip-arrow-color;
+
+      .theme-dark & {border-top-color: $dm-tooltip-arrow-color;}
     }
   }
 }
@@ -53,8 +55,10 @@
 
     &::before {
       right: 0;
-      border-width: ($tooltip-arrow-width / 2) $tooltip-arrow-height ($tooltip-arrow-width / 2) 0;
+      border-width: ($tooltip-arrow-width * 0.5) $tooltip-arrow-height ($tooltip-arrow-width * 0.5) 0;
       border-right-color: $tooltip-arrow-color;
+
+      .theme-dark & {border-right-color: $dm-tooltip-arrow-color;}
     }
   }
 }
@@ -67,8 +71,10 @@
 
     &::before {
       bottom: 0;
-      border-width: 0 ($tooltip-arrow-width / 2) $tooltip-arrow-height;
+      border-width: 0 ($tooltip-arrow-width * 0.5) $tooltip-arrow-height;
       border-bottom-color: $tooltip-arrow-color;
+
+      .theme-dark & {border-bottom-color: $dm-tooltip-arrow-color;}
     }
   }
 }
@@ -83,8 +89,10 @@
 
     &::before {
       left: 0;
-      border-width: ($tooltip-arrow-width / 2) 0 ($tooltip-arrow-width / 2) $tooltip-arrow-height;
+      border-width: ($tooltip-arrow-width * 0.5) 0 ($tooltip-arrow-width * 0.5) $tooltip-arrow-height;
       border-left-color: $tooltip-arrow-color;
+
+      .theme-dark & {border-left-color: $dm-tooltip-arrow-color;}
     }
   }
 }
@@ -112,4 +120,9 @@
   text-align: center;
   background-color: $tooltip-bg;
   @include border-radius($tooltip-border-radius);
+
+  .theme-dark & {
+    color: $dm-tooltip-color;
+    background-color: $dm-tooltip-bg;
+  }
 }

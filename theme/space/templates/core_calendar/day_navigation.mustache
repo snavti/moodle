@@ -35,26 +35,26 @@
     <div class="calendar-controls">
         <a{{!
             }} href="{{previousperiodlink}}"{{!
-            }} class="arrow_link previous btn btn-sm btn-secondary"{{!
+            }} class="arrow_link previous btn btn-icon btn-secondary"{{!
             }} title="{{#str}}dayprev, calendar{{/str}}"{{!
             }} data-year="{{previousperiod.year}}"{{!
             }} data-month="{{previousperiod.mon}}"{{!
             }} data-day="{{previousperiod.mday}}"{{!
         }}>
-            <span class="arrow_text">{{previousperiodname}}</span>
+            <span class="d-none arrow_text">{{previousperiodname}}</span>
         </a>
         <span class="hide"> | </span>
         <h4 class="current">{{periodname}}</h4>
         <span class="hide"> | </span>
         <a{{!
             }} href="{{nextperiodlink}}"{{!
-            }} class="arrow_link next btn btn-sm btn-secondary"{{!
+            }} class="arrow_link next btn btn-icon btn-secondary"{{!
             }} title="{{#str}}daynext, calendar{{/str}}"{{!
             }} data-year="{{nextperiod.year}}"{{!
             }} data-month="{{nextperiod.mon}}"{{!
             }} data-day="{{nextperiod.mday}}"{{!
         }}>
-            <span class="arrow_text">{{nextperiodname}}</span>
+            <span class="d-none arrow_text">{{nextperiodname}}</span>
         </a>
     </div>
 </div>

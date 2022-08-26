@@ -17,12 +17,41 @@
 /**
  * Theme functions.
  *
- * @package    theme_space
- * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
- * @license    Commercial https://themeforest.net/licenses
+ * @package   theme_space
+ * @copyright 2022 Marcin Czaja (https://rosea.io)
+ * @license   Commercial https://themeforest.net/licenses
  */
 
 defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Get theme setting
+ *
+ * @param string $setting
+ * @param bool $format
+ * @return string
+ */
+function theme_space_get_setting($setting, $format = false) {
+    $theme = theme_config::load('space');
+
+    if (empty($theme->settings->$setting)) {
+        return false;
+    }
+
+    if (!$format) {
+        return $theme->settings->$setting;
+    }
+
+    if ($format === 'format_text') {
+        return format_text($theme->settings->$setting, FORMAT_PLAIN);
+    }
+
+    if ($format === 'format_html') {
+        return format_text($theme->settings->$setting, FORMAT_HTML, array('trusted' => true, 'noclean' => true));
+    }
+
+    return format_string($theme->settings->$setting);
+}
 
 /**
  * Post process the CSS tree.
@@ -31,6 +60,8 @@ defined('MOODLE_INTERNAL') || die();
  * @param theme_config $theme The theme config object.
  */
 function theme_space_css_tree_post_processor($tree, $theme) {
+    error_log('theme_space_css_tree_post_processor() is deprecated. Required' .
+        'prefixes for Bootstrap are now in theme/space/scss/moodle/prefixes.scss');
     $prefixer = new theme_space\autoprefixer($tree);
     $prefixer->prefix();
 }
@@ -43,6 +74,29 @@ function theme_space_css_tree_post_processor($tree, $theme) {
  */
 function theme_space_get_extra_scss($theme) {
     $content = '';
+
+    // Sets the login background image.
+    // Check login layout, only layout #1 has background image
+    $loginlayout = theme_space_get_setting('setloginlayout');
+
+    if($loginlayout == 1 || $loginlayout == 4 || $loginlayout == 5) {
+        $loginlayoutimg = true;
+    } else {
+        $loginlayoutimg = false;
+    }
+
+    $loginbackgroundimageurl = $theme->setting_file_url('loginbg', 'loginbg');
+    if (!empty($loginbackgroundimageurl) && $loginlayoutimg == true) {
+        $content .= 'body.pagelayout-login { ';
+        $content .= "background-image: url('$loginbackgroundimageurl'); background-size: cover;";
+
+        if($loginlayout == 4 || $loginlayout == 5) {
+            $content .= "height: 100vh; overflow: hidden;";
+        }
+
+        $content .= ' }';
+    }
+
     // Always return the background image with the scss when we have it.
     return !empty($theme->settings->scss) ? $theme->settings->scss . ' ' . $content : $content;
 }
@@ -60,84 +114,83 @@ function theme_space_get_extra_scss($theme) {
  * @return bool
  */
 function theme_space_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = array()) {
-
-
-    if ($context->contextlevel == CONTEXT_SYSTEM and preg_match("/^sponsorsimage[1-9][0-9]?$/", $filearea) !== false ||
-        $context->contextlevel == CONTEXT_SYSTEM and preg_match("/^clientsimage[1-9][0-9]?$/", $filearea) !== false  ||
-        $context->contextlevel == CONTEXT_SYSTEM and preg_match("/^sliderimage[1-9][0-9]?$/", $filearea) !== false ) {
+    if ($context->contextlevel == CONTEXT_SYSTEM) {
         $theme = theme_config::load('space');
         // By default, theme files must be cache-able by both browsers and proxies.
         if (!array_key_exists('cacheability', $options)) {
             $options['cacheability'] = 'public';
         }
-        return $theme->setting_file_serve($filearea, $args, $forcedownload, $options);
-    }
-
-    if ($context->contextlevel == CONTEXT_SYSTEM && ( $filearea === 'logo' ||
-                                                      $filearea === 'customlogotopbar' ||
-                                                      $filearea === 'customloginlogo' ||
-                                                      $filearea === 'heroimg' ||
-                                                      $filearea === 'heroshadowimg' ||
-                                                      $filearea === 'herovideomp4' ||
-                                                      $filearea === 'herovideowebm' ||
-                                                      $filearea === 'fphtmlblock3bgimg' ||
-                                                      $filearea === 'loginbg' ||
-                                                      $filearea === 'customlogosidebar' ||
-                                                      $filearea === 'mobiletopbarlogo' ||
-                                                      $filearea === 'favicon' ||
-                                                      $filearea === 'customfontlighteot' ||
-                                                      $filearea === 'customfontlightwoff' ||
-                                                      $filearea === 'customfontlightwoff2' ||
-                                                      $filearea === 'customfontlightttf' ||
-                                                      $filearea === 'customfontlightsvg' ||
-                                                      $filearea === 'customfontregulareot' ||
-                                                      $filearea === 'customfontregularwoff' ||
-                                                      $filearea === 'customfontregularwoff2' ||
-                                                      $filearea === 'customfontregularttf' ||
-                                                      $filearea === 'customfontregularsvg' ||
-                                                      $filearea === 'customfontmediumeot' ||
-                                                      $filearea === 'customfontmediumwoff' ||
-                                                      $filearea === 'customfontmediumwoff2' ||
-                                                      $filearea === 'customfontmediumttf' ||
-                                                      $filearea === 'customfontmediumsvg' ||
-                                                      $filearea === 'customfontboldeot' ||
-                                                      $filearea === 'customfontboldwoff' ||
-                                                      $filearea === 'customfontboldwoff2' ||
-                                                      $filearea === 'customfontboldttf' ||
-                                                      $filearea === 'customfontboldsvg'
-                                                    )) {
-        $theme = theme_config::load('space');
-        // By default, theme files must be cache-able by both browsers and proxies.
-        if (!array_key_exists('cacheability', $options)) {
-            $options['cacheability'] = 'public';
+        if ($filearea === 'favicon') {
+            return $theme->setting_file_serve('favicon', $args, $forcedownload, $options);
+        } else if ($filearea === 'logo') {
+            return $theme->setting_file_serve('logo', $args, $forcedownload, $options); 
+        } else if ($filearea === 'loginbg') {
+            return $theme->setting_file_serve('loginbg', $args, $forcedownload, $options);  
+        } else if ($filearea === 'herologo') {
+            return $theme->setting_file_serve('herologo', $args, $forcedownload, $options);              
+        } else if ($filearea === 'customloginlogo') {
+            return $theme->setting_file_serve('customloginlogo', $args, $forcedownload, $options);            
+        } else if ($filearea === 'customlogo') {
+            return $theme->setting_file_serve('customlogo', $args, $forcedownload, $options);
+        } else if ($filearea === 'customdmlogo') {
+            return $theme->setting_file_serve('customdmlogo', $args, $forcedownload, $options);    
+        } else if ($filearea === 'customsidebarlogo') {
+            return $theme->setting_file_serve('customsidebarlogo', $args, $forcedownload, $options);  
+        } else if ($filearea === 'customsidebardmlogo') {
+            return $theme->setting_file_serve('customsidebardmlogo', $args, $forcedownload, $options);                
+        } else if ($filearea === 'fontfiles') {
+            return $theme->setting_file_serve('fontfiles', $args, $forcedownload, $options);
+        } else if ($filearea === 'spacesettingsimgs') {
+            return $theme->setting_file_serve('spacesettingsimgs', $args, $forcedownload, $options);
+        } else if (preg_match("/^block1slideimg[1-9][0-9]?$/", $filearea)!== false) {
+            return $theme->setting_file_serve($filearea, $args, $forcedownload, $options);
+        } else if (preg_match("/^block5itemimg[1-9][0-9]?$/", $filearea)!== false) {
+            return $theme->setting_file_serve($filearea, $args, $forcedownload, $options);    
+        } else if ($filearea === 'block2videoposter') {
+            return $theme->setting_file_serve('block2videoposter', $args, $forcedownload, $options);  
+        } else if ($filearea === 'block2img') {
+            return $theme->setting_file_serve('block2img', $args, $forcedownload, $options);  
+        } else if ($filearea === 'block2videomp4') {
+            return $theme->setting_file_serve('block2videomp4', $args, $forcedownload, $options);  
+        } else if ($filearea === 'block2videowebm') {
+            return $theme->setting_file_serve('block2videowebm', $args, $forcedownload, $options);                                    
+        } else if ($filearea === 'footerbgimg') {
+            return $theme->setting_file_serve('footerbgimg', $args, $forcedownload, $options);                                    
+        } else {
+            send_file_not_found();
         }
-        return $theme->setting_file_serve($filearea, $args, $forcedownload, $options);
-    } else {
-        send_file_not_found();
-    }
+    } 
 }
 
 /**
- * Get theme setting
+ * Get the URL of files from theme settings.
  *
- * @param string $setting
- * @param bool $format
- * @return string
+ * @param $setting
+ * @param $filearea
+ * @param $theme
+ * @return array|false|string|string[]|null
+ * @throws dml_exception
  */
-function theme_space_get_setting($setting, $format = false) {
-    $theme = theme_config::load('space');
+function theme_space_setting_file_url($setting, $filearea, $theme) {
+    global $CFG;
 
-    if (empty($theme->settings->$setting)) {
+    $component  = 'theme_space';
+    $itemid     = 0;
+    $filepath   = $theme->settings->$filearea;
+
+    if (empty($filepath)) {
         return false;
-    } else if (!$format) {
-        return $theme->settings->$setting;
-    } else if ($format === 'format_text') {
-        return format_text($theme->settings->$setting, FORMAT_PLAIN);
-    } else if ($format === 'format_html') {
-        return format_text($theme->settings->$setting, FORMAT_HTML, array('trusted' => true, 'noclean' => true));
-    } else {
-        return format_string($theme->settings->$setting);
     }
+    $syscontext = context_system::instance();
+
+    $url = moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php", "/$syscontext->id/$component/$filearea/$itemid".$filepath);
+
+    // Now this is tricky because the we can not hardcode http or https here, lets use the relative link.
+    // Note: unfortunately moodle_url does not support //urls yet.
+
+    $url = preg_replace('|^https?://|i', '//', $url->out(false));
+
+    return $url;
 }
 
 
@@ -157,10 +210,8 @@ function theme_space_get_main_scss_content($theme) {
     $context = context_system::instance();
     if ($filename == 'default.scss') {
         $scss .= file_get_contents($CFG->dirroot . '/theme/space/scss/preset/default.scss');
-    } else if ($filename == 'demo2.scss') {
-        $scss .= file_get_contents($CFG->dirroot . '/theme/space/scss/preset/demo2.scss');
-    } else if ($filename == 'demo3.scss') {
-        $scss .= file_get_contents($CFG->dirroot . '/theme/space/scss/preset/demo3.scss');
+    } else if ($filename == 'plain.scss') {
+        $scss .= file_get_contents($CFG->dirroot . '/theme/space/scss/preset/plain.scss');
     } else if ($filename && ($presetfile = $fs->get_file($context->id, 'theme_space', 'preset', 0, '/', $filename))) {
         $scss .= $presetfile->get_content();
     } else {
@@ -172,29 +223,14 @@ function theme_space_get_main_scss_content($theme) {
 }
 
 /**
- * Initialize page
- * @param moodle_page $page
- */
-function theme_space_page_init(moodle_page $page) {
-    global $CFG;
-    $page->requires->jquery();
-    // REMOVED: Deprecated function: error_log($CFG->version).
-    if ($CFG->version < 2015051100) {
-        $page->requires->jquery_plugin('bootstrap', 'theme_space');
-        $page->requires->jquery_plugin('dropdown', 'theme_space');
-    }
-}
-
-/**
  * Get compiled css.
  *
  * @return string compiled css
  */
 function theme_space_get_precompiled_css() {
     global $CFG;
-    return file_get_contents($CFG->dirroot . '/theme/space/style/bootstrap.css');
+    return file_get_contents($CFG->dirroot . '/theme/space/style/moodle.css');
 }
-
 
 /**
  * Get SCSS to prepend.
@@ -202,216 +238,88 @@ function theme_space_get_precompiled_css() {
  * @param theme_config $theme The theme config object.
  * @return array
  */
-
 function theme_space_get_pre_scss($theme) {
     global $CFG;
-
-    // MODIFICATION START.
-    require_once($CFG->dirroot . '/theme/space/locallib.php');
-    // MODIFICATION END.
 
     $scss = '';
     $configurable = [
         // Config key => [variableName, ...].
-        'bodybg'              => ['body-bg'],
-        'bodycolor'           => ['body-color'],
-        'bodycolorsecondary'  => ['body-color-secondary'],
-        'bodycolorlight'      => ['body-color-light'],
-        'linkcolor'           => ['link-color'],
-        'linkhovercolor'      => ['link-hover-color'],
-        'bordercolor'         => ['border-color'],
-        'cardbordercolor'     => ['card-border-color'],
-        'cardbg'              => ['card-bg'],
-        'cardtext'            => ['card-text'],
-        'cardtitle'            => ['card-title'],
-        // Colors
-        'white'    => ['white'],
-        'gray100' => ['gray-100'],
-        'gray200' => ['gray-200'],
-        'gray300' => ['gray-300'],
-        'gray400' => ['gray-400'],
-        'gray500' => ['gray-500'],
-        'gray600' => ['gray-600'],
-        'gray700' => ['gray-700'],
-        'gray800' => ['gray-800'],
-        'gray900' => ['gray-900'],
-        'black'    => ['black'],
-        'blue1'   => ['blue-1'],
-        'blue2'   => ['blue-2'],
-        'blue3'   => ['blue-3'],
-        'blue4'   => ['blue-4'],
-        'blue5'   => ['blue-5'],
-        'blue6'   => ['blue-6'],
-        'blue7'   => ['blue-7'],
-        'blue8'   => ['blue-8'],
-        'blue9'   => ['blue-9'],
-        'red-1'    => ['red-1'],
-        'red-2'    => ['red-2'],
-        'red-3'    => ['red-3'],
-        'red-4'    => ['red-4'],
-        'red-5'    => ['red-5'],
-        'red-6'    => ['red-6'],
-        'red-7'    => ['red-7'],
-        'yellow-1' => ['yellow-1'],
-        'yellow-2' => ['yellow-2'],
-        'yellow-3' => ['yellow-3'],
-        'yellow-4' => ['yellow-4'],
-        'yellow-5' => ['yellow-5'],
-        'yellow-6' => ['yellow-6'],
-        'yellow-7' => ['yellow-7'],
-        'green-1'  => ['green-1'],
-        'green-2'  => ['green-2'],
-        'green-3'  => ['green-3'],
-        'green-4'  => ['green-4'],
-        'green-5'  => ['green-5'],
-        'green-6'  => ['green-6'],
-        'green-7'  => ['green-7'],
-        'green-8'  => ['green-8'],
-        'green-9'  => ['green-9'],
-        'purple-1' => ['purple-1'],
-        'purple-2' => ['purple-2'],
-        'purple-3' => ['purple-3'],
-        'purple-4' => ['purple-4'],
-         //Theme Color
-        'themecolor1' => ['theme-color-1'],
-        'themecolor2' => ['theme-color-2'],
-        'themecolor3' => ['theme-color-3'],
-        'themecolor4' => ['theme-color-4'],
-        'themecolor5' => ['theme-color-5'],
-        'themecolor6' => ['theme-color-6'],
-        'themecolor7' => ['theme-color-7'],
-        'themecolor8' => ['theme-color-8'],
-        'themecolor9' => ['theme-color-9'],
-         //Dropdown
-        'dropdownbg'                        => ['dropdown-bg'],
-        'dropdowntext'                      => ['dropdown-text'],
-        'dropdowndividerbg'                => ['dropdown-bdivider-bg'],
-        'dropdowndividerbg'                => ['dropdown-divider-bg'],
-        'dropdownlinkcolor'                => ['dropdown-link-color'],
-        'dropdownlinkhovercolor'          => ['dropdown-link-hover-color'],
-        'dropdownlinkhoverbg'             => ['dropdown-link-hover-bg'],
-        'dropdownlinkactivecolor'         => ['dropdown-link-active-color'],
-        'dropdownlinkactivebg'            => ['dropdown-link-active-bg'],
-        'dropdownheadercolor'              => ['dropdown-header-color'],
-        'dropdownshadow'                   => ['dropdown-shadow'],
-         //Top Bar
-        'top-bar-bg'                         => ['top-bar-bg'],
-        'top-bar-bg-secondary'               => ['top-bar-bg-secondary'],
-        'top-bar-bg-secondary-text'          => ['top-bar-bg-secondary-text'],
-        'top-bar-border'                     => ['top-bar-border'],
-        'top-bar-link'                       => ['top-bar-link'],
-        'top-bar-link-hover'                 => ['top-bar-link-hover'],
-        'top-bar-link-hover-bg'              => ['top-bar-link-hover-bg'],
-        'top-bar-icons'                      => ['top-bar-icons'],
-        'top-bar-icons-bg-hover'             => ['top-bar-icons-bg-hover'],
-        'top-bar-text'                       => ['top-bar-text'],
-        //Dropdown light e.g Top Bar
-        'dropdown-light-bg'                  => ['dropdown-light-bg'],
-        'dropdown-light-bg-secondary'        => ['dropdown-light-bg-secondary'],
-        'dropdown-light-text'                => ['dropdown-light-text'],
-        'dropdown-light-box-shadow'          => ['dropdown-light-box-shadow'],
-        'dropdown-light-link-color'          => ['dropdown-light-link-color'],
-        'dropdown-light-link-hover-color'    => ['dropdown-light-link-hover-color'],
-        'dropdown-light-link-hover-bg'       => ['dropdown-light-link-hover-bg'],
-        'dropdown-light-link-disabled-color' => ['dropdown-light-link-disabled-color'],
-        'dropdown-light-header-color'        => ['dropdown-light-header-color'],
-        'dropdown-light-border'              => ['dropdown-light-border'],
-        //Button primary
-        'btnprimarybg' => ['btn-primary-bg'],
-        'btnprimarybghover' => ['btn-primary-bg-hover'],
-        'btnprimaryborder' => ['btn-primary-border'],
-        'btnprimaryborderhover' => ['btn-primary-border-hover'],
-        'btnprimaryborderwidth' => ['btn-primary-border-width'],
-        'btnprimarytext' => ['btn-primary-text'],
-        'btnprimarytexthover' => ['btn-primary-text-hover'],
-        'btnprimaryshadow' => ['btn-primary-shadow'],
-        //Button Secondary
-        'btnsecondarybg' => ['btn-secondary-bg'],
-        'btnsecondarybghover' => ['btn-secondary-bg-hover'],
-        'btnsecondaryborder' => ['btn-secondary-border'],
-        'btnsecondaryborderhover' => ['btn-secondary-border-hover'],
-        'btnsecondaryborderwidth' => ['btn-secondary-border-width'],
-        'btnsecondarytext' => ['btn-secondary-text'],
-        'btnsecondarytexthover' => ['btn-secondary-text-hover'],
-        'btnsecondaryshadow' => ['btn-secondary-shadow'],
-        //Button Reset
-        'btnresetbg' => ['btn-reset-bg'],
-        'btnresetbghover' => ['btn-reset-bg-hover'],
-        'btnresetborder' => ['btn-reset-border'],
-        'btnresetborderhover' => ['btn-reset-border-hover'],
-        'btnresetborderwidth' => ['btn-reset-border-width'],
-        'btnresettext' => ['btn-reset-text'],
-        'btnresettexthover' => ['btn-reset-text-hover'],
-        'btnresetshadow' => ['btn-reset-shadow'],
-        //Button Special
-        'btnspecialbg' => ['btn-special-bg'],
-        'btnspecialbghover' => ['btn-special-bg-hover'],
-        'btnspecialborder' => ['btn-special-border'],
-        'btnspecialborderhover' => ['btn-special-border-hover'],
-        'btnspecialborderwidth' => ['btn-special-border-width'],
-        'btnspecialtext' => ['btn-special-text'],
-        'btnspecialtexthover' => ['btn-special-text-hover'],
-        'btnspecialshadow' => ['btn-special-shadow'],
-        //Drawer
-        'drawerbg' => ['drawer-bg'],
-        'drawernavboxbg' => ['drawer-nav-box-bg'],
-        'drawernavboxshadow' => ['drawer-nav-box-shadow'],
-        'drawernavitemactive' => ['drawer-nav-item-active'],
-        'drawernavitemhover' => ['drawer-nav-item-hover'],
-        'drawernavitemtextcolor' => ['drawer-nav-item-text-color'],
-        'drawernavitemtextcolorhover' => ['drawer-nav-item-text-color-hover'],
-        'drawernavitemtextcoloractive' => ['drawer-nav-item-text-color-active'],
-        'drawernavitemcolorhover' => ['drawer-nav-item-text-color-hover'],
-        'drawernavitemicon' => ['drawer-nav-item-icon'],
-        'drawernavitemiconhover' => ['drawer-nav-item-icon-hover'],
-        'drawernavitemiconactive' => ['drawer-nav-item-icon-active'],
-        'drawerheading' => ['drawer-heading'],
-        'drawertext' => ['drawer-text'],
-        'drawerlink' => ['drawer-link'],
-        'drawerlinkhover' => ['drawer-link-hover'],
-        'drawerlinkhoverbg' => ['drawer-link-hover-bg'],
-        'drawerhr' => ['drawer-hr'],
-        'drawernaviconsize' => ['drawer-nav-icon-size'],
-        'drawernaviconwidth' => ['drawer-nav-icon-width'],
-        'drawernaviconfontsize' => ['drawer-nav-icon-font-size'],
-        'drawernavitemiconopacity' => ['drawer-nav-item-icon-opacity'],
-        'drawerwidth' => ['drawer-width'],
-        //Footer
-        'footerbg' => ['footer-bg'],
-        'footertextcolor' => ['footer-text-color'],
-        'footernavigationheading' => ['footer-navigation-heading'],
-        'footernavigationcolor' => ['footer-navigation-color'],
-        'footernavigationborder' => ['footer-navigation-border'],
-        'footernavigationlinkcolor' => ['footer-navigation-link-color'],
-        'footernavigationlinkcolorhover' => ['footer-navigation-link-color-hover'],
-        //Fonts
-        'fontweightlight' => ['font-weight-light'],
-        'fontweightregular' => ['font-weight-regular'],
-        'fontweightmedium' => ['font-weight-sm-bold'],
+        'colorloginbgtext' => ['colorloginbgtext'],
+        //Block 1
+        'block1sliderwrapperbg' => ['block1slidewrapperbg'],
+        // Customization
+        'fontweightheadings' => ['headings-font-weight'],
+        'fontbody' => ['font-family-base'],
+        'fontweightregular' => ['font-weight-normal'],
+        'fontweightmedium' => ['font-weight-medium'],
         'fontweightbold' => ['font-weight-bold'],
-        'googlefontname' => ['font-family-sans-serif'],
-        //Typo
-        'fontsizelg' => ['font-size-lg'],
-        'fontsizebase' => ['font-size-base'],
-        'fontsizesm' => ['font-size-sm'],
-        'fontsizexs' => ['font-size-xs'],
-        'h2fontsize' => ['h2-font-size'],
-        'h3fontsize' => ['h3-font-size'],
-        'h4fontsize' => ['h4-font-size'],
-        'h5fontsize' => ['h5-font-size'],
-        'h6fontsize' => ['h6-font-size'],
-        //Breakpoints
-        'gridbreakpointsm' => ['grid-breakpoint-sm'],
-        'gridbreakpointmd' => ['grid-breakpoint-md'],
-        'gridbreakpointlg' => ['grid-breakpoint-lg'],
-        //Cards
-        'coursecarddescheight' => ['course-card-desc-height'],
-        'cardimgheight' => ['card-img-height'],
+        'fontheadings' => ['fontheadings'],
+        //Text
+        'colorbody' => ['body-color'],
+        'colorbodysecondary' => ['body-color-secondary'],
+        'colorbodylight' => ['body-color-light'],
+        'colorlink' => ['link-color'],
+        'colorlinkhover' => ['link-color-hover'],
+        //Grays
+        'white' => ['white'],
+        'black' => ['black'],
+        'colorgray100' => ['gray-100'],
+        'colorgray200' => ['gray-200'],
+        'colorgray300' => ['gray-300'],
+        'colorgray400' => ['gray-400'],
+        'colorgray500' => ['gray-500'],
+        'colorgray600' => ['gray-600'],
+        'colorgray700' => ['gray-700'],
+        'colorgray800' => ['gray-800'],
+        'colorgray900' => ['gray-900'],
+        //Primary
+        'colorprimary100' => ['primary-color-100'],
+        'colorprimary200' => ['primary-color-200'],
+        'colorprimary300' => ['primary-color-300'],
+        'colorprimary400' => ['primary-color-400'],
+        'colorprimary500' => ['primary-color-500'],
+        'colorprimary600' => ['primary-color-600'],
+        'colorprimary700' => ['primary-color-700'],
+        'colorprimary800' => ['primary-color-800'],
+        'colorprimary900' => ['primary-color-900'],
+        //Others
+        'colorbodybg' => ['body-bg'],
+        'colorborder' => ['border-color'],
+        //Topbar
+        'topbarheight' => ['navbar-height'],
+        'colortopbarbg' => ['topbar-bg'],
+        'colortopbartext' => ['topbar-text'],
+        'colortopbarlink' => ['topbar-link'],
+        'colortopbarlinkhover' => ['topbar-link-hover'],
+        'colortopbarbtn' => ['topbar-btn'],
+        'colortopbarbtntext' => ['topbar-btn-text'],
+        'colortopbarbtnhover' => ['topbar-btn-hover'],
+        'colortopbarbtnhovertext' => ['topbar-btn-hover-text'],
+        'stickybreadcrumbs' => ['stickybreadcrumbs'],
         //Buttons
-        'borderradius' => ['border-radius'],
         'btnborderradius' => ['btn-border-radius'],
-        'btnborderwidth' => ['input-btn-border-width'],
-        //Hero
+        //Sidebar
+        'colordrawerbg' => ['drawer-bg'],
+        'colordrawertext' => ['drawer-text'],
+        'colordrawernavcontainer' => ['drawer-nav-container'],
+        'colordrawernavbtntext' => ['drawer-nav-btn-text'],
+        'colordrawernavbtnicon' => ['drawer-nav-btn-icon'],
+        'colordrawernavbtntexth' => ['drawer-nav-btn-text-hover'],
+        'colordrawernavbtniconh' => ['drawer-nav-btn-icon-hover'],
+        'colordrawernavbtnbgh' => ['drawer-nav-btn-bg-hover'],
+        'colordrawernavbtntextlight' => ['drawer-nav-btn-text-light'],
+        'colordrawerscrollbar' => ['drawer-scroll-bg-track'],
+        'colordrawerlink' => ['drawer-link'],
+        'colordrawerlinkh' => ['drawer-link-h'],
+        //Footer
+        'colorfooterbg' => ['footer-bg'],
+        'colorfooterborder' => ['footer-border'],
+        'colorfootertext' => ['footer-text'],
+        'colorfooterlink' => ['footer-link'],
+        'colorfooterlinkhover' => ['footer-link-color-hover'],
+        //Course card
+        'maxcoursecardtextheight' => ['max-course-card-text-height'],
+        //Hero from Space 1.14
         'heroshadowcolor1' => ['hero-gradient-1'],
         'heroshadowcolor2' => ['hero-gradient-2'],
         'heroshadowgradientdirection' => ['hero-gradient-direction'],
@@ -427,16 +335,6 @@ function theme_space_get_pre_scss($theme) {
         'heroimageheightlg' => ['heroimageheight-lg'],
         'heroimageheightmd' => ['heroimageheight-md'],
         'heroimageheightsm' => ['heroimageheight-sm'],
-        // General
-        'sectionpadding' => ['section-padding'],
-        'sectionpaddingsm' => ['section-padding-sm'],
-        //Calendar
-        'caleventcategorycolor' => ['calendarEventCategoryColor'],
-        'caleventcoursecolor' => ['calendarEventCourseColor'],
-        'caleventcategorycolor' => ['calendarEventCategoryColor'],
-        'caleventglobalcolor' => ['calendarEventGlobalColor'],
-        'caleventusercolor' => ['calendarEventUserColor'],
-        'caleventgroupecolor' => ['calendarEventGroupeColor']
     ];
 
     // Prepend variables first.
@@ -455,109 +353,266 @@ function theme_space_get_pre_scss($theme) {
         $scss .= $theme->settings->scsspre;
     }
 
-    if (!empty($theme->settings->fontsize)) {
-        $scss .= '$font-size-base: ' . (1 / 100 * $theme->settings->fontsize) . "rem !default;\n";
-    }
-
     return $scss;
 }
 
-/**
- * Extend theme navigation
- * Author: Willian Mano Araújo
- * https://moodle.org/plugins/theme_moove
- * @param flat_navigation $flatnav
- */
-function theme_space_extend_flat_navigation(\flat_navigation $flatnav) {
-    theme_space_rebuildcoursesections($flatnav);
-    theme_space_delete_menuitems($flatnav);
-}
-
-/**
- * Remove items from navigation
- * Author: Willian Mano Araújo
- * https://moodle.org/plugins/theme_moove
- * @param flat_navigation $flatnav
- */
-function theme_space_delete_menuitems(\flat_navigation $flatnav) {
-
-  foreach ($flatnav as $item) {
-
-      $itemstodelete = [];
-
-      if (in_array($item->key, $itemstodelete)) {
-          $flatnav->remove($item->key);
-
-          continue;
-      }
-
-      // modified by Marcin Czaja
-      if (is_numeric($item->key)) {
-
-          $flatnav->remove($item->key);
-
-          continue;
-      }
-      // end of modification
-
-      if (isset($item->parent->key) && $item->parent->key == 'mycourses' &&
-          isset($item->type) && $item->type == \navigation_node::TYPE_COURSE) {
-
-          $flatnav->remove($item->key);
-
-          continue;
-      }
-
-  }
-}
-
 
 
 /**
- * Improve flat navigation menu
+ * Build the guest access hint HTML code.
  *
- * @param flat_navigation $flatnav
+ * @param int $courseid The course ID.
+ * @return string.
  */
-function theme_space_rebuildcoursesections(\flat_navigation $flatnav) {
-    global $PAGE;
+function theme_space_get_course_guest_access_hint($courseid) {
+    global $CFG;
+    require_once($CFG->dirroot . '/enrol/self/lib.php');
 
-    if (!isguestuser() ) {
+    $html = '';
+    $instances = enrol_get_instances($courseid, true);
+    $plugins = enrol_get_plugins(true);
+    foreach ($instances as $instance) {
+        if (!isset($plugins[$instance->enrol])) {
+            continue;
+        }
+        $plugin = $plugins[$instance->enrol];
+        if ($plugin->show_enrolme_link($instance)) {
+            $html = html_writer::tag('div', get_string('showhintcourseguestaccesslink',
+                'theme_space', array('url' => $CFG->wwwroot . '/enrol/index.php?id=' . $courseid)));
+            break;
+        }
+    }
 
-        $participantsitem = $flatnav->find('participants', \navigation_node::TYPE_CONTAINER);
+    return $html;
+}
 
-        if (!$participantsitem) {
-            return;
+
+/**
+ * Build the course page information banners HTML code.
+ * This function evaluates and composes all information banners which may appear on a course page below the full header.
+ *
+ * @return string.
+ */
+function theme_space_get_course_information_banners() {
+    global $CFG, $COURSE, $PAGE, $USER;
+
+    // Require user library.
+    require_once($CFG->dirroot.'/user/lib.php');
+
+    // Initialize HTML code.
+    $html = '';
+
+
+    // If the setting showhintcoursehidden is set, the visibility of the course is hidden and
+    // a hint for the visibility will be shown.
+    if (get_config('theme_space', 'showhintcoursehidden') == 'yes'
+            && $PAGE->has_set_url()
+            && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+            && $COURSE->visible == false) {
+        $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning wrapper-fw mt-4'));
+        $html .= html_writer::start_tag('div', array('class' => 'media'));
+        $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+        $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+        <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+        <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+        </svg>';
+        $html .= html_writer::end_tag('div');
+        $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+        $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
+        // If the user has the capability to change the course settings, an additional link to the course settings is shown.
+        if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
+            $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
+                    'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
+        }
+        $html .= html_writer::end_tag('div');
+        $html .= html_writer::end_tag('div');
+        $html .= html_writer::end_tag('div');
+    }
+
+    // If the setting showhintcourseguestaccesssetting is set, a hint for users that view the course with guest access is shown.
+    // We also check that the user did not switch the role. This is a special case for roles that can fully access the course
+    // without being enrolled. A role switch would show the guest access hint additionally in that case and this is not
+    // intended.
+    if (get_config('theme_space', 'showhintcourseguestaccesssetting') == 'yes'
+            && is_guest(\context_course::instance($COURSE->id), $USER->id)
+            && $PAGE->has_set_url()
+            && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+            && !is_role_switched($COURSE->id)) {
+        $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning wrapper-fw mt-4'));
+        $html .= html_writer::start_tag('div', array('class' => 'media'));
+        $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+        $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path>
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path>
+        <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
+        </svg>';
+        $html .= html_writer::end_tag('div');
+        $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+        $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
+                array('role' => role_get_name(get_guest_role())));
+        $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+        $html .= html_writer::end_tag('div');
+        $html .= html_writer::end_tag('div');
+        $html .= html_writer::end_tag('div');
+    }
+
+    // If the setting showhintcourseselfenrol is set, a hint for users is shown that the course allows unrestricted self
+    // enrolment. This hint is only shown if the course is visible, the self enrolment is visible and if the user has the
+    // capability "theme/space:viewhintcourseselfenrol".
+    if (get_config('theme_space', 'showhintcourseselfenrol') == 'yes'
+            && $PAGE->has_set_url()
+            && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+            && $COURSE->visible == true) {
+        // Get the active enrol instances for this course.
+        $enrolinstances = enrol_get_instances($COURSE->id, true);
+        // Prepare to remember when self enrolment is / will be possible.
+        $selfenrolmentpossiblecurrently = false;
+        $selfenrolmentpossiblefuture = false;
+        foreach ($enrolinstances as $instance) {
+            // Check if unrestricted self enrolment is possible currently or in the future.
+            $now = (new \DateTime("now", \core_date::get_server_timezone_object()))->getTimestamp();
+            if ($instance->enrol == 'self' && empty($instance->password) && $instance->customint6 == 1 &&
+                    (empty($instance->enrolenddate) || $instance->enrolenddate > $now)) {
+
+                // Build enrol instance object with all necessary information for rendering the note later.
+                $instanceobject = new stdClass();
+
+                // Remember instance name.
+                if (empty($instance->name)) {
+                    $instanceobject->name = get_string('pluginname', 'enrol_self') .
+                            " (" . get_string('defaultcoursestudent', 'core') . ")";
+                } else {
+                    $instanceobject->name = $instance->name;
+                }
+
+                // Remember type of unrestrictedness.
+                if (empty($instance->enrolenddate) && empty($instance->enrolstartdate)) {
+                    $instanceobject->unrestrictedness = 'unlimited';
+                    $selfenrolmentpossiblecurrently = true;
+                } else if (empty($instance->enrolstartdate) &&
+                        !empty($instance->enrolenddate) && $instance->enrolenddate > $now) {
+                    $instanceobject->unrestrictedness = 'until';
+                    $selfenrolmentpossiblecurrently = true;
+                } else if (empty($instance->enrolenddate) &&
+                        !empty($instance->enrolstartdate) && $instance->enrolstartdate > $now) {
+                    $instanceobject->unrestrictedness = 'from';
+                    $selfenrolmentpossiblefuture = true;
+                } else if (empty($instance->enrolenddate) &&
+                        !empty($instance->enrolstartdate) && $instance->enrolstartdate <= $now) {
+                    $instanceobject->unrestrictedness = 'since';
+                    $selfenrolmentpossiblecurrently = true;
+                } else if (!empty($instance->enrolstartdate) && $instance->enrolstartdate > $now &&
+                        !empty($instance->enrolenddate) && $instance->enrolenddate > $now) {
+                    $instanceobject->unrestrictedness = 'fromuntil';
+                    $selfenrolmentpossiblefuture = true;
+                } else if (!empty($instance->enrolstartdate) && $instance->enrolstartdate <= $now &&
+                        !empty($instance->enrolenddate) && $instance->enrolenddate > $now) {
+                    $instanceobject->unrestrictedness = 'sinceuntil';
+                    $selfenrolmentpossiblecurrently = true;
+                } else {
+                    // This should not happen, thus continue to next instance.
+                    continue;
+                }
+
+                // Remember enrol start date.
+                if (!empty($instance->enrolstartdate)) {
+                    $instanceobject->startdate = $instance->enrolstartdate;
+                } else {
+                    $instanceobject->startdate = null;
+                }
+
+                // Remember enrol end date.
+                if (!empty($instance->enrolenddate)) {
+                    $instanceobject->enddate = $instance->enrolenddate;
+                } else {
+                    $instanceobject->enddate = null;
+                }
+
+                // Remember this instance.
+                $selfenrolinstances[$instance->id] = $instanceobject;
+            }
         }
 
-        if ($PAGE->course->format != 'singleactivity') {
-            $coursesectionsoptions = [
-                'text' => get_string('coursesections', 'theme_space'),
-                'shorttext' => get_string('coursesections', 'theme_space'),
-                'icon' => new pix_icon('t/viewdetails', ''),
-                'type' => \navigation_node::COURSE_CURRENT,
-                'key' => 'course-sections',
-                'parent' => $participantsitem->parent
-            ];
+        // If there is at least one unrestricted enrolment instance,
+        // show the hint with information about each unrestricted active self enrolment in the course.
+        if (!empty($selfenrolinstances) &&
+                ($selfenrolmentpossiblecurrently == true || $selfenrolmentpossiblefuture == true)) {
+            // Start hint box.
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-selfenrol-infobox alert alert-info wrapper-fw mt-4'));
+            $html .= html_writer::start_tag('div', array('class' => 'media'));
+            $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+            $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 8.75L13.25 12L9.75 15.25"></path>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V17.25C19.25 18.3546 18.3546 19.25 17.25 19.25H9.75"></path>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 12H4.75"></path>
+            </svg>';
+            $html .= html_writer::end_tag('div');
+            $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
 
-            $coursesections = new \flat_navigation_node($coursesectionsoptions, 0);
+            // Show the start of the hint depending on the fact if enrolment is already possible currently or
+            // will be in the future.
+            if ($selfenrolmentpossiblecurrently == true) {
+                $html .= get_string('showhintcourseselfenrolstartcurrently', 'theme_space');
+            } else if ($selfenrolmentpossiblefuture == true) {
+                $html .= get_string('showhintcourseselfenrolstartfuture', 'theme_space');
+            }
+            $html .= html_writer::empty_tag('br');
 
-            foreach ($flatnav as $item) {
-                if ($item->type == \navigation_node::TYPE_SECTION) {
-                    $coursesections->add_node(new \navigation_node([
-                        'text' => $item->text,
-                        'shorttext' => $item->shorttext,
-                        'icon' => $item->icon,
-                        'type' => $item->type,
-                        'key' => $item->key,
-                        'parent' => $coursesections,
-                        'action' => $item->action
-                    ]));
+            // Iterate over all enrolment instances to output the details.
+            foreach ($selfenrolinstances as $selfenrolinstanceid => $selfenrolinstanceobject) {
+                // If the user has the capability to config self enrolments, enrich the instance name with the settings link.
+                if (has_capability('enrol/self:config', \context_course::instance($COURSE->id))) {
+                    $url = new moodle_url('/enrol/editinstance.php', array('courseid' => $COURSE->id,
+                            'id' => $selfenrolinstanceid, 'type' => 'self'));
+                    $selfenrolinstanceobject->name = html_writer::link($url, $selfenrolinstanceobject->name);
                 }
+
+                // Show the enrolment instance information depending on the instance configuration.
+                if ($selfenrolinstanceobject->unrestrictedness == 'unlimited') {
+                    $html .= get_string('showhintcourseselfenrolunlimited', 'theme_space',
+                            array('name' => $selfenrolinstanceobject->name));
+                } else if ($selfenrolinstanceobject->unrestrictedness == 'until') {
+                    $html .= get_string('showhintcourseselfenroluntil', 'theme_space',
+                            array('name' => $selfenrolinstanceobject->name,
+                                    'until' => userdate($selfenrolinstanceobject->enddate)));
+                } else if ($selfenrolinstanceobject->unrestrictedness == 'from') {
+                    $html .= get_string('showhintcourseselfenrolfrom', 'theme_space',
+                            array('name' => $selfenrolinstanceobject->name,
+                                    'from' => userdate($selfenrolinstanceobject->startdate)));
+                } else if ($selfenrolinstanceobject->unrestrictedness == 'since') {
+                    $html .= get_string('showhintcourseselfenrolsince', 'theme_space',
+                            array('name' => $selfenrolinstanceobject->name,
+                                    'since' => userdate($selfenrolinstanceobject->startdate)));
+                } else if ($selfenrolinstanceobject->unrestrictedness == 'fromuntil') {
+                    $html .= get_string('showhintcourseselfenrolfromuntil', 'theme_space',
+                            array('name' => $selfenrolinstanceobject->name,
+                                    'until' => userdate($selfenrolinstanceobject->enddate),
+                                    'from' => userdate($selfenrolinstanceobject->startdate)));
+                } else if ($selfenrolinstanceobject->unrestrictedness == 'sinceuntil') {
+                    $html .= get_string('showhintcourseselfenrolsinceuntil', 'theme_space',
+                            array('name' => $selfenrolinstanceobject->name,
+                                    'until' => userdate($selfenrolinstanceobject->enddate),
+                                    'since' => userdate($selfenrolinstanceobject->startdate)));
+                }
+
+                // Add a trailing space to separate this instance from the next one.
+                $html .= ' ';
             }
 
-            $flatnav->add($coursesections, 'myhome');
+            // If the user has the capability to config self enrolments, add the call for action.
+            if (has_capability('enrol/self:config', \context_course::instance($COURSE->id))) {
+                $html .= html_writer::empty_tag('br');
+                $html .= get_string('showhintcourseselfenrolinstancecallforaction', 'theme_space');
+            }
 
+            // End hint box.
+            $html .= html_writer::end_tag('div');
+            $html .= html_writer::end_tag('div');
+            $html .= html_writer::end_tag('div');
         }
-
     }
+
+    // Return HTML code.
+    return $html;
 }

@@ -36,12 +36,12 @@
 }}
 <div class="hidden h-100" data-region="view-contacts" aria-hidden="true" data-user-id="{{loggedinuser.id}}">
     <div class="d-flex flex-column h-100">
-        <div class="border-top">
-            <ul class="nav nav-pills nav-fill my-3" role="tablist">
-                <li class="nav-item">
+        <div>
+            <ul class="nav nav-tabs mt-0 mb-2 mx-3 justify-content-between" role="tablist">
+                <li class="col pl-0 pr-1">
                     <a
                         id="contacts-tab-{{uniqid}}"
-                        class="nav-link active"
+                        class="w-100 nav-link active d-inline-block text-center"
                         href="#contacts-tab-panel-{{uniqid}}"
                         data-toggle="tab"
                         data-action="show-contacts-section"
@@ -52,10 +52,10 @@
                         {{#str}} contacts, core_message {{/str}}
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="col pr-0 pl-1">
                     <a
                         id="requests-tab-{{uniqid}}"
-                        class="nav-link"
+                        class="w-100 nav-link d-inline-block text-center"
                         href="#requests-tab-panel-{{uniqid}}"
                         data-toggle="tab"
                         data-action="show-requests-section"
@@ -64,11 +64,11 @@
                         aria-selected="false"
                     >
                         {{#str}} requests {{/str}}
-                        <span class="badge badge-msg ml-2 px-1 py-0{{^contactrequestcount}}hidden{{/contactrequestcount}}"
+                        <sup class="badge-msg {{^contactrequestcount}}hidden{{/contactrequestcount}}"
                         data-region="contact-request-count"
                         aria-label="{{#str}} pendingcontactrequests, core_message, {{contactrequestcount}} {{/str}}">
                             {{contactrequestcount}}
-                        </span>
+                        </sup>
                     </a>
                 </li>
             </ul>

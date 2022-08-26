@@ -53,82 +53,121 @@
 <body {{{ bodyattributes }}}>
 {{> core/local/toast/wrapper}}
 
-<div id="page-wrapper">
+<div id="page-wrapper" class="d-print-block {{#output.courseheadermenu}}rui--course-with-nav{{/output.courseheadermenu}} {{^output.courseheadermenu}}rui--course-witout-nav{{/output.courseheadermenu}}">
 
     {{{ output.standard_top_of_body_html }}}
 
-    {{>theme_space/navbar}}
+    {{> theme_space/navbar }}
 
-    <div id="page" class="container-fluid">
-        {{{ output.full_header }}}
-
-        <div id="page-content" class="row no-gutters page-main-content">
-            <div id="region-main-box">
-                {{#hasregionmainsettingsmenu}}
-                <div id="region-main-settings-menu" class="region-main-settings-menu d-print-none {{#hasblocks}}has-blocks{{/hasblocks}}">
-                    <div> {{{ output.region_main_settings_menu }}} </div>
+    <div id="page" data-region="mainpage" data-usertour="scroller" class="container-fluid drawers {{#courseindexopen}}show-drawer-right{{/courseindexopen}} {{#blockdraweropen}}show-hidden-drawer{{/blockdraweropen}} drag-container">
+        <div id="topofscroll" class="main-inner">
+            <div id="page-content" class="page-content wrapper-page">
+                {{> theme_space/navbar-secondary }}
+                {{{ output.breadcrumbs }}}
+                {{{coursepageinformationbanners}}}
+                <div class="wrapper-header">
+                    <div class="rui-courseheadermenu-container">{{{ output.courseheadermenu }}}</div>
                 </div>
-                {{/hasregionmainsettingsmenu}}
-                <section id="region-main" {{#hasblocks}}class="has-blocks mb-3"{{/hasblocks}}>
+
+                
+                <div id="region-main-box" class="region-main-wrapper">
                     {{#hasregionmainsettingsmenu}}
-                    <div class="region_main_settings_menu_proxy"></div>
+                    <div id="region-main-settings-menu" class="rui-blocks-area {{#hassidecourseblocks}}has-sidecourseblocks{{/hassidecourseblocks}}">
+                        <div> {{{ output.region_main_settings_menu }}} </div>
+                    </div>
                     {{/hasregionmainsettingsmenu}}
-                    {{{ output.course_content_header }}}
 
-                    {{#hasmaintopwidgets}}
-                    <section data-region="blocks-main-top-widget" class="blocks-main-top-widget d-print-none">
-                    {{{ maintopwidgets }}}
+                    <section id="region-main" class="{{#hassidecourseblocks}}has-sidecourseblocks wrapper-has-blocks{{/hassidecourseblocks}}" aria-label="{{#str}}content{{/str}}">
+                        <div {{#hassidecourseblocks}}class="blocks-wrapper d-inline-flex flex-wrap justify-content-between w-100"{{/hassidecourseblocks}}>
+                            <div class="{{#hassidecourseblocks}}wrapper-blocks mx-0{{/hassidecourseblocks}}">
+
+                                {{{ output.full_header }}}
+
+                                {{#courseimagefw}}
+                                <div class="rui-course-cover mt-4">{{{ output.course_hero }}}</div>
+                                {{/courseimagefw}}
+
+                                {{#hasctopbl}}
+                                <div class="my-4 wrapper-xxl">
+                                    <section id="ctopbl" data-region="tmpl-course-blocks" class="rui-blocks-area">
+                                        {{{ ctopbl }}}
+                                    </section>
+                                </div>
+                                {{/hasctopbl}}
+
+                                {{#hascstopbl}}
+                                <section id="cstopbl" data-region="tmpl-course-blocks" class="rui-blocks-area">
+                                    {{{ cstopbl }}}
+                                </section>
+                                {{/hascstopbl}}
+
+                                {{#courseimagecontent}}<div class="rui-course-cover mb-4">{{{ output.course_hero }}}</div>{{/courseimagecontent}}
+
+                                {{#hasregionmainsettingsmenu}}
+                                    <div class="region_main_settings_menu_proxy"></div>
+                                {{/hasregionmainsettingsmenu}}
+                                {{{ output.course_content_header }}}
+                                {{{ output.main_content }}}
+                                {{{ output.activity_navigation }}}
+                                {{{ output.course_content_footer }}}
+
+                                {{#hascsbottombl}}
+                                <div>
+                                    <section id="csbottombl" data-region="tmpl-course-blocks" class="rui-blocks-area">
+                                        {{{ csbottombl }}}
+                                    </section>
+                                </div>
+                                {{/hascsbottombl}}
+
+                            </div>
+                            {{#hassidecourseblocks}}
+                            <div class="tmpl-course-blocks">
+                                <section id="sidecourseblocks" data-region="tmpl-incourse-blocks" class="rui-blocks-area">
+                                    {{{ sidecourseblocks }}}
+                                </section>
+                            </div>
+                            {{/hassidecourseblocks}}
+
+                            
+                        </div>
                     </section>
-                    {{/hasmaintopwidgets}}
 
-                    {{{ output.main_content }}}
+                    
 
-                    {{{ output.activity_navigation }}}
-                    {{{ output.course_content_footer }}}
+                </div>
 
-                    {{#hasmainfwidgets}}
-                    <section data-region="blocks-main-footer-widget" class="blocks-main-footer-widget d-print-none">
-                    {{{ mainfwidgets }}}
+                {{#hascbottombl}}
+                <div class="mt-4 wrapper-xxl">
+                    <section id="cbottombl" data-region="tmpl-course-blocks" class="rui-blocks-area">
+                        {{{ cbottombl }}}
                     </section>
-                    {{/hasmainfwidgets}}
+                </div>
+                {{/hascbottombl}}
 
-                </section>
-                {{#hasblocks}}
-                <section data-region="blocks-column" class="sidebar-widgets d-print-none">
-                    {{{ sidepreblocks }}}
-                </section>
-                {{/hasblocks}}
             </div>
         </div>
-    </div>
+
+        {{> theme_space/footer }}
+        
+    </div>       
+
+    {{^hiddensidebar}}
+        {{> theme_space/nav-drawer }}
+    {{/hiddensidebar}}
+    {{> theme_space/courseindex-tmpl}}
+    {{> theme_space/hasblocks-tmpl }}
+
+
     {{{ output.standard_after_main_region_html }}}
-
-    {{^removesidebar}}
-    {{> theme_space/nav-drawer }}
-    {{/removesidebar}}
-    {{#navdrawercp}}
-    {{> theme_space/nav-drawer }}
-    {{/navdrawercp}}
-
+    
 </div>
-
-{{> theme_space/footer }}
-{{> theme_space/footer-scripts }}
 
 </body>
 </html>
 {{#js}}
 M.util.js_pending('theme_space/loader');
-require(['theme_space/loader'], function() {
+require(['theme_space/loader', 'theme_space/drawer'], function(Loader, Drawer) {
+    Drawer.init();
     M.util.js_complete('theme_space/loader');
-});
-require(['theme_space/backtotop'], function(mod) {
-    mod.init();
-});
-
-M.util.js_pending('theme_space/drawer');
-require(['theme_space/drawer'], function(drawer) {
-    drawer.init();
-    M.util.js_complete('theme_space/drawer');
 });
 {{/js}}

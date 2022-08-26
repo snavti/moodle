@@ -25,23 +25,23 @@
 }}
 <div id="recentlyaccessedcourses-view-{{uniqid}}" data-region="recentlyaccessedcourses-view">
     <div data-region="loading-placeholder">
-        <div class="card-deck dashboard-card-scroll overflow-hidden row justify-content-start pl-0 pr-2 m-0">
-            {{> core_course/placeholder-course }}
-            {{> core_course/placeholder-course }}
-            {{> core_course/placeholder-course }}
+        <div class="overflow-hidden rui-loading-placeholder">
+            <svg class="spinner" viewBox="0 0 50 50">
+                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
         </div>
     </div>
     <div class="hidden" data-region="view-content">
-        {{< core_course/coursecards }}
-            {{$classes}}one-row fixed-width-cards justify-content-center overflow-hidden row justify-content-start m-0{{/classes}}
-        {{/ core_course/coursecards }}
         {{#pagingbar}}
-            <div class="d-flex paging-bar-container" data-region="paging-bar-container">
+            <div class="d-flex paging-bar-container mb-3" data-region="paging-bar-container">
                 {{> core/paged_content_paging_bar }}
             </div>
         {{/pagingbar}}
+        {{< core_course/coursecards }}
+            {{$classes}}one-row fixed-width-cards justify-content-center overflow-hidden{{/classes}}
+        {{/ core_course/coursecards }}
     </div>
     <div class="hidden text-xs-center text-center mt-3" data-region="empty-message">
-        <p class="text-muted mt-3 pb-4">{{#str}} nocourses, block_recentlyaccessedcourses {{/str}}</p>
+        <p class="text-muted mt-3">{{#str}} nocourses, block_recentlyaccessedcourses {{/str}}</p>
     </div>
 </div>

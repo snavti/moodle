@@ -35,9 +35,9 @@
 
 }}
 
-<div class="d-flex align-items-center">
+<div class="d-flex rui-message-header-margin">
     <div class="align-self-stretch" >
-        <a class="h-100 py-3 mr-2 d-flex align-items-center btn btn-sm" href="#" data-route-back>
+        <a class="h-100 mx-3 d-flex align-items-center btn-msg" href="#" data-route-back>
             {{> core_message/message_drawer_icon_back }}
         </a>
     </div>
@@ -45,26 +45,28 @@
         {{#imageurl}}
             <div class="d-flex align-items-center">
                 <img
-                    class="rounded-circle"
+                    class="rounded"
                     src="{{{.}}}"
                     alt="{{name}}"
                     aria-hidden="true"
                     style="height: 40px"
                 >
-                <span class="{{^isfavourite}}hidden{{/isfavourite}} message-name-favorite" data-region="favourite-icon-container">
-                    {{#pix}} i/star-rating, core {{/pix}}
+                <span class="{{^isfavourite}}hidden{{/isfavourite}} {{#isfavourite}}d-grid{{/isfavourite}} rui-message-name-favorite" data-region="favourite-icon-container">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4.75L13.75 10.25H19.25L14.75 13.75L16.25 19.25L12 15.75L7.75 19.25L9.25 13.75L4.75 10.25H10.25L12 4.75Z"></path>
+                    </svg>
                 </span>
             </div>
         {{/imageurl}}
-        <div class="w-100 ml-3 row align-items-center">
+        <div class="w-100 ml-2 row align-items-center">
             <div class="w-100 d-flex">
                 <strong class="m-0 message-name">{{name}}</strong>
             </div>
             {{#showonlinestatus}}
-                <p class="w-100 message-user-status">
+                <span class="w-100 message-user-status small">
                     {{#isonline}}{{#str}} loggedin, core_message {{/str}}{{/isonline}}
                     {{^isonline}}{{#str}} loggedoff, core_message {{/str}}{{/isonline}}
-                </p>
+                </span>
             {{/showonlinestatus}}
         </div>
     </div>

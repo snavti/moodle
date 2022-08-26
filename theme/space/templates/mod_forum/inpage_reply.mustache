@@ -34,28 +34,28 @@
     }
 }}
 <div data-content="inpage-reply-content" style="display: none;">
-    <div class="forum-post-reply w-100">
+    <div class="forum-post-reply">
         <form data-post-id="{{postid}}" id="inpage-reply-{{postid}}" data-content="inpage-reply-form" action="{{{reply_url}}}">
             <div class="row pb-1">
                 <div class="w-100">
-                    <textarea rows="5" name="post" title="post" class="form-control" placeholder="{{#str}} replyplaceholder, forum {{/str}}"></textarea>
+                    <textarea rows="5" name="post" title="post" class="form-control mb-2 w-100" placeholder="{{#str}} replyplaceholder, forum {{/str}}"></textarea>
                     <input type="hidden" name="postformat" value="{{postformat}}"/>
                 </div>
                 <input type="hidden" name="subject" value="{{parentsubject}}"/>
                 <input type="hidden" name="reply" value="{{postid}}"/>
                 <input type="hidden" name="sesskey" value="{{sesskey}}"/>
             </div>
-            <div class="d-sm-block d-md-inline-flex justify-content-between align-items-center w-100 mb-4">
-                <div class="d-sm-block d-md-inline-flex align-items-center">
-                    <button class="btn btn-primary mt-sm-2 mt-md-0 mr-1" title="{{#str}} submit, core {{/str}}" data-action="forum-inpage-submit">
+            <div class="d-inline-flex justify-content-between align-items-center w-100 mb-4">
+                <div class="d-inline-flex align-items-center">
+                    <button class="btn btn-primary mr-1" title="{{#str}} submit, core {{/str}}" data-action="forum-inpage-submit">
                         <span data-region="submit-text">{{#str}} submit, core {{/str}}</span>
                         <span data-region="loading-icon-container" class="hidden">{{> core/loading }}</span>
                     </button>
-                    <button class="btn btn-secondary mt-sm-2 mt-md-0" title="{{#str}} cancel, core {{/str}}" data-action="collapsible-link">
+                    <button class="btn btn-secondary" title="{{#str}} cancel, core {{/str}}" data-action="collapsible-link">
                         {{#str}} cancel, core {{/str}}
                     </button>
                     {{#canreplyprivately}}
-                    <div class="mt-sm-2 mt-md-0 ml-4 form-check form-check-inline">
+                    <div class="ml-4 form-check form-check-inline">
 
                         <label class="custom-control ios-switch mb-0">
                             <input type="checkbox" class="ios-switch-control-input form-check-input" id="private-reply-checkbox-{{uniqid}}" title="{{#str}} privatereply, forum {{/str}}" name="privatereply"/>
@@ -67,8 +67,13 @@
                     {{/canreplyprivately}}
                 </div>
 
-                <button title="{{#str}} advanced, core {{/str}}" data-action="forum-advanced-reply" class="forum-advanced-btn badge badge-light badge-link border-0 float-right" type="submit">
-                    <i class="fas fa-pencil-ruler mr-1"></i> {{#str}} advanced, core {{/str}}
+                <button title="{{#str}} advanced, core {{/str}}" data-action="forum-advanced-reply" class="forum-advanced-btn btn btn-info border-0 float-right" type="submit">
+                    <svg class="mr-2" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.75 13L7.75 19.25H16.25L18.25 13L12 4.75L5.75 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M5.75 19.25H18.25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M12 4.75V12.25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                    {{#str}} advanced, core {{/str}}
                 </button>
             </div>
         </form>

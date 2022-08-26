@@ -19,34 +19,49 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * A login page layout for the space theme.
  *
- * @package    theme_space
- * @copyright  Copyright © 2018 onwards, Marcin Czaja | RoseaThemes, rosea.io - Rosea Themes
- * @license    Commercial https://themeforest.net/licenses
+ * @package   theme_space
+ * @copyright 2022 Marcin Czaja (https://rosea.io)
+ * @license   Commercial https://themeforest.net/licenses
  */
 
-$bodyattributes = $OUTPUT->body_attributes();
-$loginalignment = theme_space_get_setting('loginalignment');
-if ($loginalignment == 1) {
-    $extraclasses[] = 'login-left';
-}
-if ($loginalignment == 2) {
-    $extraclasses[] = 'login-center';
-}
-if ($loginalignment == 3) {
-    $extraclasses[] = 'login-right';
-}
 $siteurl = $CFG->wwwroot;
+
+$loginlayout = theme_space_get_setting('setloginlayout');
+
+$loginlayout1 = false;
+$extraclasses[] = 'rui-login-page';
+
+$loginlayout = theme_space_get_setting('setloginlayout');
+if ($loginlayout == 1) {
+    $extraclasses[] = 'rui-login-layout-1';
+    $loginlayout1 = true;
+}
+if ($loginlayout == 2) {
+    $extraclasses[] = 'rui-login-layout-2';
+}
+if ($loginlayout == 3) {
+    $extraclasses[] = 'rui-login-layout-3';
+}
+if ($loginlayout == 4) {
+    $extraclasses[] = 'rui-login-layout-4';
+}
+if ($loginlayout == 5) {
+    $extraclasses[] = 'rui-login-layout-5';
+}
+
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
+
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
     'bodyattributes' => $bodyattributes,
-    'siteurl' => $siteurl
+    'siteurl' => $siteurl,
+    'loginlayout1' => $loginlayout1
 ];
 
 $themesettings = new \theme_space\util\theme_settings();
-$templatecontext = array_merge($templatecontext, $themesettings->login_block());
-$templatecontext = array_merge($templatecontext, $themesettings->head_elements());
-$templatecontext = array_merge($templatecontext, $themesettings->fonts());
+$templatecontext = array_merge($templatecontext, $themesettings->global_settings());
+$templatecontext = array_merge($templatecontext, $themesettings->footer_settings());
+$templatecontext = array_merge($templatecontext, $themesettings->login_settings());
 
-echo $OUTPUT->render_from_template('theme_space/login', $templatecontext);
+echo $OUTPUT->render_from_template('theme_space/tmpl-login', $templatecontext);

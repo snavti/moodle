@@ -49,21 +49,24 @@
     }
 }}
 <div class='competency-heading'>
-    <h4 id="competency_link_{{competency.id}}" class="mt-2 d-block align-items-center">
+    <div id="competency_link_{{competency.id}}" class="mt-2 d-block">
 
-        <span class="mr-1 py-1">{{{competency.shortname}}}</span>
-        <small class="badge badge-dark">
-        {{#showlinks}}
-            <a href="{{pluginbaseurl}}/competencies.php?competencyid={{competency.id}}">{{competency.idnumber}}</a>
-        {{/showlinks}}
-        {{^showlinks}}
-            {{competency.idnumber}}
-        {{/showlinks}}
-        </small>
-    </h4>
+        <div class="d-inline-flex align-items-center">
+            <h5 class="mb-0">{{{competency.shortname}}}</h5>
+            {{#showlinks}}
+                <a href="{{pluginbaseurl}}/competencies.php?competencyid={{competency.id}}"><span class="badge badge-info ml-2">{{competency.idnumber}}</span></a>
+            {{/showlinks}}
+            {{^showlinks}}
+                <span class="badge badge-light ml-2">{{competency.idnumber}}</span>
+            {{/showlinks}}
+        </div>
+    </div>
     {{#framework}}
-        <div class='competency-origin'>
-            <p><small>{{{framework.shortname}}} - {{taxonomyterm}}</small>
+        <div class="competency-origin mt-3 pt-3 border-top">
+            <div class="d-inline-flex align-items-center">
+                <h3 class="mb-0">{{{framework.shortname}}}</h3>
+                <span class="badge badge-info ml-2">{{taxonomyterm}}</span>
+            </div>
         </div>
     {{/framework}}
 </div>
@@ -71,7 +74,9 @@
 {{#competency.description}}
 <p>{{{competency.description}}}</p>
 {{/competency.description}}
+
 {{#comppath}}
+<hr />
     <span class="float-left">{{#str}}path, tool_lp{{/str}}&nbsp;</span>{{> tool_lp/competency_path }}
 {{/comppath}}
 {{#showrelatedcompetencies}}

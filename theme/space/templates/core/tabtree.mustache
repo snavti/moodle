@@ -32,18 +32,13 @@
         }]
     }
 }}
-<div class="nav-tabs-container w-100">
-  <ul class="nav nav-tabs mb-3">
-    {{#tabs}}
-      <li class="nav-item">
-        <a class="nav-link{{#active}} active{{/active}}{{#inactive}} disabled{{/inactive}}" {{#link}}href="{{{link}}}"{{/link}} title="{{title}}">{{{text}}}</a>
-      </li>
-    {{/tabs}}
-  </ul>
-</div>
-
-<div class="nav-tabs-sm">
-  {{#secondrow}}
-    {{>core/tabtree}}
-  {{/secondrow}}
-</div>
+<ul class="rui-nav-tabs nav nav-tabs">
+  {{#tabs}}
+    <li class="nav-item">
+      <a class="nav-link{{#active}} active{{/active}}{{#inactive}} disabled{{/inactive}}" {{#link}}href="{{{link}}}"{{/link}} title="{{title}}">{{{text}}}</a>
+    </li>
+  {{/tabs}}
+</ul>
+{{#secondrow}}
+  {{>core/tabtree}}
+{{/secondrow}}

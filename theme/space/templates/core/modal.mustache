@@ -44,6 +44,7 @@
     <div class="modal-dialog {{$classes}}{{classes}}{{/classes}}" role="document" data-region="modal" aria-labelledby="{{uniqid}}-modal-title" tabindex="0">
         <div class="modal-content">
             <div class="modal-header {{$headerclasses}}{{headerclasses}}{{/headerclasses}}" data-region="header">
+
                 {{$header}}
                     <h5 id="{{uniqid}}-modal-title" class="modal-title" data-region="title">{{$title}}{{title}}{{/title}}</h5>
                 {{/header}}
@@ -54,7 +55,11 @@
                     {{{body}}}
                 {{/body}}
             </div>
-            <div class="modal-footer" data-region="footer">{{$footer}}{{{footer}}}{{/footer}}</div>
+            <div class="modal-footer" data-region="footer">
+                {{$footer}}
+                    {{{footer}}}
+                {{/footer}}
+            </div>
         </div>
     </div>
 </div>

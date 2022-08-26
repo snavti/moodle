@@ -15,47 +15,26 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    Page header.
+    @template core/full_header
+
+    This template renders the header.
+
+    Example context (json):
+    {
+        "contextheader": "context_header_html",
+        "settingsmenu": "settings_html",
+        "hasnavbar": false,
+        "navbar": "navbar_if_available",
+        "courseheader": "course_header_html",
+        "welcomemessage": "welcomemessage"
+    }
 }}
-
-
-<header id="page-header">
-
-    <div class="row no-gutters">
-
-      {{#hasnavbar}}
-      <div class="breadcrumbs w-100 row no-gutters">
-        <div id="page-navbar" class="breadcrumbs-container w-100">
-            {{{navbar}}}
-        </div>
-      </div>
-      {{/hasnavbar}}
-
-      <div class="w-100 row no-gutters align-items-center c-header-content">
-        {{#contextheader}}<div class="page-title">{{{contextheader}}}</div>{{/contextheader}}
-
-        <div id="settingsMenu" class="settings-menu d-inline-flex">
-          {{#settingsmenu}}
-          <div id="headerBtn" class="header-settings-menu-box">{{{settingsmenu}}}</div>
-          {{/settingsmenu}}
-          {{#headeractions}}
-          <div class="header-actions-container ml-1" data-region="header-actions-container">
-            <div class="header-action">{{{.}}}</div>
-          </div>
-          {{/headeractions}}
-          {{{pageheadingbutton}}}
-        </div>
-
-
-
-        {{#pageheading}}<h3 class="page-sub-title">{{{pageheading}}}</h3>{{/pageheading}}
-
-        {{#courseheader}}
-        <div id="course-header" class="col-12 row">{{{courseheader}}}</div>
-        {{/courseheader}}
-
-      </div>
-
-    </div>
-
+<header id="page-header" class="page-header-content">
+  {{#contextheader}}
+    {{{.}}}
+  {{/contextheader}}
+  {{#pageheading}}<h3 class="page-sub-title">{{{pageheading}}}</h3>{{/pageheading}}
+  {{#courseheader}}
+  <div id="course-header">{{{courseheader}}}</div>
+  {{/courseheader}}
 </header>

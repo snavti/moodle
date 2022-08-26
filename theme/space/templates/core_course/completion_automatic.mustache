@@ -29,25 +29,25 @@
 }}
 {{#istrackeduser}}
     {{#statuscomplete}}
-    <span class="badge badge-success mb-1" role="listitem" {{!
+    <span class="badge-sm badge-success my-1 mr-1" role="listitem" {{!
         }}{{#accessibledescription}}{{!
             }}title="{{.}}" {{!
             }}aria-label="{{.}}" {{!
         }}{{/accessibledescription}}>
-        <strong>{{#str}}completion_automatic:done, core_course{{/str}}</strong> <span class="ml-2 font-weight-normal">{{description}}</span>
+        <strong class="mr-2">{{#str}}completion_automatic:done, core_course{{/str}}</strong> <span class="font-weight-normal">{{description}}</span>
     </span>
     {{/statuscomplete}}
     {{#statuscompletefail}}
-    <span class="badge badge-danger mb-1" role="listitem" {{!
+    <span class="badge-sm badge-danger my-1 mr-1" role="listitem" {{!
         }}{{#accessibledescription}}{{!
             }}title="{{.}}" {{!
             }}aria-label="{{.}}" {{!
         }}{{/accessibledescription}}>
-        <strong>{{#str}}completion_automatic:failed, core_course{{/str}}</strong> <span class="ml-2 font-weight-normal">{{description}}</span>
+        <strong class="mr-2">{{#str}}completion_automatic:failed, core_course{{/str}}</strong> <span class="font-weight-normal">{{description}}</span>
     </span>
     {{/statuscompletefail}}
     {{#statusincomplete}}
-    <span class="badge badge-secondary mb-1" role="listitem" {{!
+    <span class="badge-sm badge-secondary my-1 mr-1" role="listitem" {{!
         }}{{#accessibledescription}}{{!
             }}title="{{.}}" {{!
             }}aria-label="{{.}}" {{!
@@ -57,7 +57,7 @@
     {{/statusincomplete}}
 {{/istrackeduser}}
 {{^istrackeduser}}
-    <span class="badge badge-secondary mb-1" role="listitem">
+    <span class="badge-sm badge-secondary my-1 mr-1" role="listitem">
         <span>{{description}}</span>
     </span>
 {{/istrackeduser}}
