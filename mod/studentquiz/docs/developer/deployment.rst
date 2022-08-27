@@ -1,4 +1,0 @@
-Deployment
-==========
-
-Some text here.
