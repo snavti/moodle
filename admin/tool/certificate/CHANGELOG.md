@@ -1,13 +1,25 @@
 # Changelog
 
-## 3.11.8 (2022031620)
+## 4.0.3 (2022082400)
+### Fixed
+- Fixed bug with the reportbuilder reports showing 'source unavailable' error to some users.
+
+### Changed
+- Add lock when generating certificate
+- Convert certificates to use core reportbuilder system reports
+
+## 4.0.2 (2022071200)
 ### Added
 - Course certificates may be archived when a course is reset allowing to receive more than one
   certificate per user in the same course
 
-## 3.11.7 (2022031610)
+## 4.0.1 (2022051000)
 ### Changed
 - Prevent race condition resulting in issuing course certificate twice
+
+## 4.0.0 (2022042000)
+### Changed
+- This version of the plugin is only for Moodle LMS 4.0 and above
 
 ## 3.11.6 (2022031500)
 ### Added

@@ -1,13 +1,13 @@
 CHANGELOG
 =========
 
-3.11.5 (2022-06-08)
+4.0.0. (2022-05-04)
 -------------------
-* [BUG] #7214 - remove deprecated string from list of deprecated strings - github pull request #65 - hdagheda
-
-3.11.4 (2022-05-24)
--------------------
+* Moodle 4.0.0 compatible version
+* [FEATURE] Add idnumber support
 * [HOTFIX] #7208 - fix sql query when filters applied
+* [FEATURE] #7173 - update icon to monologo
+* [BUG] #7212 - remove deprecated string from list of deprecated strings - github pull request #65 - hdagheda 
 
 3.11.3 (2022-04-05)
 -------------------

@@ -1,7 +1,7 @@
 moodle-local_staticpage
 =======================
 
-[![Moodle Plugin CI](https://github.com/moodle-an-hochschulen/moodle-local_staticpage/workflows/Moodle%20Plugin%20CI/badge.svg?branch=MOODLE_311_STABLE)](https://github.com/moodle-an-hochschulen/moodle-local_staticpage/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3AMOODLE_311_STABLE)
+[![Moodle Plugin CI](https://github.com/moodle-an-hochschulen/moodle-local_staticpage/workflows/Moodle%20Plugin%20CI/badge.svg?branch=master)](https://github.com/moodle-an-hochschulen/moodle-local_staticpage/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3Amaster)
 
 Moodle plugin which displays static information pages which exist outside any course, imprint or faq pages for example, complete with Moodle navigation and theme
 
@@ -9,7 +9,7 @@ Moodle plugin which displays static information pages which exist outside any co
 Requirements
 ------------
 
-This plugin requires Moodle 3.11+
+This plugin requires Moodle 4.0+
 
 
 Motivation for this plugin
@@ -59,7 +59,7 @@ On this page, you can configure several aspects of local_staticpage's behaviour.
 
 #### 2.1. Data source of document title
 
-By default, local_staticpage will use the first `<h1>` tag as document title, document heading and breadcrumb item title of the resulting static page.
+By default, local_staticpage will use the first `<h1>` tag as document title and document heading of the resulting static page.
 In this section, you can change this behaviour to using the first `<title>` tag for each of these.
 
 Please note that if local_staticpage doesn't find the configured (`<h1>` or `<title>`) tag, it will derive the document title from the document filename.

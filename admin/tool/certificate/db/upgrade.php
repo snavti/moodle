@@ -227,7 +227,7 @@ function xmldb_tool_certificate_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2021050600, 'tool', 'certificate');
     }
 
-    if ($oldversion < 2022031611) {
+    if ($oldversion < 2022051800) {
 
         // Define field archived to be added to tool_certificate_issues.
         $table = new xmldb_table('tool_certificate_issues');
@@ -239,7 +239,7 @@ function xmldb_tool_certificate_upgrade($oldversion) {
         }
 
         // Certificate savepoint reached.
-        upgrade_plugin_savepoint(true, 2022031611, 'tool', 'certificate');
+        upgrade_plugin_savepoint(true, 2022051800, 'tool', 'certificate');
     }
 
     return true;
