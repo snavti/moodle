@@ -1,0 +1,87 @@
+{{!
+    This file is part of the Tutorial Booking activity.
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_tutorialbooking/teacher_slot
+
+    Student view of the tutorial booking activity.
+
+    Classes required for JS:
+    * tutorial_session
+    * movedown
+    * moveup
+    * controls
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id
+    * menu - Data to render an action menu
+    * signups
+    * title
+    * urledit
+    * urldelete
+    * urladdusers
+    * urlregistername
+    * urlregisterdate
+    * urlmessage
+    * urlmoveup
+    * urlmovedown
+
+    Example context (json):
+    {
+        "id": 6,
+        "menu": {},
+        "signups": [
+            "<li>Bill Jukes</li>",
+            "<li>You</li>",
+            "<li>Wendy Darling</li>"
+        ],
+        "title": "Slot 1",
+        "urledit": "http://example.com/",
+        "urldelete": "http://example.com/",
+        "urladdusers": "http://example.com/",
+        "urlregistername": "http://example.com/",
+        "urlregisterdate": "http://example.com/",
+        "urlmessage": "http://example.com/",
+        "urlmoveup": "http://example.com/",
+        "urlmovedown": "http://example.com/"
+    }
+}}
+<div id="slot-{{id}}" class="tutorial_session editing" data-name="{{{title}}}">
+    {{> mod_tutorialbooking/slot_information}}
+    {{^privatesignups}}<div>{{#str}} attendees, tutorialbooking {{/str}}</div>{{/privatesignups}}
+    <ul class="session_attendees">
+        {{#signups}}{{{.}}}{{/signups}}
+    </ul>
+    <span class="controls">{{#menu}}{{> core/action_menu}}{{/menu}}
+        <ul>
+            {{#editsignuplists}}
+                <li class="control moveup">
+                    <a href="{{{urlmoveup}}}">
+                        {{# pix }} MoveUp, mod_tutorialbooking, {{#str}} moveupsession, tutorialbooking {{/str}} {{/ pix }}
+                    </a>
+                </li>
+                <li class="control movedown">
+                    <a href="{{{urlmovedown}}}">
+                        {{# pix }} MoveDown, mod_tutorialbooking, {{#str}} movedownsession, tutorialbooking {{/str}} {{/ pix }}
+                    </a>
+                </li>
+            {{/editsignuplists}}
+        </ul>
+    </span>
+</div>

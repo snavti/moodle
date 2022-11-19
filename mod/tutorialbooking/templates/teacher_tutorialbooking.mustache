@@ -1,0 +1,103 @@
+{{!
+    This file is part of the Tutorial Booking activity.
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_tutorialbooking/teacher_tutorialbooking
+
+    Teacher view of the tutorial booking activity.
+
+    Classes required for JS:
+    * tutorial_sessions
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id
+    * slots
+    * editsignuplists
+    * urladdslot
+    * urllock
+    * locked
+    * editmessage
+    * urlviewmessages
+    * editexport
+    * exportall
+    * urlalltutorials
+    * urlexport
+
+    Example context (json):
+    {
+        "id": 42,
+        "slots": [],
+        "editsignuplists": true,
+        "urladdslot": "http://example.com/",
+        "urllock": "http://example.com/",
+        "locked": false,
+        "editmessage": true,
+        "urlviewmessages": "http://example.com/",
+        "editexport": true,
+        "exportall": true,
+        "urlalltutorials": "http://example.com/",
+        "urlexport": "http://example.com/",
+    }
+}}
+<div class="box tutorial">
+    {{> mod_tutorialbooking/tutorialbooking_information}}
+    <ul class="controls">
+        {{#editsignuplists}}
+            <li class="control">
+                <a href="{{{urladdslot}}}" class="btn btn-secondary btn-sm">
+                    {{#str}} newtimslotprompt, tutorialbooking {{/str}}
+                </a>
+            </li>
+            <li class="control"><a href="{{{urllock}}}" class="btn btn-secondary btn-sm">
+                {{#locked}}{{#str}} locked, tutorialbooking {{/str}}{{/locked}}
+                {{^locked}}{{#str}} unlocked, tutorialbooking {{/str}}{{/locked}}
+            </a></li>
+        {{/editsignuplists}}
+        <li class="control">
+            <a href="{{{urlviewmessages}}}" class="btn btn-secondary btn-sm">
+                {{#str}} viewmessages, tutorialbooking {{/str}}
+            </a>
+        </li>
+        {{#editexport}}
+            {{#exportall}}
+                <li class="control">
+                    <a href="{{{urlalltutorials}}}" class="btn btn-secondary btn-sm">
+                        {{#str}} showalltutorialbookings, tutorialbooking {{/str}}
+                    </a>
+                </li>
+            {{/exportall}}
+            <li class="control">
+                <a href="{{{urlexport}}}" class="btn btn-secondary btn-sm">
+                    {{#str}} exportlistprompt, tutorialbooking {{/str}}
+                </a>
+            </li>
+        {{/editexport}}
+    </ul>
+</div>
+<div id="tutorial-{{id}}" class="tutorial_sessions">
+    {{#slots}} {{> mod_tutorialbooking/teacher_slot}} {{/slots}}
+    {{^slots}} <div class="alert alert-danger">{{#str}} noslots, tutorialbooking {{/str}}</div> {{/slots}}
+</div>
+{{#editsignuplists}}
+{{#js}}
+require(['mod_tutorialbooking/move'], function(DragDrop) {
+    DragDrop.init();
+})
+{{/js}}
+{{/editsignuplists}}
