@@ -1,18 +1,20 @@
-<a href="https://travis-ci.org/catalyst/moodle-tool_heartbeat">
-<img src="https://travis-ci.org/catalyst/moodle-tool_heartbeat.svg?branch=master">
-</a>
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/catalyst/moodle-tool_heartbeat/ci/:master?label=ci)
 
 # A heartbeat test page for Moodle
 
-* [What is this?](#what-is-this)
-* [Branches](#branches)
-* [Installation](#installation)
-* [Configuration](#configuration)
-* [Testing](#testing)
+- [A heartbeat test page for Moodle](#a-heartbeat-test-page-for-moodle)
+- [What is this?](#what-is-this)
+  - [Front end health](#front-end-health)
+  - [Application health](#application-health)
+  - [Failed login detection](#failed-login-detection)
+- [Branches](#branches)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Testing](#testing)
 
 # What is this?
 
-This plugin exposes various endpoint that can be wired to load balancers and monitoring systems to help expose when this go wrong.
+This plugin exposes various endpoints that can be wired to load balancers and monitoring systems to help expose when things go wrong.
 
 NOTE: In an ideal world this plugin should be redundant and most of it's functionality built into core as a new API, enabling each plugin to delare it's own extra health checks. See:
 
@@ -131,15 +133,12 @@ https://moodle.org/plugins/view/tool_heartbeat
 http://moodle.local/admin/settings.php?section=tool_heartbeat
 
 * Set a fake warning state of 'error' or 'warn'
+* By default in a new install this is set to 'error'. This is done intertionally so that you know your monitoring is wired up correctly end to end. You should see you monitoring raise an alert which tells you that it is a test and links to the admin setting to turn it into normal monitoring mode.
 * Optionaly lock down the endpoints by IP
 
 
 # Testing
 
-When you have first setup this plugin and wired it end to end with Nagios / Icinga or another monitoring tool, you want the peace of mind to know that it is all correctly working. There is a setting which allows you to send a fake warning so you can confirm your pager will go off. This setting is set to 'error' by default by design
+When you first setup this plugin and have wired it end to end with Nagios / Icinga or another monitoring tool, you want the peace of mind to know that it is all correctly working. There is a setting which allows you to send a fake warning so you can confirm your pager will go off. This setting is set to 'error' by default by design
 
 http://moodle.local/admin/settings.php?section=tool_heartbeat
-
-
-
-

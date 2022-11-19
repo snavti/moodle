@@ -42,7 +42,7 @@ echo '<!-- Start Block 23 -->';
 echo '<div class="wrapper-xl rui-fp-block--23 '.$block23class.' s-courses-list row no-gutters justify-content-sm-center justify-content-lg-start">';
 
           if(!empty($block23introtitle) || !empty($block23introcontent)) {
-          echo '<div class="wrapper-md">';
+          echo '<div class="wrapper-md mb-sm-4 mb-md-0">';
           }
           if(!empty($block23introtitle)) {
                     echo '<h3 class="rui-block-title">'.$block23introtitle.'</h3>';
@@ -54,7 +54,7 @@ echo '<div class="wrapper-xl rui-fp-block--23 '.$block23class.' s-courses-list r
           echo '</div>';
           }
 
-            echo '<div class="col-sm-11 col-lg-4 m-b-3"><div class="special-heading text-left">';
+            echo '<div class="col-sm-12 col-lg-4 m-b-3"><div class="special-heading text-left">';
                     echo $block23icon;
                     if(!empty($block23heading)) { echo '<h3 class="title">'.$block23heading.'</h3>'; }
                     if(!empty($block23content)) { echo '<div class="mt-3 mb-3 pr-sm-0 pr-lg-4 lead text-left">'.$block23content.'</div>'; }
@@ -62,7 +62,7 @@ echo '<div class="wrapper-xl rui-fp-block--23 '.$block23class.' s-courses-list r
             echo '</div></div>';
         
             if(!empty($block23html1)) { 
-            echo '<div class="col-sm-11 col-lg row no-gutters pl-sm-0 pl-lg-4 justify-content-sm-center"><div class="col-sm-12 col-md text-left">';
+            echo '<div class="col-sm-12 col-lg row no-gutters pl-sm-0 pl-lg-4 justify-content-sm-center"><div class="col-sm-12 col-md text-left">';
             echo $block23html1;
             echo '</div>';
             }

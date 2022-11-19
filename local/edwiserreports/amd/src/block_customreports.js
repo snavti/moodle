@@ -1,12 +1,32 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Plugin administration pages are defined here.
+ *
+ * @copyright   2021 wisdmlabs <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 define([
     'jquery',
-    'core/str',
-    'local_edwiserreports/defaultconfig',
-    'local_edwiserreports/variables',
-    'local_edwiserreports/flatpickr',
-    'local_edwiserreports/jquery.dataTables',
-    'local_edwiserreports/dataTables.bootstrap4'
-], function($, str, config, v) {
+    './defaultconfig',
+    './variables',
+    './common',
+    './flatpickr',
+    './jquery.dataTables',
+    './dataTables.bootstrap4'
+], function($, config, v, common) {
     /**
      * Selector datable variable
      * @type {object | null}
@@ -98,14 +118,19 @@ define([
     var getDatatableConfig = function(selectorType) {
         if (selectorType == 'lps') {
             return {
-                "columns": [
-                    {"data": "select"},
-                    {"data": "fullname"},
-                    {"data": "shortname"},
-                    {"data": "startdate"},
-                    {"data": "enddate"},
-                    {"data": "duration"},
-                ],
+                "columns": [{
+                    "data": "select"
+                }, {
+                    "data": "fullname"
+                }, {
+                    "data": "shortname"
+                }, {
+                    "data": "startdate"
+                }, {
+                    "data": "enddate"
+                }, {
+                    "data": "duration"
+                }],
                 "language": {
                     "searchPlaceholder": "Search Learning Programs",
                     "emptyTable": "There are no learning programs"
@@ -113,17 +138,28 @@ define([
             };
         } else {
             return {
-                "columns": [
-                    {"data": "select"},
-                    {"data": "fullname"},
-                    {"data": "shortname"},
-                    {"data": "category"},
-                    {"data": "startdate"},
-                    {"data": "enddate"},
-                ],
+                "columns": [{
+                    "data": "select"
+                }, {
+                    "data": "fullname"
+                }, {
+                    "data": "shortname"
+                }, {
+                    "data": "category"
+                }, {
+                    "data": "startdate"
+                }, {
+                    "data": "enddate"
+                }],
                 "language": {
-                    "searchPlaceholder": "Search Course",
-                    "emptyTable": "There are no courses"
+                    info: M.util.get_string('tableinfo', 'local_edwiserreports'),
+                    infoEmpty: M.util.get_string('infoempty', 'local_edwiserreports'),
+                    emptyTable: M.util.get_string('nocourses', 'local_edwiserreports'),
+                    zeroRecords: M.util.get_string('zerorecords', 'local_edwiserreports'),
+                    paginate: {
+                        previous: M.util.get_string('previous', 'moodle'),
+                        next: M.util.get_string('next', 'moodle')
+                    }
                 }
             };
         }
@@ -155,7 +191,8 @@ define([
         });
 
         // Prepare url to get selector related data
-        var url = v.requestUrl + '?action=get_customreport_selectors_ajax&sesskey=' + M.cfg.sesskey + '&filter=' + filter;
+        var url = v.requestUrl + '?action=get_customreport_selectors_ajax&secret=' +
+            M.local_edwiserreports.secret + '&filter=' + filter;
 
         // Show custom report selectors
         rootContainer.show();
@@ -166,6 +203,7 @@ define([
         // Get all courses/learningprogram
         selectorTable = customReportSelectors.find(tableSelectorClass).show().DataTable({
             ajax: url,
+            dom: '<"edwiserreports-table"<"table-filter d-flex"f><t><"table-pagination"p>>',
             columns: dtConfig.columns,
             language: dtConfig.language,
             responsive: true,
@@ -177,7 +215,10 @@ define([
             scrollX: true,
             paging: false,
             bInfo: false,
-            bSort: false
+            bSort: false,
+            drawCallback: function() {
+                common.stylePaginationButton(this);
+            }
         }).columns.adjust();
     };
 

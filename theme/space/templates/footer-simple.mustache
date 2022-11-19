@@ -18,8 +18,8 @@
     Page footer.
 }}
 
-<footer>
-    <div class="my-4">
+<footer id="s-page-footer" class="wrapper-page" {{#footerbgimg}}style="background-image: url('{{{footerbgimg}}}');"{{/footerbgimg}} {{#footercustomcss}}{{{.}}}{{/footercustomcss}}>
+    <div class="wrapper-xl my-4 text-center">
                 <div id="course-footer">{{{ output.course_footer }}}</div>
 
                 <div class="rui-footer-btns">

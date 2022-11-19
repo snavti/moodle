@@ -65,7 +65,7 @@ $page = new admin_settingpage('theme_space_block9', get_string('settingsblock9',
           $name = 'theme_space/block9htmlcontent';
           $title = get_string('blockhtmlcontent', 'theme_space');
           $description = get_string('blockhtmlcontent_desc', 'theme_space');
-          $default = '<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+          $default = '<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mx-0">
 
           <!-- Start item -->
           <div class="rui-card-item col mb-4">

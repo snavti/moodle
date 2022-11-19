@@ -27,7 +27,7 @@
             position: relative;
         }
 
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-between(xs,sm) {
             .cb-listitem {
                 flex-basis: 50%;
             }
@@ -130,7 +130,7 @@
             .theme-dark & {color: $dm-text-muted;}
         }
 
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-between(xs,sm) {
             .cb-column {
                 flex: 0 0 50%;
                 max-width: 50%;

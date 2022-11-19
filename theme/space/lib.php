@@ -78,24 +78,31 @@ function theme_space_get_extra_scss($theme) {
     // Sets the login background image.
     // Check login layout, only layout #1 has background image
     $loginlayout = theme_space_get_setting('setloginlayout');
+    $loginlayoutimg = false;
 
     if($loginlayout == 1 || $loginlayout == 4 || $loginlayout == 5) {
         $loginlayoutimg = true;
-    } else {
+    } if($loginlayout == 2 || $loginlayout == 3) {
+        $loginlayoutimg = false;
+    }
+    else {
         $loginlayoutimg = false;
     }
 
     $loginbackgroundimageurl = $theme->setting_file_url('loginbg', 'loginbg');
-    if (!empty($loginbackgroundimageurl) && $loginlayoutimg == true) {
-        $content .= 'body.pagelayout-login { ';
-        $content .= "background-image: url('$loginbackgroundimageurl'); background-size: cover;";
-
-        if($loginlayout == 4 || $loginlayout == 5) {
-            $content .= "height: 100vh; overflow: hidden;";
+    if ($loginlayout == 1 || $loginlayout == 4 || $loginlayout == 5) {
+        if (!empty($loginbackgroundimageurl)) {
+            $content .= 'body.path-login { ';
+            $content .= "background-image: url('$loginbackgroundimageurl'); background-size: cover; background-attachment: fixed;";
+    
+            // if($loginlayout == 4 || $loginlayout == 5) {
+            //     $content .= "height: 100vh; overflow: hidden;";
+            // }
+    
+            $content .= ' }';
         }
-
-        $content .= ' }';
     }
+
 
     // Always return the background image with the scss when we have it.
     return !empty($theme->settings->scss) ? $theme->settings->scss . ' ' . $content : $content;
@@ -254,6 +261,7 @@ function theme_space_get_pre_scss($theme) {
         'fontweightmedium' => ['font-weight-medium'],
         'fontweightbold' => ['font-weight-bold'],
         'fontheadings' => ['fontheadings'],
+        'mycourseswrapperheight' => ['mycourses-wrapper-height'],
         //Text
         'colorbody' => ['body-color'],
         'colorbodysecondary' => ['body-color-secondary'],
@@ -314,8 +322,8 @@ function theme_space_get_pre_scss($theme) {
         //Footer
         'colorfooterbg' => ['footer-bg'],
         'colorfooterborder' => ['footer-border'],
-        'colorfootertext' => ['footer-text'],
-        'colorfooterlink' => ['footer-link'],
+        'colorfootertext' => ['footer-text-color'],
+        'colorfooterlink' => ['footer-link-color'],
         'colorfooterlinkhover' => ['footer-link-color-hover'],
         //Course card
         'maxcoursecardtextheight' => ['max-course-card-text-height'],
@@ -335,6 +343,8 @@ function theme_space_get_pre_scss($theme) {
         'heroimageheightlg' => ['heroimageheight-lg'],
         'heroimageheightmd' => ['heroimageheight-md'],
         'heroimageheightsm' => ['heroimageheight-sm'],
+        //Login
+        'loginbgcolor' => ['login-bgcolor'],
     ];
 
     // Prepend variables first.

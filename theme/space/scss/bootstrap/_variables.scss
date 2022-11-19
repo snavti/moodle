@@ -364,8 +364,8 @@ $grid-breakpoints: (
 // Define the maximum width of `.container` for different screen sizes.
 
 $container-max-widths: (
-  sm: 90%,
-  md: 90%,
+  sm: 100%,
+  md: 100%,
   lg: 960px,
   xl: 1140px
 ) !default;
@@ -657,7 +657,7 @@ $input-font-size-lg:                    $input-btn-font-size-lg !default;
 $input-line-height-lg:                  $input-btn-line-height-lg !default;
 
 $input-bg:                              $container-bg !default;
-$dm-input-bg:                           #080808 !default;
+$dm-input-bg:                           $dm-body-bg !default;
 $input-disabled-bg:                     $gray-200 !default;
 $dm-input-disabled-bg:                  $dm-gray-200 !default;
 $input-color:                           $gray-800 !default;
@@ -1039,12 +1039,12 @@ $dropdown-text:                     $gray-900 !default;
 
               // Dark mode
               $dm-dropdown-color:                    $dm-body-color !default;
-              $dm-dropdown-bg:                       #080808 !default;
-              $dm-dropdown-border-color:             $dm-gray-300 !default;
-              $dm-dropdown-divider-bg:               $dm-gray-200 !default;
+              $dm-dropdown-bg:                       #1b1e22 !default;
+              $dm-dropdown-border-color:             #2f3237 !default;
+              $dm-dropdown-divider-bg:               #2d333b !default;
               $dm-dropdown-link-color:               $primary-color-400 !default;
               $dm-dropdown-link-hover-color:         $dm-gray-900!default;
-              $dm-dropdown-link-hover-bg:            $dm-gray-200!default;
+              $dm-dropdown-link-hover-bg:            #2d333b!default;
               $dm-dropdown-link-active-color:        $dm-gray-900 !default;
               $dm-dropdown-link-active-bg:           $dm-gray-200  !default;
               $dm-dropdown-link-disabled-color:      $dm-gray-400 !default;
@@ -1351,7 +1351,7 @@ $modal-scale-transform:             scale(1.02) !default;
 $alert-padding-y:                   .55rem !default;
 $alert-padding-x:                   1.25rem !default;
 $alert-margin-bottom:               1rem !default;
-$alert-border-radius:               $border-radius !default;
+$alert-border-radius:               $btn-border-radius !default;
 $alert-link-font-weight:            $font-weight-bold !default;
 $alert-border-width:                $border-width !default;
 
@@ -1362,7 +1362,7 @@ $alert-color-level:                 6 !default;
 
 // Progress bars
 
-$progress-height:                   10px !default;
+$progress-height:                   16px !default;
 $progress-font-size:                $font-size-base * .75 !default;
 $progress-bg:                       $blue-200 !default;
 $progress-border-radius:            10px!default;
@@ -1615,7 +1615,7 @@ $drawer-nav-icon-width: 30px!default;
             $topbar-btn-hover-text:        $primary-color-600!default;
 
 
-            $dm-topbar-bg:                  $dm-gray-100!default;
+            $dm-topbar-bg:                  $dm-body-bg!default;
             $dm-topbar-text:                $dm-gray-900!default;
             
             $dm-topbar-btn-text:            $dm-gray-900!default;
@@ -1669,6 +1669,9 @@ $drawer-padding-x: 50px !default;
 $drawer-padding-y: 40px !default;
 $drawer-offscreen-gutter: 20px !default;
 $drawer-box-inner-padding: 3px!default;
-$right-drawer-width: 290px;
+$right-drawer-width: 320px;
 
 $max-course-card-text-height: 127px!default;
+
+$login-bgcolor: $gray-200!default;
+$login-bgcolor-txt: $body-color!default;

@@ -37,6 +37,7 @@
                 <FIELD COMMENT="User Id" NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD COMMENT="Completed Modules" NAME="completedmodules" TYPE="text" LENGTH="500" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD COMMENT="Total Modules" NAME="totalmodules" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD COMMENT="Completable Modules" NAME="completablemods" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD COMMENT="Course Progress" NAME="progress" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
                 <FIELD COMMENT="Course Completion Time" NAME="completiontime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD COMMENT="Is Progress Change" NAME="pchange" TYPE="int" LENGTH="2" DEFAULT="1" NOTNULL="true" SEQUENCE="false"/>
@@ -44,6 +45,40 @@
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+                <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+            </INDEXES>
+        </TABLE>
+        <TABLE
+            COMMENT="Information about the custom reports block"
+            NAME="edwreports_custom_reports">
+            <FIELDS>
+                <FIELD COMMENT="Custom Reports Id" NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD COMMENT="Custom Reports Short Name" NAME="shortname" TYPE="text" LENGTH="255" NOTNULL="true"/>
+                <FIELD COMMENT="Custom Reports Full Name" NAME="fullname" TYPE="text" LENGTH="255" NOTNULL="true"/>
+                <FIELD COMMENT="Created By User Id" NAME="createdby" TYPE="int" LENGTH="10" NOTNULL="true"/>
+                <FIELD COMMENT="Custom Reports Data" NAME="data" TYPE="text" LENGTH="1000" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD COMMENT="Desktop Enable" NAME="enabledesktop" TYPE="int" LENGTH="2" DEFAULT="0" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD COMMENT="Custom Reports Creation Time" NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD COMMENT="Custom Reports Modfied Time" NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE
+            COMMENT="Keeps secret keys for user authentication"
+            NAME="edwreports_authentication">
+            <FIELDS>
+                <FIELD COMMENT="Id" NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD COMMENT="User id" NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+                <FIELD COMMENT="Secret key" NAME="secret" TYPE="text" LENGTH="10" NOTNULL="true"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="unique" TYPE="unique" FIELDS="userid"/>
             </KEYS>
         </TABLE>
     </TABLES>

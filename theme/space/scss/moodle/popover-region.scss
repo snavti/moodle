@@ -50,6 +50,10 @@ $content-header-footer-height: 110px;
     @include border-radius($dropdown-border-radius);
     box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px, rgba(0, 0, 0, 0.07) 0px 2px 4px, rgba(0, 0, 0, 0.07) 0px 4px 8px, rgba(0, 0, 0, 0.07) 0px 8px 16px, rgba(0, 0, 0, 0.07) 0px 16px 32px, rgba(0, 0, 0, 0.07) 0px 32px 64px;
 
+    @include media-breakpoint-between(xs,sm) {
+    left: -125px;
+    }
+
     .theme-dark & {
         color: $dm-dropdown-color;
         background-color: $dm-dropdown-bg;
@@ -420,13 +424,13 @@ $content-header-footer-height: 110px;
 
 .rui-notification-pref,
 .rui-markallread {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     padding: 3px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    border-radius: $border-radius;
+    border-radius: $btn-border-radius;
 
     &:hover {
         text-decoration: none;

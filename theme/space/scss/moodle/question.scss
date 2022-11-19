@@ -149,6 +149,11 @@
     td,
     th {
         padding: 0 0.2em;
+        
+        div {
+            align-items: center;
+            flex-wrap: wrap;
+        }
     }
 
     th {
@@ -295,6 +300,7 @@ body.path-question-type {
 }
 
 .path-mod-quiz input[size] {
+    margin: 0;
     min-width: 70px;
     width: auto;
     max-width: 100%;
@@ -430,18 +436,21 @@ body.jsenabled .questionflag input[type=checkbox] {
     margin: 1rem 0;
     height: auto;
 
-    .instancesectioncontainer {
-        position: relative;
-    }
-
     .editing_section {
-        position: absolute;
-        top: 3px;
-        left: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
     }
 }
 
+#page-mod-quiz-edit .section-heading .instancesectioncontainer {
+    display: inline-flex;
+}
+
 #page-mod-quiz-edit .section-heading .instancesectioncontainer h3 {
+    display: flex;
     color: inherit;
 }
 
@@ -492,16 +501,36 @@ body.jsenabled .questionflag input[type=checkbox] {
 }
 
 #page-mod-quiz-edit .section .activity .editing_move {
-    top: calc(50% - 26px);
+    position: relative;
+    top: 0;
     left: 0;
 }
 
+#page-mod-quiz-edit.select-multiple#page-mod-quiz-edit ul.slots li.section li.activity .mod-indent-outer,
 #page-mod-quiz-edit ul.slots li.section li.activity .mod-indent-outer {
-    padding-left: 130px;
+    display: flex;
+    flex-wrap: wrap;
+
+    @include media-breakpoint-up(md) {
+        padding-left: 80px;
+    }
+
+    @include media-breakpoint-between(xs,sm) {
+        padding-left: 0;
+    }
 }
 
 #page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmark {
     font-weight: $font-weight-medium;
+}
+
+#page-mod-quiz-edit ul.slots li.section li.activity .activityinstance {
+    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;    
+    position: relative!important;
+    top: 0;
+    left: 0;
 }
 
 // Questin name and desc
@@ -514,7 +543,7 @@ body.jsenabled .questionflag input[type=checkbox] {
 
 #page-mod-quiz-edit ul.slots li.activity div.activityinstance .questiontext {
     display: block;
-    padding-left: 35px;
+    padding-left: 60px;
     margin-top: 5px;
     margin-bottom: 20px;
 
@@ -534,7 +563,7 @@ body.jsenabled .questionflag input[type=checkbox] {
 }
 
 .page_split_join {
-    width: 50%;
+    width: 100%;
 }
 
 #page-mod-quiz-edit ul.slots li.section li.activity .page_split_join_wrapper {
@@ -627,17 +656,27 @@ body.jsenabled .questionflag input[type=checkbox] {
     @include border-radius(2px);
     overflow: hidden;
 }
+#page-mod-quiz-edit ul.slots .activityinstance span.instancename .icon {
+    margin: 0!important;
+    opacity: 1;
+}
 
-#page-mod-quiz-edit ul.slots .activityinstance img.activityicon {
-    margin: 0 0 20px 0;
-    padding: 0;
+#page-mod-quiz-edit ul.slots .activityinstance .rui-icon-container {
+    width: 40px;
+    height: 40px;
+    margin: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;   
+    background-color: $gray-100;
+    border-radius: 40px;
 
-    position: absolute;
-    top: calc(50% - 20px);
-    left: 70px;
-
-    width: 30px!important;
-    height: 30px!important;
+    .icon {
+        padding: 0;
+        margin: 0;
+        width: 20px;
+        height: 20px;
+    }
 }
 
 #page-mod-quiz-edit ul.slots .activityinstance {
@@ -678,6 +717,10 @@ body.jsenabled .questionflag input[type=checkbox] {
 
 #page-mod-quiz-edit div.questionbank .categoryquestionscontainer {
     background: transparent;
+}
+
+.categoryquestionscontainer {
+    overflow-x: auto;
 }
 
 #page-mod-quiz-edit #categoryquestions > thead {
@@ -835,24 +878,20 @@ body.jsenabled .questionflag input[type=checkbox] {
     }
 }
 
+#page-mod-quiz-edit.select-multiple input.select-multiple-checkbox[type="checkbox"] {
+    margin: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #page-mod-quiz-edit ul.slots .activityinstance span.instancename {
+    margin-top: 10px;
     overflow: auto;
     text-overflow: initial;
     white-space: break-spaces;
-
-    margin-top: 40px;
     display: block;
     height: auto;
-
-    .icon {
-        margin-right: .5rem;
-        color: $link-color;
-        opacity: .7;
-
-        .theme-dark & {
-            color: $dm-link-color;
-        }
-    }
 }
 
 #page-mod-quiz-edit .section .activity .actions {
@@ -864,6 +903,7 @@ body.jsenabled .questionflag input[type=checkbox] {
     display: inline-flex;
     justify-content: flex-end;
     align-items: center;
+    flex-wrap: wrap;
 
     .icon {
         @extend .btn-special-icon;
@@ -914,15 +954,25 @@ a#hidebankcmd {
 // qtype_shortanswer
 .que.numerical .answer,
 .que.shortanswer .answer {
+    width: 100%;
     padding: 0;
-    margin-left: .35rem; //margin on the left between label and input field
+    margin-top: .35rem;
+
     display: inline-flex;
     align-items: center;
 }
 
 .que label {
+    margin-bottom: 0;
+
+    @include media-breakpoint-up(md) {
     display: inline-flex;
-    margin: 0 10px 0 0;
+    flex-wrap: wrap;
+    }
+
+    @include media-breakpoint-between(xs,sm) {
+    display: block;
+    }
 }
 
 body.path-question-type .mform fieldset.hidden {
@@ -1038,7 +1088,9 @@ body.path-question-type .mform fieldset.hidden {
     }
 }
 
-#categoryquestions {
+table#categoryquestions {
+    width: max-content;
+
     td.modifiername,
     td.creatorname
     {
@@ -1049,13 +1101,16 @@ body.path-question-type .mform fieldset.hidden {
         }
     }
 
-    th [class*="sort"] {
-        margin: 0!important;
-        padding-left: 0!important;
-    }
-
     th, td {
         padding: .75rem!important;
+    }
+
+    th {
+        color: $body-color;
+
+        .theme-dark & {
+            color: $dm-body-color;
+        }
     }
 
     .editmenu {
@@ -1073,6 +1128,28 @@ body.path-question-type .mform fieldset.hidden {
     .addtoquizaction .icon {
         background-color: $gray-300;
     }
+}
+
+#categoryquestions .questiontext {
+    max-width: 500px;
+
+    //reset default sytles for clarity
+    h1, h2, h3, h4, h5, h6, p, strong, span, b, em {
+        max-width: 600px;
+        display: block!important;
+        
+        font-size: $font-size-sm!important;
+        font-weight: $font-weight-normal!important;
+        text-align: left!important;
+    }
+
+    img {
+        margin: 10px 0!important;
+        float: none!important;
+        max-width: 100%!important;
+        height: auto!important;
+    }
+
 }
 
 #categoryquestions .checkbox {
@@ -1155,12 +1232,16 @@ body.path-question-type .mform fieldset.hidden {
     width: auto;
     padding-left: 30px;
     padding-right: 30px;
-    margin-bottom: $page-margin;
+
 
     border-radius: $border-radius;
     background-color: $yellow-100;
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
+
+    @include media-breakpoint-up(md) {
+        margin-bottom: 40px;
+    }
 
     .theme-dark & {
         background-color: $yellow-900;
@@ -1268,6 +1349,14 @@ body.path-question-type .mform fieldset.hidden {
     font-family: $font-family-base;
     font-size: $font-size-base;
 
+    @include media-breakpoint-between(xs,sm) {
+    width: 100%;
+    display: block;
+    margin-bottom: 1rem;
+    margin-right: 0;
+    text-align: center;
+    }
+
     .theme-dark & {
         color: $dm-body-color;
     }
@@ -1286,7 +1375,10 @@ body.path-question-type .mform fieldset.hidden {
 .que .qtext {
     margin-bottom: .5rem;
     font-size: 1.5rem;
-    font-weight: normal;
+
+    @include media-breakpoint-between(xs,sm) {
+    font-size: $font-size-base;
+    }
 }
 
 .que .content {
@@ -1501,13 +1593,26 @@ body.path-question-type .mform fieldset.hidden {
 
     width: 100%;
     display: inline-flex;
+    flex-wrap: wrap;
     justify-content: space-between;
 
     font-size: $font-size-sm;
 
+    @include media-breakpoint-between(xs,sm) {
+    .btn {
+        display: block;
+        width: 100%;
+        margin-top: .25rem;
+    }
+    }
+
     .rui-controls {
-        #page-mod-quiz-summary & {
+        width: 100%;
+
+        @include media-breakpoint-between(xs,sm) {
+        .singlebutton {
             width: 100%;
+        }
         }
     }
 }
@@ -1517,6 +1622,15 @@ body.path-question-type .mform fieldset.hidden {
 .rui-submitbtns .mod_quiz-next-nav
 {
     float: none;
+
+    @include media-breakpoint-between(xs,sm) {
+        flex-wrap: wrap;
+
+        .btn {
+            width: 100%;
+            margin-top:.25rem;
+        }
+    }
 }
 
 #page-mod-quiz-attempt .submitbtns,
@@ -1577,7 +1691,7 @@ body.path-question-type .mform fieldset.hidden {
         text-align: left;
     }
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
         width: 100%;
 
         .singlebutton,
@@ -1999,5 +2113,24 @@ div[class*="draggrouphomes"] {
 
         .userpicture {
             margin-right: 10px;
+        }
+    }
+
+
+    @include media-breakpoint-between(xs,sm) {
+        .quizstartbuttondiv,
+        .quizstartbuttondiv .btn {
+            width: 100%;
+        }
+    }
+
+    .quizsummaryheading th:empty {
+        padding: 0;
+    }
+
+    .camera {
+        video {
+            margin-top: 10px;
+            width: 100%;
         }
     }

@@ -67,8 +67,6 @@
                 {{{ output.breadcrumbs }}}
                 {{{coursepageinformationbanners}}}
                 <div class="wrapper-header">
-
-                    {{{ output.clean_header }}}
                     {{#headeractions}}
                     <div class="header-actions-container ml-1" data-region="header-actions-container">
                         <div class="header-action">{{{.}}}</div>
@@ -108,6 +106,7 @@
         </div>
         {{> theme_space/footer }}
     </div>
+
             
     {{^hiddensidebar}}
         {{> theme_space/nav-drawer }}

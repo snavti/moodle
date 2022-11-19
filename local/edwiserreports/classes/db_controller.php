@@ -33,6 +33,7 @@ require_once($CFG->libdir . '/completionlib.php');
 use moodle_exception;
 use completion_info;
 use context_course;
+use local_edwiserreports\controller\progress;
 use stdClass;
 
 /**
@@ -51,6 +52,61 @@ class db_controller {
     public function __construct() {
         // Set Progress Table Name.
         $this->progresstable = 'edwreports_course_progress';
+    }
+
+    /**
+     * Fix missing course progress data.
+     */
+    public function fix_missing_course_progress() {
+        global $DB;
+
+        mtrace('Fixing missing course progress data...');
+
+        $this->progress = new progress('fix_missing_course_progress');
+        $this->progress->start_progress();
+
+        // Deleting course records where courseid is < 2.
+        $DB->execute('DELETE FROM {edwreports_course_progress} WHERE courseid < 2');
+
+        // Get all courses.
+        $courses = get_courses();
+        unset($courses[1]);
+
+        $progress = 0;
+        $increament = 100 / count($courses);
+
+        // Parse all courses.
+        foreach ($courses as $cid => $course) {
+            // Increamenting progress.
+            $progress += $increament;
+
+            // Get course context.
+            $coursecontext = context_course::instance($course->id);
+
+            // Get all enrolled users with role students
+            // 'moodle/course:isincompletionreports' - this capability is allowed to only students
+            // This will return all learners in a course.
+            list($esql, $params) = get_enrolled_sql($coursecontext, 'moodle/course:isincompletionreports');
+            $sql = "SELECT DISTINCT u.id userid, '{$cid}' courseid
+                      FROM {user} u
+                      JOIN ($esql) je ON je.id = u.id
+                 LEFT JOIN {edwreports_course_progress} ecp ON u.id = ecp.userid AND ecp.courseid = :courseid
+                     WHERE u.deleted = 0
+                       AND ecp.courseid is null";
+
+            $params['courseid'] = $cid;
+
+            $users = $DB->get_records_sql($sql, $params);
+
+            if (!empty($users)) {
+                $DB->insert_records($this->progresstable, $users);
+            }
+
+            $this->progress->update_progress($progress);
+        }
+        $this->progress->end_progress();
+
+        mtrace('');
     }
 
     /**
@@ -145,15 +201,11 @@ class db_controller {
 
         // Get all courses.
         $courses = get_courses();
+        unset($courses[1]);
 
         // Parse all courses.
         $progressdata = array();
         foreach ($courses as $cid => $course) {
-            // Skip system course (Moodle Default Course)
-            // which is always a courseid equal to '1'.
-            if ($course->id == 1) {
-                continue;
-            }
 
             // Get course context.
             $coursecontext = context_course::instance($course->id);
@@ -238,6 +290,7 @@ class db_controller {
                 $completioninfo->completedmodules = null;
                 $completioninfo->completedmodulescount = 0;
                 $completioninfo->progress = 0;
+                $completioninfo->completablemods = count($modules);
                 $completioninfo->timecompleted = null;
 
                 // If percentage is not null then calculate percentage.
@@ -256,14 +309,14 @@ class db_controller {
                             continue;
                         }
 
-                        // Total modules.
-                        $completioninfo->totalmodules++;
-
                         // Get course module data.
                         $data = $completion->get_data($module, false, $userid);
                         // If completion status is set then increase
                         // Completion count.
                         if ($data->completionstate) {
+                            // Total modules.
+                            $completioninfo->totalmodules++;
+
                             $completedmodules[] = $module->id;
                             $completioninfo->completedmodulescount++;
 
@@ -280,14 +333,6 @@ class db_controller {
                         $completioninfo->completedmodules = implode(',', $completedmodules);
                     }
 
-                    // Check if pecentage is inconsistance due to the
-                    // cron issue then recalculate progress percentage.
-                    $progresstemp = floor(($completioninfo->completedmodulescount / $completioninfo->totalmodules) * 100);
-
-                    if ($percentage !== $progresstemp) {
-                        $completioninfo->progress = $progresstemp;
-                    }
-
                     // If completion is not 100% then remove completion time.
                     if ($completioninfo->progress != 100) {
                         $completioninfo->timecompleted = null;
@@ -295,7 +340,6 @@ class db_controller {
                 }
             }
         }
-
         // Return completion information about course and user.
         return $completioninfo;
     }

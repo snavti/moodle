@@ -52,11 +52,11 @@
     }
 }}
 {{^disabled}}
-    <a href="{{{url}}}" id="{{id}}" class="btn btn-sm btn-secondary" {{#attributes}} {{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}} data-toggle="tooltip" data-placement="left"></a>
+    <a href="{{{url}}}" id="{{id}}" class="btn btn-sm btn-secondary" {{#attributes}} {{name}}="{{value}}" {{/attributes}} data-toggle="tooltip" data-placement="top" title="{{{text}}}"></a>
     {{#hasactions}}
         {{> core/actions }}
     {{/hasactions}}
 {{/disabled}}
 {{#disabled}}
-    <span class="currentlink btn btn-sm btn-secondary" {{#attributes}} {{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}}></span>
+    <span class="currentlink btn btn-sm btn-secondary" {{#attributes}} {{name}}="{{value}}" {{/attributes}}></span>
 {{/disabled}}

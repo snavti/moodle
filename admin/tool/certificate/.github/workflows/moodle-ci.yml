@@ -4,11 +4,11 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     services:
       postgres:
-        image: postgres:10
+        image: postgres:12
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -36,6 +36,9 @@ jobs:
             moodle-branch: 'MOODLE_400_STABLE'
             database: mariadb
             extensions: xmlrpc-beta
+          - php: '7.4'
+            moodle-branch: 'master' # TODO WP-3904 change to MOODLE_401_STABLE
+            database: pgsql
 
     steps:
       - name: Check out repository code

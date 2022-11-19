@@ -1,122 +1,177 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Active Courses / Popular Courses block.
+ *
+ * @copyright   2022 Wisdmlabs <support@wisdmlabs.com>
+ * @author      Yogesh Shirsath
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 define([
     'jquery',
-    'core/chartjs',
-    'local_edwiserreports/defaultconfig',
+    './defaultconfig',
     './common',
-    'local_edwiserreports/jquery.dataTables',
-    'local_edwiserreports/dataTables.bootstrap4'
-], function($, Chart, cfg, common) {
+], function(
+    $,
+    CFG,
+    common
+) {
+
     /**
-     * Initialize
-     * @param {function} notifyListner Callback function
+     * Selectors.
      */
-    function init(notifyListner) {
-        var activeCourseTable;
+    var SELECTOR = {
+        PANEL: '#activecoursesblock',
+        TABLE: '#activecoursesblock table',
+        SEARCH: '.table-search-input input',
+        USERS: '#activecoursesblock table a.modal-trigger'
+    };
 
-        var panel = cfg.getPanel("#activecoursesblock");
-        var panelBody = cfg.getPanel("#activecoursesblock", "body");
-        var loader = panelBody + " .loader";
-        var table = panelBody + " .table";
+    /**
+     * Data table object.
+     */
+    var dataTable = null;
 
-        // Show loader.
-        common.loader.show('#activecoursesblock');
-
-        /* Ajax request to get data for active courses table */
-        $.ajax({
-            url: cfg.requestUrl,
-            type: cfg.requestType,
-            dataType: cfg.requestDataType,
-            data: {
-                action: 'get_activecourses_data_ajax',
-                sesskey: $(panel).data("sesskey")
-            },
-        })
-            .done(function(response) {
-                /* Create active course table */
-                createActiveCourseTable(response.data);
-            })
-            .fail(function(error) {
-                console.log(error);
-            })
-            .always(function() {
-                /* Added fixed column rank in datatable */
-                activeCourseTable.on('order.dt search.dt', function() {
-                    activeCourseTable.column(0, {search: 'applied', order: 'applied'}).nodes().each(function(cell, i) {
-                        if (i == 0) {
-                            cell.innerHTML = "<i class='fa fa-trophy text-gold'></i>";
-                        } else if (i == 1) {
-                            cell.innerHTML = "<i class='fa fa-trophy text-silver'></i>";
-                        } else if (i == 2) {
-                            cell.innerHTML = "<i class='fa fa-trophy text-bronze'></i>";
-                        } else {
-                            cell.innerHTML = i + 1;
-                        }
-                    });
-                    $(table + " td:not(.bg-secondary)").addClass("bg-white");
-                }).draw();
-
-                /* Notify that this event is completed */
-                notifyListner("activeCourses");
-
-                // Hide loader.
-                common.loader.hide('#activecoursesblock');
-            });
-
+    /**
+     * Promises list.
+     */
+    let PROMISE = {
         /**
-         * Create active course table.
-         * @param {object} data Table data object
+         * Get active courses.
+         * @returns {PROMISE}
          */
-        function createActiveCourseTable(data) {
-            /* If datable already created the destroy the table*/
-            if (activeCourseTable) {
-                activeCourseTable.destroy();
-            }
-
-            /* Create datatable for active courses */
-            activeCourseTable = $(table).DataTable({
-                responsive: true,
-                data: data,
-                aaSorting: [[2, 'desc']],
-                aoColumns: [
-                    null,
-                    null,
-                    {"orderSequence": ["desc"]},
-                    {"orderSequence": ["desc"]},
-                    {"orderSequence": ["desc"]}
-                ],
-                language: {
-                    searchPlaceholder: "Search Course"
+        GET_ACTIVECOURSES: function() {
+            return $.ajax({
+                url: CFG.requestUrl,
+                type: CFG.requestType,
+                dataType: CFG.requestDataType,
+                data: {
+                    action: 'get_activecourses_data_ajax',
+                    secret: M.local_edwiserreports.secret,
+                    lang: $('html').attr('lang')
                 },
-                initComplete: function() {
-                    /* Remove laoder and display table after table is created */
-                    $(loader).hide();
-                    $(table).fadeIn("slow");
-                },
-                drawCallback: function() {
-                    $('.dataTables_paginate > .pagination').addClass('pagination-sm pull-right');
-                    $('.dataTables_filter').addClass('pagination-sm pull-right');
-                },
-                columnDefs: [
-                    {
-                        "targets": 0,
-                        "className": "text-center",
-                        "orderable": false
-                    },
-                    {
-                        "targets": 1,
-                        "className": "text-left",
-                        "orderable": false
-                    },
-                    {
-                        "targets": "_all",
-                        "className": "text-center",
-                    }
-                ],
-                lengthChange: false,
-                bInfo: false
             });
         }
+    };
+
+    /**
+     * Load data to dataTable using ajax.
+     */
+    function loadData() {
+        // Show loader.
+        common.loader.show(SELECTOR.PANEL);
+
+        PROMISE.GET_ACTIVECOURSES().done(function(response) {
+                if (dataTable !== null) {
+                    dataTable.destroy();
+                }
+                dataTable = $(SELECTOR.TABLE).DataTable({
+                    responsive: true,
+                    data: response.data,
+                    dom: '<"edwiserreports-table"<t><"table-pagination"p>>',
+                    aaSorting: [
+                        [2, 'desc']
+                    ],
+                    aoColumns: [null, null, {
+                        "orderSequence": ["desc"]
+                    }, {
+                        "orderSequence": ["desc"]
+                    }, {
+                        "orderSequence": ["desc"]
+                    }],
+                    language: {
+                        info: M.util.get_string('tableinfo', 'local_edwiserreports'),
+                        infoEmpty: M.util.get_string('infoempty', 'local_edwiserreports'),
+                        emptyTable: M.util.get_string('nocourses', 'local_edwiserreports'),
+                        zeroRecords: M.util.get_string('zerorecords', 'local_edwiserreports'),
+                        paginate: {
+                            previous: M.util.get_string('previous', 'moodle'),
+                            next: M.util.get_string('next', 'moodle')
+                        }
+                    },
+                    drawCallback: function() {
+                        common.stylePaginationButton(this);
+                    },
+                    columnDefs: [{
+                            "targets": 0,
+                            "className": "text-left pl-5",
+                            "orderable": false
+                        },
+                        {
+                            "targets": 1,
+                            "className": "text-left",
+                            "orderable": false
+                        },
+                        {
+                            "targets": "_all",
+                            "className": "text-center",
+                        }
+                    ],
+                    lengthChange: false,
+                    bInfo: false
+                });
+                /* Added fixed column rank in datatable */
+                dataTable.on('order.dt', function() {
+                    dataTable.column(0, {
+                        order: 'applied'
+                    }).nodes().each(function(cell, i) {
+                        let img = '';
+                        if (i >= 0 && i <= 2) {
+                            img = "<img class='ml-1' src='" + M.util.image_url(
+                                'trophy/' + ['gold', 'silver', 'bronze'][i],
+                                'local_edwiserreports'
+                            ) + "'></img>";
+                        }
+                        cell.innerHTML = (i + 1) + img;
+                    });
+                    $(SELECTOR.TABLE + " td:not(.bg-secondary)").addClass("bg-white");
+                }).draw();
+            })
+            .fail(function(data) {
+                console.log(data);
+            })
+            .always(function() {
+                // Hide loader.
+                common.loader.hide(SELECTOR.PANEL);
+            });
+    }
+
+    /**
+     * Initialize
+     * @param {function} invalidUser Callback function
+     */
+    function init(invalidUser) {
+
+        // Block not present on page.
+        if ($(SELECTOR.PANEL).length === 0) {
+            return;
+        }
+
+        // Enable select2 on cohort filter.
+        $(SELECTOR.PANEL).find('.singleselect').select2({
+            selectionTitleAttribute: false
+        });
+
+        loadData();
+
+        // Search in table.
+        $('body').on('input', `${SELECTOR.PANEL} ${SELECTOR.SEARCH}`, function() {
+            dataTable.columns(1).search($(this).val()).draw();
+        });
     }
 
     // Must return the init function

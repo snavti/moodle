@@ -9,63 +9,193 @@
     }
 }}
 
-    <div class="rui-backtologin">
-        <a href="{{{ config.wwwroot }}}/login/index.php" class="btn--back">
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.25 6.75L4.75 12L10.25 17.25"></path>
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.25 12H5"></path>
-            </svg>
-        </a>
-    </div>
+        <div class="rui-login-layout 
+        {{#loginlayoutimg}}rui-login-layout-img{{/loginlayoutimg}} 
+        {{^loginlayoutimg}}rui-login-layout-simple{{/loginlayoutimg}} 
+        {{#loginlogooutside}}rui-login--logo-outsite{{/loginlogooutside}} 
+        {{#loginlayout1}}rui-login-layout--1{{/loginlayout1}}
+        {{#loginlayout2}}rui-login-layout--2{{/loginlayout2}}
+        {{#loginlayout3}}rui-login-layout--3{{/loginlayout3}}
+        {{#loginlayout4}}rui-login-layout--4{{/loginlayout4}}
+        {{#loginlayout5}}rui-login-layout--5{{/loginlayout5}}
+        ">
 
-    <div class="rui-logo-top-btn">
-        {{#stringbacktologin}}<span class="rui-login-calabel">{{{stringbacktologin}}}</span>{{/stringbacktologin}} <a href="{{{ config.wwwroot }}}/login/index.php" class="btn-link--clean">{{#str}}login{{/str}}</a>
-    </div>
-
-    <div class="rui-signup-layout">
-        <div class="rui-login-wrapper row no-gutters align-items-center justify-content-start">
-            <div class="rui-login-container row no-gutters">
-                <div class="rui-signup-box rui-book-wrapper">
-                    <div class="rui-loginpage-intro">
-
-                        <div class="d-inline-flex align-items-center border-bottom pb-4 mb-4 w-100">
-                            {{#customloginlogo}}
-                            <a href="{{{ config.wwwroot }}}"><h2 class="rui-login-logo mb-0"><img src="{{customloginlogo}}" title="{{sitename}}" alt="{{sitename}}" class="img-fluid"/></h2></a>
-                            {{/customloginlogo}}
-
-                            {{^customloginlogo}}
-                            {{#logourl}}
-                            <a href="{{{ config.wwwroot }}}"><h2 class="rui-login-logo mb-0"><img src="{{logourl}}" title="{{sitename}}" alt="{{sitename}}" class="img-fluid"/></h2></a>
-                            {{/logourl}}
-
-                            {{^logourl}}
-                            <a href="{{{ config.wwwroot }}}"><h2 class="mb-0">{{sitename}}</h2></a>
-                            {{/logourl}}
-                            {{/customloginlogo}}
-                            <h4 class="rui-login-logo--sep">{{#str}}newaccount{{/str}}</h4>
-                        </div>
-
-                        {{#signupintrotext}}
-                        <div class="rui-loginpage-intro-content">
-                            {{{signupintrotext}}}
-                        </div>
-                        {{/signupintrotext}}
-                    </div>
+         
+            <div class="rui-login-top-btn">
+            {{#stringbacktologin}}<span class="rui-login-calabel ml-1">{{{stringbacktologin}}}</span>{{/stringbacktologin}} <a href="{{{ config.wwwroot }}}/login/index.php" class="btn-link--clean mx-2">{{#str}}login{{/str}}</a>
+            </div>
 
 
-                    <div class="rui-login-form">
-                        {{{formhtml}}}
-                    </div><!-- .rui-login-form -->
+            {{#loginlayoutimg}}
+            <div class="rui-login-wrapper">
+                <div class="rui-login-top-wrapper">
+            {{/loginlayoutimg}}
 
+            {{#loginlogooutside}}
+            <div class="rui-login-logo-container my-6">
+            {{#loginlayoutimg}}<div class="rui-login-top">{{/loginlayoutimg}}
+                <div>
+                    {{#customloginlogo}}
+                    <a href="{{{ config.wwwroot }}}"><img src="{{customloginlogo}}" title="{{sitename}}" alt="{{sitename}}" class="rui-login-logo img-fluid"/></a>
+                    {{/customloginlogo}}
 
-                </div><!-- .rui-signup-box -->
+                    {{^customloginlogo}}
+                        {{#logourl}}
+                        <a href="{{{ config.wwwroot }}}"><img src="{{logourl}}" title="{{sitename}}" alt="{{sitename}}" class="rui-login-logo img-fluid"/></a>
+                        {{/logourl}}
 
-                {{#signuptext}}
-                <div class="rui-signup-additional-content">
-                    {{{signuptext}}}
+                        {{^logourl}}
+                        <a href="{{{ config.wwwroot }}}"><h1 class="rui-login-logo-name">{{sitename}}</h1></a>
+                        {{/logourl}}
+                    {{/customloginlogo}}
                 </div>
-                {{/signuptext}}
+            {{#loginlayoutimg}}</div>{{/loginlayoutimg}}
+            </div>
+            {{/loginlogooutside}}
+           
+            {{#loginhtmlcontent1}}
+            <div class="rui-login-html-1">                           
+                {{{loginhtmlcontent1}}}
+            </div>
+            {{/loginhtmlcontent1}}  
+            
+            {{#loginlayoutimg}}    
+                </div>
+            </div>
+            {{/loginlayoutimg}}
 
+            {{#loginlayoutimg}}
+            <div class="rui-login-wrapper row no-gutters align-items-center justify-content-center w-100">
+                <div class="rui-login-container row no-gutters">
+
+            {{/loginlayoutimg}}
+
+                    <div class="rui-login-box">
+                        <div class="rui-login-content">
+                            {{#cansignup}}
+                                <div class="sr-only">
+                                    <a href="{{signupurl}}">{{#str}} tocreatenewaccount {{/str}}</a>
+                                </div>
+                            {{/cansignup}}
+
+                            <div class="rui-loginpage-intro">
+                                {{^loginlogooutside}}
+                                <div class="rui-loginpage-intro-logo">
+                                    {{#customloginlogo}}
+                                    <a href="{{{ config.wwwroot }}}"><h2><img src="{{customloginlogo}}" title="{{sitename}}" alt="{{sitename}}" class="rui-login-logo img-fluid"/></h2></a>
+                                    {{/customloginlogo}}
+
+                                    {{^customloginlogo}}
+                                        {{#logourl}}
+                                        <a href="{{{ config.wwwroot }}}"><h2><img src="{{logourl}}" title="{{sitename}}" alt="{{sitename}}" class="rui-login-logo img-fluid"/></h2></a>
+                                        {{/logourl}}
+
+                                        {{^logourl}}
+                                        <a href="{{{ config.wwwroot }}}"><h2>{{sitename}}</h2></a>
+                                        {{/logourl}}
+                                    {{/customloginlogo}}
+                                </div>
+                                {{/loginlogooutside}}
+
+                                {{#signupintrotext}}
+                                <div class="rui-loginpage-intro-content mb-3 text-center">
+                                {{{signupintrotext}}}
+                                </div>
+                                {{/signupintrotext}}
+
+                                {{#loginlayout1}}
+                                {{#signuptext}}
+                                <div class="rui-loginpage-intro-content mb-3">
+                                    {{{signuptext}}}
+                                    <hr class="hr-small" />
+                                </div>
+                                {{/signuptext}}
+                                {{/loginlayout1}}
+      
+                            </div>
+                            
+                            <div class="rui-login-form">
+                            {{{formhtml}}}
+                            </div><!-- .rui-login-form -->
+
+
+                            {{#loginhtmlblockbottom}}
+                                <div class="rui-login-bottom-block">
+                                {{{loginhtmlblockbottom}}}
+                                </div>
+                            {{/loginhtmlblockbottom}}                        
+
+                            {{^loginlayoutimg}}
+                                {{#loginhtmlcontent3}}
+                                <div class="rui-login-html-3">
+                                    {{{loginhtmlcontent3}}}
+                                </div>
+                                {{/loginhtmlcontent3}}
+
+                                {{#loginfootercontent}}
+                                <div class="rui-login-footer-content text-center mb-2">
+                                    <hr class="hr-small" />
+                                    {{{loginfootercontent}}}
+                                </div>
+                                {{/loginfootercontent}}
+                            {{/loginlayoutimg}}
+                        </div><!-- .rui-login-content -->
+                    </div><!-- .rui-login-box -->
+
+                    {{#loginlayoutimg}}
+                    <div class="rui-login-bg-container" style="background-image: url('{{loginbg}}');">
+                        {{#signuptext}}
+                            <div class="rui-login-additional-content">
+                            {{{signuptext}}}
+                            </div>
+                        {{/signuptext}}
+                    </div>
+                    {{/loginlayoutimg}}
+               
+            {{#loginlayoutimg}}
+                </div>
+            </div>
+            {{/loginlayoutimg}}
+
+            {{#loginlayoutimg}}
+            <div class="rui-login-wrapper">
+                {{#loginhtmlcontent3}}
+                <div class="rui-login-footer rui-login-footer-content">
+                    {{{loginhtmlcontent3}}}
+                </div>
+                {{/loginhtmlcontent3}}
+
+                {{#loginfootercontent}}
+                <div class="rui-login-footer text-center">
+                {{{loginfootercontent}}}
+                </div>
+                {{/loginfootercontent}}
+                
+            </div>
+            {{/loginlayoutimg}}
+
+            <button type="button" class="btn btn-xs btn-dark btn--cookie" {{!
+        }} data-modal="alert"{{!
+        }} data-modal-title-str='["cookiesenabled", "core"]' {{!
+        }} data-modal-content-str='["cookiesenabled_help_html", "core"]'{{!
+        }}>
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+            </svg>
+
+            <span class="ml-1">{{#str}}cookiesnotice{{/str}}</span></button>
+
+        </div><!-- .login layout -->
+
+        {{#maintenance}}
+        <div class="rui-maintenance">
+            <h2>{{#str}}sitemaintenance, core_admin{{/str}}</h2>
+            <div class="rui-maintenance-desc">
+                {{{maintenance}}}
             </div>
         </div>
-    </div><!-- .login layout #1 -->
+        {{/maintenance}}
+    
+{{{logincustomfooterhtml}}}

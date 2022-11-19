@@ -163,6 +163,10 @@
     border-color: $gray-300 $gray-200 $gray-300 $gray-300;
     border-radius: $border-radius;
 
+    @include media-breakpoint-between(xs,sm) {
+    padding: 10px!important;
+    }
+
     &:before, &:after {
         content: '';
 

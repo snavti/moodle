@@ -11,8 +11,8 @@
         {{{ sidebartopblocks }}}
 
         {{#customsidebarlogo}}
-        <div class="rui-drawer-logo {{#customsidebardmlogo}}dark-mode-logo{{/customsidebardmlogo}}">
-            <img src="{{customsidebarlogo}}" alt="{{sitename}}" class="rui-custom-logo ml-2 img-fluid" />
+        <div class="rui-drawer-logo {{#customsidebardmlogo}}dark-mode-logo{{/customsidebardmlogo}} text-sm-center text-md-left">
+            <img src="{{customsidebarlogo}}" alt="{{sitename}}" class="rui-custom-logo img-fluid" />
             {{#customsidebardmlogo}}<img src="{{customsidebardmlogo}}" alt="{{sitename}}" class="rui-custom-dmlogo ml-2 img-fluid" />{{/customsidebardmlogo}}
         </div>
         {{/customsidebarlogo}}
@@ -30,12 +30,23 @@
         </ul>
         {{/output.mainsidebarmenu}}
 
+        {{#iscoursepage}}
+            {{#showcoursenav}}
+            <div class="rui-drawer-course-nav mt-3">
+                <ul class="rui-flatnavigation rui-flatnavigation-sm">
+                    {{{ output.coursedrawermenu }}}
+                </ul>
+            </div>
+            {{/showcoursenav}}
+        {{/iscoursepage}}
+
         {{#customsmcontent}}
         <div class="rui-custom-sidebar-content my-4">
         {{{customsmcontent}}}
         </div>
         {{/customsmcontent}}
 
+        {{#showmycoursesbox}}
         <div class="rui-sidebar-mycourses">
             <button class="rui-sidebar-abtn rui-sidebar-nav-item-link" type="button" data-toggle="collapse" data-target="#myCoursesBox" aria-expanded="false" aria-controls="myCoursesBox">
                 <span class="rui-sidebar-nav-icon">
@@ -49,10 +60,30 @@
             </button>
             <div class="collapse" id="myCoursesBox">
                 {{{ output.space_mycourses_heading }}}
-                <div class="rui-course-wrapper">{{{ output.space_mycourses }}}</div>
+                <div class="form-inline simplesearchform">
+                    <div class="search-input-group d-inline-flex justify-content-between w-100" role="search">
+                        <span class="search-input-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"></path>
+                            </svg>
+                        </span>
+                        <input
+                            type="text"
+                            id="myCoursesListSearch"
+                            onkeyup="myCoursesList()"
+                            class="search-input w-100"
+                            placeholder="{{#str}}search, core{{/str}}"
+                            aria-label="{{#str}}search, core{{/str}}" 
+                        />
+                    </div>
+                </div>               
+                <div class="rui-course-wrapper">
+                    {{{ output.space_mycourses }}}
+                </div>
                 {{{ output.space_allcourseslink }}}
             </div>    
         </div>
+        {{/showmycoursesbox}}
         
         {{#customsfcontent}}
         <div class="rui-custom-sidebar-content my-4">

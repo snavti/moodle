@@ -29,11 +29,21 @@ defined('MOODLE_INTERNAL') || die;
 require_once($CFG->dirroot . '/local/edwiserreports/classes/db_controller.php');
 
 use context_course;
+use local_edwiserreports\controller\progress;
 
 /**
  * Update course progress data
  */
 class update_course_progress_data extends \core\task\scheduled_task {
+
+    /**
+     * Can run cron task.
+     *
+     * @return boolean
+     */
+    public function can_run(): bool {
+        return true;
+    }
     /**
      * Return the task's name as shown in admin screens.
      *
@@ -47,14 +57,31 @@ class update_course_progress_data extends \core\task\scheduled_task {
      * Execute the sheduled task
      */
     public function execute() {
+
+        // Progress.
+        $this->progress = new progress('update_course_progress');
+
         // Database controller.
         $dbc = new \local_edwiserreports\db_controller();
+
+        $dbc->fix_missing_course_progress();
 
         // Get updatable record from database.
         $progressdata = $dbc->get_course_progress_changeble_records();
 
+        if (empty($progressdata)) {
+            return;
+        }
+
+        mtrace('Updating course progress data...');
+
+        $this->progress->start_progress();
+        $progress = 0;
+        $counter = 0;
+        $increament = 100 / count($progressdata);
         // Parse all progress data.
         foreach ($progressdata as $data) {
+            $progress += $increament;
             // Get course.
             $course = get_course($data->courseid);
 
@@ -78,6 +105,9 @@ class update_course_progress_data extends \core\task\scheduled_task {
                 // Get total modules.
                 $data->totalmodules = $completion->totalmodules;
 
+                // Get max completable modules.
+                $data->completablemods = $completion->completablemods;
+
                 // Default completed modules.
                 $data->completedmodules = null;
 
@@ -98,8 +128,8 @@ class update_course_progress_data extends \core\task\scheduled_task {
                 // If criteria is set and course progress in 100%
                 // then trigger edw_course_completion event.
                 if (
-                    $data->criteria == 1 && // If completion criteria is set
-                    $data->progress == 100 && // If progress in 100%
+                    $data->criteria == 1 && // If completion criteria is set.
+                    $data->progress == 100 && // If progress in 100%.
                     $oldprogress != $data->progress // If progress is changed.
                 ) {
                     // Create a course completion event.
@@ -127,6 +157,12 @@ class update_course_progress_data extends \core\task\scheduled_task {
 
                 // Trigger completion event.
                 $event->trigger();
+            }
+
+            if ($counter++ % 10 == 0) {
+                $counter = 0;
+                // Update progress.
+                $this->progress->update_progress($progress);
             }
         }
     }

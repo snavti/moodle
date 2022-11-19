@@ -7,7 +7,7 @@
         position: fixed;
         top: 0;
         left: 0;
-        z-index: $zindex-modal-backdrop;
+        z-index: 9999;
         transition: 0.5s;
         width: 100vw;
         margin: 0;
@@ -50,14 +50,21 @@
     padding: 0 $page-margin;
     margin: 0;
     width: 100%;
+    //height: calc(100vh - #{$navbar-height});
     position: relative;
 
-    @include media-breakpoint-down(md) {
-    margin-top: 60px!important;
+    @include media-breakpoint-only(md) {
+    margin-top: 78px!important;
+    padding: 0 68px;
+
+        #page-site-index & {
+            padding: 0 16px;
+        }
     }
 
     @include media-breakpoint-between(xs,sm) {
-    padding: 30px 16px 0;
+        margin-top: 68px!important;
+        padding: 0 10px;
     }
 
     #page-login-index & {
@@ -155,10 +162,6 @@
 .wrapper-xl {
     max-width: $wrapper-xl;
     width: 100%;
-
-    @include media-breakpoint-between(xs,md) {
-    width: 90%;
-    }
 }
 
 .wrapper-xxl {
@@ -220,38 +223,51 @@
 }
 
 
-#page-wrapper {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+// #page-wrapper {
+//     height: 100%;
+//     display: flex;
+//     flex-direction: column;
 
-    #page {
-        flex: 1 0 auto;
-        display: flex;
-        flex-direction: column;
+//     #page {
+//         flex: 1 0 auto;
+//         display: flex;
+//         flex-direction: column;
 
-        #page-content {
-            flex: 1 0 auto;
-        }
-    }
-}
+//         #page-content {
+//             flex: 1 0 auto;
+//         }
+//     }
+// }
 
 //---- Footer
 #s-page-footer {
-    margin: $page-padding-global -#{$page-margin} 0;
     padding: $page-padding-global $page-margin;
 
-    width: calc(100% + 2 * #{$page-margin});
     flex-shrink: 0;
     
     border-top: 1px solid $footer-border;
     background-color: $footer-bg;
     color: $footer-text-color;
 
+    @include media-breakpoint-up(lg) {
+    width: calc(100% + 160px);
+    margin: 20px -80px 0;    
+    }
+
+    @include media-breakpoint-only(md) {
+    width: calc(100% + 136px);
+    margin: 20px -68px;
+
+        #page-site-index & {
+            margin: 10px -10px;
+            width: calc(100% + 20px);
+        }
+    }
+
     @include media-breakpoint-between(xs,sm) {
-    padding: 30px 20px;
-    margin: $page-padding-global -16px 0;
-    width: calc(100% + 32px);
+        padding: 30px;
+        margin: 10px -10px;
+        width: calc(100% + 20px);
     }
 
     hr {
@@ -271,7 +287,7 @@
 
 .rui-footer--contact,
 .rui-footer--social {
-    display: inline-flex;
+    display: flex;
     flex-wrap: wrap;
     align-items: center;
 
@@ -280,6 +296,10 @@
     padding: 0;
     font-size: $font-size-xs;
     color: $footer-text-color;
+
+    @include media-breakpoint-between(xs,sm) {
+    justify-content: center;
+    }
 
     li {
         display: inline-flex;
@@ -365,7 +385,7 @@
     height: $navbar-height;
     position: sticky;
     top: 0;
-    z-index: $zindex-fixed + 20;
+    z-index: $zindex-fixed + 200;
 
     background-color: $topbar-bg;
     border-bottom: 1px solid $border-color;
@@ -375,9 +395,9 @@
     font-size: 0.875rem; //14px
     color: $topbar-text;    
 
-    @include media-breakpoint-down(sm) {
-    padding-left: 8px;
-    padding-right: 8px;
+    @include media-breakpoint-between(xs,sm) {
+    padding-left: 10px;
+    padding-right: 10px;
     min-height: $navbar-height;
     height: auto;
     }
@@ -398,7 +418,7 @@
     display: flex;
     align-items: center;
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
     flex-wrap: wrap;
     justify-content: space-between;
     }
@@ -544,7 +564,7 @@
 }
 
 
-@include media-breakpoint-down(sm) {
+@include media-breakpoint-between(xs,sm) {
 .header-button-group {
     width: 100%;
 
@@ -562,6 +582,10 @@
 
     .rui-page-title {
         margin-bottom: 20px;
+
+        @include media-breakpoint-between(xs,sm) {
+        max-width: calc(100% - 60px);
+        }
     }
 }
 
@@ -576,13 +600,27 @@
 
 .page-header-content {
     margin-top: $page-padding-global;
+    margin-bottom: 15px;
 
     width: 100%;
     position: relative;
 
+    @include media-breakpoint-up(md) {
     display: inline-flex;
     align-items: flex-start;
     justify-content: space-between;
+
+    #page-grade-report-overview-index & {
+        margin-top: 0;
+        margin-bottom: $page-padding-global;
+    }
+
+    }
+
+    @include media-breakpoint-between(xs,sm) {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    }
 
     .rui-course-header &,
     .rui-title-container,
@@ -639,7 +677,7 @@
                 color: $dm-topbar-text;
             }
 
-            @include media-breakpoint-down(sm) {
+            @include media-breakpoint-between(xs,sm) {
                 margin-right: 0;
                 width: 100%;
             }
@@ -657,21 +695,23 @@
     }
 }
 
-    .rui-navbar-nav--sep {
-        position: relative;
+    @include media-breakpoint-up(md) {
+        .rui-navbar-nav--sep {
+            position: relative;
 
-        &:before{
-            content: '';
-            background-color: rgba($black, .15);
-            width: 1px;
-            height: 16px;
+            &:before{
+                content: '';
+                background-color: rgba($black, .15);
+                width: 1px;
+                height: 16px;
 
-            position: absolute;
-            top: calc(50% - 8px);
-            left: -6px;
+                position: absolute;
+                top: calc(50% - 8px);
+                left: -6px;
+            }
         }
     }
-
+    
     .popover-region-notifications:not(.collapsed) {
        .nav-link {
             background-color: $gray-700;
@@ -756,7 +796,19 @@
     font-size: $font-size-xs;
     color: $topbar-btn-text;
 
-    @include media-breakpoint-down(sm) {
+    background: transparent;
+
+    &:hover {
+        background: $topbar-btn-hover;
+        color: $topbar-btn-hover-text; 
+        
+        .theme-dark & {
+            background-color: $dm-topbar-btn-hover;
+            color: $dm-topbar-btn-text;
+        }
+    }
+
+    @include media-breakpoint-between(xs,sm) {
     padding: 8px;
     }
 
@@ -852,18 +904,8 @@
 .rui-drawer-toggle {
     margin-right: 8px;
 
-    @include media-breakpoint-down(sm) {
-    margin-right: 3px;
-    }
-}
-
-.rui-topbar-special-btn {
-    background: transparent;
-    color: $topbar-btn-text;
-
-    &:hover {
-        background: $topbar-btn-hover;
-        color: $topbar-btn-hover-text;       
+    @include media-breakpoint-between(xs,sm) {
+    margin-right: 0;
     }
 }
 
@@ -876,7 +918,7 @@
 body:not(#rui-lang-btn).rui-navbar-lang {
     position: relative;
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
     margin-left: 0;
     margin-right: 0;
     }
@@ -912,7 +954,7 @@ body:not(#rui-lang-btn).rui-navbar-lang {
         display: inline-flex;
         flex-wrap: wrap;
 
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-between(xs,sm) {
         top: 95px;
         }
     }
@@ -982,6 +1024,14 @@ body:not(#rui-lang-btn).rui-navbar-lang {
 /* Footer */
 .rui-footer-content {
     font-size: $font-size-xs;
+
+    @include media-breakpoint-between(xs,sm) {
+    text-align: center;
+    }
+
+    ol {
+        text-align: left;
+    }
 }
 
 .rui-footer-copy {
@@ -1278,7 +1328,12 @@ body:not(.theme-dark) {
 
 .region-main-wrapper,
 .profile_tree {
-    margin-top: $page-padding-global;
+    @include media-breakpoint-up(md) {
+        margin-top: $page-padding-global;
+    }
+    @include media-breakpoint-between(xs,sm) {
+        margin-top: 15px;
+    }
 }
 
 #blocks-dashboardonecol {
@@ -1299,17 +1354,9 @@ body:not(.theme-dark) {
 
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .26), 0 14px 44px 0 rgba(0, 0, 0, .2);
     position: fixed;
-    right: $topbar-padding-x;
+    right: 10px;
     bottom: 10px;
     z-index: $zindex-tooltip;
-
-    .drawer-open-right & {
-        right: $topbar-padding-x + $right-drawer-width;
-
-        @include media-breakpoint-between(xs,sm) {
-        right: $topbar-padding-x;
-        }
-    }
 
     .theme-dark & {
         background-color: $black;
@@ -1335,7 +1382,7 @@ body:not(.theme-dark) {
     }
 }
 
-@include media-breakpoint-down(sm) {
+@include media-breakpoint-between(xs,sm) {
     //the scroll to top button
     .drawer-toggles {
         z-index: 100;
@@ -1368,11 +1415,12 @@ body:not(.theme-dark) {
 
     #page.drawers {
         position: relative;
-        overflow-y: auto;
+        //overflow-y: auto;
         @include transition(0.2s);
-        height: calc(100vh - #{$navbar-height});
+        //height: calc(100vh - #{$navbar-height});
         left: 0;
         right: 0;
+        height: 100%;
     }
 }
 
@@ -1411,7 +1459,8 @@ body:not(.theme-dark) {
 .rui-nav--admin,
 .rui-content-message-container,
 .rui-course-card-text,
-#sidepre-blocks .rui-sidebar-blocks-wrapper
+#sidepre-blocks .rui-sidebar-blocks-wrapper,
+.rui-course-wrapper
 {
     @include thin-scrolls($scroll-bg-track);
 
@@ -1428,4 +1477,103 @@ body:not(.theme-dark) {
     
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
+}
+
+
+// RWD
+.rui-mobile-nav {
+    @include media-breakpoint-up(md) {
+        display: none;
+        z-index: -2;
+    }
+
+    @include media-breakpoint-between(xs,sm) {
+        position: absolute;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    
+        width: 100%;
+        height: $navbar-height;
+        z-index: 1;
+    }
+}
+
+
+
+@include media-breakpoint-between(xs,sm) {
+    .rui-mobile-nav-btn-close,
+    .rui-mobile-nav-btn {
+        position: absolute;
+        top: calc(50% - 20px);
+        right: 20px;
+        z-index: $zindex-fixed;
+    }
+
+    .rui-mobile-nav-btn-close {
+        display: none;
+        opacity: 0;
+        right: 0;
+
+        .opened & {
+            position: absolute;
+            opacity: 1;
+            z-index: 4;
+            display: flex;
+        }
+    }
+
+    .rui-topbar {
+        .moremenu,
+        .rui-icon-menu {
+            z-index: -1;
+            display: none;
+            opacity: 0;
+
+            .opened & {
+                background-color: $topbar-bg;
+                position: absolute;
+                opacity: 1;
+                z-index: 3;
+                display: flex;
+
+                .theme-dark & {
+                    background-color: $dm-topbar-bg;
+                }
+            }
+        }
+
+        .rui-icon-menu {
+            .opened & {
+                top: 0;
+                right: 45px;
+            }
+        }
+    }
+
+    .moremenu .nav-link {
+        margin: 0;
+    }
+
+    .more-nav {
+        a {
+            margin: 0;
+        }
+
+        .dropdown-menu {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+
+    #topbarLeft {
+        z-index: 3;
+    }
+}
+
+
+// Fix some unnecessary layout gaps
+.box:empty {
+    display: none;
 }

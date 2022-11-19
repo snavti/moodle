@@ -706,7 +706,7 @@ class theme_space_core_question_renderer extends core_question_renderer {
     protected function status(question_attempt $qa, qbehaviour_renderer $behaviouroutput,
             question_display_options $options) {
         return html_writer::tag('div', $qa->get_state_string($options->correctness),
-                array('class' => 'state mx-2'));
+                array('class' => 'state m-2'));
     }
 
     /**
@@ -750,7 +750,7 @@ class theme_space_core_question_renderer extends core_question_renderer {
                                 array('id' => $id . 'label', 'for' => $id . 'checkbox')) . "\n";
 
                 $divattributes = array(
-                    'class' => 'questionflag mx-2 editable',
+                    'class' => 'questionflag m-2 editable',
                     'aria-atomic' => 'true',
                     'aria-relevant' => 'text',
                     'aria-live' => 'assertive',

@@ -63,78 +63,12 @@ function local_edwiserreports_output_fragment_userslist($args) {
 
             $response = \local_edwiserreports\courseprogressblock::get_userslist_table($courseid, $minval, $maxval, $cohortid);
             break;
-        case "courseengage":
-            require_once($CFG->dirroot . '/local/edwiserreports/classes/blocks/courseengageblock.php');
-            $courseid = clean_param($args['courseid'], PARAM_TEXT);
-            $action   = clean_param($args['action'], PARAM_TEXT);
-
-            $response = \local_edwiserreports\courseengageblock::get_userslist_table($courseid, $action, $cohortid);
-            break;
     }
 
     return $response;
 }
 
 require_once("$CFG->libdir/formslib.php");
-
-/**
- * Email Dialog form to send report via email
- */
-class local_edwiserreports_email_dialog_form extends moodleform {
-    /**
-     * Add elements to form.
-     */
-    public function definition() {
-        $mform = $this->_form;
-        $customdata = $this->_customdata;
-        $blockname = $customdata["blockname"];
-
-        // Email Text area.
-        $mform->addElement('text', 'email',
-            get_string('email', 'local_edwiserreports'),
-            array(
-                'size' => '30',
-                'placeholder' => get_string("emailexample", "local_edwiserreports")
-            )
-        );
-        $mform->setType('email', PARAM_NOTAGS);
-
-        // Subject Text area.
-        $mform->addElement('text', 'subject',
-            get_string("subject", "local_edwiserreports"),
-            array(
-                'size' => '30',
-                'placeholder' => get_string($blockname . "exportheader", "local_edwiserreports")
-            )
-        );
-        $mform->setType('subject', PARAM_NOTAGS);
-
-        // Content Text area.
-        $mform->addElement('editor', 'content',
-            get_string("content", "local_edwiserreports"),
-            array(
-                'rows' => '5',
-                'cols' => '40',
-                'enable_filemanagement' => false
-            )
-        );
-        $mform->setType('content', PARAM_RAW);
-        $this->content["text"] = get_string($blockname . "exporthelp", "local_edwiserreports");
-    }
-}
-
-/**
- * Create fragment for email dialog box
- * @param  [array] $args Arguments
- * @return [string] HTML String
- */
-function local_edwiserreports_output_fragment_email_dialog($args) {
-    $blockname = clean_param($args["blockname"], PARAM_TEXT);
-    $form = new local_edwiserreports_email_dialog_form(null, array("blockname" => $blockname));
-    ob_start();
-    $form->display();
-    return ob_get_clean();
-}
 
 /**
  * Serves any files associated with the theme settings.
@@ -246,8 +180,8 @@ function local_edwiserreports_output_fragment_get_blocksetting_form($params) {
     $output .= html_writer::end_tag('div');
     $output .= html_writer::tag(
         'button',
-        'Save',
-        array('type' => 'submit', 'class' => 'btn btn-primary pull-right save-block-settings')
+        get_string('save'),
+        array('type' => 'submit', 'class' => 'btn theme-primary-bg text-white pull-right save-block-settings')
     );
 
     $output .= html_writer::end_tag('form');
@@ -278,6 +212,7 @@ function local_edwiserreports_output_fragment_get_blockscap_form($block) {
 
     // Get block capabilities.
     $capabilities = \local_edwiserreports\utility::get_blocks_capability($block);
+    $hidden = count($capabilities) > 1 ? '' : 'hidden';
     $capvalue = 'report/edwiserreports_' . $blockname . ':view';
 
     // Prepare form for block editing.
@@ -287,22 +222,23 @@ function local_edwiserreports_output_fragment_get_blockscap_form($block) {
     $output .= html_writer::start_tag('div', array('class' => 'col-md-3'));
     $output .= html_writer::tag('label',
         get_string('capabilties', $component),
-        array('class' => 'col-form-label d-inline', 'for' => 'id_capabilities')
+        array('class' => 'col-form-label d-inline h4', 'for' => 'id_capabilities')
     );
     $output .= html_writer::end_tag('label');
     $output .= html_writer::end_tag('div');
     $output .= html_writer::start_tag('div', array('class' => 'col-md-9'));
-    $output .= $capabilities[$capvalue];
-    $output .= html_writer::select($capabilities, 'capabilities', $capvalue, null, array('class' => 'hidden'));
+    $output .= html_writer::tag('label', $capabilities[$capvalue], array('class' => 'col-form-label d-inline h4'));
+    $output .= html_writer::select($capabilities, 'capabilities', $capvalue, null, array('class' => $hidden . ' h4'));
     $output .= html_writer::end_tag('label');
     $output .= html_writer::end_tag('div');
     $output .= html_writer::end_tag('div');
 
     $output .= html_writer::start_div('clearfix path-admin-tool-capability overflow-scroll col-12 cap-overview');
-    $output .= local_edwiserreports_output_fragment_block_overview_display($capvalue);
+    $blockname = $block->classname . '-' . $block->id;
+    $output .= local_edwiserreports_block_overview_display($capvalue, $blockname);
     $output .= html_writer::end_div();
-    $btnparams = array('type' => 'submit', 'class' => 'btn btn-primary pull-right save-block-caps');
-    $output .= html_writer::tag('button', 'Save', $btnparams);
+    $btnparams = array('type' => 'submit', 'class' => 'btn theme-primary-bg text-white pull-right save-block-caps');
+    $output .= html_writer::tag('button', get_string('save'), $btnparams);
 
     $output .= html_writer::end_tag('form');
 
@@ -311,45 +247,72 @@ function local_edwiserreports_output_fragment_get_blockscap_form($block) {
 
 /**
  * Render blocks capability view
- * @param array $capvalue Fragment parameter array
+ * @param Array $capvalue  Fragment parameter array
+ * @param Array $blockname Block name
  */
-function local_edwiserreports_output_fragment_block_overview_display($capvalue) {
+function local_edwiserreports_output_fragment_block_overview_display($args) {
+    $capvalue = $args['capvalue'];
+    $blockname = current(explode(':', $capvalue));
+    $blockname = end(explode('_', $blockname));
+    return local_edwiserreports_block_overview_display($capvalue, $blockname);
+}
+
+/**
+ * Render blocks capability view
+ * @param Array $capvalue  Fragment parameter array
+ * @param Array $blockname Block name
+ */
+function local_edwiserreports_block_overview_display($capvalue, $blockname = '') {
     global $CFG;
 
     require_once($CFG->dirroot . '/admin/tool/capability/locallib.php');
 
     $context = context_system::instance();
     $strpermissions = array(
-        CAP_INHERIT => new lang_string('inherit', 'role'),
-        CAP_ALLOW => new lang_string('allow', 'role'),
-        CAP_PREVENT => new lang_string('prevent', 'role'),
-        CAP_PROHIBIT => new lang_string('prohibit', 'role')
+        CAP_ALLOW => new lang_string('show'),
+        CAP_PREVENT => new lang_string('hide')
     );
     $permissionclasses = array(
-        CAP_INHERIT => 'inherit',
         CAP_ALLOW => 'allow',
-        CAP_PREVENT => 'prevent',
-        CAP_PROHIBIT => 'prohibit',
+        CAP_PREVENT => 'prevent'
     );
 
     $output = html_writer::start_tag('table', array('class' => 'comparisontable w-full'));
     $output .= html_writer::start_tag('thead');
     $output .= html_writer::start_tag('tr');
+
     // Prepare data in same loop.
     $data = html_writer::start_tag('tbody');
     $data .= html_writer::start_tag('tr');
+    if (stripos($blockname, 'customreportsblock') !== false) {
+        $defaultcaps = \local_edwiserreports\utility::get_default_capabilities()['report/edwiserreports_customreports:manage'];
+    } else {
+        // Default capability.
+        $defaultcaps = \local_edwiserreports\utility::get_default_capabilities()[$capvalue];
+    }
 
     // Get capability context.
     $roles = role_fix_names(get_all_roles($context));
     $capabilitycontext = tool_capability_calculate_role_data($capvalue, $roles);
-    foreach ($roles as $roleid => $role) {
+    $warnings = [];
+    foreach ($roles as $role) {
+        $rolecap = \local_edwiserreports\utility::get_rolecap_from_context($capabilitycontext[$context->id], $role, $blockname);
+
+        if ($rolecap == CAP_INHERIT && isset($defaultcaps[$role->archetype])) {
+            $rolecap = $defaultcaps[$role->archetype];
+        }
+        if (!isset($defaultcaps[$role->archetype])) {
+            if ($rolecap == CAP_ALLOW) {
+                $warnings[] = $role->localname;
+            } else {
+                continue;
+            }
+        }
         $output .= '<th><div><a href="javascript:void(0)">' . $role->localname . '</a></div></th>';
 
-        $rolecap = $capabilitycontext[$context->id]->rolecapabilities[$role->id];
-        $permission = isset($rolecap) ? $rolecap : CAP_INHERIT;
+        $permission = $rolecap > 0 ? CAP_ALLOW : CAP_PREVENT;
         $data .= '<td class="switch-capability ' . $permissionclasses[$permission] . '" data-permission="' . $permission . '">';
         $data .= '<label>' . $strpermissions[$permission] . '</label>';
-
         foreach ($permissionclasses as $key => $class) {
             $checked = '';
             if ($key == $permission) {
@@ -371,7 +334,26 @@ function local_edwiserreports_output_fragment_block_overview_display($capvalue) 
     $output .= $data;
     $output .= html_writer::end_tag('table');
 
-    return $output;
+    $warning = '';
+    if (!empty($warnings)) {
+        $warning = html_writer::start_tag('div');
+        $warning .= html_writer::tag('div', get_string('warning'), array('class' => 'text-warning h3'));
+        $warning .= html_writer::tag(
+            'label',
+            get_string('permissionwarning', 'local_edwiserreports')
+        );
+        $warning .= html_writer::start_tag('ul');
+        foreach ($warnings as $role) {
+            $warning .= html_writer::tag('li', $role);
+        }
+        $warning .= html_writer::end_tag('ul');
+        $warning .= html_writer::end_tag('div');
+    }
+    return $warning . $output;
+}
+
+function local_edwiserreports_extends_navigation(global_navigation $nav) {
+    local_edwiserreports_extend_navigation($nav);
 }
 
 /**
@@ -392,18 +374,33 @@ function local_edwiserreports_extend_navigation(navigation_node $nav) {
     $PAGE->requires->js_call_amd('local_edwiserreports/install', 'init');
 
     if ($hasblocks) {
-        $icon = new pix_icon('i/stats', '');
+        if ($CFG->branch < 400) {
+            $icon = new pix_icon('i/stats', '');
 
-        $node = $nav->add(
-            get_string('reportsandanalytics', 'local_edwiserreports'),
-            new moodle_url($CFG->wwwroot . '/local/edwiserreports/index.php'),
-            navigation_node::TYPE_CUSTOM,
-            'reportsandanalytics',
-            'reportsandanalytics',
-            $icon
-        );
-        $node->showinflatnavigation = true;
+            $node = $nav->add(
+                get_string('reportsandanalytics', 'local_edwiserreports'),
+                new moodle_url($CFG->wwwroot . '/local/edwiserreports/index.php'),
+                navigation_node::TYPE_CUSTOM,
+                'reportsandanalytics',
+                'reportsandanalytics',
+                $icon
+            );
+            $node->showinflatnavigation = true;
+        } else if (stripos($CFG->custommenuitems, "/local/edwiserreports/index.php") === false) {
+            $nodes = explode("\n", $CFG->custommenuitems);
+            $node = get_string('reportsandanalytics', 'local_edwiserreports');
+            $node .= "|";
+            $node .= "/local/edwiserreports/index.php";
+            array_unshift($nodes, $node);
+            $CFG->custommenuitems = implode("\n", $nodes);
+        }
     }
+
+    // If url is not set.
+    if (!$PAGE->has_set_url()) {
+        return true;
+    }
+
     $iscompletionpage = strpos($PAGE->url, '/local/edwiserreports/completion.php');
     if ($PAGE->pagelayout !== 'course' && $PAGE->pagelayout !== 'incourse' && !$iscompletionpage) {
         return true;
@@ -413,80 +410,195 @@ function local_edwiserreports_extend_navigation(navigation_node $nav) {
         return;
     }
 
-    $icon = new pix_icon('i/report', '');
+    if ($CFG->branch < 400) {
+        $icon = new pix_icon('i/report', '');
 
-    $node = $nav->add(
-        get_string('completionreports', 'local_edwiserreports'),
-        new moodle_url($CFG->wwwroot . '/local/edwiserreports/completion.php', array('courseid' => $COURSE->id)),
-        navigation_node::TYPE_CUSTOM,
-        'completionreports',
-        'completionreports',
-        $icon
-    );
-    $node->showinflatnavigation = true;
+        $node = $nav->add(
+            get_string('completionreports', 'local_edwiserreports'),
+            new moodle_url($CFG->wwwroot . '/local/edwiserreports/completion.php', array('courseid' => $COURSE->id)),
+            navigation_node::TYPE_CUSTOM,
+            'completionreports',
+            'completionreports',
+            $icon
+        );
+        $node->showinflatnavigation = true;
+    } else {
+        $nodes = explode("\n", $CFG->custommenuitems);
+        $pluginnode = array_shift($nodes);
+        $node = get_string('completionreports', 'local_edwiserreports');
+        $node .= "|";
+        $node .= '/local/edwiserreports/completion.php?courseid=' . $COURSE->id;
+        array_unshift($nodes, $node);
+        array_unshift($nodes, $pluginnode);
+        $CFG->custommenuitems = implode("\n", $nodes);
+
+    }
+}
+
+/**
+ * Delete orphan block records from db which is removed from default block list.
+ *
+ * @return void
+ */
+function local_edwiserreports_process_orphan_blocks() {
+    global $DB;
+    $defaultblocks = local_edwiserreports_get_default_block_settings();
+    $installedblocks = $DB->get_records('edwreports_blocks');
+    foreach ($installedblocks as $block) {
+        if (!array_key_exists($block->blockname, $defaultblocks)) {
+            $DB->delete_records('edwreports_blocks', array('id' => $block->id));
+        }
+    }
+}
+
+/**
+ * Adding new/missing block records in edwreports_blocks table.
+ *
+ * @return bool
+ */
+function local_edwiserreports_process_block_creation() {
+    global $DB;
+
+    // All Default blocks.
+    $defaultblocks = local_edwiserreports_get_default_block_settings();
+
+    // Create each block.
+    $blocks = array();
+    $index = -1;
+    foreach ($defaultblocks as $key => $block) {
+        $index++;
+        if ($DB->record_exists('edwreports_blocks', array('blockname' => $key))) {
+            unset($defaultblocks[$key]);
+            continue;
+        }
+    }
+
+    foreach ($defaultblocks as $key => $block) {
+        $blockdata = new stdClass();
+        $blockdata->blockname = $key;
+        $blockdata->classname = $block['classname'];
+        $blockdata->blocktype = LOCAL_SITEREPORT_BLOCK_TYPE_DEFAULT;
+        $blockdata->blockdata = json_encode((object) array(
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => $block[LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW],
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => $block[LOCAL_SITEREPORT_BLOCK_TABLET_VIEW],
+            'position' => $index++
+        ));
+        $blockdata->timecreated = time();
+        $blocks[] = $blockdata;
+    }
+
+    $status = $DB->insert_records('edwreports_blocks', $blocks);
+
+    local_edwiserreports_process_orphan_blocks();
+    return $status;
 }
 
 /**
  * Get default block settings
+ *
+ * @return Array
  */
 function local_edwiserreports_get_default_block_settings() {
     // Return default block settings.
-    return array(
+    $index = 0;
+    $blocks = array(
         'activeusers' => array(
             'classname' => 'activeusersblock',
-            'position' => 0,
-            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
-            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
-            LOCAL_SITEREPORT_BLOCK_MOBILE_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+            'position' => $index++,
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+        ),
+        'visitsonsite' => array(
+            'classname' => 'visitsonsiteblock',
+            'position' => $index++,
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+        ),
+        'timespentonsite' => array(
+            'classname' => 'timespentonsiteblock',
+            'position' => $index++,
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+        ),
+        'timespentoncourse' => array(
+            'classname' => 'timespentoncourseblock',
+            'position' => $index++,
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+        ),
+        'courseactivitystatus' => array(
+            'classname' => 'courseactivitystatusblock',
+            'position' => $index++,
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+        ),
+        'learnertimespentonsite' => array(
+            'classname' => 'learnertimespentonsiteblock',
+            'position' => $index++,
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
         ),
         'courseprogress' => array(
             'classname' => 'courseprogressblock',
-            'position' => 1,
+            'position' => $index++,
             LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
-            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
-            LOCAL_SITEREPORT_BLOCK_MOBILE_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+        ),
+        'courseengagement' => array(
+            'classname' => 'courseengagementblock',
+            'position' => $index++,
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
         ),
         'activecourses' => array(
             'classname' => 'activecoursesblock',
-            'position' => 2,
+            'position' => $index++,
             LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
-            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
-            LOCAL_SITEREPORT_BLOCK_MOBILE_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
         ),
         'certificates' => array(
             'classname' => 'certificatesblock',
-            'position' => 3,
+            'position' => $index++,
             LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
-            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
-            LOCAL_SITEREPORT_BLOCK_MOBILE_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
         ),
         'liveusers' => array(
             'classname' => 'liveusersblock',
-            'position' => 4,
+            'position' => $index++,
             LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
-            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
-            LOCAL_SITEREPORT_BLOCK_MOBILE_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
         ),
         'siteaccess' => array(
             'classname' => 'siteaccessblock',
-            'position' => 5,
+            'position' => $index++,
             LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
-            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
-            LOCAL_SITEREPORT_BLOCK_MOBILE_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
         ),
         'todaysactivity' => array(
             'classname' => 'todaysactivityblock',
-            'position' => 6,
+            'position' => $index++,
             LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
-            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
-            LOCAL_SITEREPORT_BLOCK_MOBILE_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
         ),
         'inactiveusers' => array(
             'classname' => 'inactiveusersblock',
-            'position' => 7,
+            'position' => $index++,
             LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
-            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE,
-            LOCAL_SITEREPORT_BLOCK_MOBILE_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+        ),
+        'grade' => array(
+            'classname' => 'gradeblock',
+            'position' => $index++,
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
+        ),
+        'learnercourseprogress' => array(
+            'classname' => 'learnercourseprogressblock',
+            'position' => $index++,
+            LOCAL_SITEREPORT_BLOCK_DESKTOP_VIEW => LOCAL_SITEREPORT_BLOCK_MEDIUM,
+            LOCAL_SITEREPORT_BLOCK_TABLET_VIEW => LOCAL_SITEREPORT_BLOCK_LARGE
         )
     );
+
+    return $blocks;
 }

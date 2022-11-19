@@ -1,3 +1,23 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Plugin administration pages are defined here.
+ *
+ * @copyright   2021 wisdmlabs <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 define(["jquery", "local_edwiserreports/variables", "local_edwiserreports/select2"], function($, v) {
     var defaultConfig = {
         // Default Config
@@ -5,6 +25,11 @@ define(["jquery", "local_edwiserreports/variables", "local_edwiserreports/select
         requestType: v.requestType,
         requestDataType: v.requestDataType,
         component: v.component,
+
+        // Get color theme.
+        getColorTheme: function() {
+            return edwiser_reports_color_themes;
+        },
 
         // Todays Activity Block
         getTodaysActivityBlock: function() {
@@ -15,7 +40,6 @@ define(["jquery", "local_edwiserreports/variables", "local_edwiserreports/select
 
             // Return course progress graph object
             return {
-                ctx: $(v.todaysActivityBlock)[0].getContext("2d"),
                 labelName: "Page Access",
                 graph: {
                     type: "bar",
@@ -78,7 +102,6 @@ define(["jquery", "local_edwiserreports/variables", "local_edwiserreports/select
 
             // Return course progress graph object
             return {
-                ctx: $(v.activeUsersBlock)[0].getContext("2d"),
                 labelName: "Page Access",
                 graph: {
                     type: "line",
@@ -114,9 +137,9 @@ define(["jquery", "local_edwiserreports/variables", "local_edwiserreports/select
                         aspectRatio: 1
                     },
                     labelName: {
-                        activeUsers: "Active Users",
-                        enrolments: "Course Enrolment",
-                        completionRate: "Course Completion Rate"
+                        activeUsers: M.util.get_string('activeusers', 'local_edwiserreports'),
+                        enrolments: M.util.get_string('courseenrolment', 'local_edwiserreports'),
+                        completionRate: M.util.get_string('coursecompletionrate', 'local_edwiserreports'),
                     },
                     backgroundColor: {
                         activeUsers: "rgba(0, 0, 0, 0)",
@@ -137,62 +160,6 @@ define(["jquery", "local_edwiserreports/variables", "local_edwiserreports/select
             };
         },
 
-        /**
-         * Get course progress block object
-         * @return {object} Course progress graph object
-         */
-        getCourseProgressBlock: function() {
-            var cpBlockData = $(v.courseProgressBlock);
-            if (cpBlockData.length == 0) {
-                return false;
-            }
-
-            // Return course progress graph object
-            return {
-                ctx: $(v.courseProgressBlock)[0].getContext("2d"),
-                graph: {
-                    type: "pie",
-                    data: [0, 0, 0, 0, 0, 0],
-                    options: {
-                        responsive: true,
-                        legend: {position: 'bottom'},
-                        maintainAspectRatio: false,
-                        aspectRatio: 1,
-                        tooltips: {
-                            callbacks: {
-                                title: function(tooltipItem, data) {
-                                    return [
-                                        M.util.get_string('cpblocktooltip1',
-                                            v.component,
-                                            {
-                                                "per": data.labels[tooltipItem[0].index],
-                                            }),
-                                        M.util.get_string('cpblocktooltip2',
-                                            v.component,
-                                            {
-                                                "val": data.datasets[0].data[tooltipItem[0].index]
-                                            })
-                                    ];
-                                },
-                                label: function() {
-                                    return '';
-                                }
-                            }
-                        }
-                    },
-                    labels: [
-                        M.util.get_string('per20-0', v.component),
-                        M.util.get_string('per40-20', v.component),
-                        M.util.get_string('per60-40', v.component),
-                        M.util.get_string('per80-60', v.component),
-                        M.util.get_string('per100-80', v.component),
-                        M.util.get_string('per100', v.component)
-                    ],
-                    backgroundColor: ["#fe6384", "#36a2eb", "#fdce56", "#cacbd0", "#4ac0c0", "#ff851b"]
-                }
-            };
-        },
-
         changeExportUrl: v.changeExportUrl,
 
         // Get learning program blocks
@@ -208,7 +175,9 @@ define(["jquery", "local_edwiserreports/variables", "local_edwiserreports/select
                     type: "pie",
                     options: {
                         responsive: true,
-                        legend: {position: 'bottom'},
+                        legend: {
+                            position: 'bottom'
+                        },
                         maintainAspectRatio: false,
                         aspectRatio: 1,
                         tooltips: {

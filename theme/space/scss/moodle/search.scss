@@ -10,8 +10,11 @@
 .simplesearchform {
     position: relative;
     border: 0;
-
     max-width: 320px;
+
+    .block & {
+      z-index: 0;
+    }
 
     .block-myoverview & {
       max-width: 100%;
@@ -115,7 +118,10 @@
     position: absolute;
     right: 0;
 
-    @include media-breakpoint-down(md) {
+    @include media-breakpoint-only(md) {
+    right: -45px;
+    }
+    @include media-breakpoint-between(xs,sm) {
     right: -40px;
     }
   }

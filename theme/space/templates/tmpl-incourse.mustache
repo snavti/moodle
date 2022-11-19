@@ -59,7 +59,7 @@
 
     {{> theme_space/navbar }}
 
-    <div id="page" data-region="mainpage" data-usertour="scroller" class="container-fluid drawers {{#courseindexopen}}show-drawer-right{{/courseindexopen}} {{#blockdraweropen}}show-hidden-drawer{{/blockdraweropen}} drag-container">
+    <div id="page" data-region="mainpage" data-usertour="scroller" class="container-fluid drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-hidden-drawer{{/blockdraweropen}} drag-container">
         <div id="topofscroll" class="main-inner">
             <div id="page-content" class="page-content wrapper-page">
                 {{> theme_space/navbar-secondary }}
@@ -89,7 +89,7 @@
                                     {{> core/activity_header }}
                                 {{/headercontent}}
                                 {{#overflow}}
-                                    <div class="container-fluid tertiary-navigation mt-3">
+                                    <div class="container-fluid tertiary-navigation mt-3 px-0">
                                         <div class="navitem">
                                             {{> core/url_select}}
                                         </div>

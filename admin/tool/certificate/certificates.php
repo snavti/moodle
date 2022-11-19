@@ -39,23 +39,31 @@ $template = \tool_certificate\template::instance($templateid);
 if ($coursecontext = $template->get_context()->get_course_context(false)) {
     require_login($coursecontext->instanceid);
 } else {
-    admin_externalpage_setup('tool_certificate/managetemplates', '', null, $pageurl);
+    admin_externalpage_setup('tool_certificate/managetemplates', '', null, $pageurl, ['nosearch' => true]);
 }
 
 if (!$template->can_view_issues()) {
     throw new moodle_exception('issueormanagenotallowed', 'tool_certificate');
 }
 
-$heading = get_string('certificates', 'tool_certificate');
+$heading = $title = $template->get_formatted_name();
+if ($template->get_shared()) {
+    $heading .= html_writer::tag('div', get_string('shared', 'tool_certificate'),
+        ['class' => 'badge badge-pill badge-secondary font-small ml-2 align-middle']);
+}
+$PAGE->navbar->add($title, $pageurl);
+$PAGE->set_title($title);
+$PAGE->set_heading($heading, false);
 
-$PAGE->set_title("$SITE->shortname: " . $heading);
-$PAGE->navbar->add($heading);
-$PAGE->set_heading($heading);
+// Secondary navigation.
+$secondarynav = new \tool_certificate\local\views\template_secondary($PAGE, $template);
+$secondarynav->initialise();
+$PAGE->set_secondarynav($secondarynav);
 
 $outputpage = new \tool_certificate\output\issues_page($template->get_id());
 
 $data = $outputpage->export_for_template($PAGE->get_renderer('core'));
-$data += ['heading' => $template->get_formatted_name()];
+$data += ['heading' => get_string('template', 'tool_certificate')];
 if ($template->can_issue_to_anybody()) {
     $data += ['addbutton' => true, 'addbuttontitle' => get_string('issuecertificates', 'tool_certificate'),
         'addbuttonurl' => null, 'addbuttonattrs' => ['name' => 'data-tid', 'value' => $template->get_id()],

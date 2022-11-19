@@ -44,9 +44,13 @@
     <div id="page" class="container-fluid">
 
         <div id="page-content" class="page-content">
-            {{{ output.page_heading }}}
+            <div class="mt-4 text-center">{{{ output.page_heading }}}</div>
             <section id="region-main" aria-label="{{#str}}content{{/str}}">
-                {{{ output.main_content }}}
+                <div class="rui-blocks-wrapper">
+                     <div class="wrapper-course wrapper-xl">
+                    {{{ output.main_content }}}
+                    </div>
+                </div>
             </section>
         </div>
 

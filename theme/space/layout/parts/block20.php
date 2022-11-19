@@ -125,7 +125,8 @@ echo '<!-- Start Block #20 -->';
 echo '<!-- End Block #20 -->';
 
 echo '<script>';
-echo 'var slider = tns({container: \'.hero-slider\',items: 1,mode: \'carousel\',slideBy: 1,mouseDrag: true,autoHeight: true,';
+echo 'var slider = tns({container: \'.hero-slider\',items: 1,mode: \'carousel\',slideBy: 1,mouseDrag: true,';
+if($block20count >= 2) { echo 'autoHeight: true,';}
 echo 'controls: true, controlsText: ["<svg width=\'24\' height=\'24\' fill=\'none\' viewBox=\'0 0 24 24\'><path stroke=\'currentColor\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M10.25 6.75L4.75 12L10.25 17.25\'></path><path stroke=\'currentColor\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19.25 12H5\'></path></svg>", "<svg width=\'24\' height=\'24\' fill=\'none\' viewBox=\'0 0 24 24\'><path stroke=\'currentColor\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M13.75 6.75L19.25 12L13.75 17.25\'></path><path stroke=\'currentColor\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 12H4.75\'></path></svg>"],';
 if(theme_space_get_setting('sliderloop') == '1') { echo 'loop: true,';}
 if(theme_space_get_setting('sliderintervalenabled') == '1') { echo 'autoplayButtonOutput: false, autoplay: true, autoplayTimeout:'.$sliderinterval.',';}

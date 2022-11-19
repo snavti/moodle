@@ -48,13 +48,13 @@ echo '<div class="wrapper-xl rui-fp-block--5 '.$block5class.'">';
           echo '</div>';
           }
           echo $block5html;
-          echo '<div class="swiper swiper-block--5">';
-                    echo '<div class="swiper-wrapper mb-4">';
+          echo '<div class="swiper swiper-block--5 mt-3">';
+                    echo '<div class="swiper-wrapper mb-md-4">';
 
                     for ($i = 1; $i <= $block5count; $i++) {
 
                               $title = format_text(theme_space_get_setting("block5itemtitle" . $i),FORMAT_HTML, array('noclean' => true));
-                              $url = format_text(theme_space_get_setting("block5itemurl" . $i),FORMAT_HTML, array('noclean' => true));
+                              $url = theme_space_get_setting("block5itemurl" . $i);
                               $img = $PAGE->theme->setting_file_url("block5itemimg" . $i, "block5itemimg" . $i);
 
                               echo '<div class="swiper-slide text-center">';
@@ -62,12 +62,12 @@ echo '<div class="wrapper-xl rui-fp-block--5 '.$block5class.'">';
                               if(!empty($url)) {
                                     echo '<a href="'.$url.'">';
                               }
-                                        echo '<img class="wrapper-xl rui-fp-block--5-item img-fluid rounded" src="'.$img.'" alt="'.$title.'" /></a>';
-                              echo '</div>';
-
+                                        echo '<img class="wrapper-fw rui-fp-block--5-item img-fluid rounded" src="'.$img.'" alt="'.$title.'" />';
                               if(!empty($url)) {
                                     echo '</a>';
                               }
+                              
+                              echo '</div>';
 
                     }
                     echo '</div>';

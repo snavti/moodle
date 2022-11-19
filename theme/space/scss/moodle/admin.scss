@@ -17,17 +17,17 @@
     }
 }
 
+@include media-breakpoint-between(xs,md) {
+    .rui-nav--admin-container {
+        overflow-x: auto;
+    } 
+}
+
 .rui-nav--admin {
     padding: 0 10px;
 
-    display: block;
     width: max-content;
 
-    min-width: 180px;
-    max-width: 300px;
-    height: 90vh;
-
-    overflow-y: auto;
     font-size: 0.875rem;
 
     @include media-breakpoint-up(lg) {
@@ -35,19 +35,28 @@
     overflow-y: auto;
     position: sticky;
     top: 30px;
+
+    display: block;
+
+    min-width: 180px;
+    max-width: 300px;
+    height: 90vh;
+    overflow-y: auto;
     }
 
-    @include media-breakpoint-between(xs,sm) {
-    width: 100%;
-    min-width: 100%;
-    max-width: 100%;
+    @include media-breakpoint-between(xs,md) {
+        display: inline-flex;
+
+        .nav-link {
+            padding: 16px;
+        }
     }
 }
 
 .rui-settings-container {
     margin-top: 12px;
 
-    @include media-breakpoint-between(xs,sm) {
+    @include media-breakpoint-between(xs,md) {
     padding: 0;
     }
 }
@@ -628,7 +637,7 @@
     }
 }
 
-@include media-breakpoint-down(sm) {
+@include media-breakpoint-between(xs,sm) {
     .admin_colourpicker .colourdialogue {
         max-width: 100%;
     }
@@ -670,10 +679,12 @@
             margin: 1rem 1.5rem 1rem 0;
 
             a {
-            font-weight: $font-weight-bold;
+            font-size: $font-size-sm;
+            font-weight: $font-weight-medium;
             color: inherit;
 
                 &:hover {
+                    color: $link-hover-color;
                     text-decoration: none;
                 }
             }
@@ -728,7 +739,7 @@
 
         .pluginname {
             .componentname {
-                margin-left: 52px;
+                margin-left: 48px;
                 font-size: $font-size-sm;
                 color: $text-muted;
             }
@@ -1132,11 +1143,13 @@
       font-weight: $font-weight-medium;
   }
 
- .rui-setting-heading-wrapper--special {
-    margin-left: 60px;
 
-    position: relative;
- }
+  @include media-breakpoint-up(lg) {
+    .rui-setting-heading-wrapper--special {
+        margin-left: 60px;
+        position: relative;
+     }
+  }
 
   .rui-settings-item + .rui-setting-heading-wrapper {
       margin-top: $page-padding-global;
@@ -1218,7 +1231,9 @@
       border-bottom: 1px solid $border-color;
 
       #page-admin-setting-themesettingspace & {
-          padding-left: 60px;
+        @include media-breakpoint-up(lg) {
+            padding-left: 60px;
+        }
       }
 
       &:last-of-type {
@@ -1264,7 +1279,7 @@
     .rui-sticky-btns {
         margin-left: 220px;
 
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-between(xs,sm) {
         margin-left: 0;
         }
     }
@@ -1280,7 +1295,7 @@
         display: inline-flex;
         align-items: center;
 
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-between(xs,sm) {
             width: 100%;
             margin: 30px;
         }
@@ -1303,7 +1318,7 @@
     }
 }
 
-@include media-breakpoint-up(md) {
+@include media-breakpoint-up(lg) {
     [data-settings-name="theme_space_scb"] {
         margin-top: 35px;
         position: relative;
@@ -1437,6 +1452,10 @@ textarea[id$="footercontent"]
         position: absolute;
         right: 0;
         top: calc(50% - 10px);
+    }
+
+    .small {
+        max-width: 120px;
     }
 }
 

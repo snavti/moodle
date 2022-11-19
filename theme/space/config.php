@@ -39,13 +39,13 @@ $THEME->layouts = [
     // Most backwards compatible layout without the blocks - this is the layout used by default.
     'base' => array(
         'file' => 'tmpl-columns2.php',
-        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks', 'sidecourseblocks'),
         'defaultregion' => 'side-pre',
     ),
     // Standard layout with blocks, this is recommended for most pages with general information.
     'standard' => array(
         'file' => 'tmpl-columns2.php',
-        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks', 'sidecourseblocks'),
         'defaultregion' => 'side-pre',
     ),
     // Main course page.
@@ -63,7 +63,7 @@ $THEME->layouts = [
     // Part of course, typical for modules - default page layout if $cm specified in require_login().
     'incourse' => array(
         'file' => 'tmpl-incourse.php',
-        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks','sidecourseblocks'),
         'defaultregion' => 'side-pre',
     ),
     // The site home page.
@@ -76,7 +76,7 @@ $THEME->layouts = [
     // Server administration scripts.
     'admin' => array(
         'file' => 'tmpl-admin.php',
-        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks', 'sidecourseblocks'),
         'defaultregion' => 'side-pre',
     ),
     // Moodle 4.0 - My courses page.
@@ -84,6 +84,7 @@ $THEME->layouts = [
         'file' => 'tmpl-columns2.php',
         'regions' => array('side-pre'),
         'defaultregion' => 'side-pre',
+        'options' => array('nonavbar' => true),
     ),
     // My dashboard page.
     'mydashboard' => array(
@@ -156,7 +157,7 @@ $THEME->layouts = [
     // The pagelayout used for reports.
     'report' => array(
         'file' => 'tmpl-report.php',
-        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks'),
+        'regions' => array('side-pre', 'sidebartopblocks', 'sidebarbottomblocks','sidecourseblocks'),
         'defaultregion' => 'side-pre',
     ),
     // The pagelayout used for safebrowser and securewindow.

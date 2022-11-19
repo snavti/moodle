@@ -1,3 +1,23 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Plugin administration pages are defined here.
+ *
+ * @copyright   2021 wisdmlabs <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /* eslint-disable no-console */
 define([
     'jquery',
@@ -6,13 +26,15 @@ define([
     'core/notification',
     'core/fragment',
     'core/templates',
-    'local_edwiserreports/variables',
+    './variables',
     './common',
-    'local_edwiserreports/jquery.dataTables',
-    'local_edwiserreports/dataTables.bootstrap4',
-    'local_edwiserreports/flatpickr',
-    'local_edwiserreports/common'
+    './jquery.dataTables',
+    './dataTables.bootstrap4',
+    './flatpickr'
 ], function($, ModalFactory, ModalEvents, Notification, Fragment, Templates, V, common) {
+
+    var filter = 'last7days';
+
     /**
      * Initialize
      * @param {integer} CONTEXTID Current page context id
@@ -25,19 +47,35 @@ define([
         var dropdownToggle = "#filter-dropdown.dropdown-toggle";
         var dropdownMenu = ".dropdown-menu[aria-labelledby='filter-dropdown']";
         var dropdownItem = dropdownMenu + " .dropdown-item";
-        var flatpickrCalender = "#flatpickrCalender";
-        var dropdownButton = "button#filter-dropdown";
-        var filter = 'weekly';
+        var cohortFilter = '.cohort-select';
         var cohortId = 0;
-        var dropdownInput = "#wdm-userfilter input.form-control.input";
+        var dropdownInput = "#userfilter input.form-control.input";
         var sesskey = null;
         var DataTable = null;
+        var modalTable = null;
+        var searchTable = PageId + " .table-search-input input";
+        var lengthSelect = PageId + " .table-length-input select";
+        var flatpickr = null;
 
-        // Varibales for cohort filter
-        var cohortFilterBtn = "#cohortfilter";
-        var cohortFilterItem = cohortFilterBtn + " ~ .dropdown-menu .dropdown-item";
-        // Var tableDom = '<"row"f><"row"t><"row"<"d-none"i><p>>';
+        var SELECTOR = {
+            DATESELECTED: '.selected-period',
+            DATE: '.edwiserreports-calendar',
+            DATEMENU: '.edwiserreports-calendar + .dropdown-menu',
+            DATEITEM: '.edwiserreports-calendar + .dropdown-menu .dropdown-item',
+            DATEPICKER: '.edwiserreports-calendar + .dropdown-menu .dropdown-calendar',
+            DATEPICKERINPUT: '.edwiserreports-calendar + .dropdown-menu .flatpickr'
+        };
+
+        // Initialize select2.
+        $(PageId).find('.singleselect').select2();
+
+        $(PageId).find('.download-links input[name="cohortid"]').val(cohortId);
+        $(PageId).find('.download-links input[name="filter"]').val(filter);
+
         $(document).ready(function() {
+
+            common.handleSearchInput();
+
             /* Show custom dropdown */
             $(dropdownToggle).on("click", function() {
                 $(dropdownMenu).addClass("show");
@@ -52,31 +90,38 @@ define([
             /* Hide dropdown when click anywhere in the screen */
             $(document).click(function(e) {
                 if (!($(e.target).hasClass("dropdown-menu") ||
-                    $(e.target).parents(".dropdown-menu").length)) {
+                        $(e.target).parents(".dropdown-menu").length)) {
                     $(dropdownMenu).removeClass('show');
                 }
             });
 
-            /* Select cohort filter for active users block */
-            $(cohortFilterItem).on('click', function() {
-                cohortId = $(this).data('cohortid');
-                $(cohortFilterBtn).html($(this).text());
-                $(PageId).find('.download-links input[name="cohortid"]').val(cohortId);
-                createActiveUsersTable(filter, cohortId);
-            });
-
             /* Select filter for active users block */
             $(dropdownItem + ":not(.custom)").on('click', function() {
-                filter = $(this).attr('value');
-                $(PageId).find('.download-links input[name="filter"]').val(filter);
-                $(dropdownMenu).removeClass('show');
-                $(dropdownButton).html($(this).text());
-                createActiveUsersTable(filter, cohortId);
-                $(flatpickrCalender).val("Custom");
-                $(dropdownInput).val("Custom");
+                filter = $(this).data('value');
+
+                // Set custom selected item as active.
+                $(SELECTOR.DATEITEM).removeClass('active');
+                $(this).addClass('active');
+
+                // Show selected item on dropdown button.
+                $(SELECTOR.DATE).html($(this).text());
+
+                // Hide dropdown.
+                $(SELECTOR.DATEMENU).removeClass('show');
+
+                // Clear custom date.
+                flatpickr.clear();
+                createActiveUsersTable(cohortId);
             });
 
-            createActiveUsersTable();
+            // Cohort filter.w
+            $(PageId + " " + cohortFilter).on('change', function() {
+                cohortId = $(this).val();
+                $(PageId).find('.download-links input[name="cohortid"]').val(cohortId);
+                createActiveUsersTable(cohortId);
+            });
+
+            createActiveUsersTable(cohortId);
             createModalOfUsersList();
             createDropdownCalendar();
         });
@@ -88,11 +133,11 @@ define([
             $(document).on('click', ModalTrigger, function() {
                 var title = "";
                 var action = $(this).data("action");
-                var filter = $(this).data("filter");
+                var modalFilter = $(this).data("filter");
                 var ModalRoot = null;
 
                 // eslint-disable-next-line no-eval
-                var titleDate = V.formatDate(new Date(eval(filter * 1000)), "d MMM yyyy");
+                var titleDate = V.formatDate(new Date(eval(modalFilter * 86400 * 1000)), "d MMM yyyy");
 
                 if (action == "activeusers") {
                     title = M.util.get_string('activeusersmodaltitle', V.component, {
@@ -112,10 +157,9 @@ define([
                     body: Fragment.loadFragment(
                         'local_edwiserreports',
                         'userslist',
-                        CONTEXTID,
-                        {
+                        CONTEXTID, {
                             page: 'activeusers',
-                            filter: filter,
+                            filter: modalFilter,
                             cohortid: cohortId,
                             action: action
                         }
@@ -138,19 +182,25 @@ define([
                         }
 
                         // Create dataTable for userslist
-                        ModalRoot.find(".modal-table").DataTable({
+                        modalTable = ModalRoot.find(".modal-table").DataTable({
+                            dom: '<"edwiserreports-table"<"p-2"i><t><"table-pagination"p>>',
                             language: {
-                                searchPlaceholder: "Search User",
-                                emptyTable: "There are no users"
+                                info: M.util.get_string('tableinfo', 'local_edwiserreports'),
+                                infoEmpty: M.util.get_string('infoempty', 'local_edwiserreports'),
+                                emptyTable: M.util.get_string('nousers', 'local_edwiserreports'),
+                                zeroRecords: M.util.get_string('zerorecords', 'local_edwiserreports'),
+                                paginate: {
+                                    previous: M.util.get_string('previous', 'moodle'),
+                                    next: M.util.get_string('next', 'moodle')
+                                }
                             },
                             drawCallback: function() {
-                                $('.dataTables_paginate > .pagination').addClass('pagination-sm pull-right');
-                                $('.dataTables_filter').addClass('pagination-sm pull-right');
-                            },
-                            // ScrollY : "350px",
-                            // scrollX : true,
-                            // paging: false,
-                            bInfo: false
+                                common.stylePaginationButton(this);
+                            }
+                        });
+
+                        ModalRoot.find('.table-search-input input').on('input', function() {
+                            modalTable.search(this.value).draw();
                         });
                     });
                     return;
@@ -162,19 +212,19 @@ define([
          * Create Calender in dropdown tp select range.
          */
         function createDropdownCalendar() {
-            $(flatpickrCalender).flatpickr({
+            flatpickr = $(SELECTOR.DATEPICKERINPUT).flatpickr({
                 mode: 'range',
                 altInput: true,
-                altFormat: "d/m/Y",
+                altFormat: "d M Y",
                 dateFormat: "Y-m-d",
                 maxDate: "today",
-                appendTo: document.getElementById("activeUser-calendar"),
+                appendTo: $(SELECTOR.DATEPICKER).get(0),
                 onOpen: function() {
-                    $(dropdownMenu).addClass('withcalendar');
+                    $(SELECTOR.DATEMENU).addClass('withcalendar');
+                    $(SELECTOR.DATE).dropdown('update');
                 },
                 onClose: function() {
-                    $(dropdownMenu).removeClass('withcalendar');
-                    $(dropdownMenu).removeClass('show');
+                    $(SELECTOR.DATEMENU).removeClass('withcalendar');
                     selectedCustomDate();
                 }
             });
@@ -184,26 +234,51 @@ define([
          * After Select Custom date get active users details.
          */
         function selectedCustomDate() {
-            filter = $(flatpickrCalender).val();
-            var date = $(dropdownInput).val();
+            let date = $(SELECTOR.DATEPICKERINPUT).val(); // Y-m-d format
+            let dateAlternate = $(SELECTOR.DATEPICKERINPUT).next().val().replace("to", "-"); // Date d M Y format.
+            $(SELECTOR.DATEPICKERINPUT).next().val(dateAlternate);
 
             /* If correct date is not selected then return false */
-            if (!filter.includes("to")) {
+            if (!date.includes(" to ")) {
+                flatpickr.clear();
                 return;
             }
 
-            $(dropdownButton).html(date);
-            $(flatpickrCalender).val("");
-            $(PageId).find('.download-links input[name="filter"]').val(filter);
-            createActiveUsersTable(filter, cohortId);
+            // Set active class to custom date selector item.
+            $(SELECTOR.DATEITEM).removeClass('active');
+            $(SELECTOR.DATEITEM + '.custom').addClass('active');
+
+            // Show custom date to dropdown button.
+            $(SELECTOR.DATE).html(dateAlternate);
+
+            filter = date;
+
+            // Hide dropdown.
+            $(SELECTOR.DATEMENU).removeClass('show');
+            createActiveUsersTable(cohortId);
         }
 
         /**
          * Create Active Users Table.
-         * @param {string} filter Filter string.
          * @param {integer} cohortId Integer string.
          */
-        function createActiveUsersTable(filter, cohortId) {
+        function createActiveUsersTable(cohortId) {
+            $(PageId).find('.download-links input[name="filter"]').val(filter);
+            let date, day, month, year;
+            let months = [
+                M.util.get_string('january', 'local_edwiserreports'),
+                M.util.get_string('february', 'local_edwiserreports'),
+                M.util.get_string('march', 'local_edwiserreports'),
+                M.util.get_string('april', 'local_edwiserreports'),
+                M.util.get_string('may', 'local_edwiserreports'),
+                M.util.get_string('june', 'local_edwiserreports'),
+                M.util.get_string('july', 'local_edwiserreports'),
+                M.util.get_string('august', 'local_edwiserreports'),
+                M.util.get_string('september', 'local_edwiserreports'),
+                M.util.get_string('october', 'local_edwiserreports'),
+                M.util.get_string('november', 'local_edwiserreports'),
+                M.util.get_string('december', 'local_edwiserreports')
+            ];
             sesskey = $(PageId).data("sesskey");
 
             /* If datatable is already created then destroy the table */
@@ -230,10 +305,14 @@ define([
                 var ActiveUsers = [];
                 response = JSON.parse(response);
 
-                $.each(response.labels, function(idx, val) {
+                $.each(response.dates, function(idx, val) {
+                    date = new Date(val * 86400 * 1000);
+                    day = date.getDate();
+                    month = months[date.getMonth()];
+                    year = date.getFullYear();
                     ActiveUsers[idx] = {
-                        date: val,
-                        filter: parseInt((new Date(val).getTime() / 1000)),
+                        date: `${(day < 10 ? '0' + day : day)} ${month} ${year}`,
+                        filter: response.dates[idx],
                         activeusers: response.data.activeUsers[idx],
                         courseenrolment: response.data.enrolments[idx],
                         coursecompletion: response.data.completionRate[idx]
@@ -247,51 +326,64 @@ define([
 
                 // eslint-disable-next-line promise/catch-or-return
                 Templates.render('local_edwiserreports/activeuserstable', context)
-                .then(function(html, js) {
-                    Templates.replaceNode(ActiveUsersTable, html, js);
-                    return;
-                }).fail(function(ex) {
-                    console.log(ex);
-                }).always(function() {
-                    DataTable = $(ActiveUsersTable).DataTable({
-                        responsive: true,
-                        // Dom : '<"pull-left"f><t><p>',
-                        order: [[0, 'desc']],
-                        language: {
-                            searchPlaceholder: "Search Date",
-                            emptyTable: "There are no active users"
-                        },
-                        columnDefs: [
-                            {
-                                "targets": 0,
-                                "className": "text-left"
+                    .then(function(html, js) {
+                        Templates.replaceNode(ActiveUsersTable, html, js);
+                        return;
+                    }).fail(function(ex) {
+                        Notification.exception(ex);
+                    }).always(function() {
+                        DataTable = $(ActiveUsersTable).DataTable({
+                            responsive: true,
+                            dom: '<"edwiserreports-table"<"p-2"i><t><"table-pagination"p>>',
+                            order: [
+                                [0, 'desc']
+                            ],
+                            language: {
+                                info: M.util.get_string('tableinfo', 'local_edwiserreports'),
+                                infoEmpty: M.util.get_string('infoempty', 'local_edwiserreports'),
+                                emptyTable: M.util.get_string('noactiveusers', 'local_edwiserreports'),
+                                zeroRecords: M.util.get_string('zerorecords', 'local_edwiserreports'),
+                                paginate: {
+                                    previous: M.util.get_string('previous', 'moodle'),
+                                    next: M.util.get_string('next', 'moodle')
+                                }
                             },
-                            {
-                                "targets": "_all",
-                                "className": "text-center",
+                            columnDefs: [{
+                                    "targets": 0,
+                                    "className": "text-left"
+                                },
+                                {
+                                    "targets": "_all",
+                                    "className": "text-center",
+                                }
+                            ],
+                            drawCallback: function() {
+                                common.stylePaginationButton(this);
                             }
-                        ],
-                        info: false,
-                        drawCallback: function() {
-                            $('.dataTables_paginate > .pagination').addClass('pagination-sm pull-right');
-                            $('.dataTables_filter').addClass('pagination-sm pull-right');
-                        }
-                        // ScrollY : 350,
-                        // scrollX : true,
-                        // paginate : false
-                    });
-                    $(ActiveUsersTable).show();
-                    $(loader).hide();
+                        });
+                        DataTable.page.len($(lengthSelect).val());
+                        DataTable.column(0).search($(searchTable).val()).draw();
+                        $(ActiveUsersTable).show();
+                        $(loader).hide();
 
-                    // Hide loader.
-                    common.loader.hide("#wdm-activeusers-individual");
-                });
+                        // Hide loader.
+                        common.loader.hide("#wdm-activeusers-individual");
+                    });
             }).fail(function(error) {
-                console.log(error);
+                Notification.exception(error);
                 // Hide loader.
                 common.loader.hide("#wdm-activeusers-individual");
             });
         }
+        // Observer length change.
+        $(lengthSelect).on('change', function() {
+            DataTable.page.len(this.value).draw();
+        });
+
+        // Search in table.
+        $(searchTable).on('input', function() {
+            DataTable.column(0).search(this.value).draw();
+        });
     }
     return {
         init: init

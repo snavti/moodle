@@ -20,6 +20,7 @@ use html_writer;
 use stdClass;
 use moodle_url;
 use context_course;
+use context_system;
 use core_course_list_element;
 use custom_menu;
 use action_menu_filler;
@@ -372,17 +373,26 @@ class core_renderer extends \core_renderer {
 
 
 
-     /**
-     * TODO:
+    /**
+     * 
      * Returns HTML to display course summary.
      *
-     */
-    protected function course_summary() {
-        global $COURSE;
+    */
+    protected function course_summary($courseid = 0, $content = '' ) {
+        global $COURSE, $CFG;
         $output = '';
+
+        require_once( $CFG->libdir . '/filelib.php' );
+    
+        $iscourseid = $courseid ? $courseid : $COURSE->id;
+        $iscontent = $content ? $content : $COURSE->summary;
+        $context = context_course::instance($iscourseid);
+        $desc = file_rewrite_pluginfile_urls($iscontent, 'pluginfile.php', $context->id, 'course', 'summary', NULL );
+        
         $output .= html_writer::start_div('rui-course-desc mt-3');
-        $output .= $COURSE->summary;
+        $output .= format_text( $desc, FORMAT_HTML );
         $output .= html_writer::end_div();
+
         return $output;
     }
 
@@ -455,6 +465,146 @@ class core_renderer extends \core_renderer {
     }
 
 
+    public function userhints() {
+        global $USER, $COURSE, $CFG, $PAGE;
+        $html = null;
+
+        // MODIFICATION START:
+        // If the setting showhintcourseguestaccesssetting is set, a hint for users that view the course with guest access is shown.
+        // We also check that the user did not switch the role. This is a special case for roles that can fully access the course
+        // without being enrolled. A role switch would show the guest access hint additionally in that case and this is not
+        // intended.
+        if (get_config('theme_space', 'showhintcourseguestaccesssetting') == 1
+            && is_guest(\context_course::instance($COURSE->id), $USER->id)
+            && $this->page->has_set_url()
+            && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+            && !is_role_switched($COURSE->id)) {
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning d-flex align-items-center'));
+                $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                    <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                    </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                        $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
+                            array('role' => role_get_name(get_guest_role())));
+                        $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+                    $html .= html_writer::end_tag('div');
+            $html .= html_writer::end_tag('div');
+        }
+        // End.
+        // MODIFICATION START:
+        // If the setting showhintcoursehidden is set, the visibility of the course is hidden and
+        // a hint for the visibility will be shown.
+        if (get_config('theme_space', 'page-header-headings') == 1 && $COURSE->visible == false &&
+                $this->page->has_set_url() && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning d-flex align-items-center'));
+            $html .= html_writer::tag('i', null, array('class' => 'far fa-eye-slash fa-pull-left icon d-inline-flex mr-3'));
+            $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
+            // If the user has the capability to change the course settings, an additional link to the course settings is shown.
+            if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
+                $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
+                    'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
+            }
+            $html .= html_writer::end_tag('div');
+        }
+        // End.
+        // MODIFICATION START.
+        if (get_config('theme_space', 'showhintcourseguestaccesssetting') == 1) {
+            // Check if the user did a role switch.
+            // If not, adding this section would make no sense and, even worse,
+            // user_get_user_navigation_info() will throw an exception due to the missing user object.
+            if (is_role_switched($COURSE->id)) {
+                // Get the role name switched to.
+                $opts = \user_get_user_navigation_info($USER, $this->page);
+                $role = $opts->metadata['rolename'];
+                // Get the URL to switch back (normal role).
+                $url = new moodle_url('/course/switchrole.php',
+                    array('id'        => $COURSE->id, 'sesskey' => sesskey(), 'switchrole' => 0,
+                          'returnurl' => $this->page->url->out_as_local_url(false)));
+                $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning mt-4 d-flex align-items-center'));
+                    $html .= html_writer::start_tag('div', array('class' => 'media'));
+                        $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                        $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                        <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                        <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                        </svg>';
+                        $html .= html_writer::end_tag('div');
+                        $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                            $html .= get_string('switchedroleto', 'theme_space');
+                            // Give this a span to be able to address via CSS.
+                            $html .= html_writer::tag('strong', $role, array('class' => 'switched-role px-2'));
+    
+                            // Return to normal role link.
+                            $html .= html_writer::tag('a', get_string('switchrolereturn', 'core'),
+                                array('class' => 'switched-role-backlink d-block', 'href' => $url));
+                        $html .= html_writer::end_tag('div');
+                    $html .= html_writer::end_tag('div');
+                $html .= html_writer::end_tag('div');
+            }
+        }
+        // End.    
+        // If the setting showhintcoursehidden is set, the visibility of the course is hidden and
+        // a hint for the visibility will be shown.
+        if (get_config('theme_space', 'showhintcoursehidden') == 'yes'
+                && $PAGE->has_set_url()
+                && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+                && $COURSE->visible == false) {
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning mt-4'));
+                $html .= html_writer::start_tag('div', array('class' => 'media'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                    <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                    </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                        $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
+                        // If the user has the capability to change the course settings, an additional link to the course settings is shown.
+                        if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
+                            $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
+                                    'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
+                        }
+                        $html .= html_writer::end_tag('div');
+                    $html .= html_writer::end_tag('div');
+            $html .= html_writer::end_tag('div');
+        }
+    
+        // If the setting showhintcourseguestaccesssetting is set, a hint for users that view the course with guest access is shown.
+        // We also check that the user did not switch the role. This is a special case for roles that can fully access the course
+        // without being enrolled. A role switch would show the guest access hint additionally in that case and this is not
+        // intended.
+        if (get_config('theme_space', 'showhintcourseguestaccesssetting') == 'yes'
+                && is_guest(\context_course::instance($COURSE->id), $USER->id)
+                && $PAGE->has_set_url()
+                && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+                && !is_role_switched($COURSE->id)) {
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning mt-4'));
+                $html .= html_writer::start_tag('div', array('class' => 'media'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path>
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path>
+                    <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
+                    </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                    $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
+                            array('role' => role_get_name(get_guest_role())));
+                    $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+                    $html .= html_writer::end_tag('div');
+                $html .= html_writer::end_tag('div');
+            $html .= html_writer::end_tag('div');
+        }
+
+        return $html;
+    }
+
+
     /**
      * Wrapper for header elements.
      *
@@ -493,7 +643,7 @@ class core_renderer extends \core_renderer {
             $html .= $this->render_from_template('theme_space/header_admin', $header);
         }
 
-        // MODIFICATION START:
+                // MODIFICATION START:
         // If the setting showhintcourseguestaccesssetting is set, a hint for users that view the course with guest access is shown.
         // We also check that the user did not switch the role. This is a special case for roles that can fully access the course
         // without being enrolled. A role switch would show the guest access hint additionally in that case and this is not
@@ -503,11 +653,19 @@ class core_renderer extends \core_renderer {
             && $this->page->has_set_url()
             && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
             && !is_role_switched($COURSE->id)) {
-            $html .= html_writer::start_tag('div', array('class' => 'course-guestaccess-infobox alert alert-warning'));
-            $html .= html_writer::tag('i', null, array('class' => 'fa fa-exclamation-circle fa-pull-left icon d-inline-flex mr-3'));
-            $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
-                array('role' => role_get_name(get_guest_role())));
-            $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning d-flex align-items-center'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                        $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                        <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                        <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                        </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                        $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
+                            array('role' => role_get_name(get_guest_role())));
+                        $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+                    $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('div');
         }
         // End.
@@ -516,8 +674,14 @@ class core_renderer extends \core_renderer {
         // a hint for the visibility will be shown.
         if (get_config('theme_space', 'page-header-headings') == 1 && $COURSE->visible == false &&
                 $this->page->has_set_url() && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
-            $html .= html_writer::start_tag('div', array('class' => 'course-hidden-infobox alert alert-warning'));
-            $html .= html_writer::tag('i', null, array('class' => 'far fa-eye-slash fa-pull-left icon d-inline-flex mr-3'));
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning d-flex align-items-center'));
+                $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                    <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                    </svg>';
+                $html .= html_writer::end_tag('div');
             $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
             // If the user has the capability to change the course settings, an additional link to the course settings is shown.
             if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
@@ -540,7 +704,7 @@ class core_renderer extends \core_renderer {
                 $url = new moodle_url('/course/switchrole.php',
                     array('id'        => $COURSE->id, 'sesskey' => sesskey(), 'switchrole' => 0,
                           'returnurl' => $this->page->url->out_as_local_url(false)));
-                $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning mt-4'));
+                $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning mt-4 d-flex align-items-center'));
                     $html .= html_writer::start_tag('div', array('class' => 'media'));
                         $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
                         $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -570,23 +734,23 @@ class core_renderer extends \core_renderer {
                 && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
                 && $COURSE->visible == false) {
             $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning mt-4'));
-            $html .= html_writer::start_tag('div', array('class' => 'media'));
-            $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
-            $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
-            <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
-            <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
-            </svg>';
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
-            $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
-            // If the user has the capability to change the course settings, an additional link to the course settings is shown.
-            if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
-                $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
-                        'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
-            }
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::end_tag('div');
+                $html .= html_writer::start_tag('div', array('class' => 'media'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                    <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                    </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                        $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
+                        // If the user has the capability to change the course settings, an additional link to the course settings is shown.
+                        if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
+                            $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
+                                    'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
+                        }
+                        $html .= html_writer::end_tag('div');
+                    $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('div');
         }
     
@@ -600,23 +764,22 @@ class core_renderer extends \core_renderer {
                 && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
                 && !is_role_switched($COURSE->id)) {
             $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning mt-4'));
-            $html .= html_writer::start_tag('div', array('class' => 'media'));
-            $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
-            $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path>
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path>
-            <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
-            </svg>';
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
-            $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
-                    array('role' => role_get_name(get_guest_role())));
-            $html .= theme_space_get_course_guest_access_hint($COURSE->id);
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::end_tag('div');
+                $html .= html_writer::start_tag('div', array('class' => 'media'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path>
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path>
+                    <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
+                    </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                    $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
+                            array('role' => role_get_name(get_guest_role())));
+                    $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+                    $html .= html_writer::end_tag('div');
+                $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('div');
         }
-        
 
         return $html;
     }
@@ -673,9 +836,7 @@ class core_renderer extends \core_renderer {
         //     $header->welcomemessage = \core_user::welcome_message();
         // }
 
-
-
-        // MODIFICATION START:
+                // MODIFICATION START:
         // If the setting showhintcourseguestaccesssetting is set, a hint for users that view the course with guest access is shown.
         // We also check that the user did not switch the role. This is a special case for roles that can fully access the course
         // without being enrolled. A role switch would show the guest access hint additionally in that case and this is not
@@ -685,21 +846,35 @@ class core_renderer extends \core_renderer {
             && $this->page->has_set_url()
             && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
             && !is_role_switched($COURSE->id)) {
-            $html .= html_writer::start_tag('div', array('class' => 'course-guestaccess-infobox alert alert-warning'));
-            $html .= html_writer::tag('i', null, array('class' => 'fa fa-exclamation-circle fa-pull-left icon d-inline-flex mr-3'));
-            $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
-                array('role' => role_get_name(get_guest_role())));
-            $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning d-flex align-items-center'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                        $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                        <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                        <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                        </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                        $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
+                            array('role' => role_get_name(get_guest_role())));
+                        $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+                    $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('div');
         }
         // End.
         // MODIFICATION START:
         // If the setting showhintcoursehidden is set, the visibility of the course is hidden and
         // a hint for the visibility will be shown.
-        if (get_config('theme_space', 'showhintcoursehidden') == 1 && $COURSE->visible == false &&
+        if (get_config('theme_space', 'page-header-headings') == 1 && $COURSE->visible == false &&
                 $this->page->has_set_url() && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
-            $html .= html_writer::start_tag('div', array('class' => 'course-hidden-infobox alert alert-warning'));
-            $html .= html_writer::tag('i', null, array('class' => 'far fa-eye-slash fa-pull-left icon d-inline-flex mr-3'));
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning d-flex align-items-center'));
+                $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                    <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                    </svg>';
+                $html .= html_writer::end_tag('div');
             $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
             // If the user has the capability to change the course settings, an additional link to the course settings is shown.
             if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
@@ -722,7 +897,7 @@ class core_renderer extends \core_renderer {
                 $url = new moodle_url('/course/switchrole.php',
                     array('id'        => $COURSE->id, 'sesskey' => sesskey(), 'switchrole' => 0,
                           'returnurl' => $this->page->url->out_as_local_url(false)));
-                $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning wrapper-md'));
+                $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning mt-4 d-flex align-items-center'));
                     $html .= html_writer::start_tag('div', array('class' => 'media'));
                         $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
                         $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -751,24 +926,24 @@ class core_renderer extends \core_renderer {
                 && $PAGE->has_set_url()
                 && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
                 && $COURSE->visible == false) {
-            $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning wrapper-md'));
-            $html .= html_writer::start_tag('div', array('class' => 'media'));
-            $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
-            $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
-            <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
-            <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
-            </svg>';
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
-            $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
-            // If the user has the capability to change the course settings, an additional link to the course settings is shown.
-            if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
-                $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
-                        'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
-            }
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::end_tag('div');
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning mt-4'));
+                $html .= html_writer::start_tag('div', array('class' => 'media'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                    <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                    </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                        $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
+                        // If the user has the capability to change the course settings, an additional link to the course settings is shown.
+                        if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
+                            $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
+                                    'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
+                        }
+                        $html .= html_writer::end_tag('div');
+                    $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('div');
         }
     
@@ -782,20 +957,20 @@ class core_renderer extends \core_renderer {
                 && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
                 && !is_role_switched($COURSE->id)) {
             $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning mt-4'));
-            $html .= html_writer::start_tag('div', array('class' => 'media'));
-            $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
-            $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path>
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path>
-            <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
-            </svg>';
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
-            $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
-                    array('role' => role_get_name(get_guest_role())));
-            $html .= theme_space_get_course_guest_access_hint($COURSE->id);
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::end_tag('div');
+                $html .= html_writer::start_tag('div', array('class' => 'media'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path>
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path>
+                    <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
+                    </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                    $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
+                            array('role' => role_get_name(get_guest_role())));
+                    $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+                    $html .= html_writer::end_tag('div');
+                $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('div');
         }
 
@@ -850,7 +1025,7 @@ class core_renderer extends \core_renderer {
 
         $html .= $this->render_from_template('theme_space/header', $header);
 
-        // MODIFICATION START:
+                // MODIFICATION START:
         // If the setting showhintcourseguestaccesssetting is set, a hint for users that view the course with guest access is shown.
         // We also check that the user did not switch the role. This is a special case for roles that can fully access the course
         // without being enrolled. A role switch would show the guest access hint additionally in that case and this is not
@@ -860,21 +1035,35 @@ class core_renderer extends \core_renderer {
             && $this->page->has_set_url()
             && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
             && !is_role_switched($COURSE->id)) {
-            $html .= html_writer::start_tag('div', array('class' => 'course-guestaccess-infobox alert alert-warning wrapper-md mb-0'));
-            $html .= html_writer::tag('i', null, array('class' => 'fa fa-exclamation-circle fa-pull-left icon d-inline-flex mr-3'));
-            $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
-                array('role' => role_get_name(get_guest_role())));
-            $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning d-flex align-items-center'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                        $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                        <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                        <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                        </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                        $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
+                            array('role' => role_get_name(get_guest_role())));
+                        $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+                    $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('div');
         }
         // End.
         // MODIFICATION START:
         // If the setting showhintcoursehidden is set, the visibility of the course is hidden and
         // a hint for the visibility will be shown.
-        if (get_config('theme_space', 'showhintcoursehidden') == 1 && $COURSE->visible == false &&
+        if (get_config('theme_space', 'page-header-headings') == 1 && $COURSE->visible == false &&
                 $this->page->has_set_url() && $this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
-            $html .= html_writer::start_tag('div', array('class' => 'course-hidden-infobox alert alert-warning wrapper-md mb-0'));
-            $html .= html_writer::tag('i', null, array('class' => 'far fa-eye-slash fa-pull-left icon d-inline-flex mr-3'));
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning d-flex align-items-center'));
+                $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                    <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                    </svg>';
+                $html .= html_writer::end_tag('div');
             $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
             // If the user has the capability to change the course settings, an additional link to the course settings is shown.
             if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
@@ -897,7 +1086,7 @@ class core_renderer extends \core_renderer {
                 $url = new moodle_url('/course/switchrole.php',
                     array('id'        => $COURSE->id, 'sesskey' => sesskey(), 'switchrole' => 0,
                           'returnurl' => $this->page->url->out_as_local_url(false)));
-                $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning wrapper-md mb-0'));
+                $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning mt-4 d-flex align-items-center'));
                     $html .= html_writer::start_tag('div', array('class' => 'media'));
                         $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
                         $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -926,24 +1115,24 @@ class core_renderer extends \core_renderer {
                 && $PAGE->has_set_url()
                 && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
                 && $COURSE->visible == false) {
-            $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning wrapper-md mb-0'));
-            $html .= html_writer::start_tag('div', array('class' => 'media'));
-            $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
-            $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
-            <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
-            <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
-            </svg>';
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
-            $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
-            // If the user has the capability to change the course settings, an additional link to the course settings is shown.
-            if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
-                $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
-                        'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
-            }
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::end_tag('div');
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning mt-4'));
+                $html .= html_writer::start_tag('div', array('class' => 'media'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
+                    <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                    </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                        $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
+                        // If the user has the capability to change the course settings, an additional link to the course settings is shown.
+                        if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
+                            $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
+                                    'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
+                        }
+                        $html .= html_writer::end_tag('div');
+                    $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('div');
         }
     
@@ -956,21 +1145,21 @@ class core_renderer extends \core_renderer {
                 && $PAGE->has_set_url()
                 && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
                 && !is_role_switched($COURSE->id)) {
-            $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning wrapper-md mb-0'));
-            $html .= html_writer::start_tag('div', array('class' => 'media'));
-            $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
-            $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path>
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path>
-            <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
-            </svg>';
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
-            $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
-                    array('role' => role_get_name(get_guest_role())));
-            $html .= theme_space_get_course_guest_access_hint($COURSE->id);
-            $html .= html_writer::end_tag('div');
-            $html .= html_writer::end_tag('div');
+            $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning mt-4'));
+                $html .= html_writer::start_tag('div', array('class' => 'media'));
+                    $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
+                    $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path>
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path>
+                    <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
+                    </svg>';
+                    $html .= html_writer::end_tag('div');
+                    $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
+                    $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
+                            array('role' => role_get_name(get_guest_role())));
+                    $html .= theme_space_get_course_guest_access_hint($COURSE->id);
+                    $html .= html_writer::end_tag('div');
+                $html .= html_writer::end_tag('div');
             $html .= html_writer::end_tag('div');
         }
 
@@ -1000,12 +1189,22 @@ class core_renderer extends \core_renderer {
         if(get_config('theme_space', 'isitemoncompetencies') == 1) {
             $isitemoncompetencies = true;
         }
+        
+        if(get_config('theme_space', 'showcoursenav') == 1) {
+            $showcoursenav = true;
+        } else {
+            $showcoursenav = false;
+        }
+
+        if (!$isitemongrades && !$isitemonparticipants && !$isitemonbadges && !$isitemoncompetencies) {
+            return false;
+        }
 
         $editcog = html_writer::div($this->context_header_settings_menu() , 'pull-xs-right context-header-settings-menu');
         // Header Menus for Users.
         if ($PAGE->pagelayout !== 'coursecategory' && $PAGE->pagetype !== 'course-management' && $PAGE->pagetype !== 'course-delete') {
             $course = $this->page->course;
-            $showcoursenav = true;
+    
             $context = context_course::instance($course->id);
             $hasgradebookshow = $PAGE->course->showgrades == 1;
 
@@ -1025,18 +1224,141 @@ class core_renderer extends \core_renderer {
                 $gradestatus = true;
             }
 
-            // TODO: Sprawdzic i ewentualnie usunac. Easy Enrollment Integration.
-            $globalhaseasyenrollment = enrol_get_plugin('easy');
-            $coursehaseasyenrollment = '';
-            $easycodelink = '';
-            $easycodetitle = '';
-            if ($globalhaseasyenrollment) {
-                $coursehaseasyenrollment = $DB->record_exists('enrol', array('courseid' => $COURSE->id, 'enrol' => 'easy'));
-                $easyenrollinstance = $DB->get_record('enrol', array('courseid' => $COURSE->id,'enrol' => 'easy'));
+            // Header links on course pages.
+            $course = $this->page->course;
+            $context = context_course::instance($course->id);
+            $hasadminlink = has_capability('moodle/site:configview', $context);
+    
+            if ($COURSE->id > 1 && isloggedin() && !isguestuser() && is_enrolled($context, $USER->id, '', true) || is_siteadmin() || $hasadminlink) {
+                global $CFG;
+                $headerlinks = [
+                    'showcoursenav' => $showcoursenav,
+                    'editcog' => $editcog,
+                    'headerlinksdata' => array(
+                        array(
+                            'status' => $isitemonparticipants && !isguestuser() && has_capability('moodle/course:viewparticipants', $context),
+                            'icon' => '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.78168 19.25H13.2183C13.7828 19.25 14.227 18.7817 14.1145 18.2285C13.804 16.7012 12.7897 14 9.5 14C6.21031 14 5.19605 16.7012 4.88549 18.2285C4.773 18.7817 5.21718 19.25 5.78168 19.25Z"></path>
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 14C17.8288 14 18.6802 16.1479 19.0239 17.696C19.2095 18.532 18.5333 19.25 17.6769 19.25H16.75"></path>
+                            <circle cx="9.5" cy="7.5" r="2.75" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.75 10.25C16.2688 10.25 17.25 9.01878 17.25 7.5C17.25 5.98122 16.2688 4.75 14.75 4.75"></path>
+                            </svg>
+                            ',
+                            'title' => get_string('participants', 'moodle'),
+                            'url' => new moodle_url('/user/index.php', array('id' => $PAGE->course->id)),
+                            'isactiveitem' => $this->isMenuActive('/user/index.php'),
+                            'itemid' => 'itemParticipants',
+                            ),
+                        array(
+                            'status' => $isitemonbadges && has_capability('moodle/badges:earnbadge', $context) && $CFG->enablebadges == 1,
+                            'icon' => '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.25 8.75L18.25 4.75H5.75L9.75 8.75"></path>
+                            <circle cx="12" cy="14" r="5.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
+                            </svg>
+                            ',
+                            'title' => get_string('badges', 'badges'),
+                            'url' => new moodle_url('/badges/view.php?type=2', array('id' => $PAGE->course->id)),
+                            'isactiveitem' => $this->isMenuActive('/badges/view.php'),
+                            'itemid' => 'itemBadges',
+                            ),
+                        array(
+                            'status' => $isitemoncompetencies && !isguestuser() && $hascompetencyshow,
+                            'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.25 7C9.25 8.24264 8.24264 9.25 7 9.25C5.75736 9.25 4.75 8.24264 4.75 7C4.75 5.75736 5.75736 4.75 7 4.75C8.24264 4.75 9.25 5.75736 9.25 7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M6.75 9.5V14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M10.75 12.25H15.25C16.3546 12.25 17.25 11.3546 17.25 10.25V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M19.25 7C19.25 8.24264 18.2426 9.25 17 9.25C15.7574 9.25 14.75 8.24264 14.75 7C14.75 5.75736 15.7574 4.75 17 4.75C18.2426 4.75 19.25 5.75736 19.25 7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M9.25 17C9.25 18.2426 8.24264 19.25 7 19.25C5.75736 19.25 4.75 18.2426 4.75 17C4.75 15.7574 5.75736 14.75 7 14.75C8.24264 14.75 9.25 15.7574 9.25 17Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>',
+                            'title' => get_string('competencies', 'competency'),
+                            'url' => new moodle_url('/admin/tool/lp/coursecompetencies.php', array('courseid' => $PAGE->course->id)),
+                            'isactiveitem' => $this->isMenuActive('/admin/tool/lp/coursecompetencies'),
+                            'itemid' => 'itemCompetency',
+                            ),
+                        array(
+                            'status' => $isitemongrades && $gradestatus,
+                            'icon' => '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.75 19.2502H18.25C18.8023 19.2502 19.25 18.8025 19.25 18.2502V5.75C19.25 5.19772 18.8023 4.75 18.25 4.75H5.75C5.19772 4.75 4.75 5.19772 4.75 5.75V18.2502C4.75 18.8025 5.19772 19.2502 5.75 19.2502Z"></path>
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 9.25L5.25 9.25"></path>
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 14.75L5.25 14.75"></path>
+                            </svg>
+                            ',
+                            'title' => get_string('grades', 'moodle'),
+                            'url' => $gradeurl,
+                            'isactiveitem' => $this->isMenuActive('/grade/report/grader/index.php'),
+                            'itemid' => 'itemGrade',
+                            ),
+                    ),
+                ];
             }
-            if ($coursehaseasyenrollment && isset($COURSE->id) && $COURSE->id > 1) {
-                $easycodetitle = get_string('header_coursecodes', 'enrol_easy');
-                $easycodelink = new moodle_url('/enrol/editinstance.php', array('courseid' => $PAGE->course->id,'id' => $easyenrollinstance->id,'type' => 'easy'));
+        }
+
+        if(get_config('theme_space', 'coursenavposition') == 2) {
+            return;
+        }
+        else {
+            return $this->render_from_template('theme_space/nav-course', $headerlinks);
+        }
+        
+    }
+
+
+    public function coursedrawermenu() {
+        global $PAGE, $COURSE, $USER, $DB;
+
+        $headerlinks = '';
+        // Turn on/off menu items
+        $isitemongrades = '';
+        $isitemonparticipants = '';
+        $isitemonbadges = '';
+        $isitemoncompetencies = '';
+
+        if(get_config('theme_space', 'isitemongrades') == 1) {
+            $isitemongrades = true;
+        }
+        if(get_config('theme_space', 'isitemonparticipants') == 1) {
+            $isitemonparticipants = true;
+        }
+        if(get_config('theme_space', 'isitemonbadges') == 1) {
+            $isitemonbadges = true;
+        }
+        if(get_config('theme_space', 'isitemoncompetencies') == 1) {
+            $isitemoncompetencies = true;
+        }
+
+        if(get_config('theme_space', 'showcoursenav') == 1) {
+            $showcoursenav = true;
+        } else {
+            $showcoursenav = false;
+        }
+
+        if (!$isitemongrades && !$isitemonparticipants && !$isitemonbadges && !$isitemoncompetencies) {
+            return false;
+        }
+
+        $editcog = html_writer::div($this->context_header_settings_menu() , 'pull-xs-right context-header-settings-menu');
+        // Header Menus for Users.
+
+        if ($PAGE->pagelayout !== 'coursecategory' && $PAGE->pagetype !== 'course-management' && $PAGE->pagetype !== 'course-delete') {
+            $course = $this->page->course;
+
+            $context = context_course::instance($course->id);
+            $hasgradebookshow = $PAGE->course->showgrades == 1;
+
+            $hascompetencyshow = get_config('core_competency', 'enabled');
+            $isteacher = has_capability('moodle/course:viewhiddenactivities', $context);
+
+            $gradeurl = '';
+            $gradestatus = '';
+            // Show for student in course.
+            if ($COURSE->id > 1 && isloggedin() && !isguestuser() && has_capability('gradereport/user:view', $context) && $hasgradebookshow) {
+                $gradeurl = new moodle_url('/grade/report/user/index.php', array('id' => $PAGE->course->id));
+                $gradestatus = true;
+            }
+            // Show for teacher in course.
+            if ($COURSE->id > 1 && has_capability('gradereport/grader:view', $context) && isloggedin() && !isguestuser()) {
+                $gradeurl = new moodle_url('/grade/report/grader/index.php', array('id' => $PAGE->course->id));
+                $gradestatus = true;
             }
 
             // Header links on course pages.
@@ -1108,8 +1430,86 @@ class core_renderer extends \core_renderer {
                 ];
             }
         }
-        return $this->render_from_template('theme_space/nav-course', $headerlinks);
+
+        if(get_config('theme_space', 'coursenavposition') == 1) {
+            return;
+        }
+        else {
+            return $this->render_from_template('theme_space/nav-course-drawer', $headerlinks);
+        }
+        
     }
+
+    
+    /**
+     * Returns standard navigation between activities in a course.
+     *
+     * @return string the navigation HTML.
+     */
+    public function activity_navigation() {
+        // First we should check if we want to add navigation.
+        $context = $this->page->context;
+        if (($this->page->pagelayout !== 'incourse' && $this->page->pagelayout !== 'frametop')
+            || $context->contextlevel != CONTEXT_MODULE) {
+            return '';
+        }
+        // If the activity is in stealth mode, show no links.
+        if ($this->page->cm->is_stealth()) {
+            return '';
+        }
+        $course = $this->page->cm->get_course();
+        $courseformat = course_get_format($course);
+
+        // Get a list of all the activities in the course.
+        $modules = get_fast_modinfo($course->id)->get_cms();
+        // Put the modules into an array in order by the position they are shown in the course.
+        $mods = [];
+        $activitylist = [];
+        foreach ($modules as $module) {
+            // Only add activities the user can access, aren't in stealth mode and have a url (eg. mod_label does not).
+            if (!$module->uservisible || $module->is_stealth() || empty($module->url)) {
+                continue;
+            }
+            $mods[$module->id] = $module;
+            // No need to add the current module to the list for the activity dropdown menu.
+            if ($module->id == $this->page->cm->id) {
+                continue;
+            }
+            // Module name.
+            $modname = $module->get_formatted_name();
+            // Display the hidden text if necessary.
+            if (!$module->visible) {
+                $modname .= ' ' . get_string('hiddenwithbrackets');
+            }
+            // Module URL.
+            $linkurl = new moodle_url($module->url, array('forceview' => 1));
+            // Add module URL (as key) and name (as value) to the activity list array.
+            $activitylist[$linkurl->out(false)] = $modname;
+        }
+        $nummods = count($mods);
+        // If there is only one mod then do nothing.
+        if ($nummods == 1) {
+            return '';
+        }
+        // Get an array of just the course module ids used to get the cmid value based on their position in the course.
+        $modids = array_keys($mods);
+        // Get the position in the array of the course module we are viewing.
+        $position = array_search($this->page->cm->id, $modids);
+        $prevmod = null;
+        $nextmod = null;
+        // Check if we have a previous mod to show.
+        if ($position > 0) {
+            $prevmod = $mods[$modids[$position - 1]];
+        }
+        // Check if we have a next mod to show.
+        if ($position < ($nummods - 1)) {
+            $nextmod = $mods[$modids[$position + 1]];
+        }
+        $activitynav = new \core_course\output\activity_navigation($prevmod, $nextmod, $activitylist);
+        $renderer = $this->page->get_renderer('core', 'course');
+        return $renderer->render($activitynav);
+    }
+
 
     /**
      * This is an optional menu that can be added to a layout by a theme. It contains the
@@ -1520,13 +1920,16 @@ class core_renderer extends \core_renderer {
     public function space_allcourseslink() {
         global $CFG;
         $allcourseicon = '';
+        $allcourses = '';
         //$allcoursetxt = theme_space_get_setting('stringallcourses');
         $allcoursetxt = format_text(theme_space_get_setting('stringallcourses'),FORMAT_HTML, array('noclean' => true));
 
-        if (!empty($allcoursetxt)) {
-            $allcourses = "<hr class=\"rui-sidebar-hr\"/><a class=\"rui-course-menu-list--more\" href=\"$CFG->wwwroot/course/index.php\">" . $allcoursetxt .'</a>';
-        } else {
-            $allcourses = '';
+        $systemcontext = context_system::instance();
+
+        if(has_capability('moodle/category:viewcourselist', $systemcontext)) {
+            if (!empty($allcoursetxt)) {
+                $allcourses = "<hr class=\"rui-sidebar-hr\"/><a class=\"rui-course-menu-list--more\" href=\"$CFG->wwwroot/course/index.php\">" . $allcoursetxt .'</a>';
+            }
         }
 
         return $allcourses;
@@ -1534,6 +1937,7 @@ class core_renderer extends \core_renderer {
 
     public function space_mycourses_heading() {
         global $CFG;
+        $html = null;
         $url = new moodle_url('/my/courses.php');
         $allcourseicon = '<svg width="18" height="18" fill="none" viewBox="0 0 24 24">
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
@@ -1548,7 +1952,7 @@ class core_renderer extends \core_renderer {
         } else {
             $html = '<a class="rui-course-menu-list--more mt-1" href="'.$url.'">' . get_string('details', 'moodle') . $allcourseicon .'</a><hr class="rui-sidebar-hr"/>';
         }
-
+        
         return $html;
     }
 
@@ -1651,7 +2055,7 @@ class core_renderer extends \core_renderer {
             }
         }
 
-        return '<ul class="rui-flatnavigation p-0">' . $content .'</ul>';
+        return '<ul id="myCoursesList" class="rui-flatnavigation p-0">' . $content .'</ul>';
     }
 
 
@@ -1967,7 +2371,7 @@ class core_renderer extends \core_renderer {
         // User login failures.
         if (!empty($opts->metadata['userloginfail'])) {
             $usermeta .= html_writer::div(
-                '<svg class="mr-2" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path><circle cx="12" cy="16" r="1" fill="currentColor"></circle></svg>' .  $opts->metadata['userloginfail'],
+                '<svg class="mr-1" width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path><circle cx="12" cy="16" r="1" fill="currentColor"></circle></svg>' .  $opts->metadata['userloginfail'],
                 'meta loginfailures'
             );
         }
@@ -2027,7 +2431,7 @@ class core_renderer extends \core_renderer {
                         break;
 
                     case 'link':
-                        $al = '<a class="dropdown-item" href="'.$value->url.'" data-identifier="'.$value->titleidentifier.'" title="'.$value->titleidentifier.'">'.$value->title.'</a>';
+                        $al = '<a class="dropdown-item" href="'.$value->url.'" data-identifier="'.$value->titleidentifier.'">'.$value->title.'</a>';
                         $am->add($al);
                         break;
                 }
@@ -2119,8 +2523,6 @@ class core_renderer extends \core_renderer {
         $context->logourl = $url;
         $context->sitename = format_string($SITE->fullname, true,
             ['context' => context_course::instance(SITEID), "escape" => false]);
-
-        $templatecontext = [];
 
         if ($PAGE->theme->settings->setloginlayout == 1) {
             $context->loginlayout1 = 1;
@@ -2237,6 +2639,28 @@ class core_renderer extends \core_renderer {
         $context['sitename'] = format_string($SITE->fullname, true,
             ['context' => context_course::instance(SITEID), "escape" => false]);
 
+        if ($PAGE->theme->settings->setloginlayout == 1) {
+            $context['loginlayout1'] = 1;
+        } elseif ($PAGE->theme->settings->setloginlayout == 2) {
+            $context['loginlayout2'] = 1;
+            if (isset($PAGE->theme->settings->loginbg)) {
+                $context['loginlayoutimg'] = 1;
+            }
+        } elseif ($PAGE->theme->settings->setloginlayout == 3) {
+            $context['loginlayout3'] = 1;
+            if (isset($PAGE->theme->settings->loginbg)) {
+                $context['loginlayoutimg'] = 1;
+            }
+        } elseif ($PAGE->theme->settings->setloginlayout == 4) {
+            $context['loginlayout4'] = 1;
+        } elseif ($PAGE->theme->settings->setloginlayout == 5) {
+            $context['loginlayout5'] = 1;
+        } 
+
+        if (isset($PAGE->theme->settings->loginlogooutside)) {
+            $context['loginlogooutside'] = $PAGE->theme->settings->loginlogooutside;
+        }
+
         if (isset($PAGE->theme->settings->stringbacktologin)) {
             $context['stringbacktologin'] = format_text(($PAGE->theme->settings->stringbacktologin),FORMAT_HTML, array('noclean' => true));
         }
@@ -2247,9 +2671,18 @@ class core_renderer extends \core_renderer {
             $context['signuptext'] = format_text(($PAGE->theme->settings->signuptext),FORMAT_HTML, array('noclean' => true));
         }
 
-        if (!empty($this->page->theme->settings->customloginlogo)) {
-            $url = $this->page->theme->setting_file_url('customloginlogo', 'customloginlogo');
+        if (!empty($PAGE->theme->settings->customloginlogo)) {
+            $url = $PAGE->theme->setting_file_url('customloginlogo', 'customloginlogo');
             $context['customloginlogo'] = $url;
+        }
+
+        if (!empty($PAGE->theme->settings->loginbg)) {
+            $url = $PAGE->theme->setting_file_url('loginbg', 'loginbg');
+            $context['loginbg'] = $url;
+        }
+
+        if (isset($PAGE->theme->settings->loginfootercontent)) {
+            $context['loginfootercontent'] = format_text(($PAGE->theme->settings->loginfootercontent),FORMAT_HTML, array('noclean' => true));
         }
 
         return $this->render_from_template('core/signup_form_layout', $context);
@@ -2288,225 +2721,6 @@ class core_renderer extends \core_renderer {
         return $firstview;
     }
 
-    // function theme_space_get_course_information_banners() {
-    //     global $CFG, $COURSE, $PAGE, $USER;
-    
-    //     // Initialize HTML code.
-    //     $html = '';
-    
-    //     // If the setting showhintcoursehidden is set, the visibility of the course is hidden and
-    //     // a hint for the visibility will be shown.
-    //     if (get_config('theme_space', 'showhintcoursehidden') == 'yes'
-    //             && $PAGE->has_set_url()
-    //             && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
-    //             && $COURSE->visible == false) {
-    //         $html .= html_writer::start_tag('div', array('class' => 'rui-course-hidden-infobox alert alert-warning wrapper-md'));
-    //         $html .= html_writer::start_tag('div', array('class' => 'media'));
-    //         $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
-    //         $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    //         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V15"></path>
-    //         <circle cx="12" cy="9" r="1" fill="currentColor"></circle>
-    //         <circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></circle>
-    //         </svg>';
-    //         $html .= html_writer::end_tag('div');
-    //         $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
-    //         $html .= get_string('showhintcoursehiddengeneral', 'theme_space', $COURSE->id);
-    //         // If the user has the capability to change the course settings, an additional link to the course settings is shown.
-    //         if (has_capability('moodle/course:update', context_course::instance($COURSE->id))) {
-    //             $html .= html_writer::tag('div', get_string('showhintcoursehiddensettingslink',
-    //                     'theme_space', array('url' => $CFG->wwwroot.'/course/edit.php?id='. $COURSE->id)));
-    //         }
-    //         $html .= html_writer::end_tag('div');
-    //         $html .= html_writer::end_tag('div');
-    //         $html .= html_writer::end_tag('div');
-    //     }
-    
-    //     // If the setting showhintcourseguestaccesssetting is set, a hint for users that view the course with guest access is shown.
-    //     // We also check that the user did not switch the role. This is a special case for roles that can fully access the course
-    //     // without being enrolled. A role switch would show the guest access hint additionally in that case and this is not
-    //     // intended.
-    //     if (get_config('theme_space', 'showhintcourseguestaccesssetting') == 'yes'
-    //             && is_guest(\context_course::instance($COURSE->id), $USER->id)
-    //             && $PAGE->has_set_url()
-    //             && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
-    //             && !is_role_switched($COURSE->id)) {
-    //         $html .= html_writer::start_tag('div', array('class' => 'rui-course-guestaccess-infobox alert alert-warning mt-4'));
-    //         $html .= html_writer::start_tag('div', array('class' => 'media'));
-    //         $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
-    //         $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    //         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path>
-    //         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path>
-    //         <circle cx="12" cy="16" r="1" fill="currentColor"></circle>
-    //         </svg>';
-    //         $html .= html_writer::end_tag('div');
-    //         $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
-    //         $html .= get_string('showhintcourseguestaccesssettinggeneral', 'theme_space',
-    //                 array('role' => role_get_name(get_guest_role())));
-    //         $html .= theme_space_get_course_guest_access_hint($COURSE->id);
-    //         $html .= html_writer::end_tag('div');
-    //         $html .= html_writer::end_tag('div');
-    //         $html .= html_writer::end_tag('div');
-    //     }
-    
-    //     // If the setting showhintcourseselfenrol is set, a hint for users is shown that the course allows unrestricted self
-    //     // enrolment. This hint is only shown if the course is visible, the self enrolment is visible and if the user has the
-    //     // capability "theme/space:viewhintcourseselfenrol".
-    //     if (get_config('theme_space', 'showhintcourseselfenrol') == 'yes'
-    //             && $PAGE->has_set_url()
-    //             && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
-    //             && $COURSE->visible == true) {
-    //         // Get the active enrol instances for this course.
-    //         $enrolinstances = enrol_get_instances($COURSE->id, true);
-    //         // Prepare to remember when self enrolment is / will be possible.
-    //         $selfenrolmentpossiblecurrently = false;
-    //         $selfenrolmentpossiblefuture = false;
-    //         foreach ($enrolinstances as $instance) {
-    //             // Check if unrestricted self enrolment is possible currently or in the future.
-    //             $now = (new \DateTime("now", \core_date::get_server_timezone_object()))->getTimestamp();
-    //             if ($instance->enrol == 'self' && empty($instance->password) && $instance->customint6 == 1 &&
-    //                     (empty($instance->enrolenddate) || $instance->enrolenddate > $now)) {
-    
-    //                 // Build enrol instance object with all necessary information for rendering the note later.
-    //                 $instanceobject = new stdClass();
-    
-    //                 // Remember instance name.
-    //                 if (empty($instance->name)) {
-    //                     $instanceobject->name = get_string('pluginname', 'enrol_self') .
-    //                             " (" . get_string('defaultcoursestudent', 'core') . ")";
-    //                 } else {
-    //                     $instanceobject->name = $instance->name;
-    //                 }
-    
-    //                 // Remember type of unrestrictedness.
-    //                 if (empty($instance->enrolenddate) && empty($instance->enrolstartdate)) {
-    //                     $instanceobject->unrestrictedness = 'unlimited';
-    //                     $selfenrolmentpossiblecurrently = true;
-    //                 } else if (empty($instance->enrolstartdate) &&
-    //                         !empty($instance->enrolenddate) && $instance->enrolenddate > $now) {
-    //                     $instanceobject->unrestrictedness = 'until';
-    //                     $selfenrolmentpossiblecurrently = true;
-    //                 } else if (empty($instance->enrolenddate) &&
-    //                         !empty($instance->enrolstartdate) && $instance->enrolstartdate > $now) {
-    //                     $instanceobject->unrestrictedness = 'from';
-    //                     $selfenrolmentpossiblefuture = true;
-    //                 } else if (empty($instance->enrolenddate) &&
-    //                         !empty($instance->enrolstartdate) && $instance->enrolstartdate <= $now) {
-    //                     $instanceobject->unrestrictedness = 'since';
-    //                     $selfenrolmentpossiblecurrently = true;
-    //                 } else if (!empty($instance->enrolstartdate) && $instance->enrolstartdate > $now &&
-    //                         !empty($instance->enrolenddate) && $instance->enrolenddate > $now) {
-    //                     $instanceobject->unrestrictedness = 'fromuntil';
-    //                     $selfenrolmentpossiblefuture = true;
-    //                 } else if (!empty($instance->enrolstartdate) && $instance->enrolstartdate <= $now &&
-    //                         !empty($instance->enrolenddate) && $instance->enrolenddate > $now) {
-    //                     $instanceobject->unrestrictedness = 'sinceuntil';
-    //                     $selfenrolmentpossiblecurrently = true;
-    //                 } else {
-    //                     // This should not happen, thus continue to next instance.
-    //                     continue;
-    //                 }
-    
-    //                 // Remember enrol start date.
-    //                 if (!empty($instance->enrolstartdate)) {
-    //                     $instanceobject->startdate = $instance->enrolstartdate;
-    //                 } else {
-    //                     $instanceobject->startdate = null;
-    //                 }
-    
-    //                 // Remember enrol end date.
-    //                 if (!empty($instance->enrolenddate)) {
-    //                     $instanceobject->enddate = $instance->enrolenddate;
-    //                 } else {
-    //                     $instanceobject->enddate = null;
-    //                 }
-    
-    //                 // Remember this instance.
-    //                 $selfenrolinstances[$instance->id] = $instanceobject;
-    //             }
-    //         }
-    
-    //         // If there is at least one unrestricted enrolment instance,
-    //         // show the hint with information about each unrestricted active self enrolment in the course.
-    //         if (!empty($selfenrolinstances) &&
-    //                 ($selfenrolmentpossiblecurrently == true || $selfenrolmentpossiblefuture == true)) {
-    //             // Start hint box.
-    //             $html .= html_writer::start_tag('div', array('class' => 'rui-course-selfenrol-infobox alert alert-info mt-4'));
-    //             $html .= html_writer::start_tag('div', array('class' => 'media'));
-    //             $html .= html_writer::start_tag('div', array('class' => 'mr-3'));
-    //             $html .= '<svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-    //             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 8.75L13.25 12L9.75 15.25"></path>
-    //             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V17.25C19.25 18.3546 18.3546 19.25 17.25 19.25H9.75"></path>
-    //             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 12H4.75"></path>
-    //             </svg>';
-    //             $html .= html_writer::end_tag('div');
-    //             $html .= html_writer::start_tag('div', array('class' => 'media-body align-self-center'));
-    
-    //             // Show the start of the hint depending on the fact if enrolment is already possible currently or
-    //             // will be in the future.
-    //             if ($selfenrolmentpossiblecurrently == true) {
-    //                 $html .= get_string('showhintcourseselfenrolstartcurrently', 'theme_space');
-    //             } else if ($selfenrolmentpossiblefuture == true) {
-    //                 $html .= get_string('showhintcourseselfenrolstartfuture', 'theme_space');
-    //             }
-    //             $html .= html_writer::empty_tag('br');
-    
-    //             // Iterate over all enrolment instances to output the details.
-    //             foreach ($selfenrolinstances as $selfenrolinstanceid => $selfenrolinstanceobject) {
-    //                 // If the user has the capability to config self enrolments, enrich the instance name with the settings link.
-    //                 if (has_capability('enrol/self:config', \context_course::instance($COURSE->id))) {
-    //                     $url = new moodle_url('/enrol/editinstance.php', array('courseid' => $COURSE->id,
-    //                             'id' => $selfenrolinstanceid, 'type' => 'self'));
-    //                     $selfenrolinstanceobject->name = html_writer::link($url, $selfenrolinstanceobject->name);
-    //                 }
-    
-    //                 // Show the enrolment instance information depending on the instance configuration.
-    //                 if ($selfenrolinstanceobject->unrestrictedness == 'unlimited') {
-    //                     $html .= get_string('showhintcourseselfenrolunlimited', 'theme_space',
-    //                             array('name' => $selfenrolinstanceobject->name));
-    //                 } else if ($selfenrolinstanceobject->unrestrictedness == 'until') {
-    //                     $html .= get_string('showhintcourseselfenroluntil', 'theme_space',
-    //                             array('name' => $selfenrolinstanceobject->name,
-    //                                     'until' => userdate($selfenrolinstanceobject->enddate)));
-    //                 } else if ($selfenrolinstanceobject->unrestrictedness == 'from') {
-    //                     $html .= get_string('showhintcourseselfenrolfrom', 'theme_space',
-    //                             array('name' => $selfenrolinstanceobject->name,
-    //                                     'from' => userdate($selfenrolinstanceobject->startdate)));
-    //                 } else if ($selfenrolinstanceobject->unrestrictedness == 'since') {
-    //                     $html .= get_string('showhintcourseselfenrolsince', 'theme_space',
-    //                             array('name' => $selfenrolinstanceobject->name,
-    //                                     'since' => userdate($selfenrolinstanceobject->startdate)));
-    //                 } else if ($selfenrolinstanceobject->unrestrictedness == 'fromuntil') {
-    //                     $html .= get_string('showhintcourseselfenrolfromuntil', 'theme_space',
-    //                             array('name' => $selfenrolinstanceobject->name,
-    //                                     'until' => userdate($selfenrolinstanceobject->enddate),
-    //                                     'from' => userdate($selfenrolinstanceobject->startdate)));
-    //                 } else if ($selfenrolinstanceobject->unrestrictedness == 'sinceuntil') {
-    //                     $html .= get_string('showhintcourseselfenrolsinceuntil', 'theme_space',
-    //                             array('name' => $selfenrolinstanceobject->name,
-    //                                     'until' => userdate($selfenrolinstanceobject->enddate),
-    //                                     'since' => userdate($selfenrolinstanceobject->startdate)));
-    //                 }
-    
-    //                 // Add a trailing space to separate this instance from the next one.
-    //                 $html .= ' ';
-    //             }
-    
-    //             // If the user has the capability to config self enrolments, add the call for action.
-    //             if (has_capability('enrol/self:config', \context_course::instance($COURSE->id))) {
-    //                 $html .= html_writer::empty_tag('br');
-    //                 $html .= get_string('showhintcourseselfenrolinstancecallforaction', 'theme_space');
-    //             }
-    
-    //             // End hint box.
-    //             $html .= html_writer::end_tag('div');
-    //             $html .= html_writer::end_tag('div');
-    //             $html .= html_writer::end_tag('div');
-    //         }
-    //     }
-    
-    //     // Return HTML code.
-    //     return $html;
-    // }
     
     /**
      * Build the guest access hint HTML code.

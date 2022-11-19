@@ -82,7 +82,7 @@ class theme_space_mod_lesson_renderer extends mod_lesson_renderer {
         $output .= '&nbsp;';
 
         $nolink = html_writer::link(new moodle_url('/mod/lesson/view.php', array('id' => $this->page->cm->id,
-            'pageid' => $lesson->firstpageid, 'startlastseen' => 'no')), get_string('no'), array('class' => 'btn btn-secondary'));
+            'pageid' => $lesson->firstpageid, 'startlastseen' => 'no')), get_string('no'), array('class' => 'btn btn-sm btn-secondary'));
         $output .= html_writer::tag('span', $nolink, array('class'=>'lessonbutton standardbutton'));
 
         $output .= $this->output->box_end();

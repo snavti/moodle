@@ -1,9 +1,95 @@
 CHANGELOG
 Space Moodle Theme
 - - - -
-## [2.1.3] - August XX, 2022
+## [2.2.3] - October 27, 2022
+Fixed:
++ Missing Course Index Button on Mobile
+
+
+
+## [2.2.2] - October 27, 2022
+Fixed:
++ Minor bug fixes: Dashboard Template, Block Calendar UI, Login Page Layout #4, #5
+
+
+
+## [2.2.1] - October 25, 2022
+Improvements:
++ Quiz UI on mobile
++ Course Index Close Button Position
+
+Fixed:
++ Badges Layout issue
++ Footer Links
++ Atto Editor Image Link
++ Minor bug fixes
+
+
+
+## [2.2] - October 14, 2022
+Added: 
++ Optional Course Menu (Participants, Grades, ...) [Space - Course page - Show Course Navigation]
+
+Improvements:
++ My Courses Box is optional [Sidebar - Show My Courses]
++ My Courses Box on the Sidebar - UI improvements:
+  + max-height of the box [Sidebar - My Courses Wrapper Height] 
+  + searchable list
++ My Courses Box on the Sidebar (List of all courses depends on user permissions - moodle/category:viewcourselist)
+  https://docs.moodle.org/400/en/Course_list_viewer_role
++ Course Menu (Badges, Participants, ...) right now is optional
++ Removed Confusing Labels on Hover in User Menu
++ Hidden activities now have got a different style (opacity 60%)
++ Edwiser Course Format UI Improvements
+
+Fixed:
++ Multi-lang bug (Footer Items)
++ Content Wrapper Alignment (Block #1, #2, #3)
++ Minor Bug Fixes
+
+
+
+## [2.1.5] - September 27, 2022
+Added:
++ Position of the Course Menu (Participants, Grades, ...) [Space - Course page - Course Navigation Items]
+
+Improvements:
++ Old activity navigation is back
++ Grading UI
++ Quiz UI
+
+Fixed:
++ Sign up page (minor bug fixes)
++ RWD Minor Bug Fixes
+
+
+
+## [2.1.4] - September 21, 2022
+Added:
++ Block #1 - Slider Interval
++ Feedback Fruits Plugin Custom Icon
++ Additional Class For a Guest Users (moodle-guest-user)
+
+Fixed:
++ BigBlueButton UI Support
++ Course Summary Image (added via file manager)
++ Login page layouts - RWD Improvements
++ Footer Color Customization
++ RWD Top Bar
++ H5P bug fixes
++ Minor bug fixes
+
+Improvements
++ Embedded Video UI (black border has been removed)
++ Badge for long names of categories
+
+
+
+## [2.1.3] - September 5, 2022
 Fixed:
 + Missing URL on Block #5
++ Grading issues
+
 
 
 ## [2.1.2] - August 18, 2022
@@ -11,12 +97,15 @@ Fixed:
 + Missing titles on the course index page (Moodle 4.0.2+)
 + Minor bug fixes
 
+
+
 ## [2.1.1] - August 9, 2022
 Improvements:
 + Language Icon
 
 Fixed:
 + Block #0 (Main Moodle Blocks) position 
+
 
 
 ## [2.1] - August 5, 2022
@@ -54,7 +143,6 @@ Improvements:
 + Theme Settings - description Improvements
 + UI Improvements
 
-
 Fixes:
 + Block #2 Issue (Video Hero) - Show Colorized Content Wrapper
 + Block #4 (FAQ) translation issue
@@ -66,8 +154,6 @@ Fixes:
 + Theme settings issue - Top bar - Turn on a logo area
 + Quiz edit question issue
 + Unnecessary background image on the login page (Layout #2, #3)
-
-
 
 
 

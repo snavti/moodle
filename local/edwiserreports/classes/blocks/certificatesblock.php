@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 use stdClass;
 use context_module;
-use context_course;
 use core_user;
 use html_writer;
 use cache;
@@ -40,6 +39,15 @@ require_once($CFG->dirroot.'/grade/report/grader/lib.php');
  * Class Certifictes Block. To get the data for certificates.
  */
 class certificatesblock extends block_base {
+
+    /**
+     * Initialize the block.
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->cache = cache::make('local_edwiserreports', 'certificates');
+    }
+
     /**
      * Preapre layout for each block
      * @return object Layout object
@@ -56,11 +64,10 @@ class certificatesblock extends block_base {
         $this->layout->name = get_string('certificatestatsheader', 'local_edwiserreports');
         $this->layout->info = get_string('certificatestatsblockhelp', 'local_edwiserreports');
         $this->layout->morelink = new moodle_url($CFG->wwwroot . "/local/edwiserreports/certificates.php");
-        $this->layout->hasdownloadlink = true;
-        $this->layout->filters = '';
+        $this->layout->downloadlinks = $this->get_block_download_links();
+        $this->layout->filters = $this->get_filters();
 
         // Block related data.
-        $this->block = new stdClass();
         $this->block->displaytype = 'line-chart';
 
         // Add block view in layout.
@@ -74,6 +81,19 @@ class certificatesblock extends block_base {
     }
 
     /**
+     * Prepare Inactive users filter
+     * @return string Filter HTML content
+     */
+    public function get_filters() {
+        global $OUTPUT;
+        return $OUTPUT->render_from_template('local_edwiserreports/certificatesblockfilters', [
+            'cohort' => $this->get_cohorts(true),
+            'searchicon' => $this->image_icon('actions/search'),
+            'placeholder' => get_string('searchcourse', 'local_edwiserreports')
+        ]);
+    }
+
+    /**
      * Get data for certificates block
      * @param  object $params Parameters
      * @return object         Response object for Certificates Block
@@ -82,48 +102,71 @@ class certificatesblock extends block_base {
         $response = new stdClass();
         $response->data = new stdClass();
         // Get response from cache.
-        $cache = cache::make('local_edwiserreports', 'certificates');
-        if (!$response = $cache->get('response')) {
+        if (!$response = $this->cache->get('response')) {
             $response = new stdClass();
-            $response->data = new stdClass();
-            $response->data->customcerts = self::get_certificate_list();
-
+            $response->data = $this->get_certificate_list(0);
             // Set cache for certificate response.
-            $cache->set('response', $response);
+            $this->cache->set('response', $response);
         }
 
         return $response;
     }
 
     /**
-     * Get all certificates list with details
-     * for certificates block
-     * @return [array] Array of Certifcates
+     * Get all certificates list with details for certificates block
+     * @param  int   $cohort Cohort id
+     * @return array         Array of Certifcates
      */
-    public static function get_certificate_list() {
+    public function get_certificate_list($cohort) {
         global $DB;
 
+        $cohortjoin = '';
+        if ($cohort) {
+            $cohortjoin = 'JOIN {cohort_members} cm ON cm.userid = ci.userid AND cm.cohortid = :cohortid
+                        JOIN {cohort} c ON c.id = cm.cohortid AND c.visible = 1';
+        }
+
+        $courses = $this->get_courses_of_user();
+        // Temporary course table.
+        $coursetable = utility::create_temp_table('tmp_c_c', array_keys($courses));
+
         $certificates = array();
-        $customcert = $DB->get_records("customcert", array());
+        $customcert = $DB->get_records_sql(
+            "SELECT c.*
+            FROM {customcert} c
+            JOIN {{$coursetable}} ct ON c.course = ct.tempid"
+        );
+
+        utility::drop_temp_table($coursetable);
+
         $sqlcm = "SELECT cm.id FROM {course_modules} cm
-            JOIN {modules} m ON m.id = cm.module
-            WHERE cm.course = ? AND cm.instance = ? AND m.name = ?";
+                    JOIN {modules} m ON m.id = cm.module
+                   WHERE cm.course = :course
+                     AND cm.instance = :certificate
+                     AND m.name = :name";
         foreach ($customcert as $certificate) {
             $course = get_course($certificate->course);
-            $coursecontext = context_course::instance($course->id);
             $cm = $DB->get_record_sql($sqlcm, array(
-                $certificate->course,
-                $certificate->id,
-                "customcert"
+                'course' => $certificate->course,
+                'certificate' => $certificate->id,
+                'name' => 'customcert'
             ), IGNORE_MULTIPLE);
 
             $modulecontext = context_module::instance($cm->id);
             // Get only enrolled students.
-            $enrolledusers = \local_edwiserreports\utility::get_enrolled_students($cm->id, $modulecontext);
+            $enrolledusers = \local_edwiserreports\utility::get_enrolled_students($cm->id, $modulecontext, $cohort);
 
-            $sql = "SELECT * FROM {customcert_issues}
-                WHERE customcertid = :customcertid";
+            $sql = "SELECT ci.*
+                      FROM {customcert_issues} ci
+                      $cohortjoin
+                     WHERE ci.customcertid = :customcertid";
             $params['customcertid'] = $certificate->id;
+
+            // Cohort params.
+            if ($cohort) {
+                $params["cohortid"] = $cohort;
+            }
+
             $issued = $DB->get_records_sql($sql, $params);
             // Number of perople who can view certificates.
             $notawareded = 0;
@@ -164,40 +207,41 @@ class certificatesblock extends block_base {
      * @param  int    $cohortid Cohort id
      * @return object           Certifcates details object
      */
-    public static function get_issued_users($certid, $cohortid = false) {
+    public function get_issued_users($certid, $cohortid = false) {
         global $DB;
 
-        $cache = cache::make('local_edwiserreports', 'certificates');
-        $cachekey = "certificates-userslist-" . $certid . "-";
-        if ($cohortid) {
-            $cachekey .= $cohortid;
-        } else {
-            $cachekey .= "all";
-        }
+        $cachekey = "certificates-userslist-" . $certid . "-" . $cohortid;
 
         $response = new stdClass();
         // Get certificates details from cache.
-        if (!$issuedcert = $cache->get($cachekey)) {
+        if (!$issuedcert = $this->cache->get($cachekey)) {
             $certificate = $DB->get_record("customcert", array("id" => $certid));
             $course = get_course($certificate->course);
 
-            $sql = "SELECT * FROM {customcert_issues} WHERE customcertid= :customcertid";
-            $params['customcertid'] = $certid;
+            $params = [
+                'customcertid' => $certid
+            ];
+
+            // Cohort sql.
+            $cohortjoin = '';
+            if ($cohortid) {
+                $cohortjoin = 'JOIN {cohort_members} cm ON cm.userid = ci.userid AND cm.cohortid = :cohortid
+                            JOIN {cohort} c ON c.id = cm.cohortid AND c.visible = 1';
+                $params['cohortid'] = $cohortid;
+            }
+            $sql = "SELECT ci.*
+                      FROM {customcert_issues} ci
+                      $cohortjoin
+                     WHERE ci.customcertid = :customcertid";
+
             $issued = $DB->get_recordset_sql($sql, $params);
             $issuedcert = array();
             foreach ($issued as $issue) {
-                if ($cohortid) {
-                    $cohorts = cohort_get_user_cohorts($issue->userid);
-                    if (!array_key_exists($cohortid, $cohorts)) {
-                        continue;
-                    }
-                }
-
-                $issuedcert[] = self::get_certinfo($course, $issue);
+                $issuedcert[] = $this->get_certinfo($course, $issue);
             }
 
             // Set cache for issued certificates.
-            $cache->set($cachekey, $issuedcert);
+            $this->cache->set($cachekey, $issuedcert);
         }
         $response->data = $issuedcert;
 
@@ -210,7 +254,7 @@ class certificatesblock extends block_base {
      * @param  object $issue  stdClass object of issued certificates
      * @return object         Certificate information
      */
-    public static function get_certinfo($course, $issue) {
+    public function get_certinfo($course, $issue) {
         global $DB;
 
         $enrolsql = "SELECT ue.id, ue.timemodified
@@ -226,7 +270,7 @@ class certificatesblock extends block_base {
         $gradeval = 0;
         $grade = \local_edwiserreports\utility::get_grades($course->id, $issue->userid);
         if ($grade) {
-            $gradeval = $grade->finalgrade;
+            $gradeval = round($grade->finalgrade / $grade->grademax * 100, 2);
         }
 
         $enrolment = $DB->get_record_sql($enrolsql, $params, IGNORE_MULTIPLE);
@@ -267,7 +311,7 @@ class certificatesblock extends block_base {
         $certinfo->email = $user->email;
         $certinfo->issuedate = date("d M y", $issue->timecreated);
         $certinfo->dateenrolled = $enrolmentdate;
-        $certinfo->grade = number_format($gradeval, 2);
+        $certinfo->grade = $gradeval . '%';
         $certinfo->courseprogress = $courseprogresshtml;
         return $certinfo;
     }
@@ -307,7 +351,8 @@ class certificatesblock extends block_base {
      * @return [array] Array certificates information
      */
     public static function get_exportable_data_block() {
-        $certificates = self::get_certificate_list();
+        $cert = new self();
+        $certificates = $cert->get_certificate_list(0);
         foreach ($certificates as $key => $certificate) {
             unset($certificate["id"]);
             $certificates[$key] = array_values($certificate);
@@ -327,8 +372,8 @@ class certificatesblock extends block_base {
      */
     public static function get_exportable_data_report($certid) {
         $cohortid = optional_param("cohortid", 0, PARAM_INT);
-
-        $record = self::get_issued_users($certid, $cohortid);
+        $blockobj = new self();
+        $record = $blockobj->get_issued_users($certid, $cohortid);
 
         $users = array();
 
@@ -340,6 +385,12 @@ class certificatesblock extends block_base {
         $out = array_merge(array(
             self::get_headers_report()
         ), $users);
-        return $out;
+
+        return (object) [
+            'data' => $out,
+            'options' => [
+                'orientation' => 'l',
+            ]
+        ];
     }
 }

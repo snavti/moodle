@@ -128,6 +128,13 @@ $page = new admin_settingpage('theme_space_settingssidebar', get_string( 'settin
     $setting = new admin_setting_heading($name, $heading, format_text(get_string('hmycoursesbtn_desc', 'theme_space'), FORMAT_MARKDOWN));
     $page->add($setting);
 
+    $name = 'theme_space/showmycoursesbox';
+    $title = get_string('showmycoursesbox', 'theme_space');
+    $description = get_string('showmycoursesbox_desc', 'theme_space');
+    $default = 1;
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+    $page->add($setting);
+
     $name = 'theme_space/stringmycourses';
     $title = get_string('stringmycourses', 'theme_space');
     $description = get_string('stringmycourses_desc', 'theme_space');
@@ -154,6 +161,14 @@ $page = new admin_settingpage('theme_space_settingssidebar', get_string( 'settin
     $description = get_string('stringnocourses_desc', 'theme_space');
     $default = 'You are not enrolled in any courses.';
     $setting = new admin_setting_configtextarea($name, $title, $description, $default);
+    $page->add($setting);
+
+    $name = 'theme_space/mycourseswrapperheight';
+    $title = get_string('mycourseswrapperheight', 'theme_space');
+    $description = get_string('mycourseswrapperheight_desc', 'theme_space');
+    $default = '';
+    $setting = new admin_setting_configtext($name, $title, $description, $default);
+    $setting->set_updatedcallback('theme_reset_all_caches');
     $page->add($setting);
 
     $name = 'theme_space/hsidebarcolors';

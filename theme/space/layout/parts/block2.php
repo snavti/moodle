@@ -41,6 +41,20 @@ $img = $PAGE->theme->setting_file_url("block2videoposter", "block2videoposter");
 $mp4 = $PAGE->theme->setting_file_url("block2videomp4", "block2videomp4");
 $webm = $PAGE->theme->setting_file_url("block2videowebm", "block2videowebm");
 
+$block2wrapperalignclass = null;
+if($block2wrapperalign == 0) {
+    $block2wrapperalignclass = 'rui-hero-content-left';
+}
+
+if($block2wrapperalign == 1) {
+    $block2wrapperalignclass = 'rui-hero-content-centered';
+}
+
+if($block2wrapperalign == 2) {
+    $block2wrapperalignclass = 'rui-hero-content-right';
+}
+
+
 if(theme_space_get_setting('showblock2wrapper') == '1') {
     $class = 'rui-hero-content-backdrop';
 } else {
@@ -63,7 +77,7 @@ echo '<!-- Start Block #2 -->';
         }
 
         echo '<div class="rui-hero-video">';
-        echo '<div class="rui-hero-content rui-hero-content--video '.$class.' rui-hero-content-position rui-hero-content-left rui-hero-content-backdrop">';
+        echo '<div class="rui-hero-content rui-hero-content--video '.$class.' rui-hero-content-position  '.$block2wrapperalignclass.' rui-hero-content-backdrop">';
             if(!empty($title)) {
                 echo '<h3 class="rui-hero-title">'.$title.'</h3>';
             }

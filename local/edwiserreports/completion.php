@@ -22,12 +22,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_edwiserreports;
-
-use context_system;
-use context_course;
-use moodle_url;
-
 require_once(__DIR__ . '/../../config.php');
 require_once('classes/output/renderable.php');
 
@@ -44,8 +38,16 @@ require_login(get_course($courseid));
 
 local_edwiserreports_get_required_strings_for_js();
 
+// Load color themes from constants.
+local_edwiserreports\utility::load_color_pallets();
+
 // Get course context.
 $coursecontext = context_course::instance($courseid);
+
+// Check capability.
+if (!has_capability('report/edwiserreports_completionblock:view', $coursecontext)) {
+    throw new moodle_exception(get_string('noaccess', 'local_edwiserreports'));
+}
 
 // Add CSS for edwiserreports.
 $PAGE->requires->css('/local/edwiserreports/styles/edwiserreports.min.css');
@@ -54,10 +56,14 @@ $PAGE->requires->css('/local/edwiserreports/styles/edwiserreports.min.css');
 $pageurl = new moodle_url($CFG->wwwroot . "/local/edwiserreports/completion.php", array("courseid" => $courseid));
 
 // Set page context.
-$PAGE->set_context($coursecontext);
+// Setting system context to hide course setting options.
+$PAGE->set_context(context_system::instance());
 
 // Set page layout.
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('base');
+
+// Add theme class to body.
+$PAGE->add_body_classes(array('theme_' . $PAGE->theme->name));
 
 // Set page URL.
 $PAGE->set_url($pageurl);
@@ -69,7 +75,7 @@ $PAGE->requires->js_call_amd('local_edwiserreports/completion', 'init', array($c
 $renderable = new \local_edwiserreports\output\completion_renderable();
 $output = $PAGE->get_renderer($component)->render($renderable);
 
-$PAGE->set_heading(get_string("completionheader", "local_edwiserreports", array('coursename' => $course->fullname)));
+$PAGE->set_heading('');
 $PAGE->set_title(get_string("completionheader", "local_edwiserreports", array('coursename' => $course->fullname)));
 
 // Print output for course completion page.

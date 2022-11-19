@@ -41,6 +41,13 @@ select {
     }
 }
 
+.reportlink {
+    @include media-breakpoint-between(xs,sm) {
+        text-align: center;
+
+        a { width: 100%; }
+    }
+}
 
 
 .maincalendar .calendarmonth td,
@@ -232,8 +239,15 @@ div#dock {
 
 #intro {
     margin-top: 0;
-    margin-bottom: $page-padding-global;
     padding: 0!important;
+
+    @include media-breakpoint-up(md) {
+    margin-bottom: $page-padding-global;
+    }
+
+    @include media-breakpoint-between(xs,sm) {
+    margin-bottom: 16px;
+    }
 }
 
 .nav .caret {
@@ -283,13 +297,19 @@ div#dock {
         justify-content: center;
 
         border: $border-width solid $border-color;
-        border-radius: $border-radius;
+        border-radius: $btn-border-radius;
 
         background-color: transparent;
         font-size: .85rem;
         font-weight: $font-weight-bold;
         color: $topbar-text;
 
+        .theme-dark & {
+            color: $dm-topbar-text;
+            border-color: $dm-border-color;
+        }
+
+        table &,
         .aabtn & {
             margin-right: .35rem;
         }
@@ -358,7 +378,7 @@ div#dock {
     }
 }
 
-@include media-breakpoint-down(sm) {
+@include media-breakpoint-between(xs,sm) {
     .usertext {
         display: none;
     }
@@ -569,17 +589,6 @@ div#dock {
     }
 }
 
-.path-mod-resource .resourcedetails,
-.resourcelinkdetails {
-    font-size: $font-size-sm;
-    color: $body-color-secondary;
-
-    .theme-dark & {
-        color: $dm-body-color-secondary;
-    }
-}
-
-
 //---- Survey
 //---- Activity Module
 .path-mod-survey {
@@ -587,8 +596,6 @@ div#dock {
         .reportlink {
             margin-top: 20px;
             margin-bottom: 20px;
-
-            text-align: left;
         }
 
         .rui-main-content-title--h3 {
@@ -626,4 +633,58 @@ div#dock {
         }
     }
 
+}
+
+
+//----  BigBlueButton Custom UI
+.bigbluebutton-container {
+    overflow-x: auto;
+
+    .yui3-datatable-paginator {
+        background-color: transparent;
+        background-image: none;
+
+        padding: 10px 0;
+        font-size: $font-size-sm;
+    }
+
+    .yui3-datatable-paginator-group {
+        button {
+            padding: $btn-padding-y-sm $btn-padding-x-sm;
+            font-size: $btn-font-size-sm;
+
+            background-color: $gray-200;
+            border: 0;
+            border-radius: $btn-border-radius;
+            color: $gray-900;
+          
+            .theme-dark & {
+              background-color: $dm-gray-200;
+              color: $dm-gray-900;
+            }
+          
+            &:hover {
+              background-color: $gray-300;
+              border: 0;
+              color: $gray-900;
+              box-shadow: none;
+          
+              .theme-dark & {
+                background-color: $dm-gray-300;
+                color: $dm-gray-900;
+              }
+            }
+        }
+
+        input, select {
+            margin: 0 .5rem;
+            min-width: 3rem;
+            padding: $btn-padding-y-sm $btn-padding-x-sm;
+            font-size: $btn-font-size-sm;
+            background: transparent;
+            border: $custom-select-border-width solid $custom-select-border-color;
+            border-radius: $btn-border-radius;
+            color: $gray-900;  
+        }
+    }
 }

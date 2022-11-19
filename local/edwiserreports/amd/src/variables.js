@@ -1,3 +1,23 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Plugin administration pages are defined here.
+ *
+ * @copyright   2021 wisdmlabs <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /* eslint-disable camelcase */
 // eslint-disable-next-line no-unused-vars
 define(['jquery', 'local_edwiserreports/variables'], function($) {
@@ -7,9 +27,9 @@ define(['jquery', 'local_edwiserreports/variables'], function($) {
         requestType: 'GET',
         requestDataType: 'json',
         whiteColor: "rgba(255, 255, 255, 0.8)",
-        todaysActivityBlock: "#todaysactivityblock .ct-chart",
-        activeUsersBlock: "#activeusersblock .ct-chart",
-        courseProgressBlock: "#courseprogressblock .ct-chart",
+        todaysActivityBlock: "#todaysactivityblock #apex-chart-todays-activity",
+        activeUsersBlock: "#activeusersblock #apex-chart-active-users",
+        courseProgressBlock: "#courseprogressblock #apex-chart-course-progress",
         lpStatsBlock: "#lpstatsblock .ct-chart",
         month_1: "JAN",
         month_2: "FEB",
@@ -60,235 +80,13 @@ define(['jquery', 'local_edwiserreports/variables'], function($) {
         // Plugin component
         component: 'local_edwiserreports',
 
-        // Get scheduled email context
-        getScheduledEmailFormContext: function() {
-            return {
-                timesdropdown: [
-                    {
-                        timestring: "12:00 AM",
-                        value: 0
-                    },
-                    {
-                        timestring: "01:00 AM",
-                        value: 1
-                    },
-                    {
-                        timestring: "02:00 AM",
-                        value: 2
-                    },
-                    {
-                        timestring: "03:00 AM",
-                        value: 3
-                    },
-                    {
-                        timestring: "04:00 AM",
-                        value: 4
-                    },
-                    {
-                        timestring: "05:00 AM",
-                        value: 5
-                    },
-                    {
-                        timestring: "06:00 AM",
-                        value: 6
-                    },
-                    {
-                        timestring: "07:00 AM",
-                        value: 7
-                    },
-                    {
-                        timestring: "08:00 AM",
-                        value: 8
-                    },
-                    {
-                        timestring: "09:00 AM",
-                        value: 9
-                    },
-                    {
-                        timestring: "10:00 AM",
-                        value: 10
-                    },
-                    {
-                        timestring: "11:00 AM",
-                        value: 11
-                    },
-                    {
-                        timestring: "12:00 PM",
-                        value: 12
-                    },
-                    {
-                        timestring: "01:00 PM",
-                        value: 13
-                    },
-                    {
-                        timestring: "02:00 PM",
-                        value: 14
-                    },
-                    {
-                        timestring: "03:00 PM",
-                        value: 15
-                    },
-                    {
-                        timestring: "04:00 PM",
-                        value: 16
-                    },
-                    {
-                        timestring: "05:00 PM",
-                        value: 17
-                    },
-                    {
-                        timestring: "06:00 PM",
-                        value: 18
-                    },
-                    {
-                        timestring: "07:00 PM",
-                        value: 19
-                    },
-                    {
-                        timestring: "08:00 PM",
-                        value: 20
-                    },
-                    {
-                        timestring: "09:00 PM",
-                        value: 21
-                    },
-                    {
-                        timestring: "10:00 PM",
-                        value: 22
-                    },
-                    {
-                        timestring: "11:00 PM",
-                        value: 23
-                    },
-                ],
-                daysdropdown: [
-                    {
-                        string: 1,
-                        value: 1,
-                    },
-                    {
-                        string: 2,
-                        value: 2,
-                    },
-                    {
-                        string: 3,
-                        value: 3,
-                    },
-                    {
-                        string: 4,
-                        value: 4,
-                    },
-                    {
-                        string: 5,
-                        value: 5,
-                    },
-                    {
-                        string: 6,
-                        value: 6,
-                    },
-                    {
-                        string: 7,
-                        value: 7,
-                    },
-                    {
-                        string: 8,
-                        value: 8,
-                    },
-                    {
-                        string: 9,
-                        value: 9,
-                    },
-                    {
-                        string: 10,
-                        value: 10
-                    },
-                    {
-                        string: 11,
-                        value: 11
-                    },
-                    {
-                        string: 12,
-                        value: 12
-                    },
-                    {
-                        string: 13,
-                        value: 13
-                    },
-                    {
-                        string: 14,
-                        value: 14
-                    },
-                    {
-                        string: 15,
-                        value: 15
-                    },
-                    {
-                        string: 16,
-                        value: 16
-                    },
-
-                    {
-                        string: 17,
-                        value: 17
-                    },
-                    {
-                        string: 18,
-                        value: 18
-                    },
-                    {
-                        string: 19,
-                        value: 19
-                    },
-                    {
-                        string: 20,
-                        value: 20
-                    },
-                    {
-                        string: 21,
-                        value: 21
-                    },
-                    {
-                        string: 22,
-                        value: 22
-                    },
-                    {
-                        string: 23,
-                        value: 23
-                    },
-                    {
-                        string: 24,
-                        value: 24
-                    },
-                    {
-                        string: 25,
-                        value: 25
-                    },
-                    {
-                        string: 26,
-                        value: 26
-                    },
-                    {
-                        string: 27,
-                        value: 27
-                    },
-                    {
-                        string: 28,
-                        value: 28
-                    },
-                    {
-                        string: 29,
-                        value: 29
-                    },
-                    {
-                        string: 30,
-                        value: 30
-                    },
-                    {
-                        string: 31,
-                        value: 31
-                    }
-                ]
-            };
+        // Datatable stylingclasses.
+        datatableClasses: {
+            buttonSpacing: 'mx-2',
+            buttonSize: "px-3 py-1",
+            buttonActive: "border-secondary bg-secondary text-dark rounded",
+            buttonInactive: "border theme-primary-border theme-primary-text rounded",
+            prevNextSpacing: "px-4 py-1"
         },
 
         // Change the export URL for export buttons
@@ -328,7 +126,8 @@ define(['jquery', 'local_edwiserreports/variables'], function($) {
         /* Format Date in specific format */
         formatDate: function(date, format, utc) {
             var MMMM = ["\x00", "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"];
+                "July", "August", "September", "October", "November", "December"
+            ];
             var MMM = ["\x01", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             var dddd = ["\x02", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
             var ddd = ["\x03", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -437,53 +236,6 @@ define(['jquery', 'local_edwiserreports/variables'], function($) {
                 vars[key] = value;
             });
             return vars[paramKey];
-        },
-
-        getEmailModalHeader: function(blockname, emailtype) {
-            var modalHeader = "";
-            switch (emailtype) {
-                case 1:
-                    modalHeader = "Schedule Emails for ";
-                    break;
-                default:
-                    modalHeader = "Send ";
-            }
-
-            switch (blockname) {
-                case "activeusers":
-                    modalHeader += "Active Users";
-                    break;
-                case "activecourses":
-                    modalHeader += "Popular Courses";
-                    break;
-                case "courseprogress":
-                    modalHeader += "Course Progress";
-                    break;
-                case "certificates":
-                    modalHeader += "Certificates";
-                    break;
-                case "f2fsession":
-                    modalHeader += "Instructor-Led Sessions";
-                    break;
-                case "lpstats":
-                    modalHeader += "Learning Program";
-                    break;
-                case "courseengage":
-                    modalHeader += "Course Engagement";
-                    break;
-                case "courseanalytics":
-                    modalHeader += "Course Analytics";
-                    break;
-                case "completion":
-                    modalHeader += "Course Completion";
-                    break;
-            }
-
-            if (modalHeader != "Send " && emailtype != 1) {
-                modalHeader += " Reports";
-            }
-
-            return modalHeader;
         }
     };
 });

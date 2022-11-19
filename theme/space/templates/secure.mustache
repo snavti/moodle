@@ -53,51 +53,23 @@
 <body {{{ bodyattributes }}}>
 {{> core/local/toast/wrapper}}
 
-<div id="page-wrapper" class="mt-5 wrapper-md {{#output.courseheadermenu}}rui--course-with-nav{{/output.courseheadermenu}} {{^output.courseheadermenu}}rui--course-witout-nav{{/output.courseheadermenu}}">
+<div id="page-wrapper" class="d-print-block wrapper-md">
 
     {{{ output.standard_top_of_body_html }}}
 
-    <div id="page" class="p-0 container-fluid">
+    <div id="page" data-region="mainpage" class="container-fluid drawers">
 
-        <div id="page-content" class="page-content wrapper-xxl>
-
+        <div id="page-content" class="page-content wrapper-xl">
             {{{coursepageinformationbanners}}}
-
-            <div class="wrapper-fw mt-6 mb-3">{{{ output.simpler_header }}}</div>
-
-            {{#courseimagefw}}
-            <div class="rui-course-cover wrapper-xxl">{{{ output.course_hero }}}</div>
-            {{/courseimagefw}}
-
-            <div id="region-main-box" class="region-main-wrapper">
-                {{#hasregionmainsettingsmenu}}
-                <div id="region-main-settings-menu" class="rui-blocks-area {{#hassidecourseblocks}}has-sidecourseblocks{{/hassidecourseblocks}}">
-                    <div> {{{ output.region_main_settings_menu }}} </div>
-                </div>
-                {{/hasregionmainsettingsmenu}}
-
+            <div id="region-main-box">
                 <section id="region-main" class="{{#hassidecourseblocks}}has-sidecourseblocks wrapper-has-blocks{{/hassidecourseblocks}}" aria-label="{{#str}}content{{/str}}">
                     <div {{#hassidecourseblocks}}class="blocks-wrapper d-inline-flex flex-wrap justify-content-between w-100"{{/hassidecourseblocks}}>
                         <div class="{{#hassidecourseblocks}}wrapper-blocks mx-0{{/hassidecourseblocks}}">
-
                             {{#courseimagecontent}}<div class="rui-course-cover mb-4">{{{ output.course_hero }}}</div>{{/courseimagecontent}}
-
-                            {{#hasregionmainsettingsmenu}}
-                                <div class="region_main_settings_menu_proxy"></div>
-                            {{/hasregionmainsettingsmenu}}
                             {{{ output.course_content_header }}}
                             {{{ output.main_content }}}
-                            {{{ output.activity_navigation }}}
                             {{{ output.course_content_footer }}}
                         </div>
-                        {{#hassidecourseblocks}}
-
-                        <div class="tmpl-course-blocks">
-                            <section id="sidecourseblocks" data-region="tmpl-incourse-blocks" class="rui-blocks-area">
-                                {{{ sidecourseblocks }}}
-                            </section>
-                        </div>
-                        {{/hassidecourseblocks}}
                     </div>
                 </section>
 
@@ -109,7 +81,7 @@
 
     {{{ output.standard_after_main_region_html }}}
     
-    <footer class="my-4 py-3 wrapper-md">
+    <footer class="my-4 py-3 wrapper-md text-center">
         <div class="rui-footer-copy rui-footer-content">
             {{{ footercopy }}}
         </div>

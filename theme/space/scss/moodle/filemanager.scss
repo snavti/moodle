@@ -68,7 +68,7 @@
 
 @include media-breakpoint-between(xs,md) {
     .filepicker.moodle-dialogue {
-        max-width: 100%;
+        max-width: 90%;
         height: 100%!important;
 
         .container {
@@ -83,8 +83,18 @@
             height: max-content;
         }
         
-        .rui-nav-col {
+        .rui-nav-wrapper {
             margin-bottom: $page-padding-global;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .rui-nav-col {
+            width: max-content;
+
+            .nav {
+                display: inline-flex;
+            }
         }
 
         ul li {
@@ -175,7 +185,7 @@
     }
 
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
     margin-bottom: .35rem;
     }
 }
@@ -1062,7 +1072,7 @@ a.ygtvspacer:hover {
 .fm-content-wrapper {
     position: relative;
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
     overflow-x: auto;
     }
 }

@@ -1069,12 +1069,14 @@ div.disabled {
 // New styles for the messaging UI. Once MDL-63303 is done all CSS above this line should be removed.
 
 .message-drawer {
-    width: 360px!important;
-
     background-color: $container-bg;
 
     .theme-dark & {
         background-color: $dm-container-bg;
+    }
+
+    @include media-breakpoint-up(md) {
+    width: 360px;
     }
 
     @include media-breakpoint-only(sm) {

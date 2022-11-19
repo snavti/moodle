@@ -72,7 +72,7 @@ $page = new admin_settingpage('theme_space_block16', get_string('settingsblock16
       
           <h2 class="display-2 mt-4">Hi! Cześć! ¡Hola!<br>Space 2.0 is here!</h2>
           <p class="rui-block-text--1 mt-3">Completely redesigned user interface. Better UX. In-build dark mode. All Moodle 4.0 features! Optimized - 50% less CSS,</p>
-          <div class="d-flex mt-4 justify-content-center w-100"><a href="https://rosea.io/space" class="m-2 btn btn-lg btn-dark">Get this theme for $99*</a><a href="https://rosea.gitbook.io/spaceheme/" class="m-2 btn btn-lg btn-secondary">Documentation</a></div>
+          <div class="d-flex mt-4 justify-content-center w-100 flex-wrap"><a href="https://rosea.io/space" class="m-2 btn btn-lg btn-dark">Get this theme for $99*</a><a href="https://rosea.gitbook.io/spaceheme/" class="m-2 btn btn-lg btn-secondary">Documentation</a></div>
       
           <p class="rui-block-text--light rui-block-text--3 mt-3">Trusted by hundreds customers</p>
       

@@ -42,8 +42,8 @@
         }
     }
 }}
-<div id="{{element.wrapperid}}" class="form-group row px-0 {{#error}}has-danger{{/error}} fitem {{#element.emptylabel}}femptylabel col-12{{/element.emptylabel}} {{#advanced}}advanced{{/advanced}} {{{element.extraclasses}}}" {{#element.groupname}}data-groupname="{{.}}"{{/element.groupname}}>
-    <div class="col-md-3 text-md-right mb-sm-2 mb-md-0">
+<div id="{{element.wrapperid}}" class="form-group row px-0 mb-2 {{#error}}has-danger{{/error}} fitem {{#element.emptylabel}}femptylabel col-12{{/element.emptylabel}} {{#advanced}}advanced{{/advanced}} {{{element.extraclasses}}}" {{#element.groupname}}data-groupname="{{.}}"{{/element.groupname}}>
+    <div class="col-md-3 text-md-right mb-sm-1 mb-md-0 pl-0">
         {{^element.staticlabel}}
         <label class="col-form-label d-inline {{#element.hiddenlabel}}sr-only{{/element.hiddenlabel}}" for="{{element.id}}">
             {{{label}}}
@@ -55,8 +55,8 @@
         </label>
         {{/element.staticlabel}}
         <sup class="sup">
-            {{#required}}<span title="{{#str}}required{{/str}}">{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}</span>{{/required}}
-            {{#advanced}}<span title="{{#str}}advanced{{/str}}">!</span>{{/advanced}}
+            {{#required}}<span title="{{#str}}required{{/str}}" class="rui-req-icon">{{#pix}}req, core, {{#str}}required{{/str}}{{/pix}}</span>{{/required}}
+            {{#advanced}}<span title="{{#str}}advanced{{/str}}" class="rui-adv-icon">!</span>{{/advanced}}
             {{{helpbutton}}}
         </sup>
     </div>

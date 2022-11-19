@@ -43,7 +43,7 @@ if ($hassiteconfig) {
                         $options));
 
         // Current IP validation against list for description.
-        $allowedips = get_config('tool_heartbeat', 'allowedips');
+        $allowedips = tool_heartbeat\lib::get_allowed_ips();
         $description = '';
         if (trim($allowedips) == '') {
             $message = 'allowedipsempty';
@@ -56,7 +56,7 @@ if ($hassiteconfig) {
             $type = 'notifyerror';
         };
         $description .= $OUTPUT->notification(get_string($message, 'tool_heartbeat', ['ip' => getremoteaddr()]), $type);
-
+        $description .= html_writer::tag('p', get_string('ips_combine', 'tool_heartbeat'));
 
         // IP entry box for blocking.
         $iplist = new admin_setting_configiplist('tool_heartbeat/allowedips',
@@ -65,10 +65,35 @@ if ($hassiteconfig) {
                     ''  );
         $settings->add($iplist);
 
+        $iplist = new admin_setting_configiplist(
+            'tool_heartbeat/allowedips_forced',
+            get_string('builtinallowediplist', 'tool_heartbeat'),
+            get_string('builtinallowediplist_desc', 'tool_heartbeat'),
+            ''
+        );
+        $settings->add($iplist);
+
         $settings->add(new admin_setting_configduration('tool_heartbeat/errorlog',
                 get_string('errorlog', 'tool_heartbeat'),
                 get_string('errorlogdesc', 'tool_heartbeat'), 30 * MINSECS, MINSECS));
+
+        $settings->add(new admin_setting_configtext('tool_heartbeat/configuredauths',
+                get_string('configuredauths', 'tool_heartbeat'),
+                get_string('configuredauthsdesc', 'tool_heartbeat'), '', PARAM_TEXT));
+
+        $opts = [
+            'critical' => 'CRITICAL',
+            'criticalbusiness' => get_string('error_critical_business', 'tool_heartbeat'),
+            'warning' => 'WARNING'
+        ];
+        $time = new \DateTime('now', core_date::get_server_timezone_object());
+        $settings->add(new admin_setting_configselect('tool_heartbeat/errorcritical',
+                get_string('errorascritical', 'tool_heartbeat'),
+                get_string('errorascritical_desc', 'tool_heartbeat', $time->format('e P')), 'warning', $opts));
+
+        $example = '\logstore_standard\task\cleanup_task, 5, 5, 5';
+        $settings->add(new admin_setting_configtextarea('tool_heartbeat/tasklatencymonitoring',
+                get_string('tasklatencymonitoring', 'tool_heartbeat'),
+                get_string('tasklatencymonitoring_desc', 'tool_heartbeat', $example), '', PARAM_TEXT));
     }
 }
-
-

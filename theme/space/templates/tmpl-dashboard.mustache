@@ -62,7 +62,7 @@
     <div id="page" data-region="mainpage" data-usertour="scroller" class="container-fluid drawers {{#blockdraweropen}}show-hidden-drawer{{/blockdraweropen}} drag-container">
         <div id="topofscroll" class="main-inner">
             <div id="page-content" class="page-content wrapper-page">
-            {{> theme_space/navbar-secondary }}
+                {{> theme_space/navbar-secondary }}
                 {{{coursepageinformationbanners}}}
                 <div class="wrapper-header">
                     {{#headeractions}}
@@ -114,7 +114,7 @@
                                         {{#hasdleftblocks}}
                                         <div id="blocks-dashboardleftblock" class="{{#hastwocol}}{{^customdcolsize}}col-lg-3{{/customdcolsize}}{{customdcolsize}}{{/hastwocol}}{{^hastwocol}}col-lg-3{{/hastwocol}} rui-blocks-area rui-blocks-area--sm">
                                             {{{ dleftblocks }}}
-                                            <div class="mt-3">{{{ drightblocks }}}</div>
+                                            <div {{^dleftblocks}}class="mt-3"{{/dleftblocks}}>{{{ drightblocks }}}</div>
                                         </div>
                                         {{/hasdleftblocks}}
                                     {{/hasleftcolumn}}
@@ -129,7 +129,7 @@
                                         {{#hasdrightblocks}}
                                         <div id="blocks-dashboardrightblock" class="{{#hastwocol}}{{^customdcolsize}}col-lg-3{{/customdcolsize}}{{customdcolsize}}{{/hastwocol}}{{^hastwocol}}col-lg-3{{/hastwocol}} rui-blocks-area rui-blocks-area--sm">
                                             {{{ drightblocks }}}
-                                            <div class="mt-3">{{{ dleftblocks }}}</div>
+                                            <div {{^drightblocks}}class="mt-3"{{/drightblocks}}>{{{ dleftblocks }}}</div>
                                         </div>
                                         {{/hasdrightblocks}}             
                                     {{/hasrightcolumn}}
@@ -145,14 +145,6 @@
                                 </div>
                                 {{/hasdbottomblocks}}
 
-                                {{#hasdbottomblocks}}
-                                <div class="rui-dashboard-bottom mt-4 mb-4">
-                                    <div data-region="blocks-dashboardbottomblock" class="col-12 p-0">
-                                    {{{ dbottomblocks }}}
-                                    </div>
-                                </div>
-                                {{/hasdbottomblocks}}
-
                             </div>
                         </div>
                         {{{ output.activity_navigation }}}
@@ -160,8 +152,8 @@
                     </section>
                 </div>                    
             </div> 
-        </div>           
-    {{> theme_space/footer }}
+        </div>
+        {{> theme_space/footer }}           
     </div>
        
     {{^hiddensidebar}}

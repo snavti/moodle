@@ -19,7 +19,6 @@ declare(strict_types=1);
 namespace tool_certificate\reportbuilder\local\systemreports;
 
 use core\output\inplace_editable;
-use core_course\local\entities\course_category;
 use core_reportbuilder\local\report\action;
 use core_reportbuilder\system_report;
 use html_writer;
@@ -60,7 +59,12 @@ class templates extends system_report {
         $this->add_entity($entitymain);
 
         // Add categories/tool_certificate_templates joins/entity.
-        $coursecatentity = new course_category();
+        if (class_exists(\core_course\reportbuilder\local\entities\course_category::class)) {
+            // Class was renamed in Moodle LMS 4.1.
+            $coursecatentity = new \core_course\reportbuilder\local\entities\course_category();
+        } else {
+            $coursecatentity = new \core_course\local\entities\course_category();
+        }
         $coursecatentityalias = $coursecatentity->get_table_alias('course_categories');
         $contextalias = $coursecatentity->get_table_alias('context');
 
@@ -117,6 +121,7 @@ class templates extends system_report {
         // Add inplaceeditable, visible icon and shared badge (if needed) to certificate name column.
         if ($column = $this->get_column('template:name')) {
             $column
+                ->set_title(new lang_string('name', 'tool_certificate'))
                 ->set_callback([$this, 'nameeditable'])
                 ->add_field("{$entitymainalias}.shared")
                 ->add_callback([certificateformatter::class, 'append_shared_badge']);
@@ -125,6 +130,7 @@ class templates extends system_report {
         // Add link to category name column.
         if ($column = $this->get_column('course_category:name')) {
             $column
+                ->set_title(new lang_string('coursecategory'))
                 ->set_callback([certificateformatter::class, 'course_category_name'])
                 ->add_callback([$this, 'coursecategoryname']);
         }
@@ -151,32 +157,6 @@ class templates extends system_report {
      * Note the use of ":id" placeholder which will be substituted according to actual values in the row
      */
     protected function add_actions(): void {
-        // Edit content.
-        $this->add_action((new action(
-            new moodle_url('/admin/tool/certificate/template.php', ['id' => ':id']),
-            new pix_icon('t/right', ''),
-            [],
-            false,
-            new lang_string('editcontent', 'tool_certificate')
-        ))->add_callback(function() {
-            return $this->lasttemplate->can_manage();
-        }));
-
-        // Edit details.
-        $this->add_action((new action(
-            new moodle_url('#'),
-            new pix_icon('i/settings', ''),
-            [
-                'data-action' => 'editdetails',
-                'data-id' => ':id',
-                'data-name' => ':name'
-            ],
-            false,
-            new lang_string('editdetails', 'tool_certificate')
-        ))->add_callback(function() {
-            return $this->lasttemplate->can_manage();
-        }));
-
         // Preview.
         $this->add_action((new action(
             new moodle_url('/admin/tool/certificate/view.php', ['templateid' => ':id', 'preview' => 1, 'code' => 'previewing']),
@@ -188,17 +168,6 @@ class templates extends system_report {
             new lang_string('preview')
         ))->add_callback(function() {
             return $this->lasttemplate->can_manage();
-        }));
-
-        // View issues.
-        $this->add_action((new action(
-            new moodle_url('/admin/tool/certificate/certificates.php', ['templateid' => ':id']),
-            new pix_icon('a/view_list_active', ''),
-            [],
-            false,
-            new lang_string('certificatesissued', 'tool_certificate')
-        ))->add_callback(function() {
-            return $this->lasttemplate->can_view_issues();
         }));
 
         // Issue certificate.
@@ -265,9 +234,8 @@ class templates extends system_report {
         global $PAGE;
         $template = $this->lasttemplate;
 
-        $canedit = $template->can_manage();
         $name = $template->get_formatted_name();
-        if ($canedit) {
+        if ($template->can_manage()) {
             $name = html_writer::link($template->edit_url(), $name);
 
             $value = $template->get('name');
@@ -275,9 +243,11 @@ class templates extends system_report {
             $editlabel = get_string('newvaluefor', 'form', $template->get_formatted_name());
 
             $inlineeditable = new inplace_editable('tool_certificate', 'templatename',
-                $template->get('id'), $canedit, $name, $value, $edithint, $editlabel);
+                $template->get('id'), true, $name, $value, $edithint, $editlabel);
 
             $name = $inlineeditable->render($PAGE->get_renderer('core'));
+        } else if ($template->can_view_issues()) {
+            $name = html_writer::link($template->view_issues_url(), $name);
         }
 
         return $name;

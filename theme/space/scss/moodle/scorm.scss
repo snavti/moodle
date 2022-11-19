@@ -6,6 +6,18 @@
     padding: 0!important;
 }
 
+#scormviewform {
+    @include media-breakpoint-between(xs,sm) {
+        .btn,
+        .form-inline .custom-select {
+        padding: 8px 20px;
+        margin: 2px 0!important;
+        width: 100%;
+        max-width: 100%;
+        } 
+    }
+}
+
 #scormtablecontainer {
     #attempts {
         .c5, .c6 {

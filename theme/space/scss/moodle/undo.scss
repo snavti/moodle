@@ -207,7 +207,7 @@ $allow-reset-style: true !default;
                 }
 
                 .card-body {
-                    @include media-breakpoint-down(sm) {
+                    @include media-breakpoint-between(xs,sm) {
                         padding-left: 0;
                         padding-right: 0;
                     }
@@ -251,7 +251,7 @@ $allow-reset-style: true !default;
                         }
                     }
 
-                    @include media-breakpoint-down(sm) {
+                    @include media-breakpoint-between(xs,sm) {
                         padding-left: 0;
                         padding-right: 0;
                     }

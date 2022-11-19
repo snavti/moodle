@@ -22,7 +22,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require(__DIR__ . '/../../../config.php');
+// @codingStandardsIgnoreStart
+require_once('../../../config.php');
+// @codingStandardsIgnoreEnd
+
+tool_heartbeat\lib::validate_ip_against_config();
 
 $syscontext = context_system::instance();
 $PAGE->set_url('/admin/tool/heartbeat/compresscheck.php');

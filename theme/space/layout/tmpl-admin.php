@@ -123,6 +123,9 @@ if (!$courseindex) {
     $courseindexopen = false;
 }
 $hasblocks = (strpos($blockshtml, 'data-block=') !== false || !empty($addblockbutton));
+if (!$hasblocks) {
+    $blockdraweropen = false;
+}
 $PAGE->set_secondary_navigation(false);
 $renderer = $PAGE->get_renderer('core');
 

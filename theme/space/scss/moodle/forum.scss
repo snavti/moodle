@@ -76,6 +76,7 @@
             // Do not use the default bold style for the table headings.
             font-weight: inherit;
             padding-left: 12px!important; //to align content with table header
+            min-width: 200px;
         }
 
         .userpicture {
@@ -541,8 +542,10 @@
 }
 
 .forum-post-reply {
-    margin-left: 77px;
-    max-width: 70%;
+    @include media-breakpoint-up(md) {
+        margin-left: 77px;
+        max-width: 70%;
+    }
 }
 
 .forum-icon-col {
@@ -649,7 +652,7 @@ $author-image-margin-sm: 8px;
         height: auto;
         border-radius: 10rem;
 
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-between(xs,sm) {
             margin-top: .5rem;
         }
     }
@@ -761,7 +764,7 @@ $author-image-margin-sm: 8px;
 }
 
 /** Extra small devices (portrait phones, less than 576px). */
-@include media-breakpoint-down(sm) {
+@include media-breakpoint-between(xs,sm) {
     #page-mod-forum-discuss.nested-v2-display-mode {
         .forum-post-container {
             .author-image-container {
@@ -1288,6 +1291,7 @@ $grading-content-show-content-button-padding-left: calc(#{map-get($spacers, 2) *
             position: fixed;
             overflow: auto;
             top: 0;
+            z-index: $zindex-fixed + 90;
         }
         .body-container {
             overflow: visible;
@@ -1795,12 +1799,6 @@ $grading-content-show-content-button-padding-left: calc(#{map-get($spacers, 2) *
     }
 }
 
-.grade-form {
-  input {
-    width: 100%;
-  }
-}
-
 #page-mod-forum-search {
 
     .rui-main-content-title--h4 {
@@ -1905,5 +1903,33 @@ $grading-content-show-content-button-padding-left: calc(#{map-get($spacers, 2) *
     }
 }
 
+@include media-breakpoint-between(xs,sm) {
+    .rui-exportdiscussion,
+    .rui-movediscussion {
+        width: 100%;
 
+        div {
+            width: 100%;
+        }
+
+        .btn,
+        .form-inline .custom-select {
+            margin: 2px 0!important;
+            width: 100%;
+            max-width: 100%;
+        } 
+        
+        .form-inline .custom-select {
+            height: 40px;
+            padding: 3px 6px;
+            font-size: $font-size-xs;
+        }
+    }
+
+    .rui-forum-buttons {
+        .btn {
+            width: 100%;
+        }
+    }
+}
 // End styling for mod_forum.

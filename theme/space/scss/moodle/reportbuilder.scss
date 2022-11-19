@@ -4,8 +4,11 @@
 
 /* Table */
 #page-admin-reportbuilder-edit {
+    background-color: $container-bg;
+    
     #page-popup {
         margin-top: 65px;
+        padding: 0;
     }
 }
 .reportbuilder-table {
@@ -19,7 +22,7 @@
     .filters-dropdown {
         width: 27rem;
         padding: 0;
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-between(xs,sm) {
             width: 100%;
         }
     }
@@ -50,7 +53,6 @@
             .filter-header {
                 font-size: $h5-font-size;
                 .filter-name {
-                    font-size: 1rem;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -124,7 +126,7 @@ $rb-right-sidebar-width: 350px;
         flex-shrink: 0;
     }
     .card-body .list-group-item {
-        padding: .75rem;
+        padding: .3rem .75rem;
         .icon {
             width: 18px;
             height: 18px;
@@ -145,7 +147,7 @@ $rb-right-sidebar-width: 350px;
         flex-shrink: 0;
     }
     .list-group-item {
-        padding: .75rem;
+        padding: .3rem .75rem;
         .icon {
             width: 18px;
             height: 18px;
@@ -223,11 +225,10 @@ $rb-right-sidebar-width: 350px;
         .dynamictabs .nav-tabs {
             position: fixed;
             z-index: $zindex-fixed;
-            width: calc(100% - 60px);
+            width: calc(100% - 40px);
+            border-radius: 0;
             padding-top: 0;
             margin-bottom: 0!important;
-            background-color: $white;
-            box-shadow: 0 1.25rem 0 $white; // Small hack to simulate padding bottom after nav-tabs border.
         }
         .dynamictabs .tab-content {
             padding-top: $tabs-height;

@@ -77,31 +77,38 @@
                     {{{pageheadingbutton}}}
                 </div>
 
-                <div id="region-main-box" class="region-main-wrapper">
-                    <section id="region-main" class="region-main-content {{#hasblocks}}has-blocks{{/hasblocks}}" aria-label="{{#str}}content{{/str}}">
-                        <div {{#hasblocks}}class="blocks-wrapper d-inline-flex justify-content-between w-100"{{/hasblocks}}>
-                            <div class="{{#hasblocks}}wrapper-blocks{{/hasblocks}}">
-                                {{#hasregionmainsettingsmenu}}
-                                    <div class="region_main_settings_menu_proxy"></div>
-                                {{/hasregionmainsettingsmenu}}
-           
-                                {{#headercontent}}
-                                    {{> core/activity_header }}
-                                {{/headercontent}}
-                                {{#overflow}}
-                                    <div class="container-fluid tertiary-navigation">
-                                        <div class="navitem">
-                                            {{> core/url_select}}
-                                        </div>
+                <section id="region-main" class="{{#hassidecourseblocks}}has-sidecourseblocks wrapper-has-blocks{{/hassidecourseblocks}}" aria-label="{{#str}}content{{/str}}">
+                    <div {{#hassidecourseblocks}}class="blocks-wrapper d-inline-flex flex-wrap justify-content-between w-100"{{/hassidecourseblocks}}>
+                        <div class="{{#hassidecourseblocks}}wrapper-blocks mx-0{{/hassidecourseblocks}}">
+                            {{#hasregionmainsettingsmenu}}
+                                <div class="region_main_settings_menu_proxy"></div>
+                            {{/hasregionmainsettingsmenu}}
+        
+                            {{#headercontent}}
+                                {{> core/activity_header }}
+                            {{/headercontent}}
+                            {{#overflow}}
+                                <div class="container-fluid tertiary-navigation">
+                                    <div class="navitem">
+                                        {{> core/url_select}}
                                     </div>
-                                {{/overflow}}                        
-                                {{{ output.main_content }}}
-                            </div>
+                                </div>
+                            {{/overflow}}                        
+                            {{{ output.main_content }}}
                         </div>
-                        {{{ output.activity_navigation }}}
-                        {{{ output.course_content_footer }}}
-                    </section>
-                </div>
+                    
+                        {{#hassidecourseblocks}}
+                        <div class="tmpl-course-blocks">
+                            <section id="sidecourseblocks" data-region="tmpl-incourse-blocks" class="rui-blocks-area">
+                                {{{ sidecourseblocks }}}
+                            </section>
+                        </div>
+                        {{/hassidecourseblocks}}
+                    </div>
+                    {{{ output.activity_navigation }}}
+                    {{{ output.course_content_footer }}}
+                </section>
+
             </div>
         </div>
         {{> theme_space/footer }}

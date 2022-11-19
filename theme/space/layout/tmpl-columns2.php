@@ -110,6 +110,10 @@ if ($PAGE->course->visible == '1') {
     $extraclasses[] = 'rui-course--visible';
 }
 
+if ($hassidecourseblocks) {
+    $extraclasses[] = 'page-has-blocks';
+}
+
 $forceblockdraweropen = $OUTPUT->firstview_fakeblocks();
 
 
@@ -124,6 +128,9 @@ if($courseindexopen == false) {
     $extraclasses[] = 'drawer-open-index--open';
 }
 $hasblocks = (strpos($blockshtml, 'data-block=') !== false || !empty($addblockbutton));
+if (!$hasblocks) {
+    $blockdraweropen = false;
+}
 $PAGE->set_secondary_navigation(false);
 $renderer = $PAGE->get_renderer('core');
 
@@ -151,6 +158,11 @@ if(!isloggedin()) {
     $isnotloggedin = false;
 }
 
+//Check if geust user
+if (isguestuser()) {
+    $extraclasses[] = 'moodle-guest-user';
+}
+
 // Default moodle setting menu
 $buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions() && !$PAGE->has_secondary_navigation();
 // If the settings menu will be included in the header then don't add it here.
@@ -173,6 +185,8 @@ $templatecontext = [
     'navdraweropen' => $navdraweropen,
     'draweropenright' => $draweropenright,
     'isnotloggedin' => $isnotloggedin,
+    'sidecourseblocks' => $sidecourseblocks,
+    'hassidecourseblocks' => $hassidecourseblocks,
     // Moodle 4.0
     'courseindexopen' => $courseindexopen,
     'blockdraweropen' => $blockdraweropen,

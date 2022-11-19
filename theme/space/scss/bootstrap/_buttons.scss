@@ -108,6 +108,8 @@
 .itemnav a,
 #page-enrol-index .main-content [type="submit"],
 .rui-pre button,
+.pick.template,
+.action.remove,
 .addcomponent //Atto Editor
 {
   padding: $btn-padding-y $btn-padding-x;
@@ -703,6 +705,8 @@ input[type="button"] {
 .itemnav a,
 .que .comment a,
 .btn-inverse,
+.pick.template,
+.action.remove,
 .addcomponent //Atto Editor
 {
     @extend .btn-secondary;
@@ -945,8 +949,8 @@ input[type="button"] {
       bottom: 20px;
       z-index: $zindex-sticky;
 
-      @include media-breakpoint-down(sm) {
-        bottom: 70px;
+      @include media-breakpoint-between(xs,sm) {
+        bottom: 60px;
       }
     }
 
@@ -1023,7 +1027,7 @@ input[type="button"] {
       font-size: 13px;
       font-weight: $font-weight-medium;
 
-      @include media-breakpoint-down(sm) {
+      @include media-breakpoint-between(xs,sm) {
         margin-top: 10px;
         margin-left: 0;
         white-space: break-spaces;
@@ -1174,7 +1178,7 @@ input[type="button"] {
 
 
     // Button Settings - Turn editin on/off
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
     .btn--text {
       display: none;
     }

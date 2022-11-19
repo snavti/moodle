@@ -29,7 +29,7 @@
         "welcomemessage": "welcomemessage"
     }
 }}
-<header id="page-header" class="page-header-content">
+<header id="page-header" class="page-header-content flex-wrap">
     {{#contextheader}}{{{contextheader}}}{{/contextheader}}
     {{#courseheader}}
     <div id="course-header">{{{courseheader}}}</div>
@@ -39,9 +39,9 @@
     {{{pageheadingbutton}}}
     </div>
 
-    <div class="header-actions-container ml-auto" data-region="header-actions-container">
+    <div class="header-actions-container mt-sm-3 mt-md-0 ml-md-auto" data-region="header-actions-container">
     {{#headeractions}}
-    <div class="header-action ml-2">{{{.}}}</div>
+    <div class="header-action ml-md-2">{{{.}}}</div>
     {{/headeractions}}
     </div>
 </header>

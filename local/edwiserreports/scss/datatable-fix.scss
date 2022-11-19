@@ -1,4 +1,7 @@
+/* stylelint-disable declaration-no-important */
+
 table.dataTable {
+    border-bottom: 0 !important;
     thead {
         .sorting:before,
         .sorting_asc:before,
@@ -6,7 +9,6 @@ table.dataTable {
         .sorting_asc_disabled:before,
         .sorting_desc_disabled:before {
             margin-top: -5px;
-            content: "";
             -webkit-transform: translateY(-50%);
             -ms-transform: translateY(-50%);
             -o-transform: translateY(-50%);
@@ -16,7 +18,6 @@ table.dataTable {
             position: absolute;
             top: 50%;
             right: 1em;
-            content: "";
         }
         .sorting:after,
         .sorting_asc:after,
@@ -24,7 +25,6 @@ table.dataTable {
         .sorting_asc_disabled:after,
         .sorting_desc_disabled:after {
             margin-top: 5px;
-            content: "";
             -webkit-transform: translateY(-50%);
             -ms-transform: translateY(-50%);
             -o-transform: translateY(-50%);
@@ -34,28 +34,29 @@ table.dataTable {
             position: absolute;
             top: 50%;
             right: 1em;
-            content: "";
         }
     }
-    tr, td {
+    tr,
+    td {
         background-color: unset;
     }
     th {
         vertical-align: middle;
+        border-bottom: 0 !important;
     }
 }
 
 .dataTables_wrapper {
     padding: 0;
-    > .row {
+    >.row {
         overflow: auto;
-        margin: 0 0 1rem 0;
+        margin: 0;
     }
 }
 
 .table-responsive {
-    > div.dataTables_wrapper {
-        > div.row:nth-child(2) {
+    >div.dataTables_wrapper {
+        >div.row:nth-child(2) {
             clear: both;
             overflow-x: scroll;
         }
@@ -73,14 +74,52 @@ table.dataTable td.dataTables_empty {
 }
 
 .dataTables_wrapper table.dataTable thead>tr>th {
-	padding: 10px 30px 10px 10px;
+    padding: 10px 30px 10px 10px;
 }
 
 .dataTables_wrapper .row div[class^='col-'] {
-	padding-right: 0;
-	padding-left: 0;
+    padding-right: 0;
+    padding-left: 0;
 }
 
 .dataTables_wrapper table.dataTable tr td {
-	background-color: #fff !important;
+    background-color: #fff !important;
+}
+
+// Data table.
+.edwiserreports-table {
+    .table-filter {
+        [type="search"] {
+            margin-left: 0;
+        }
+        .dataTables_length {
+            margin-left: auto;
+        }
+    }
+    .dataTables_info {
+        padding: 0;
+        float: none;
+    }
+    .table-pagination {
+        display: flex;
+        .dataTables_paginate {
+            margin: 0 auto;
+            .paginate_button {
+                &.disabled {
+                    &.previous,
+                    &.next {
+                        opacity: 0.3;
+                    }
+                }
+                &:hover {
+                    background: transparent !important;
+                    border-color: transparent !important;
+                    a {
+                        outline: 0 !important;
+                        background: transparent !important;
+                    }
+                }
+            }
+        }
+    }
 }

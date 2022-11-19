@@ -157,14 +157,14 @@ class course_renderer extends \core_course_renderer {
         }
 
         $coursecount = 1;
-        $content .= html_writer::start_tag('div', array('class' => 'rui-course-card-deck rui-course-card-deck--4 mt-2'));
+        $content .= html_writer::start_tag('div', array('class' => 'rui-course-card-deck mt-2'));
         foreach ($courses as $course) {
             $content .= $this->coursecat_coursebox($chelper, $course);
 
-            if ($coursecount % 4 == 0) {
-                $content .= html_writer::end_tag('div');
-                $content .= html_writer::start_tag('div', array('class' => 'rui-course-card-deck rui-course-card-deck--4 mt-2'));
-            }
+            // if ($coursecount % 4 == 0) {
+            //     $content .= html_writer::end_tag('div');
+            //     $content .= html_writer::start_tag('div', array('class' => 'rui-course-card-deck rui-course-card-deck--4 mt-2'));
+            // }
 
             $coursecount ++;
         }

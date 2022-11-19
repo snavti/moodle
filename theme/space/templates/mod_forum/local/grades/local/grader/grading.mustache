@@ -32,7 +32,7 @@
     {
     }
 }}
-{{<core/drawer-grade}}
+{{<core/drawer}}
     {{$drawerid}}grading-drawer-{{uniqid}}{{/drawerid}}
     {{$drawerclasses}}grader-grading-panel flex-shrink-0 {{/drawerclasses}}
     {{$drawercontent}}
@@ -110,29 +110,22 @@
 
                     <div class="grade-notifications-box mt-2">
                         <h5 id="send-student-notifications-setting">
-                            <i class="far fa-bell mr-2"></i>{{#str}}notifications, core{{/str}}
+                            {{#str}}notifications, core{{/str}}
                         </h5>
-                        <div data-region="notification" class="mx-2" role="radiogroup" aria-labelledby="send-student-notifications-setting">
-                            <label class="form-check-inline form-check-label mb-0">
-                                <div class="custom-control custom-radio custom-control-inline">
-                                    <input class="custom-control-input" type="radio" name="sendstudentnotifications" value="1"{{#defaultsendnotifications}} checked{{/defaultsendnotifications}}/>
-                                    <label class="custom-control-label ml-1" for="{{element.id}}">
-                                    {{#str}}sendstudentnotificationsyes, mod_forum{{/str}}
-                                    </label>
-                                </div>
-                            </label>
-                            <label class="form-check-inline form-check-label mb-0">
-                                <div class="custom-control custom-radio custom-control-inline">
-                                    <input class="custom-control-input" type="radio" name="sendstudentnotifications" value="0"{{^defaultsendnotifications}} checked{{/defaultsendnotifications}}/>
-                                    <label class="custom-control-label ml-1" for="{{element.id}}">
-                                    {{#str}}sendstudentnotificationsno, mod_forum{{/str}}
-                                    </label>
-                                </div>
-                            </label>
-                            {{#helpicon}}
-                                {{>core/help_icon}}
-                            {{/helpicon}}
-                        </div>
+                        <div data-region="notification" class="pt-3" role="radiogroup" aria-labelledby="send-student-notifications-setting">
+                        <label class="form-check d-inline-flex align-items-center justify-content-start w-100">
+                            <input class="form-check-input" type="radio" name="sendstudentnotifications" value="1"{{#defaultsendnotifications}} checked{{/defaultsendnotifications}}/>
+                            {{#str}}sendstudentnotificationsyes, mod_forum{{/str}}
+                        </label>
+                        <label class="form-check d-inline-flex align-items-center justify-content-start w-100">
+                            <input class="form-check-input" type="radio" name="sendstudentnotifications" value="0"{{^defaultsendnotifications}} checked{{/defaultsendnotifications}}/>
+                            {{#str}}sendstudentnotificationsno, mod_forum{{/str}}
+                        </label>
+                        {{#helpicon}}
+                            {{>core/help_icon}}
+                        {{/helpicon}}
+                    </div>
+                    <div data-region="grade-errors" role="alert" aria-live="assertive"></div>
                     </div>
                     <div data-region="grade-errors" role="alert" aria-live="assertive"></div>
                 </div>
@@ -142,4 +135,4 @@
         <div data-region="grade-errors" role="alert" aria-live="assertive"></div>
         <hr/>
     {{/drawercontent}}
-{{/core/drawer-grade}}
+{{/core/drawer}}

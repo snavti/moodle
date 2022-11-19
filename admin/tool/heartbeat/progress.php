@@ -21,9 +21,13 @@
  * @copyright  2017 Brendan Heywood <brendan@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define('NO_OUTPUT_BUFFERING', true); // progress bar is used here
+define('NO_OUTPUT_BUFFERING', true); // Progress bar is used here.
 
+// @codingStandardsIgnoreStart
 require(__DIR__ . '/../../../config.php');
+// @codingStandardsIgnoreEnd
+
+tool_heartbeat\lib::validate_ip_against_config();
 
 $syscontext = context_system::instance();
 $PAGE->set_url('/admin/tool/heartbeat/progress.php');
@@ -43,8 +47,8 @@ echo $OUTPUT->footer();
 // stack and not the test, so we have just added more margin here.
 $total = 10;
 $progressbar->update_full(0, '0%');
-for ($c = 1; $c <= 100; $c++) {
-    usleep($total * 1000000 / 100);
-    $progressbar->update_full($c, $c . '%');
+for ($c = 1; $c <= 100; $c += .2) {
+    usleep($total * 10000);
+    $progressbar->update_full($c, sprintf("You are up to %.1f out of 100", $c));
 }
 

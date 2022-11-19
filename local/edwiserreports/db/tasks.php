@@ -34,11 +34,34 @@ $tasks = [
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
-    ],
-    [
+    ], [
         'classname' => '\local_edwiserreports\task\update_course_progress_data',
         'blocking' => 0,
         'minute' => '*/5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    ], [
+        'classname' => '\local_edwiserreports\task\site_access_data',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '0',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    ], [
+        'classname' => '\local_edwiserreports\task\active_courses_data',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    ], [
+        'classname' => '\local_edwiserreports\task\active_users_data',
+        'blocking' => 0,
+        'minute' => '0',
         'hour' => '*',
         'day' => '*',
         'month' => '*',

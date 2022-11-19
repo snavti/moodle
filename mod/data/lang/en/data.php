@@ -79,7 +79,7 @@ $string['configenablerssfeeds'] = 'This switch will enable the possibility of RS
 $string['confirmdeletefield'] = 'You are about to delete this field, are you sure?';
 $string['confirmdeleterecord'] = 'Are you sure you want to delete this entry?';
 $string['confirmdeleterecords'] = 'Are you sure you want to delete these entries?';
-$string['csstemplate'] = 'CSS template';
+$string['csstemplate'] = 'Custom CSS';
 $string['csvfailed'] = 'Unable to read the raw data from the CSV file';
 $string['csvfile'] = 'CSV file';
 $string['csvimport'] = 'CSV file import';
@@ -95,7 +95,7 @@ $string['data:exportuserinfo'] = 'Export user information';
 $string['data:managecomments'] = 'Manage comments';
 $string['data:manageentries'] = 'Manage entries';
 $string['data:managetemplates'] = 'Manage templates';
-$string['data:manageuserpresets'] = 'Manage all template presets';
+$string['data:manageuserpresets'] = 'Manage presets';
 $string['data:rate'] = 'Rate entries';
 $string['data:readentry'] = 'Read entries';
 $string['data:viewalluserpresets'] = 'View presets from all users';
@@ -168,8 +168,8 @@ $string['fielddelimiter'] = 'Field separator';
 $string['fielddescription'] = 'Field description';
 $string['fieldenclosure'] = 'Field enclosure';
 $string['fieldheight'] = 'Height';
-$string['fieldheightlistview'] = 'Height in list view';
-$string['fieldheightsingleview'] = 'Height in single view';
+$string['fieldheightlistview'] = 'Height (in pixels) in list view';
+$string['fieldheightsingleview'] = 'Height (in pixels) in single view';
 $string['fieldids'] = 'Field ids';
 $string['fieldmappings'] = 'Field mappings';
 $string['fieldmappings_help'] = 'This menu allows you to keep the data from the existing database. To preserve the data in a field, you must map it to a new field, where the data will appear. Any field can also be left blank, with no information copied into it. Any old field not mapped to a new one will be lost and all its data removed.
@@ -182,8 +182,8 @@ $string['fields'] = 'Fields';
 $string['fieldsnavigation'] = 'Fields tertiary navigation';
 $string['fieldupdated'] = 'Field updated';
 $string['fieldwidth'] = 'Width';
-$string['fieldwidthlistview'] = 'Width in list view';
-$string['fieldwidthsingleview'] = 'Width in single view';
+$string['fieldwidthlistview'] = 'Width (in pixels) in list view';
+$string['fieldwidthsingleview'] = 'Width (in pixels) in single view';
 $string['file'] = 'File';
 $string['filesnotgenerated'] = 'Not all files were generated: {$a}';
 $string['filtername'] = 'Database auto-linking';
@@ -195,14 +195,14 @@ $string['fromfile'] = 'Import from zip file';
 $string['fromfile_help'] = 'The import from zip file feature allows you to browse for and upload a preset zip of templates and fields.';
 $string['generateerror'] = 'Not all files generated!';
 $string['header'] = 'Header';
-$string['headeraddtemplate'] = 'Defines the interface for adding or editing entries';
-$string['headerasearchtemplate'] = 'Defines the interface for the advanced search';
-$string['headercsstemplate'] = 'Defines local CSS styles for the other templates';
-$string['headerjstemplate'] = 'Defines custom Javascript for manipulating the way elements are displayed in the List, Single or Add templates';
-$string['headerlisttemplate'] = 'Defines browsing interface for multiple entries';
-$string['headerrsstemplate'] = 'Defines appearance of entries in RSS feeds';
-$string['headersingletemplate'] = 'Defines browsing interface for a single entry';
-$string['checkbox'] = 'Checkbox';
+$string['headeraddtemplate'] = 'Define the interface for adding or editing entries.';
+$string['headerasearchtemplate'] = 'Define the interface for the advanced search.';
+$string['headercsstemplate'] = 'Add custom CSS to templates.';
+$string['headerjstemplate'] = 'Add custom JavaScript for the List, Single or Add entry templates.';
+$string['headerlisttemplate'] = 'Define the appearance of List view.';
+$string['headerrsstemplate'] = 'Define the appearance of entries in RSS feeds.';
+$string['headersingletemplate'] = 'Define the appearance of Single view.';
+$string['checkbox'] = 'Checkboxes';
 $string['chooseexportfields'] = 'Choose the fields you wish to export';
 $string['chooseexportformat'] = 'Choose the format you wish to export to';
 $string['chooseorupload'] = 'Choose file';
@@ -231,12 +231,16 @@ $string['invalidfieldid'] = 'Field ID is incorrect';
 $string['invalidfieldname'] = 'Please choose another name for this field';
 $string['invalidfieldtype'] = 'Field type is incorrect';
 $string['invalidid'] = 'Incorrect data ID';
+$string['missingfieldtype'] = 'Field type for {$a->name} not found';
+$string['missingfieldtypes'] = 'The following fields do not have their corresponding field types installed and will not be included in the Add entry form. You need to check the Add entry template and remove any field names.';
+$string['missingfieldtypeimport'] = 'The following fields were not imported because their corresponding field types are not installed:';
+$string['unknown'] = 'Unknown field';
 $string['invalidpreset'] = '{$a} is not a preset.';
 $string['invalidrecord'] = 'Incorrect record';
 $string['invalidurl'] = 'The URL you just entered is not valid';
-$string['jstemplate'] = 'Javascript template';
+$string['jstemplate'] = 'Custom JavaScript';
 $string['latitude'] = 'Latitude';
-$string['latlong'] = 'Latitude/longitude';
+$string['latlong'] = 'Coordinates';
 $string['latlongboth'] = 'Both latitude and longitude are required.';
 $string['latlongdownloadallhint'] = 'Download link for all entries as KML';
 $string['latlongkmllabelling'] = 'How to label items in KML files (Google Earth)';
@@ -244,7 +248,7 @@ $string['latlonglinkservicesdisplayed'] = 'Link-out services to display';
 $string['latlongotherfields'] = 'Other fields';
 $string['list'] = 'View list';
 $string['listview'] = 'List view';
-$string['listtemplate'] = 'List template';
+$string['listtemplate'] = 'List view template';
 $string['longitude'] = 'Longitude';
 $string['manageapproved'] = 'Allow editing of approved entries';
 $string['managefields'] = 'Manage fields';
@@ -260,18 +264,18 @@ $string['menuchoose'] = 'Choose...';
 $string['missingdata'] = 'Data id or object must be provided to field class';
 $string['missingfield'] = 'Programmer error: You must specify field and/or data when defining field class.';
 $string['modulename'] = 'Database';
-$string['modulename_help'] = 'The database activity module enables participants to create, maintain and search a collection of entries (i.e. records).  The structure of the entries is defined by the teacher as a number of fields. Field types include checkbox, radio buttons, drop-down menu, text area, URL, picture and uploaded file.
+$string['modulename_help'] = 'Database enables participants to create, maintain, and search a collection of entries.
 
-The visual layout of information when listing, viewing or editing database entries may be controlled by database templates. Database activities may be shared between courses as presets and a teacher may also import and export database entries.
+The structure of the entries is defined using different types of fields, such as short text, dropdown list, text area, URL, image, or file.
 
-If the database auto-linking filter is enabled, any entries in a database will be automatically linked where the words or phrases appear within the course.
+As a teacher, you can comment and rate entries. You can also allow students to rate and comment on entries (peer evaluation). Ratings can be aggregated to form a final grade, which is recorded in the gradebook.
 
-A teacher can allow comments on entries. Entries can also be rated by teachers or students (peer evaluation). Ratings can be aggregated to form a final grade which is recorded in the gradebook.
+If the Database auto-linking filter is enabled, any entries in a database will be automatically linked where the words or phrases appear within the course.
 
-Database activities have many uses, such as
+You can use Database to:
 
-* A collaborative collection of web links, books, book reviews, journal references etc
-* For displaying student-created photos, posters, websites or poems for peer comment and review.';
+* Create a collaborative collection of links, books, book reviews, journal references, etc.
+* Display student-created photos, posters, websites or poems for peer comment and review.';
 $string['modulename_link'] = 'mod/data/view';
 $string['modulenameplural'] = 'Databases';
 $string['more'] = 'More';
@@ -386,7 +390,7 @@ $string['selectexportoptions'] = 'Select export options';
 $string['showall'] = 'Show all entries';
 $string['single'] = 'View single';
 $string['singleview'] = 'Single view';
-$string['singletemplate'] = 'Single template';
+$string['singletemplate'] = 'Single view template';
 $string['subplugintype_datafield'] = 'Database field type';
 $string['subplugintype_datafield_plural'] = 'Database field types';
 $string['subplugintype_datapreset'] = 'Preset';
@@ -399,7 +403,7 @@ $string['templates'] = 'Templates';
 $string['templatesnavigation'] = 'Templates tertiary navigation';
 $string['templatesaved'] = 'Template saved';
 $string['text'] = 'Text';
-$string['textarea'] = 'Textarea';
+$string['textarea'] = 'Text area';
 $string['timeadded'] = 'Time added';
 $string['timemodified'] = 'Time modified';
 $string['todatabase'] = 'to this database.';

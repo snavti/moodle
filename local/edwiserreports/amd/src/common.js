@@ -1,5 +1,24 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Plugin administration pages are defined here.
+ *
+ * @copyright   2021 wisdmlabs <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /* eslint-disable no-console */
-/* eslint-disable camelcase */
 define([
     'jquery',
     'core/notification',
@@ -7,73 +26,38 @@ define([
     'core/modal_factory',
     'core/modal_events',
     'core/templates',
-    'core/str',
-    'local_edwiserreports/variables',
-    'local_edwiserreports/selectors',
-    'local_edwiserreports/templateselector',
-    'local_edwiserreports/jspdf',
-    'local_edwiserreports/select2',
-    'local_edwiserreports/jquery.dataTables',
-    'local_edwiserreports/dataTables.bootstrap4'
+    './variables',
+    './selectors',
+    './select2',
+    './jquery.dataTables',
+    './dataTables.bootstrap4'
 ], function(
     $,
-    notif,
-    fragment,
+    Notification,
+    Fragment,
     ModalFactory,
     ModalEvents,
     Templates,
-    str,
     v,
-    selector,
-    tempSelector,
-    jsPDF
+    selector
 ) {
-    var emailListTable = null;
     /**
-     * Email Shcedule Modal Related Psrametres start
+     * Selectors list.
      */
-    // Form root
-    var formRoot = '#scheduletab';
+    let SELECTOR = {
+        TABLE: '.edwiserreports-table',
+        FILTER: '.table-filter',
+        SEARCHTABLE: '.table-search-input input',
+        PAGINATION: '.table-pagination',
+        PAGINATIONITEM: '.paginate_button'
+    };
 
-    // Dropdowns
-    var dropdowns = formRoot + ' .dropdown a.dropdown-item';
-    var dropdownSelector = 'button.dropdown-toggle';
-
-    // Duration dropdown selectors
-    var durationSelector = formRoot + ' .dropdown.duration-dropdown a.dropdown-item';
-    var durationInput = formRoot + ' input#esr-sendduration';
-
-    // Times dropdown selector
-    var timesDropdown = formRoot + ' .dropdown:not(.duration-dropdown)';
-    var timesDropdownBtn = timesDropdown + ' button.dropdown-toggle';
-    var timesDropdownLink = timesDropdown + ' a.dropdown-item';
-    var dailyDropdownBtn = formRoot + ' .dropdown.daily-dropdown button.dropdown-toggle';
-    var weeklyDropdownBtn = formRoot + ' .dropdown.weekly-dropdown button.dropdown-toggle';
-    var monthlyDropdownBtn = formRoot + ' .dropdown.monthly-dropdown button.dropdown-toggle';
-
-    var timeInput = formRoot + ' input#esr-sendtime';
-
-    // For email schedule setting
-    var settingBtn = "#listemailstab .esr-email-sched-setting";
-    var deleteBtn = "#listemailstab .esr-email-sched-delete";
-    var emailListToggleSwitch = "#listemailstab [id^='esr-toggle-']";
-
-    // Messaged for email schedule
-    var schedulerrormsg = M.util.get_string('scheduleerrormsg', 'local_edwiserreports');
-    var schedulesuccessmsg = M.util.get_string('schedulesuccessmsg', 'local_edwiserreports');
-    var deletesuccessmsg = M.util.get_string('deletesuccessmsg', 'local_edwiserreports');
-    var deleteerrormsg = M.util.get_string('deleteerrormsg', 'local_edwiserreports');
-    var emptyerrormsg = M.util.get_string('emptyerrormsg', 'local_edwiserreports');
-    var emailinvaliderrormsg = M.util.get_string('emailinvaliderrormsg', 'local_edwiserreports');
-
-    var tabs = '[data-plugin="tabs"] .nav-link, [data-plugin="tabs"] .tab-pane';
-    var formTab = '[aria-controls="scheduletab"], #scheduletab';
-
-    var windowLoader = '<div id="cover-spin"></div>';
+    Templates.render('local_edwiserreports/insight-placeholder', {});
+    Templates.render('local_edwiserreports/insight', {});
 
     // Loader functions.
     var loader = {
-        show: function(id) {
+        show: function(id, position) {
             var $class;
             if (id == undefined) {
                 id = 'body';
@@ -81,9 +65,19 @@ define([
             } else {
                 $class = 'position-absolute';
             }
+            if (position != undefined) {
+                $class = position;
+            }
             $(id).append(`
             <div class="edwiserreports-loader ${$class}">
-                <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i>
+                <div class="animation-wrapper">
+                    <div class="fa-animation">
+                        <i class="fa fa-cog fa-lg fa-spin"></i>
+                        <i class="fa fa-cog fa-md fa-spin spin-reverse"></i>
+                        <i class="fa fa-cog fa-sm fa-spin spin-reverse"></i>
+                    </div>
+                    ${M.util.get_string('loading', 'moodle')}
+                </div>
             </div>
             `);
         },
@@ -95,112 +89,7 @@ define([
         }
     };
 
-    /**
-     * Email Shcedule Modal Related Psrametres end
-     */
-
     $(document).ready(function() {
-        var exportPdf = '.download-links button[value="pdf"]';
-        var scheduledEmailDropdown = '.download-links button[value="email"]';
-
-        // Export data in pdf
-        $(document).on("click", exportPdf, function(e) {
-            e.preventDefault();
-
-            var _this = this;
-            var form = $(_this).closest("form");
-            $.ajax({
-                url: form.attr('action'),
-                type: 'POST',
-                data: {
-                    'type': $(_this).val(),
-                    'block': form.find('input[name="block"]').val(),
-                    'filter': form.find('input[name="filter"]').val(),
-                    'cohortid': form.find('input[name="cohortid"]').val(),
-                    'region': form.find('input[name="region"]').val()
-                }
-            }).done(function(response) {
-                response = JSON.parse(response);
-                var pdf = jsPDF('p', 'pt', 'a4');
-                var margins = {
-                    top: 40,
-                    bottom: 30,
-                    left: 10,
-                    width: "100%"
-                };
-
-                pdf.setFontSize(10);
-
-                // ID selector for either ID or node name. ("#iAmID", "div", "span" etc.)
-                // There is no support for any other type of selectors
-                // (class, of compound) at this time.
-                var specialElementHandlers = {
-                    // Element with id of "bypass" - jQuery style selector
-                    // eslint-disable-next-line no-unused-vars
-                    '#bypassme': function(element, renderer) {
-                        // True = "handled elsewhere, bypass text extraction"
-                        return true;
-                    }
-                };
-                // All coords and widths are in jsPDF instance's declared units
-                // 'inches' in this case
-                pdf.fromHTML(
-                    response.data.html, // HTML string or DOM elem ref.
-                    margins.left, // X coord
-                    margins.top, { // Y coord
-                    'width': margins.width, // Max width of content on PDF
-                    'elementHandlers': specialElementHandlers
-                    },
-                    // eslint-disable-next-line no-unused-vars
-                    function(dispose) {
-                        // Dispose: object with X, Y of the last line add to the PDF
-                        //          this allow the insertion of new lines after html
-                        pdf.save(response.data.filename);
-                    }, margins);
-            }).always(function() {
-                $(document).find('#cover-spin').hide();
-            });
-        });
-
-        /**
-         * Schedule emails to send reports                                    e.preventDefault();            var _this [description]
-         */
-        $(document).on("click", scheduledEmailDropdown, function(e) {
-            e.preventDefault();
-            var data = v.getScheduledEmailFormContext();
-
-            var form = $(this).closest('form');
-            var formData = form.serializeArray();
-            $(formData).each(function($k, $d) {
-                data[$d.name] = $d.value;
-            });
-
-            ModalFactory.create({
-                title: M.util.get_string('scheduleemailfor', 'local_edwiserreports') +
-                ' ' + M.util.get_string(data.block + 'exportheader', 'local_edwiserreports'),
-                body: Templates.render('local_edwiserreports/email_schedule_tabs', data)
-            }, $(this))
-                .done(function(modal) {
-                    var root = modal.getRoot();
-
-                    modal.modal.addClass("modal-lg");
-
-                    root.on(ModalEvents.bodyRendered, function() {
-                        root.find("#esr-blockname").val(data.blockname);
-                        root.find("#esr-region").val(data.region);
-                        root.find("#esr-sesskey").val(data.sesskey);
-                        emailListTable = render_all_scheduled_emails(data, modal);
-                    });
-
-                    root.on(ModalEvents.hidden, function() {
-                        modal.destroy();
-                    });
-
-                    email_schedule_form_init(data, root, modal);
-                    modal.show();
-                });
-        });
-
         // Show reports page when document is ready
         $('#wdm-edwiserreports').removeClass('d-none');
 
@@ -261,12 +150,11 @@ define([
 
             if (action == 'edit') {
                 ModalFactory.create({
-                    title: 'Edit Block Setting',
-                    body: fragment.loadFragment(
+                    title: M.util.get_string('editblocksetting', 'local_edwiserreports'),
+                    body: Fragment.loadFragment(
                         'local_edwiserreports',
                         'get_blocksetting_form',
-                        contextid,
-                        {
+                        contextid, {
                             blockname: blockname
                         }
                     )
@@ -285,7 +173,7 @@ define([
                             });
 
                             // Set users preferences
-                            set_block_preference(blockname, data);
+                            setBlockPreference(blockname, data);
                         });
                     });
 
@@ -324,12 +212,11 @@ define([
                 });
             } else if (action == "editcap") {
                 ModalFactory.create({
-                    title: 'Edit Block Capabilities',
-                    body: fragment.loadFragment(
+                    title: M.util.get_string('editblockcapabilities', 'local_edwiserreports'),
+                    body: Fragment.loadFragment(
                         'local_edwiserreports',
                         'get_blockscap_form',
-                        contextid,
-                        {
+                        contextid, {
                             blockname: blockname
                         }
                     )
@@ -347,16 +234,15 @@ define([
                                 data[$d.name] = $d.value;
                             });
 
-                            fragment.loadFragment(
+                            Fragment.loadFragment(
                                 'local_edwiserreports',
                                 'block_overview_display',
-                                contextid,
-                                {
+                                contextid, {
                                     capvalue: data.capabilities
                                 }
-                            // eslint-disable-next-line no-unused-vars
+                                // eslint-disable-next-line no-unused-vars
                             ).done(function(html, js, css) {
-                                modal.modal.find('.cap-overview').html(html);
+                                Templates.replaceNodeContents(modal.modal.find('.cap-overview'), html, js);
                                 switchCapabilitiesBlock(modal);
                             });
                         });
@@ -374,7 +260,7 @@ define([
 
                             // Set block capabilities
                             setBlockCapabilities(blockname, data, function() {
-                                modal.destroy();
+                                modal.hide();
                             });
                         });
                     });
@@ -437,14 +323,14 @@ define([
                 callback();
                 location.reload();
             } else {
-                notif.addNotification({
+                Notification.addNotification({
                     message: "Error",
                     type: "error"
                 });
             }
         }).fail(function(error) {
             console.log(error);
-            notif.addNotification({
+            Notification.addNotification({
                 message: error,
                 type: "error"
             });
@@ -459,7 +345,7 @@ define([
      * @param {string} blockname Block name
      * @param {string} data Data for preference
      */
-    function set_block_preference(blockname, data) {
+    function setBlockPreference(blockname, data) {
         data.blockname = blockname;
         data = JSON.stringify(data);
         var sesskey = $('#' + blockname).data('sesskey');
@@ -475,7 +361,7 @@ define([
             }
         }).fail(function(error) {
             console.log(error);
-            notif.addNotification({
+            Notification.addNotification({
                 message: error,
                 type: "error"
             });
@@ -485,478 +371,194 @@ define([
     }
 
     /**
-     * Render all emails in modal
-     * @param {object} data Data for datatable
-     * @param {Object} modal Modal object
-     * @return {Object} Datatable object
+     * Send plain formatted time.
+     * @param {Number} h Hours
+     * @param {Number} m Minutes
+     * @param {Number} s Seconds
+     * @returns {String}
      */
-    function render_all_scheduled_emails(data, modal) {
-        var table = modal.getRoot().find("#esr-shceduled-emails");
-
-        // Resize event to adjust datatable when click on the all list tab
-        // Not able to call resize when ajax completed
-        // So got the temporary solution
-        $(document).on('click', '[aria-controls="listemailstab"]', function() {
-            $(window).resize();
-        });
-
-        // Create datatable
-        return table.DataTable({
-            ajax: {
-                url: v.requestUrl + '?sesskey=' + data.sesskey,
-                type: v.requestType,
-                data: {
-                    action: 'get_scheduled_emails_ajax',
-                    data: JSON.stringify({
-                        blockname: data.block,
-                        region: data.region
-                    })
-                }
-            },
-            language: {
-                searchPlaceholder: "Search shceduled email",
-                emptyTable: "There is no scheduled emails",
-                sClass: 'text-center'
-            },
-            drawCallback: function() {
-                $('.dataTables_paginate > .pagination').addClass('pagination-sm pull-right');
-                $('.dataTables_filter').addClass('pagination-sm pull-right');
-            },
-            order: [[2, "asc"]],
-            columns: [
-                {
-                    "data": "esrname",
-                    "orderable": true
-                },
-                {
-                    "data": "esrnextrun",
-                    "orderable": true
-                },
-                {
-                    "data": "esrfrequency",
-                    "orderable": true
-                },
-                {
-                    "data": "esrmanage",
-                    "orderable": false
-                }
-            ],
-            responsive: true,
-            bInfo: false,
-            lengthChange: false,
-        });
-    }
-
-    /**
-     * Validate email shceduled form
-     * @param  {object} form Form object
-     * @param  {object} errorBox Box to show error
-     * @return {boolean} Return form validation status
-     */
-    function validate_email_scheduled_form(form, errorBox) {
-        var esrname = form.find('[name="esrname"]').val();
-        var esrrecepient = form.find('[name="esrrecepient"]').val();
-        if (esrname == "" || esrrecepient == "") {
-            errorBox.html(emptyerrormsg).show();
-            return false;
+    function timePlainFormat(h, m, s) {
+        if (h > 0) {
+            h = h < 10 ? "0" + h : h;
+        } else {
+            h = "00";
         }
-
-        var re = /^(\s?[^\s,]+@[^\s,]+\.[^\s,]+\s?,)*(\s?[^\s,]+@[^\s,]+\.[^\s,]+)$/g;
-        if (!re.test(esrrecepient)) {
-            errorBox.html(emailinvaliderrormsg).show();
-            return false;
+        if (m > 0) {
+            m = m < 10 ? "0" + m : m;
+        } else {
+            m = "00";
         }
-
-        return true;
-    }
-
-    /**
-     * Save scheduled emails
-     * @param {Object} data Data for email
-     * @param {object} root Modal root object
-     * @param {Object} modal Modal object
-     */
-    function save_schedule_email_init(data, root, modal) {
-        // On save perform operation
-        root.on('click', '[data-action="save"]', function() {
-            var errorBox = root.find(".esr-form-error");
-            errorBox.html(loader).show();
-
-            if (validate_email_scheduled_form(root.find("form"), errorBox)) {
-                var filter = data.filter;
-                var cohortid = data.cohortid;
-                var block = data.block;
-                var url = M.cfg.wwwroot + "/local/edwiserreports/download.php?type=emailscheduled&filter="
-                + filter + "&cohortid=" + cohortid + "&block=" + block;
-
-                // Send ajax to save the scheduled email
-                $.ajax({
-                    url: url,
-                    type: "POST",
-                    data: root.find("form").serialize()
-                }).done(function(response) {
-                    response = $.parseJSON(response);
-
-                    // If error then log the error
-                    if (response.error) {
-                        errorBox.html(schedulerrormsg);
-                        console.log(response.error);
-                    } else {
-                        if (emailListTable) {
-                            emailListTable.destroy();
-                        }
-                        emailListTable = render_all_scheduled_emails(data, modal);
-                        errorBox.html(schedulesuccessmsg);
-                    }
-                }).fail(function(error) {
-                    errorBox.html(schedulerrormsg);
-                    console.log(error);
-                }).always(function() {
-                    errorBox.delay(3000).fadeOut('slow');
-                });
-            }
-        });
-
-        // Reset scheduled form
-        root.on('click', '[data-action="cancel"]', function() {
-            root.find('[name^=esr]:not(.d-none):not([id="esr-toggle-"])').val("");
-            root.find('#esr-id').val(-1);
-        });
-    }
-
-    /**
-     * Update dropdown button text
-     * @param  {object} _this click object
-     */
-    function update_dropdown_btn_text(_this) {
-        var val = $(_this).data('value');
-        var text = $(_this).text();
-        var dropdownBtn = $(_this).closest(".dropdown").find(dropdownSelector);
-
-        // Set button values
-        dropdownBtn.text(text);
-        dropdownBtn.data("value", val);
-    }
-
-    /**
-     * Duration dropdown init
-     * @param {object} _this click object
-     * @param {Object} root Modal root obuject
-     */
-    function duration_dropdown_init(_this, root) {
-        var val = $(_this).data('value');
-
-        root.find(durationInput).val(val);
-        $(timesDropdownBtn).hide();
-
-        // Show only selected dropdown
-        var subDropdown = null;
-        switch (val) {
-            case 1: // Weekly
-                subDropdown = $(weeklyDropdownBtn);
-                break;
-            case 2: // Monthly
-                subDropdown = $(monthlyDropdownBtn);
-                break;
-            default: // Daily
-                subDropdown = $(dailyDropdownBtn);
+        if (s > 0) {
+            s = s < 10 ? "0" + s : s;
+        } else {
+            s = "00";
         }
-
-        // Show subdropdown
-        subDropdown.show();
-
-        // Set values to hidden input fieds
-        var timeval = subDropdown.data("value");
-        $(timeInput).val(timeval);
+        return h + ":" + m + ":" + s;
     }
 
     /**
-     * Email schedle setting session initialization
-     * @param {object} _this click object
-     * @param {Object} root Modal root obuject
+     * Convert seconds to HH:MM:SS
+     * @param {Integer} seconds Seconds
+     * @param {Object} opts Options
+     * @returns {String}
      */
-    function email_schedule_setting_init(_this, root) {
-        var id = $(_this).data("id");
-        var blockname = $(_this).data("blockname");
-        var region = $(_this).data("region");
+    function timeFormatter(seconds, opts) {
+        seconds = Number(seconds);
+        var h = Math.floor(seconds / 3600);
+        var m = Math.floor(seconds % 3600 / 60);
+        var s = Math.floor(seconds % 3600 % 60);
 
-        $.ajax({
-            url: v.requestUrl,
-            type: v.requestType,
-            sesskey: $(_this).data("sesskey"),
-            data: {
-                action: 'get_scheduled_email_detail_ajax',
-                sesskey: $(_this).data("sesskey"),
-                data: JSON.stringify({
-                    id: id,
-                    blockname: blockname,
-                    region: region
-                })
-            }
-        }).done(function(response) {
-            response = JSON.parse(response);
-            if (!response.error) {
-                set_email_shedule_form_values(response, _this, root);
-
-                root.find(tabs).removeClass("active show");
-                root.find(formTab).addClass("active show");
-            } else {
-                console.log(response);
-            }
-        }).fail(function(error) {
-            console.log(error);
-        });
-    }
-
-    /**
-     * Set email shcedule values in form
-     * @param {Object} response Response object
-     * @param {object} _this click object
-     * @param {Object} root Modal root obuject
-     */
-    function set_email_shedule_form_values(response, _this, root) {
-        var esrDurationVal = null;
-        var esrTimeVal = null;
-
-        $.each(response.data, function(idx, val) {
-            if (typeof val === 'object') {
-                // Set block value name
-                root.find("#esr-blockname").val(val.blockname);
-                root.find("#esr-region").val(val.region);
-            } else if (idx === "esrduration") {
-                var esrDuration = '[aria-labelledby="durationcount"] .dropdown-item[data-value="' + val + '"]';
-                esrDurationVal = val;
-                // Trigger click event
-                root.find(esrDuration).click();
-            } else if (idx === "esrtime") {
-                esrTimeVal = val;
-            } else if (idx === "esremailenable") {
-                var checkbox = $('input[name="' + idx + '"]');
-                if (val) {
-                    checkbox.prop("checked", true);
+        if (typeof opts == 'object' && opts.dataPointIndex !== undefined && opts.dataPointIndex !== -1) {
+            var time = [];
+            var short = opts.short !== undefined && opts.short;
+            if (h > 0) {
+                if (short) {
+                    time.push(h + " " + "h.");
                 } else {
-                    checkbox.prop("checked", false);
+                    time.push(h + " " + (h == 1 ? M.util.get_string('hour', 'local_edwiserreports') :
+                        M.util.get_string('hours', 'local_edwiserreports')));
                 }
-            } else {
-                // Set values for input text
-                $('[name="' + idx + '"]').val(val);
             }
-
-        });
-
-        // Subdropdown click event
-        var subSelectedDropdpown = '.dropdown-item[data-value="' + esrTimeVal + '"]';
-
-        // Show only selected dropdown
-        var subDropdown = null;
-        switch (esrDurationVal) {
-            case "1": // Weekly
-                subDropdown = $(".weekly-dropdown");
-                break;
-            case "2": // Monthly
-                subDropdown = $(".monthly-dropdown");
-                break;
-            default: // Daily
-                subDropdown = $(".daily-dropdown");
+            if (m > 0) {
+                if (short) {
+                    time.push(m + " " + "min.");
+                } else {
+                    time.push(m + " " + (m == 1 ? M.util.get_string('minute', 'local_edwiserreports') :
+                        M.util.get_string('minutes', 'local_edwiserreports')));
+                }
+            }
+            if (s > 0) {
+                if (short) {
+                    time.push(s + " " + "sec.");
+                } else {
+                    time.push(s + " " + (s == 1 ? M.util.get_string('second', 'local_edwiserreports') :
+                        M.util.get_string('seconds', 'local_edwiserreports')));
+                }
+            }
+            if (time.length == 0) {
+                time.push(0);
+            }
+            return time.join(', ');
         }
-
-        // Trigger click event
-        subDropdown.find(subSelectedDropdpown).click();
+        return timePlainFormat(h, m, s);
     }
 
     /**
-     * Delete Scheduled email
-     * @param {Object} data Data for email
-     * @param {object} root Modal root object
-     * @param {Object} modal Modal object
+     * Render insight card.
+     * @param {String} selector DOM selector
+     * @param {Object} data     Insight data
      */
-    function email_schedule_delete_init(data, root, modal) {
-        var id = data.id;
-        var blockname = data.block;
-        var region = data.region;
-        var errorBox = root.find(".esr-form-error");
-        errorBox.html(loader).show();
-
-        $.ajax({
-            url: v.requestUrl,
-            type: v.requestType,
-            sesskey: data.sesskey,
-            data: {
-                action: 'delete_scheduled_email_ajax',
-                sesskey: data.sesskey,
-                data: JSON.stringify({
-                    id: id,
-                    blockname: blockname,
-                    region: region
-                })
-            }
-        }).done(function(response) {
-            if (!response.error) {
-                if (emailListTable) {
-                    emailListTable.destroy();
-                }
-                emailListTable = render_all_scheduled_emails(data, modal);
-                errorBox.html(deletesuccessmsg);
-            } else {
-                errorBox.html(deleteerrormsg);
-            }
-        }).fail(function(error) {
-            errorBox.html(deleteerrormsg);
-            console.log(error);
-        }).always(function() {
-            errorBox.delay(3000).fadeOut('slow');
-        });
-    }
-
-    /**
-     * Change scheduled email status
-     * @param {Object} data Data for email
-     * @param {object} root Modal root object
-     * @param {Object} modal Modal object
-     */
-    function change_scheduled_email_status_init(data, root, modal) {
-        // eslint-disable-next-line no-unused-vars
-        modal = null;
-        var id = data.id;
-        var blockname = data.block;
-        var region = data.region;
-        var sesskey = data.sesskey;
-
-        var errorBox = root.find(".esr-form-error");
-
-        $.ajax({
-            url: v.requestUrl,
-            type: v.requestType,
-            data: {
-                action: 'change_scheduled_email_status_ajax',
-                sesskey: sesskey,
-                data: JSON.stringify({
-                    id: id,
-                    blockname: blockname,
-                    region: region
-                })
-            }
-        }).done(function(response) {
-            response = JSON.parse(response);
-            if (!response.error) {
-                errorBox.html(response.successmsg);
-                errorBox.show();
-                errorBox.delay(3000).fadeOut('slow');
-            } else {
-                errorBox.html(response.errormsg);
-                errorBox.show();
-                errorBox.delay(3000).fadeOut('slow');
-            }
-        });
-    }
-
-    /**
-     * Manage schedule emails form initialization
-     * @param {Object} data Data for email
-     * @param {object} root Modal root object
-     * @param {Object} modal Modal object
-     */
-    function email_schedule_form_init(data, root, modal) {
-        // If dropdown selected then update the button text
-        root.on('click', dropdowns, function() {
-            update_dropdown_btn_text(this);
-        });
-
-        // Select duration for email schedule
-        root.on('click', durationSelector, function() {
-            duration_dropdown_init(this, root);
-        });
-
-        // Select time for schedule
-        root.on('click', timesDropdownLink, function() {
-            root.find(timeInput).val($(this).data('value'));
-        });
-
-        // When setting button clicked then
-        root.on('click', settingBtn, function() {
-            email_schedule_setting_init(this, root);
-        });
-
-        // When delete button clicked then
-        root.on('click', deleteBtn, function(e) {
-            data.id = $(this).data("id");
-
-            str.get_strings([
-                {
-                    key: 'confirmemailremovaltitle',
-                    component: 'local_edwiserreports'
-                },
-                {
-                    key: 'confirmemailremovalquestion',
-                    component: 'local_edwiserreports'
-                },
-                {
-                    key: 'yes',
-                    component: 'moodle'
-                },
-                {
-                    key: 'no',
-                    component: 'moodle'
-                }
-            ]).done(function(s) {
-                notif.confirm(s[0], s[1], s[2], s[3], $.proxy(function() {
-                    email_schedule_delete_init(data, root, modal);
-                }, e.currentTarget));
+    function insight(selector, data) {
+        data.insight.title = M.util.get_string(data.insight.title, 'local_edwiserreports');
+        if (data.details !== undefined && data.details.data !== undefined) {
+            data.details.data.forEach(function(value, index) {
+                data.details.data[index].title = M.util.get_string(value.title, 'local_edwiserreports');
             });
-        });
-
-        // When toggle switch clicked then
-        root.on('change', emailListToggleSwitch, function() {
-            data.id = $(this).data("id");
-            change_scheduled_email_status_init(data, root, modal);
-        });
-
-        // Send the notification immidiatly
-        root.on('click', '[data-action="send"]', function() {
-            sendMailToUser(data, this, root);
-        });
-
-        // On save perform operation
-        save_schedule_email_init(data, root, modal);
+        }
+        Templates.render('local_edwiserreports/insight-placeholder', {})
+            .done(function(html, js) {
+                Templates.replaceNodeContents(selector, html, js);
+                Templates.render('local_edwiserreports/insight', data)
+                    .done(function(html, js) {
+                        Templates.replaceNodeContents(selector, html, js);
+                    })
+                    .fail(function(ex) {
+                        Notification.exception(ex);
+                        $(selector).remove();
+                    });
+            });
     }
 
     /**
-     * Send mail to user
-     * @param {Object} data Data for email
-     * @param {object} _this anchor tag
-     * @param {object} root Modal root object
+     * Styling pagination button of data table.
+     * @param {DOM} element Table element
      */
-    function sendMailToUser(data, _this, root) {
-        var filter = data.filter;
-        var cohortid = data.cohortid;
-        var block = data.block;
-        var errorBox = root.find(".esr-form-error");
-        errorBox.html('').show();
-        if ($(document).find('#cover-spin')) {
-            $("body").append(windowLoader);
+    function stylePaginationButton(element) {
+        let pagination = $(element).closest(SELECTOR.TABLE).find(SELECTOR.PAGINATION);
+        if (pagination.find(SELECTOR.PAGINATIONITEM).length < 4) {
+            pagination.addClass('d-none');
+            return;
         }
-        $(document).find('#cover-spin').show(0);
+        pagination.removeClass('d-none');
+        pagination.find(SELECTOR.PAGINATIONITEM).addClass(v.datatableClasses.buttonSpacing);
+        pagination.find(SELECTOR.PAGINATIONITEM + ' a').addClass(v.datatableClasses.buttonSize);
+        pagination.find(SELECTOR.PAGINATIONITEM + '.active a').addClass(v.datatableClasses.buttonActive);
+        pagination.find(SELECTOR.PAGINATIONITEM + ':not(.active) a').addClass(v.datatableClasses.buttonInactive);
+        pagination.find(SELECTOR.PAGINATIONITEM + '.previous a').addClass(v.datatableClasses.prevNextSpacing);
+        pagination.find(SELECTOR.PAGINATIONITEM + '.next a').addClass(v.datatableClasses.prevNextSpacing);
+        // Different margin.
+        pagination.find(SELECTOR.PAGINATIONITEM + '.previous').removeClass(v.datatableClasses.buttonsSpacing)
+            .addClass('mx-4');
+        pagination.find(SELECTOR.PAGINATIONITEM + '.next').removeClass(v.datatableClasses.buttonsSpacing)
+            .addClass('mx-4');
 
-        $.ajax({
-            url: M.cfg.wwwroot + "/local/edwiserreports/download.php?type=email&filter="
-            + filter + "&cohortid=" + cohortid + "&block=" + block,
-            type: "POST",
-            data: root.find('form').serialize()
-        }).done(function(response) {
-            response = $.parseJSON(response);
-            if (response.error) {
-                errorBox.html('<div class="alert alert-danger"><b>ERROR:</b>' + response.errormsg + '</div>');
-            } else {
-                errorBox.html('<div class="alert alert-success"><b>Success:</b>' + response.errormsg + '</div>');
-            }
-        }).fail(function(response) {
-            errorBox.html('<div class="alert alert-danger"><b>ERROR:</b>' + response.errormsg + '</div>');
-        }).always(function() {
-            errorBox.delay(3000).fadeOut('slow');
-            $(document).find('#cover-spin').hide();
+    }
+
+    /**
+     * This function calls callback function when user change the date.
+     *
+     * @param {function} callback Callback function to handle date change
+     */
+    function dateChange(callback) {
+        $(document).on('edwiserreport:datechange', function(event) {
+            callback(event.detail.date);
         });
     }
+
+    /**
+     * Handling highlight of search input.
+     */
+    function handleSearchInput() {
+        /* Table search listener */
+        $('body').on('input', SELECTOR.SEARCHTABLE, function() {
+            $(this).toggleClass('empty', $(this).val() === '');
+        });
+    }
+    /**
+     * Apply precision to number. If number is whole then return as it is.
+     * @param {Number} value     Value to apply precision
+     * @param {Number} precision Precision to apply
+     * @returns {Number}
+     */
+    function toPrecision(value, precision) {
+        if (value % 1 === 0) {
+            return value;
+        }
+        return value.toPrecision(precision);
+    }
+
+    /**
+     * Handle filters size based on visibility.
+     * @param {String} PANEL Panel name
+     */
+    function handleFilterSize(PANEL) {
+        let removeClasses = ['col-md-3', 'col-md-4', 'col-md-6', 'col-md-12'];
+        let addClasses = [];
+        switch ($(PANEL).find('.filter-selector:not(.d-none)').length) {
+            case 1:
+                addClasses = removeClasses.splice(removeClasses.indexOf('col-md-12'), 1);
+                break;
+            case 2:
+                addClasses = removeClasses.splice(removeClasses.indexOf('col-md-6'), 1);
+                break;
+            case 3:
+                addClasses = removeClasses.splice(removeClasses.indexOf('col-md-4'), 1);
+                break;
+            case 4:
+                addClasses = removeClasses.splice(removeClasses.indexOf('col-md-3'), 1);
+                break;
+        }
+        $(PANEL).find('.filter-selector').addClass(addClasses.join(' ')).removeClass(removeClasses.join(' '));
+    }
+
     return {
-        loader: loader
+        loader: loader,
+        toPrecision: toPrecision,
+        insight: insight,
+        timeFormatter: timeFormatter,
+        dateChange: dateChange,
+        stylePaginationButton: stylePaginationButton,
+        handleSearchInput: handleSearchInput,
+        handleFilterSize: handleFilterSize
     };
 });

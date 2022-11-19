@@ -23,9 +23,11 @@
  */
 
 // Make sure varnish doesn't cache this. But it still might so go check it!
+// @codingStandardsIgnoreStart
 header('Pragma: no-cache');
 header('Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate, proxy-revalidate');
 header('Expires: Tue, 04 Sep 2012 05:32:29 GMT');
+// @codingStandardsIgnoreEnd
 
 // Set this manually to true as needed.
 if (false) {
@@ -45,7 +47,7 @@ if (isset($argv) && $argv[0]) {
     define('CLI_SCRIPT', false);
     $fullcheck = isset($_GET['fullcheck']);
 }
-if (!defined(CLI_SCRIPT)) {
+if (!defined('CLI_SCRIPT')) {
     $checksession = isset($_GET['checksession']);
 }
 define('NO_UPGRADE_CHECK', true);
@@ -59,11 +61,12 @@ define('ABORT_AFTER_CONFIG', true);
  */
 function check_climaintenance($configfile) {
     $content = file_get_contents($configfile);
-    $content = preg_replace("#[^!:]//#", "\n//", $content);  // Set comments to be on newlines, replace '//' with '\n//', where // does not start with :
-    $content = preg_replace("/;/", ";\n", $content);         // Split up statements, replace ';' with ';\n'
+    // Set comments to be on newlines, replace '//' with '\n//', where // does not start with a : colon.
+    $content = preg_replace("#[^!:]//#", "\n//", $content);
+    $content = preg_replace("/;/", ";\n", $content);         // Split up statements, replace ';' with ';\n'.
     $content = preg_replace("/^[\s]+/m", "", $content);      // Removes all initial whitespace and newlines.
 
-    $re = '/^\$CFG->dataroot\s+=\s+["\'](.*?)["\'];/m';  // Lines starting with $CFG->dataroot
+    $re = '/^\$CFG->dataroot\s+=\s+["\'](.*?)["\'];/m';  // Lines starting with $CFG->dataroot.
     preg_match($re, $content, $matches);
     if (!empty($matches)) {
         $climaintenance = $matches[count($matches) - 1] . '/climaintenance.html';
@@ -118,7 +121,7 @@ require_once($CFG->libdir.'/filelib.php');
 
 // IP Locking, check for CLI, check for remote IP in validated list, if not, exit.
 if (!(isset($argv))) {
-    require_once('iplock.php');
+    tool_heartbeat\lib::validate_ip_against_config();
 }
 
 if ($fullcheck || $checksession) {

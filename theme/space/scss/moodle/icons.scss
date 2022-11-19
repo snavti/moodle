@@ -182,3 +182,24 @@ $iconsizes: map-merge((
         }
     }
 }
+
+.rui-adv-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: $gray-100;
+    color: $gray-600;
+
+    font-size: 10px;
+    font-weight: $font-weight-bold;
+
+    width: 16px;
+    height: 16px;
+    border-radius: 12px;
+
+    .theme-dark & {
+        background-color: $dm-gray-100;
+        color: $dm-gray-600;
+    }
+}

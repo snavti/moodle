@@ -30,22 +30,23 @@
     }
 }}
 
-<div id="discussion-container-{{uniqid}}" data-content="forum-discussion">
+<div id="discussion-container-{{uniqid}}" class="rui-forum-discussion" data-content="forum-discussion">
 {{#html}}
     <div class="d-flex flex-wrap mb-4 position-relative">
         <div>{{{exportdiscussion}}}</div>
-        <div class="{{#exportdiscussion}}ml-2{{/exportdiscussion}}">{{{modeselectorform}}}</div>
-        <div class="mt-sm-3 mt-md-0 ml-md-2">{{{movediscussion}}}</div>
+        <div class="rui-exportdiscussion {{#exportdiscussion}}ml-2{{/exportdiscussion}}">{{{modeselectorform}}}</div>
+        <div class="rui-movediscussion mt-sm-1 mt-md-0 ml-md-2">{{{movediscussion}}}</div>
 
-        <div class="ml-auto">
-            {{#hasanyactions}}
+        {{#hasanyactions}}
+        <div class="rui-hasanyactions ml-auto mt-sm-2 mt-md-0">
             <div class="d-flex flex-wrap flex-row-reverse mb-3 position-relative" data-container="discussion-tools">
                 <div class="discussion-settings-menu">
                     {{> mod_forum/forum_action_menu}}
                 </div>
             </div>
-            {{/hasanyactions}}    
         </div>
+        {{/hasanyactions}}    
+    
     </div>
     {{{neighbourlinks}}}    
 {{/html}}

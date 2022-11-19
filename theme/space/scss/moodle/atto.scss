@@ -43,6 +43,10 @@ div.editor_atto_toolbar {
     }
 }
 
+div.editor_atto_toolbar .menuplaceholder {
+    display: inline-block;
+}
+
 div.editor_atto_toolbar button {
     padding: 6px;
     margin: 1px;
@@ -355,15 +359,6 @@ div.editor_atto_content:hover .atto_control {
     width: 100%;
 }
 
-.atto_image_button_text-top.img-fluid,
-.atto_image_button_middle.img-fluid,
-.atto_image_button_text-bottom.img-fluid {
-    display: block!important;
-    max-width: 100%!important;
-    margin-left: 0!important;
-    margin-right: 0!important;
-}
-
   // Atto editor modal window
   .ftoggler {
     .yui3-widget-modal &,
@@ -374,4 +369,10 @@ div.editor_atto_content:hover .atto_control {
 
   .atto_form.atto_media>.tab-content {
       padding: 10px;
+  }
+
+  .atto_image_button_text-top.img-fluid, .atto_image_button_middle.img-fluid, .atto_image_button_text-bottom.img-fluid {
+    max-width: 100%;
+    margin: 0;
+    border-radius: $btn-border-radius;
   }

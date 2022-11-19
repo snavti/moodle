@@ -106,6 +106,8 @@ input#id_externalurl {
 }
 
 .form-inline label:not(.sr-only):not(.accesshide) + select {
+  margin-top: .25rem;
+  margin-bottom: .25rem;
   margin-left: 0.5rem;
 }
 
@@ -669,7 +671,7 @@ textarea[data-auto-rows] {
     background-repeat: no-repeat;
     background-position: calc(100% - 20px);
 
-    border-radius: $border-radius;
+    border-radius: $btn-border-radius;
 
     h3 {
       font-size: $font-size-sm;
@@ -710,7 +712,7 @@ textarea[data-auto-rows] {
     margin-bottom: 0;
   }
 
-
+  .fheader.collapsed,
   .mform fieldset.collapsed legend a.fheader {
     /*rtl:raw:
         background-image: url([[pix:t/collapsed_rtl]]);
@@ -1206,7 +1208,7 @@ textarea[data-auto-rows] {
   [data-toggle="popover"] {
     position: absolute;
     top: calc(50% - 12px);
-    right: 30px;
+    right: 40px;
   }
 }
 
@@ -1421,6 +1423,15 @@ textarea[data-auto-rows] {
 
         .rui-icon-menu & {
           width: 200px!important;
+
+
+          @include media-breakpoint-between(xs,sm) {
+            width: 250px!important;
+            position: absolute;
+            z-index: 3;
+            top: 0;
+            left: -55px;
+          }
         }
 
         .theme-dark & {
@@ -1428,6 +1439,7 @@ textarea[data-auto-rows] {
         }
 
         .search-input {
+          width: 100%;
           padding: .75rem 1.25rem .75rem 45px;
           margin: 0;
           height: 47px;
@@ -1439,12 +1451,10 @@ textarea[data-auto-rows] {
           border: none;
 
           #nav-drawer & {
-            background-color: $white;
-
-            .theme-dark & {
-              background-color: $black;
-              color: $dm-gray-900;
-            }
+            padding: 7px 40px;
+            margin-bottom: 4px;
+            height: auto;
+            font-size: $font-size-xs;
           }
 
           .theme-dark & {
@@ -1457,11 +1467,15 @@ textarea[data-auto-rows] {
           display: flex;
           position: absolute;
           left: 15px;
-          top: calc(50% - 11px); // Icon has 11px height
+          top: calc(50% - 11px);
+
+          #nav-drawer & {
+            top: calc(50% - 10px);
+            left: 12px;
+          }
         }
 
 
-      // TODO: Add variables for primary color
         .search-input-btn {
           position: absolute;
           top: calc(50% - 15px);
@@ -1484,10 +1498,42 @@ textarea[data-auto-rows] {
             color: $dm-body-color-secondary;
           }
 
+          #nav-drawer & {
+          color: $white;
+          }
+
           &:hover {
             background-color: $primary-color-600;
             color: $primary-color-100;
           }
         }
 
+      }
+
+      .rui-show-password-btn {
+        position: absolute;
+        top: calc(50% - 15px);
+        right: 5px;
+
+        background-color: $primary-color-100;
+        color: $primary-color-600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 30px;
+        height: 30px;
+        border-radius: 30px;
+
+        &:hover {
+          background-color: $primary-color-100;
+          color: $primary-color-600;
+        }
+
+        &.rui-show-password-btn--hidden {
+          background-color: $gray-100;
+          color: $gray-600;
+        }
+
+        cursor: pointer;
       }

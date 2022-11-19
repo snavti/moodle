@@ -7,6 +7,7 @@
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
+  justify-content: center;
 
   padding: $badge-padding-y $badge-padding-x;
   @include font-size($badge-font-size);
@@ -247,7 +248,7 @@
         align-items: center;
         flex-wrap: wrap;
 
-        padding: $badge-padding-y $badge-padding-x;
+        padding: $badge-padding-y 1.25rem;
         @include font-size($badge-font-size);
         font-weight: $badge-font-weight;
         vertical-align: baseline;

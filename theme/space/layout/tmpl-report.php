@@ -113,6 +113,9 @@ if($courseindexopen == false) {
     $extraclasses[] = 'drawer-open-index--open';
 }
 $hasblocks = (strpos($blockshtml, 'data-block=') !== false || !empty($addblockbutton));
+if (!$hasblocks) {
+    $blockdraweropen = false;
+}
 $PAGE->set_secondary_navigation(false);
 $renderer = $PAGE->get_renderer('core');
 
@@ -138,6 +141,11 @@ if(!isloggedin()) {
     $isnotloggedin = true;
 } else {
     $isnotloggedin = false;
+}
+
+//Check if geust user
+if (isguestuser()) {
+    $extraclasses[] = 'moodle-guest-user';
 }
 
 // Default moodle setting menu

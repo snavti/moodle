@@ -113,6 +113,23 @@ $page = new admin_settingpage('theme_space_settingscourses', get_string( 'settin
 	$setting = new admin_setting_heading($name, $heading, format_text(get_string('hcoursenavitems_desc', 'theme_space'), FORMAT_MARKDOWN));
 	$page->add($setting);
 
+    $name = 'theme_space/showcoursenav';
+    $title = get_string('showcoursenav', 'theme_space');
+    $description = get_string('showcoursenav_desc', 'theme_space');
+    $default = 1;
+    $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+    $page->add($setting);
+
+	$name = 'theme_space/coursenavposition';
+	$title = get_string('coursenavposition', 'theme_space');
+	$description = get_string('coursenavposition_desc', 'theme_space');
+	$options = [];
+	$options[1] = get_string('coursenavposition1', 'theme_space');
+	$options[2] = get_string('coursenavposition2', 'theme_space');
+	$setting = new admin_setting_configselect($name, $title, $description, 1, $options);
+	$setting->set_updatedcallback('theme_reset_all_caches');
+	$page->add($setting);
+
     $name = 'theme_space/isitemonparticipants';
     $title = get_string('isitemonparticipants', 'theme_space');
     $description = get_string('isitemonparticipants_desc', 'theme_space');

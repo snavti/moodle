@@ -1,15 +1,35 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Plugin administration pages are defined here.
+ *
+ * @copyright   2021 wisdmlabs <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /* eslint-disable no-console */
 define([
     'jquery',
-    'core/chartjs',
-    'local_edwiserreports/defaultconfig',
-    'local_edwiserreports/variables',
+    'core/notification',
+    './defaultconfig',
+    './variables',
     './common',
-    'local_edwiserreports/jquery.dataTables',
-    'local_edwiserreports/dataTables.bootstrap4'
+    './jquery.dataTables',
+    './dataTables.bootstrap4'
 ], function(
     $,
-    Chart,
+    Notification,
     cfg,
     V,
     common
@@ -17,51 +37,78 @@ define([
 
     /**
      * Initialize
-     * @param {function} notifyListner Callback function
+     * @param {function} invalidUser Callback function
      */
-    function init(notifyListner) {
-        var activeUsersTable;
+    function init(invalidUser) {
         var panel = cfg.getPanel("#inactiveusersblock");
         var panelBody = cfg.getPanel("#inactiveusersblock", "body");
-        var panelTitle = cfg.getPanel("#inactiveusersblock", "title");
         var table = panelBody + " #inactiveuserstable";
-        var tableWrapper = panelBody + " #inactiveuserstable_wrapper";
-        var loader = panelBody + " .loader";
-        var dropdown = panelTitle + " .dropdown-menu .dropdown-item";
-        var dropdownToggle = panelTitle + " button.dropdown-toggle";
+        var dropdown = panelBody + " .dropdown-menu .dropdown-item";
+        var dropdownToggle = panelBody + " button.dropdown-toggle";
         var inActiveUsersTable = null;
         var exportUrlLink = panel + " .dropdown-menu[aria-labelledby='export-dropdown'] .dropdown-item";
+        var searchTable = panel + " .table-search-input input";
 
-        // Get inactive users data on load
-        getInactiveUsersData($(dropdown).data("value"));
+        if ($(panel).length) {
+            // Rending data table.
+            inActiveUsersTable = $(table).DataTable({
+                dom: '<"edwiserreports-table"<t><"table-pagination"p>>',
+                aaSorting: [
+                    [2, 'desc']
+                ],
+                language: {
+                    info: M.util.get_string('tableinfo', 'local_edwiserreports'),
+                    infoEmpty: M.util.get_string('infoempty', 'local_edwiserreports'),
+                    emptyTable: M.util.get_string('noinactiveusers', 'local_edwiserreports'),
+                    zeroRecords: M.util.get_string('zerorecords', 'local_edwiserreports'),
+                    paginate: {
+                        previous: M.util.get_string('previous', 'moodle'),
+                        next: M.util.get_string('next', 'moodle')
+                    }
+                },
+                columnDefs: [{
+                    "targets": 1,
+                    "className": "d-none d-sm-none d-md-table-cell d-lg-table-cell "
+                }, {
+                    "targets": 2,
+                    "className": "text-center"
+                }],
+                drawCallback: function() {
+                    common.stylePaginationButton(this);
+                    // Hide loader.
+                    common.loader.hide('#inactiveusersblock');
+                },
+                responsive: true,
+                lengthChange: false,
+                bInfo: false
+            });
 
-        /**
-         * On click of dropdown get inactive user list based on filter
-         */
-        $(dropdown).on("click", function() {
-            // Get filter
-            var filter = $(this).data("value");
-            $(panel).find('.download-links input[name="filter"]').val(filter);
+            // Get inactive users data on load
+            getInactiveUsersData($(dropdown).data("value"));
 
-            // If table is already created then destroy the tablw
-            if (activeUsersTable) {
-                activeUsersTable.destroy();
-            }
+            /**
+             * On click of dropdown get inactive user list based on filter
+             */
+            $(dropdown).on("click", function() {
+                // Get filter
+                var filter = $(this).data("value");
+                $(panel).find('.download-links input[name="filter"]').val(filter);
 
-            // Show load and remove table
-            $(loader).show();
-            $(table).hide();
-            $(tableWrapper).hide();
+                // Set dropdown button value
+                $(dropdownToggle).html($(this).html());
 
-            // Set dropdown button value
-            $(dropdownToggle).html($(this).html());
+                // Change export data url
+                cfg.changeExportUrl(filter, exportUrlLink, V.filterReplaceFlag);
 
-            // Change export data url
-            cfg.changeExportUrl(filter, exportUrlLink, V.filterReplaceFlag);
+                // Get inactive users
+                getInactiveUsersData($(this).data("value"));
+            });
 
-            // Get inactive users
-            getInactiveUsersData($(this).data("value"));
-        });
+            // Search in table.
+            $('body').on('input', searchTable, function() {
+                inActiveUsersTable.search(this.value).draw();
+            });
+        }
 
         /**
          * Get inactive users list based on filter
@@ -73,69 +120,33 @@ define([
             common.loader.show('#inactiveusersblock');
 
             $.ajax({
-                url: cfg.requestUrl,
-                type: 'GET',
-                dataType: 'json',
-                data: {
-                    action: 'get_inactiveusers_data_ajax',
-                    sesskey: $(panel).data("sesskey"),
-                    data: JSON.stringify({
-                        filter: filter
-                    })
-                },
-            })
-                .done(function(response) {
-                    createInactiveUsersTable(response.data);
+                    url: cfg.requestUrl,
+                    type: cfg.requestType,
+                    dataType: cfg.requestDataType,
+                    data: {
+                        action: 'get_inactiveusers_data_ajax',
+                        secret: M.local_edwiserreports.secret,
+                        lang: $('html').attr('lang'),
+                        data: JSON.stringify({
+                            filter: filter
+                        })
+                    },
                 })
-                .fail(function(error) {
-                    console.log(error);
+                .done(function(response) {
+                    if (response.error === true && response.exception.errorcode === 'invalidsecretkey') {
+                        invalidUser('inactiveusersblock', response);
+                        return;
+                    }
+                    inActiveUsersTable.clear();
+                    inActiveUsersTable.rows.add(response.data);
+                    inActiveUsersTable.draw();
+                })
+                .fail(function(ex) {
+                    Notification.exception(ex);
                 }).always(function() {
-                    notifyListner("inActiveUsers");
-
                     // Hide loader.
                     common.loader.hide('#inactiveusersblock');
                 });
-        }
-
-        /**
-         * Create inactive users table
-         * @param  {String} data Table data
-         */
-        function createInactiveUsersTable(data) {
-            // If table is creted then destroy table
-            if (inActiveUsersTable) {
-                // Remove table data first
-                $("#inactiveuserstable tbody").remove();
-                inActiveUsersTable.destroy();
-            }
-
-            // Display loader
-            $(loader).hide();
-            $(table).show();
-
-            // Create inactive users table
-            inActiveUsersTable = $(table).DataTable({
-                data: data,
-                // Dom : '<"pull-left"f><t>',
-                aaSorting: [[2, 'desc']],
-                oLanguage: {
-                    sEmptyTable: "No inactive users are available.",
-                    sSearchPlaceholder: "Search Users"
-                },
-                columnDefs: [
-                    {
-                        "targets": 2,
-                        "className": "text-center"
-                    }
-                ],
-                drawCallback: function() {
-                    $('.dataTables_paginate > .pagination').addClass('pagination-sm pull-right');
-                    $('.dataTables_filter').addClass('pagination-sm pull-right');
-                },
-                responsive: true,
-                lengthChange: false,
-                bInfo: false
-            });
         }
     }
 

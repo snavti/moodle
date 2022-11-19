@@ -260,19 +260,19 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
 
                 if ($badge->type == BADGE_TYPE_COURSE && isset($badge->courseid)) {
                     $coursename = $DB->get_field('course', 'fullname', array('id' => $badge->courseid));
-                    $output .= html_writer::start_tag('span', array('class' => 'badge badge-info'));
+                    $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-info'));
                         $output .= '<span class="mr-1 font-weight-bold">' . get_string('course') . ': </span>' . $coursename;
                     $output .= html_writer::end_tag('span');
                 }
 
                 if (!empty($badge->version)) {
-                    $output .= html_writer::start_tag('span', array('class' => 'badge badge-secondary'));
+                    $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-secondary'));
                         $output .= '<span class="mr-1 font-weight-bold">' . get_string('version', 'badges') . ': </span>' . $badge->version;
                     $output .= html_writer::end_tag('span');
                 }
 
                 if (!empty($languages[$badge->language])) {
-                    $output .= html_writer::start_tag('span', array('class' => 'badge badge-secondary'));
+                    $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-secondary'));
                         $output .= '<span class="mr-1 font-weight-bold">' . get_string('language') . ': </span>' . $languages[$badge->language];
                     $output .= html_writer::end_tag('span');
                 }
@@ -318,18 +318,18 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
 
                 if (!is_numeric($issued['issuedOn'])) {
                     $issued['issuedOn'] = strtotime($issued['issuedOn']);
-                    $output .= html_writer::start_tag('span', array('class' => 'badge badge-secondary'));
+                    $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-secondary'));
                         $output .= '<span class="mr-1 font-weight-bold">' . get_string('dateawarded', 'badges') . ': </span>' . userdate($issued['issuedOn']);
                     $output .= html_writer::end_tag('span');
                 }
 
                 if (isset($issued['expires'])) {
                     if ($issued['expires'] < $now) {
-                        $output .= html_writer::start_tag('span', array('class' => 'badge badge-danger'));
+                        $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-danger'));
                             $output .= '<span class="mr-1 font-weight-bold">' . get_string('expirydate', 'badges') . ': </span>' . userdate($issued['expires']) . get_string('warnexpired', 'badges');
                         $output .= html_writer::end_tag('span');
                     } else {
-                        $output .= html_writer::start_tag('span', array('class' => 'badge badge-warning'));
+                        $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-warning'));
                             $output .= '<span class="mr-1 font-weight-bold">' . get_string('expirydate', 'badges') . ': </span>' . userdate($issued['expires']);
                         $output .= html_writer::end_tag('span');
                     }
@@ -600,9 +600,9 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
             $name = html_writer::link(new moodle_url('/badges/overview.php', array('id' => $b->id)), $forlink);
 
             if (!$b->is_active()) {
-                $status = '<span class="badge badge-danger">' . $b->statstring . '</span>';
+                $status = '<span class="my-1 badge badge-danger">' . $b->statstring . '</span>';
             } else {
-                $status = '<span class="badge badge-success">' . $b->statstring . '</span>';
+                $status = '<span class="my-1 badge badge-success">' . $b->statstring . '</span>';
             }
 
             $criteria = self::print_badge_criteria($b, 'short');
@@ -697,7 +697,7 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
     /**
      * Outputs list en badges.
      *
-     * @param badge $badge Badge object.
+     * @param Badge object.
      * @return string $output content endorsement to output.
      */
     protected function print_badge_endorsement(badge $badge) {
@@ -713,7 +713,7 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
             $output .= html_writer::start_tag('div', array('class' => 'ml-4'));
 
                 if (!empty(userdate($endorsement->dateissued))) {
-                    $output .= html_writer::start_tag('span', array('class' => 'badge badge-light'));
+                    $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-light'));
                         $output .= '<span class="mr-1 font-weight-bold">' . get_string('dateawarded', 'badges') . ': </span>' . userdate($endorsement->dateissued);
                     $output .= html_writer::end_tag('span');
                 }
@@ -745,7 +745,7 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
     /**
      * Print list badges related.
      *
-     * @param badge $badge Badge objects.
+     * @param Badge objects.
      * @return string $output List related badges to output.
      */
     protected function print_badge_related(badge $badge) {
@@ -772,7 +772,7 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
     /**
      * Print list badge alignments.
      *
-     * @param badge $badge Badge objects.
+     * @param Badge objects.
      * @return string $output List alignments to output.
      */
     protected function print_badge_alignments(badge $badge) {
@@ -814,19 +814,19 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
                     // Badge details.
 
                     if (!empty($badge->version)) {
-                        $output .= html_writer::start_tag('span', array('class' => 'badge badge-secondary'));
+                        $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-secondary'));
                             $output .= '<span class="mr-1 font-weight-bold">' . get_string('version', 'badges') . ': </span>' . $badge->version;
                         $output .= html_writer::end_tag('span');
                     }
 
                     if (!empty($languages[$badge->language])) {
-                        $output .= html_writer::start_tag('span', array('class' => 'badge badge-secondary'));
+                        $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-secondary'));
                             $output .= '<span class="mr-1 font-weight-bold">' . get_string('language') . ': </span>' . $languages[$badge->language];
                         $output .= html_writer::end_tag('span');
                     }
 
                     if (!empty(userdate($badge->timecreated))) {
-                        $output .= html_writer::start_tag('span', array('class' => 'badge badge-info'));
+                        $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-info'));
                             $output .= '<span class="mr-1 font-weight-bold">' . get_string('createdon', 'search') . ': </span>' . userdate($badge->timecreated);
                         $output .= html_writer::end_tag('span');
                     }
@@ -856,13 +856,13 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
                                     $output .= '<svg class="mr-2" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path><circle cx="12" cy="16" r="1" fill="currentColor"></circle></svg>' . get_string('expireperiodh', 'badges', round($badge->expireperiod / 60 / 60, 2));
                                 $output .= html_writer::end_tag('span');
                             } else {
-                                $output .= html_writer::start_tag('span', array('class' => 'badge badge-danger'));
+                                $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-danger'));
                                     $output .= '<svg class="mr-2" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.9522 16.3536L10.2152 5.85658C10.9531 4.38481 13.0539 4.3852 13.7913 5.85723L19.0495 16.3543C19.7156 17.6841 18.7487 19.25 17.2613 19.25H6.74007C5.25234 19.25 4.2854 17.6835 4.9522 16.3536Z"></path><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10V12"></path><circle cx="12" cy="16" r="1" fill="currentColor"></circle></svg>' . get_string('expireperiod', 'badges', round($badge->expireperiod / 60 / 60 * 0.54, 2));
                                 $output .= html_writer::end_tag('span');
                             }
                         }
                     } else {
-                        $output .= html_writer::start_tag('span', array('class' => 'badge badge-success'));
+                        $output .= html_writer::start_tag('span', array('class' => 'my-1 badge badge-success'));
                             $output .= '<span class="mr-1 font-weight-bold">' . get_string('noexpiry', 'badges') . '</span>';
                         $output .= html_writer::end_tag('span');
                     }
@@ -905,6 +905,7 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
                     $output .= html_writer::end_tag('div'); // rui-badge-desc
                 $output .= html_writer::end_tag('div'); // .rui-badge-overview
 
+                
                 if (!empty($badge->issuername)|| !empty($badge->issuercontact)) {
                     $output .= html_writer::start_tag('span', array('class' => 'alert alert-secondary d-block'));
                         $output .=  '<span class="mr-1 font-weight-bold">' . get_string('issuername', 'badges') . ': </span>' . $badge->issuername;
@@ -983,7 +984,7 @@ class theme_space_core_badges_renderer extends core_badges_renderer {
 
                     $output .= html_writer::end_tag('div'); // .wrapper-fw
 
-            $output .= html_writer::end_tag('div'); // .badge-ovrview-wrapper
+           
 
         $output .= html_writer::end_tag('div');
         return $output;

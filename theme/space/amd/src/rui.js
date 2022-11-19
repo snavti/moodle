@@ -63,14 +63,26 @@ define(['jquery', 'core/log', 'core/aria'], function($, log) {
                         $('body').toggleClass('drawer-courseindex--open');
                     }
                 });
-                 
 
+                $('#mobileNav, .rui-mobile-nav-btn-close').click(function() {
+                   $('#topBar').toggleClass('opened');
+                });
+                
+                 
                 // Remove unnecessary string "..." from default moodle blocks
                 $('.block .footer').each(function() {
                     var text = $(this).html();
                     $(this).html(text.replace('...', ''));
                 });   
 
+                $('.rui-nav--admin .nav-link').each(function() {
+                    var text = $(this).html();
+                    $(this).html(text.replace('(', '<span class="mt-1 small d-block text-light">'));
+                }); 
+                $('.rui-nav--admin .nav-link').each(function() {
+                    var text = $(this).html();
+                    $(this).html(text.replace(')', '</span>'));
+                }); 
             });
 
         }

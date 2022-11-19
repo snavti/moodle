@@ -5,16 +5,12 @@
     background-color: $gray-100;
 }
 
-#page-login-signup {
-    background-image: none!important;
-}
-
 .rui-login-footer {
     padding: 0 20px;
-    margin-bottom: 80px;
+    margin-bottom: 30px;
 
     @include media-breakpoint-between(xs,md) {
-    margin: 0 auto 40px;
+    margin: 0 auto 20px;
     width: 90%;
     }
 }
@@ -23,8 +19,7 @@
     font-size: $font-size-sm;
 }
 
-.rui-login-createaccount--top,
-.rui-logo-top-btn {
+.rui-login-top-btn {
     background-color: rgba($black, .4);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
@@ -34,7 +29,30 @@
     font-size: $font-size-sm;
     color: $white;
 
-    a {
+    @include media-breakpoint-up(md) {
+        position: fixed;
+        top: 5px;
+        right: 5px;
+        text-align: right;
+
+        .rui-login-layout-5 & {
+            left: 5px;
+            right: auto;
+        }
+    }
+
+    @include media-breakpoint-between(xs,sm) {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    margin: 3px auto;
+    }
+
+    a, .btn-link--clean {
         font-size: $font-size-sm;
         color: $white;
 
@@ -43,64 +61,18 @@
             opacity: .6;
         }
     }
-}
-
-.rui-logo-top-btn {
-    position: fixed;
-    top: $page-padding-global;
-    right: $page-padding-global;
-    text-align: right;
 
     h1 {
         font-size: 14px;
     }
 
-    @include media-breakpoint-between(xs,md) {
-    position: relative;
-    top: 0;
-    width: 100%;
-    }
-
-    @include media-breakpoint-only(md) {
-    padding: 39px 10px;
-    right: 30px;
-    }
-
-    @include media-breakpoint-between(xs,sm) {
-    padding: 20px 10px 20px 90px;
-    right: 10px;
-    }
 }
-
-
-        .rui-login-createaccount--top {
-            position: absolute;
-            top: 0;
-            right: 0;
-            font-size: $font-size-sm;
-
-            @include media-breakpoint-between(xs,md) {
-            position: relative;
-            top: auto;
-            right: auto;
-            width: 90%;
-
-            margin: 20px auto;
-            text-align: center;
-            }
-
-            .btn-link--clean {
-                font-weight: $font-weight-bold;
-                color: inherit;
-
-                &:hover {
-                    opacity: 1;
-                }
-            }
-        }
 
         .rui-loginpage-intro-logo {
             margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             text-align: center;
 
             a {
@@ -126,12 +98,40 @@
 }
 
 .rui-login-box {
-    padding: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: $container-bg;
     border-radius: $border-radius;
 
-    @include media-breakpoint-down(sm) {
-    padding: 20px;
+    @include media-breakpoint-between(xs,sm) {
+    padding: 10px;
+    }
+
+    .rui-login-layout--1 & {
+        padding: 30px;
+        @include media-breakpoint-between(xs,sm) {
+        padding: 20px;
+        }
+    }
+
+    .rui-login-layout--2 &,
+    .rui-login-layout--3 & {
+        padding: 60px;
+
+        @include media-breakpoint-between(xs,sm) {
+        padding: 20px;
+        }
+    }
+
+    .rui-login-layout--4 &,
+    .rui-login-layout--5 &  {
+        padding: 40px;
+
+        @media (max-width: 900px) {
+        padding: 20px;
+        width: 100%;    
+        }     
     }
 }
 
@@ -142,7 +142,7 @@
     background-color: $container-bg;
     border-radius: $border-radius;
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
     padding: 20px;
     }    
 
@@ -158,7 +158,8 @@
 }
 
 .rui-hasinstructions-desc {
-    font-size: $font-size-sm;
+    font-size: $font-size-xs;
+    font-weight: 400;
 }
 
 .rui-rememberusername-text,
@@ -172,7 +173,7 @@
 // Layout
 
     .rui-login-container {
-        margin: 40px auto;
+        margin: 30px auto;
 
         overflow: hidden;
 
@@ -184,45 +185,82 @@
         border-radius: $border-radius;
 
         .rui-login-layout-img & {
-            max-width: 1020px;
+            max-width: 960px;
+
+            @include media-breakpoint-up(lg) {
             width: 100%;
+            }
         }
 
         .rui-login-layout--2 & {
             flex-direction: row;
+
+            @include media-breakpoint-up(md) {
+            border-radius: 30px;
+            }
+
+            @include media-breakpoint-between(xs,sm) {
+            border-radius: $border-radius;
+            }
         }
 
         .rui-login-layout--3 & {
             flex-direction: row-reverse;
-        }
 
-        #page-login-signup & {
-            background-color: transparent;
-        }
+            @include media-breakpoint-up(md) {
+            border-radius: 30px;
+            }
 
-        @include media-breakpoint-between(sm,md) {
-            margin: 30px auto;
-            width: 100%;
+            @include media-breakpoint-between(xs,sm) {
+            border-radius: $border-radius;
+            }
         }
     }
 
     .rui-login-bg-container {
         width: 50%;
-        background-color: $primary-color-600;
+        background-color: $login-bgcolor;
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center;
         position: relative;   
 
+        color: $login-bgcolor-txt;
+
+        h1, h2, h3, h4, h5, h6, p, small, span, div {
+            color: inherit;
+        }
+
+        @include media-breakpoint-up(md) {
+        .rui-login-layout-2 & {
+            border-radius: 0 30px 30px 0;
+        }
+        .rui-login-layout-3 & {
+            border-radius: 30px 0 0 30px;
+        }
+        }
+
         @include media-breakpoint-between(sm,md) {
-        display: none;
+        width: 100%;
+        }
+
+        @include media-breakpoint-between(xs,sm) {
+        border-radius: $border-radius;
         }
     }
 
     .rui-login-box {
-        .rui-login-layout-simple & {
-            max-width: 500px;
+        .rui-login-content {
+            @include media-breakpoint-up(md) {
+                width: 340px;
+                height: 100%;
+            }
+            @include media-breakpoint-between(xs,sm) {
+                max-width: 280px;
+                height: 100%;
+            }
         }
+
         .rui-login-layout-img & {
             width: 50%;
             @include media-breakpoint-only(md) {
@@ -236,35 +274,32 @@
             }
         }
         .rui-login-layout--1 & {
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: 60px;
-        }
-        .rui-login-layout--4 & {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            overflow-y: auto;
-            border-radius: 0;
+            margin: 30px auto;
+            width: 100%;
+            max-width: 400px;
             @include thin-scrolls($scroll-bg-track);
-
-            .theme-dark & {
-                @include thin-scrolls($dm-drawer-scroll-bg-track);
-            }
         }
+
+        .rui-login-layout--4 &,
         .rui-login-layout--5 & {
-            position: fixed;
+            @media (min-width: 901px) {
+            position: absolute;
             top: 0;
-            right: 0;
-            height: 100vh;
-            overflow-y: auto;
             border-radius: 0;
-            @include thin-scrolls($scroll-bg-track);
-
-            .theme-dark & {
-                @include thin-scrolls($dm-drawer-scroll-bg-track);
+            min-height: 100vh;
             }
+            @media (max-width: 900px) {
+            position: relative;
+            top: 0;
+            }
+        }
+
+        .rui-login-layout--4 & {
+           left: 0;
+        }
+
+        .rui-login-layout--5 & {
+            right: 0;
         }
     }
 
@@ -278,19 +313,12 @@
     }
 
     .rui-login-wrapper {
-        width: 90%;
-        max-width: 1020px;
+        width: 100%;
+        max-width: 960px;
         margin-left: auto;
         margin-right: auto;
     }
 
-// Sign up Page
-.rui-login-logo {
-    img {
-        width: auto;
-        height: 40px;
-    }
-}
 
 .rui-login-logo--sep {
     margin-bottom: 0;
@@ -322,26 +350,11 @@
     }
 
     @include media-breakpoint-between(xs,sm) {
-    padding: 0 10px 30px 10px;
+    padding: 0;
     }
 }
 
-.rui-signup-box {
-    margin-bottom: 40px;
-    max-width: 600px;
-
-    @include media-breakpoint-between(lg,xl) {
-    max-width: 500px;
-    }
-
-    @include media-breakpoint-between(md,lg) {
-    max-width: 400px;
-    }
-
-    @include media-breakpoint-between(xs,md) {
-    max-width: 100%;
-    }
-
+.rui-login-box {
     .form-control {
         width: 100%;
     }
@@ -372,13 +385,15 @@
 }
 
 .rui-signup-additional-content {
-    margin: 90px 0;
-    padding-left: 80px;
-
     height: max-content;
 
+    @include media-breakpoint-up(lg) {
     position: sticky;
     top: 11%;
+
+    margin: 90px 0;
+    padding-left: 80px;
+    }
 
     @include media-breakpoint-between(xs,md) {
     width: 90%;
@@ -390,12 +405,12 @@
 
 .rui-backtologin {
     position: fixed;
-    top: 70px;
+    top: 26px;
     left: 30px;
 
     @include media-breakpoint-between(xs,sm) {
     position: absolute;
-    top: 10px;
+    top: -34px;
     left: 10px;
     }
 }
@@ -452,7 +467,7 @@
     font-size: $font-size-xs;
     color: $gray-100;
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
     padding: 8px;
     }
 
@@ -470,6 +485,7 @@
     background-size: 22px;
     background-position: 16px;
     background-repeat: no-repeat;
+    background-color: transparent;
 
     padding-left: 50px;
 }
@@ -493,7 +509,7 @@
     }
 }
 
-@include media-breakpoint-down(sm) {
+@include media-breakpoint-between(xs,sm) {
 .rui-lang-btn .rui-lang-btn-text {
     display: none;
 }
@@ -503,7 +519,12 @@
     margin-top: 25px;
 }
 
-.rui-login-logo {
+.rui-login-logo-container {
+    .rui-login-logo {
+        max-width: 260px;
+        height: auto;
+    }
+
     .rui-login-layout--1 &,
     .rui-login-layout--2 &,
     .rui-login-layout--3 & {
@@ -513,17 +534,37 @@
         justify-content: center;
         text-align: center;
     
-        width: 100%;
-        max-height: 90px;
+        max-width: 100%;
+        max-height: 200px;
     }
 
     .rui-login-layout--4 &,
     .rui-login-layout--5 & {
-        width: auto;
+        @media (min-width: 901px) {
+            width: 200px;
+            position: fixed;
+            top: 40px;
+        }
+
+        @media (max-width: 900px) {
+            width: 100%;
+            position: relative;
+            text-align: center;
+        }
     }
 
-    .rui-login-logo {
-        height: 80px;
+    .rui-login-layout--4 & {
+        @media (min-width: 901px) {
+            right: 60px;
+            text-align: right;
+        }
+    }
+
+    .rui-login-layout--5 & {
+        @media (min-width: 901px) {
+            left: 60px;
+            text-align: left;
+        }
     }
 }
 
@@ -537,12 +578,31 @@
     }
 }
 
-.rui-login-top,
-.rui-login-top--content {
-    @include media-breakpoint-between(sm,md) {
-    width: 100%;
-    margin: 0 auto 40px;
+.rui-login-html-1 {
+    .rui-login-layout--4 &,
+    .rui-login-layout--5 & {
+        position: fixed;
+        top: 40%;
+
+        font-weight: $font-weight-bold;
+        color: $white;
+
+        @media (min-width: 901px) {
+            font-size: 40px;
+        }
+
+        @media (max-width: 900px) {
+            display: none;
+        }
     }   
+    .rui-login-layout--4 & {
+        right: 60px;
+    }   
+
+    .rui-login-layout--5 & {
+        left: 60px;
+    }   
+
 }
 
 #page-login-index {
@@ -554,6 +614,7 @@
 }
 
 .rui-login-logo-name {
+    margin-bottom: 0;
     font-size: 1.125rem;
     font-weight: $font-weight-bold;
     color: $body-color;
@@ -567,20 +628,5 @@
     .rui-login-layout--5 & {
         left: 16px;
         right: auto;
-    }
-}
-
-.rui-login-logo {
-    .rui-login-layout--4 &,
-    .rui-login-layout--5 & {
-        position: fixed;
-        top: 40px;
-    }
-
-    .rui-login-layout--4 & {
-        right: 60px;
-    }
-    .rui-login-layout--5 & {
-        left: 60px;
     }
 }

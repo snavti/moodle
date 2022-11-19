@@ -75,7 +75,7 @@
                 </div>
                 <div class="collapse show px-3" id="criteria-{{id}}" role="radiogroup" aria-labelledby="criterion-description-{{id}}">
                     {{#levels}}
-                        <div class="form-check">
+                        <div class="form-check d-inline-flex align-items-center justify-content-start w-100">
                             <input class="form-check-input level"
                                    type="radio"
                                    name="advancedgrading[criteria][{{criterionid}}][levelid]"
@@ -91,7 +91,7 @@
                                         tabindex="-1"
                                     {{/checked}}
                             >
-                            <label class="w-100" for="advancedgrading-criteria-{{criterionid}}-levels-{{id}}-definition">
+                            <label class="col" for="advancedgrading-criteria-{{criterionid}}-levels-{{id}}-definition">
                                 <span>
                                     {{{definition}}}
                                 </span>

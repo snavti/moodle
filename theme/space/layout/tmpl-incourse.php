@@ -128,6 +128,9 @@ if($courseindexopen == false) {
     $extraclasses[] = 'drawer-open-index--open';
 }
 $hasblocks = (strpos($blockshtml, 'data-block=') !== false || !empty($addblockbutton));
+if (!$hasblocks) {
+    $blockdraweropen = false;
+}
 $PAGE->set_secondary_navigation(false);
 $renderer = $PAGE->get_renderer('core');
 
@@ -160,12 +163,23 @@ if(!isloggedin()) {
     $isnotloggedin = false;
 }
 
+//Check if geust user
+if (isguestuser()) {
+    $extraclasses[] = 'moodle-guest-user';
+}
+
 // Default moodle setting menu
 $buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions() && !$PAGE->has_secondary_navigation();
 // If the settings menu will be included in the header then don't add it here.
 $regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settings_menu() : false;
 
 $iscoursepage = true;
+if (theme_space_get_setting('showcoursenav') == '1') {
+    $showcoursenav = true;
+} else {
+    $showcoursenav = false;
+}
+
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
 
 $templatecontext = [
@@ -185,6 +199,7 @@ $templatecontext = [
     'draweropenright' => $draweropenright,
     'isnotloggedin' => $isnotloggedin,
     'iscoursepage' => $iscoursepage,
+    'showcoursenav' => $showcoursenav,
     // Moodle 4.0
     'courseindexopen' => $courseindexopen,
     'blockdraweropen' => $blockdraweropen,

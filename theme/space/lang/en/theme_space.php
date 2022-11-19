@@ -46,7 +46,7 @@ $string['displaycontentbank'] = 'Content Bank';
 $string['displaynavitems_desc'] = '';
 
 $string['nobootswatch'] = 'None';
-$string['pluginname'] = 'Space (2.1.2)';
+$string['pluginname'] = 'Space (2.2.3)';
 $string['privacy:metadata'] = 'The space theme does not store any personal data about any user.';
 $string['rawscss'] = 'Raw SCSS';
 $string['rawscss_desc'] = 'Use this field to provide SCSS or CSS code which will be injected at the end of the style sheet.';
@@ -90,7 +90,7 @@ $string['customsfcontent_desc'] = 'Custom content under "My Courses" section. <b
         &#x3C;/p&#x3E;
     &#x3C;/span&#x3E;
     &#x3C;div class=&#x22;ml-5&#x22;&#x3E;
-        &#x3C;p class=&#x22;rui-block-text--light rui-block-text--3&#x22;&#x3E;Space (2.1.2) is fully compatible with moodle 4.0 and later. Theme is not compatible with Space 1.x.&#x3C;/p&#x3E;&#x3C;a href=&#x22;#&#x22; class=&#x22;mt-2 rui-block-text--3&#x22; target=&#x22;_blank&#x22;&#x3E;Get this theme for just $99&#x3C;/a&#x3E;
+        &#x3C;p class=&#x22;rui-block-text--light rui-block-text--3&#x22;&#x3E;Space (2.2.3) is fully compatible with moodle 4.0 and later. Theme is not compatible with Space 1.x.&#x3C;/p&#x3E;&#x3C;a href=&#x22;#&#x22; class=&#x22;mt-2 rui-block-text--3&#x22; target=&#x22;_blank&#x22;&#x3E;Get this theme for just $99&#x3C;/a&#x3E;
     &#x3C;/div&#x3E;
 &#x3C;/div&#x3E;</pre>';
 $string['turnoffsidebarfp'] = 'Turn off the sidebar (Front Page)';
@@ -143,7 +143,7 @@ $string['region-dbottomblocks'] = 'Dashboard Bottom Blocks';
 $string['region-dleftblocks'] = 'Dashboard Left Blocks';
 $string['region-dmiddleblocks'] = 'Dashboard Middle Blocks';
 $string['region-drightblocks'] = 'Dashboard Right Blocks';
-$string['region-sidecourseblocks'] = 'Course - Sidebar Blocks';
+$string['region-sidecourseblocks'] = 'Right Sidebar Blocks';
 $string['region-ctopbl'] = 'Course - Top Blocks';
 $string['region-cbottombl'] = 'Course - Bottom Blocks';
 $string['region-cstopbl'] = 'Course Sections - Top Blocks';
@@ -168,7 +168,7 @@ $string['showhintcoursehiddensetting'] = 'Show hint in hidden courses';
 $string['showhintcoursehiddensetting_desc'] = 'With this setting a hint will appear in the course header as long as the visibility of the course is hidden. This helps to identify the visibility state of a course at a glance without the need for looking at the course settings.';
 $string['showhintcoursehiddensettingslink'] = 'You can change the visibility in the <a href="{$a->url}">course settings</a>.';
 $string['showhintcoursehiddengeneral'] = 'This course is currently <strong>hidden</strong>. Only enrolled teachers can access this course when hidden.';
-
+$string['showhintcourseguestaccesslink'] = 'To have full access to the course, you can <a href="{$a->url}">self enrol into this course</a>.';
 
 //Edit Button Text
 $string['editon'] = 'Turn Edit On';
@@ -201,6 +201,9 @@ $string['seomanifestjson_desc'] = '';
 //Course Card
 $string['cccteachers'] = 'Display teachers section';
 $string['cccteachers_desc'] = 'Display teachers section on the main course page.';
+
+$string['cccteachers'] = 'Display teachers section (Course Card only)';
+$string['cccteachers_desc'] = 'Display teachers list';
 
 $string['cccteacheravatar'] = 'Display teachers (Course Card)';
 $string['cccteacheravatar_desc'] = '';
@@ -295,6 +298,8 @@ $string['loginfootercontent_desc'] = 'Custom HTML content<br />
 </ul>';
 $string['loginbg'] = 'Login Page Background';
 $string['loginbg_desc'] = '';
+$string['loginbgcolor'] = 'Login Background Color (Image Container)';
+$string['loginbgcolor_desc'] = '';
 $string['customloginlogo'] = 'Custom Logo on the Login Page';
 $string['customloginlogo_desc'] = '<strong>Recommendation:</strong> SVG files or png files with transparent background.';
 $string['colorloginbgtext'] = 'Text Color';
@@ -316,9 +321,9 @@ $string['customsignupoutside_desc'] = 'Display the sign-up link on the right top
 $string['hideforgotpassword'] = 'Hide remember password link';
 $string['hideforgotpassword_desc'] = '';
 $string['logininfobox'] = 'Additional content under the password input field.';
-$string['logininfobox_desc'] = 'Code snippet:<pre class="rui-pre"><code>&#x3C;div class=&#x22;mt-3&#x22;&#x3E;
-&#x3C;p class=&#x22;small&#x22;&#x3E;Sample text&#x3C;/p&#x3E;
-&#x3C;/div&#x3E;</code></pre>';
+$string['logininfobox_desc'] = 'Code snippet:<pre class="rui-pre"><code>&#x3C;div class=&#x22;mt-3&#x22;&#x3E;&#x3C;p class=&#x22;small&#x22;&#x3E;Sample text&#x3C;/p&#x3E;&#x3C;/div&#x3E;</code></pre>
+<br /><h5>Available content fields areas.</h5>
+<a href="'.$siteurl.'/theme/space/doc/login-area-info.jpg" target="_blank" class="mt-3"><img src="'.$siteurl.'/theme/space/doc/login-area-info.jpg" class="img-fluid rounded" alt="Login area" width="200" /></a>';
 
 //Repeatable
 $string['none'] = 'None';
@@ -352,8 +357,12 @@ $string['stickybreadcrumbs'] = 'Sticky Breadcrumbs';
 $string['stickybreadcrumbs_desc'] = '<hr /><h3 class="font-weight-medium">Custom Top Bar Navigation</h3><p>To add custom top bar navigation just go <a href="'.$siteurl.'/admin/settings.php?section=themesettings#admin-custommenuitems">to moodle settings.</a></p><span class="badge badge-sq badge-light">Site administration - Appearance - Themes - Theme settings - Custom menu items</span>';
 $string['topbarheight'] = 'Custom Top Bar Height';
 $string['topbarheight_desc'] = 'Leave empty for default value or set up your own height. Paddings will be generated automatically.';
+$string['showmycoursesbox'] = 'Show My Courses Box';
+$string['showmycoursesbox_desc'] = 'Turn on/off "My Courses" box on the left sidebar';
 $string['hmycoursesbtn'] = 'My Courses';
 $string['hmycoursesbtn_desc'] = 'Customize the sidebar "My Courses" area.';
+$string['mycourseswrapperheight'] = 'My Courses Wrapper Height (px)';
+$string['mycourseswrapperheight_desc'] = '';
 $string['stringmycourses'] = 'My Courses';
 $string['stringmycourses_desc'] = '';
 $string['stringdetails'] = 'Details';
@@ -362,7 +371,8 @@ $string['stringdetails_desc'] = '<div class="mt-3 mb-2">Sample code snippet <spa
 &lt;path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 12H4.75"&gt;&lt;/path&gt;
 &lt;/svg&gt;</pre>';
 $string['stringallcourses'] = 'List of all available courses';
-$string['stringallcourses_desc'] = 'Leave this field empty if you want to hide this button.';
+$string['stringallcourses_desc'] = 'Leave this field empty if you want to hide this button.<br />This button depends on user permissions - moodle/category:viewcourselist. <br />From \'Site administration / Users / Permissions / Define roles\' 
+<a href="https://docs.moodle.org/400/en/Course_list_viewer_role" target="_blank">Learn more about course list viewer role</a>';
 $string['stringnocourses'] = 'You are not enrolled in any courses.';
 $string['stringnocourses_desc'] = '';
 $string['topbarcustomhtml'] = 'Custom HTML Area';
@@ -373,7 +383,7 @@ $string['topbarcustomhtml_desc'] = '<div class="mt-3 mb-2">Sample code snippet <
         &#x3C;path d=&#x22;M6.75 11.5V16.25C6.75 16.25 8 18.25 12 18.25C16 18.25 17.25 16.25 17.25 16.25V11.5&#x22; stroke=&#x22;currentColor&#x22; stroke-width=&#x22;1.5&#x22; stroke-linecap=&#x22;round&#x22; stroke-linejoin=&#x22;round&#x22;&#x3E;&#x3C;/path&#x3E;
     &#x3C;/svg&#x3E;
 &#x3C;/span&#x3E;
-&#x3C;p&#x3E;Space (2.1.2) is here!&#x3C;br&#x3E;&#x3C;a href=&#x22;#&#x22; target=&#x22;_blank&#x22;&#x3E;Get this theme today!&#x3C;/a&#x3E;
+&#x3C;p&#x3E;Space (2.2.3) is here!&#x3C;br&#x3E;&#x3C;a href=&#x22;#&#x22; target=&#x22;_blank&#x22;&#x3E;Get this theme today!&#x3C;/a&#x3E;
 &#x3C;/p&#x3E;
 &#x3C;/span&#x3E;</pre>';
 
@@ -907,7 +917,7 @@ $string['sliderclickable_desc'] = 'Each slide will be clickable.';
 $string['rtlslider'] = 'Enable RTL Slider';
 $string['rtlslider_desc'] = '';
 $string['sliderinterval'] = 'Slider interval';
-$string['sliderinterval_desc'] = 'Units: 1000 -> 1s. Enable slider interval must be checked.';
+$string['sliderinterval_desc'] = 'Units: 1000 -> 1s.';
 $string['sliderfrontpage'] = 'Show slideshow in frontpage';
 $string['sliderfrontpage_desc'] = 'If enabled, the slideshow will be showed in the frontpage page replacing the header image.';
 $string['slidercount'] = 'Slider count';
@@ -1069,7 +1079,7 @@ $string['additionalclass_desc'] = '<strong class="badge badge-warning mr-2">Only
 $string['hintro'] = '<img src="'.$siteurl.'/theme/space/doc/space-icon.svg" class="img-fluid rounded my-3" width="80" height="80" alt="space Moodle Theme" /><div class="lead-3">Space for Moodle 4</div>';
 $string['hintro_desc'] = '
 <div class="mt-1 small">by <a href="https://rosea.io">RoseaThemes</a></div><hr class="mt-3" />
-<div class="mt-3"><span class="badge badge-primary"><a href="https://rosea.gitbook.io/space-moodle-theme/changelog" target="_blank">Version: 2.1</a></span></div>
+<div class="mt-3"><span class="badge badge-primary"><a href="https://rosea.gitbook.io/space-moodle-theme/changelog" target="_blank">Version: 2.2.3</a></span></div>
 <div class="mt-4"><h3 class="lead-4 mb-2">Need help with theme customization?<br />Or you want to report a bug?</h3>Just let me know. Open <a href="https://roseathemes.ticksy.com" target="_blank">a ticket</a> or contact me via support form on the ThemeForest item page.</div>
 <a href="https://rosea.gitbook.io/space-moodle-theme/" target="_blank" class="btn btn-sm btn-dark mt-3">Online documentation</a>
 ';
@@ -1118,7 +1128,7 @@ $string['unaddableblocks'] = 'Unneeded blocks';
 $string['unaddableblocks_desc'] = 'The blocks specified are not needed when using this theme and will not be listed in the \'Add a block\' menu.';
 
 
-// Space (2.1.2)
+// Space (2.2.3)
 $string['hcoursenavitems'] = 'Course Navigation Items';
 $string['hcoursenavitems_desc'] = 'Turn on/off any navigation items like: Participants, Grades, Competencies, Badges.';
 $string['isitemongrades'] = 'Grade';
@@ -1129,6 +1139,12 @@ $string['isitemonbadges'] = 'Badges';
 $string['isitemonbadges_desc'] = '';
 $string['isitemoncompetencies'] = 'Competencies';
 $string['isitemoncompetencies_desc'] = '';
+$string['coursenavposition'] = 'Position of the Course Navigation';
+$string['coursenavposition_desc'] = 'You can display course navigation up to the main content or on the sidebar (under the main navigation)';
+$string['coursenavposition1'] = '#1 - Before the Main Content';
+$string['coursenavposition2'] = '#2 - Left Sidebar';
+$string['showcoursenav'] = 'Show Course Navigation';
+$string['showcoursenav_desc'] = 'Turn on/off the navigation (Participants, Grades, Competencies, Badges)';
 
 $string['hmainnav'] = 'Main Navigation Items';
 $string['hmainnav_desc'] = 'Customization of the Main Navigation Items';

@@ -24,12 +24,8 @@
 
 namespace local_edwiserreports;
 
-defined('MOODLE_INTERNAL') || die();
-
 use stdClass;
 use html_writer;
-use context_system;
-use block_online_users\fetcher;
 
 /**
  * Class live users Block. To get the data of live users.
@@ -45,6 +41,7 @@ class liveusersblock extends block_base {
         $this->layout->id = 'liveusersblock';
         $this->layout->name = get_string('realtimeusers', 'local_edwiserreports');
         $this->layout->info = get_string('realtimeusersblockhelp', 'local_edwiserreports');
+        $this->layout->filters = $this->get_filters();
 
         // Add block view in layout.
         $this->layout->blockview = $this->render_block('liveusersblock', $this->block);
@@ -53,6 +50,18 @@ class liveusersblock extends block_base {
 
         // Return blocks layout.
         return $this->layout;
+    }
+
+    /**
+     * Prepare Inactive users filter
+     * @return string Filter HTML content
+     */
+    public function get_filters() {
+        global $OUTPUT;
+        return $OUTPUT->render_from_template('local_edwiserreports/common-table-search-filter', [
+            'searchicon' => $this->image_icon('actions/search'),
+            'placeholder' => get_string('searchuser', 'local_edwiserreports')
+        ]);
     }
 
     /**
@@ -67,6 +76,61 @@ class liveusersblock extends block_base {
     }
 
     /**
+     * Get the listing of online users
+     *
+     * @param int $now Time now
+     * @param int $timetoshowusers Number of seconds to show online users
+     * @return array
+     */
+    protected static function get_users($now, $timetoshowusers) {
+        global $USER, $DB, $CFG;
+
+        $timefrom = 100 * floor(($now - $timetoshowusers) / 100); // Round to nearest 100 seconds for better query cache.
+
+        $groupmembers = "";
+        $groupselect  = "";
+        $groupby       = "";
+        $lastaccess    = ", lastaccess, currentlogin, lastlogin";
+        $uservisibility = "";
+        $uservisibilityselect = "";
+        if ($CFG->block_online_users_onlinestatushiding) {
+            $uservisibility = ", up.value AS uservisibility";
+            $uservisibilityselect = "AND (" . $DB->sql_cast_char2int('up.value') . " = 1
+                                    OR up.value IS NULL
+                                    OR u.id = :userid)";
+        }
+        $params = array();
+
+        if (class_exists('\core_user\fields')) {
+            $userfieldsapi = \core_user\fields::for_userpic()->including('username', 'deleted');
+            $userfields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
+        } else {
+            // Using fallback deprecated method for backword compatibility.
+            $extrafields = get_extra_user_fields(\context_system::instance());
+            $extrafields[] = 'username';
+            $extrafields[] = 'deleted';
+            $userfields = \user_picture::fields('u', $extrafields);
+        }
+
+        $params['now'] = $now;
+        $params['timefrom'] = $timefrom;
+        $params['userid'] = $USER->id;
+        $params['name'] = 'block_online_users_uservisibility';
+
+        $sql = "SELECT $userfields $lastaccess $uservisibility
+                    FROM {user} u $groupmembers
+                LEFT JOIN {user_preferences} up ON up.userid = u.id
+                        AND up.name = :name
+                    WHERE u.lastaccess > :timefrom
+                        AND u.lastaccess <= :now
+                        AND u.deleted = 0
+                        $uservisibilityselect
+                        $groupselect $groupby
+                ORDER BY lastaccess DESC ";
+        return $DB->get_records_sql($sql, $params);
+    }
+
+    /**
      * Get online users data
      * @return array Array of online users
      */
@@ -74,41 +138,32 @@ class liveusersblock extends block_base {
         global $DB;
 
         $timenow = time();
-        $context = context_system::instance();
         $activeusertimeout = 60;
         $inactiveusertimeout = 30 * 60;
 
-        $activefetcher = new fetcher(null, $timenow, $activeusertimeout, $context);
-        $inactivefetcher = new fetcher(null, $timenow, $inactiveusertimeout, $context);
-
-        $activeusers = $activefetcher->get_users(0);
-        $inactiveusers = $inactivefetcher->get_users(0);
+        $activeusers = self::get_users($timenow, $activeusertimeout);
+        $inactiveusers = self::get_users($timenow, $inactiveusertimeout);
 
         $users = array();
         foreach ($inactiveusers as $inactiveuser) {
             $user = array();
             $user["name"] = fullname($inactiveuser);
 
-            $lastlogin = array_values(
-                $DB->get_records("logstore_standard_log", array(
-                    "target" => "user",
-                    "action" => "loggedin",
-                    "userid" => $inactiveuser->id
-                ), "timecreated DESC", "timecreated", 0, 1)
-            );
-
-            if (isset($lastlogin[0]->timecreated) && $lastlogin[0]->timecreated) {
-                $user["lastlogin"] = '<div class="d-none">'.$lastlogin[0]->timecreated.'</div>';
-                $user["lastlogin"] .= format_time($timenow - $lastlogin[0]->timecreated);
+            if ($inactiveuser->lastlogin != 0) {
+                $user["lastlogin"] = '<div class="d-none">' . $inactiveuser->lastlogin . '</div>';
+                $user["lastlogin"] .= format_time($timenow - $inactiveuser->lastlogin);
+            } else if ($inactiveuser->currentlogin != 0) {
+                $user["lastlogin"] = '<div class="d-none">' . $inactiveuser->currentlogin . '</div>';
+                $user["lastlogin"] .= format_time($timenow - $inactiveuser->currentlogin);
             } else {
                 $user["lastlogin"] = get_string('never');
             }
 
             if (array_key_exists($inactiveuser->id, $activeusers)) {
-                $user["status"] = html_writer::tag("span", "active", array("class" => "badge badge-success"));
+                $user["status"] = html_writer::tag("span", get_string('active'), array("class" => "text-success"));
             } else {
-                $user["status"] = html_writer::tag("span", "inactive", array(
-                        "class" => "badge badge-danger"
+                $user["status"] = html_writer::tag("span", get_string('inactive'), array(
+                        "class" => "text-danger"
                     )
                 );
             }

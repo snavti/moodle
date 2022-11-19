@@ -50,10 +50,17 @@ class report_blocks {
         // Prepare layout for each block.
         foreach ($blocks as $block) {
             // If user dont have capability to see the block.
-            $capname = 'report/edwiserreports_' . $block->classname . ':view';
-            if (!has_capability($capname, $context) &&
-                !can_view_block($capname)) {
-                continue;
+            if ($block->classname !== 'customreportsblock') {
+                $capname = 'report/edwiserreports_' . $block->classname . ':view';
+                if (!has_capability($capname, $context) &&
+                    !can_view_block($capname)) {
+                    continue;
+                }
+            } else {
+                if (!is_siteadmin() &&
+                    !can_view_block('customreportsroleallow-' . $block->id)) {
+                    continue;
+                }
             }
 
             // Check if class file exist.
@@ -65,7 +72,11 @@ class report_blocks {
             require_once($filepath);
 
             $classname = '\\local_edwiserreports\\' . $classname;
-            $blockbase = new $classname();
+            if ($block->classname == 'customreportsblock') {
+                $blockbase = new $classname($block->id);
+            } else {
+                $blockbase = new $classname();
+            }
             $layout = $blockbase->get_layout();
 
             if ($layout === false) {
@@ -75,13 +86,19 @@ class report_blocks {
             // Get block preferences.
             $pref = \local_edwiserreports\utility::get_reportsblock_preferences($block);
 
-            if ($pref["hidden"] && !$USER->editing) {
+            if (isset($pref["hidden"]) && $pref["hidden"] && (isset($USER->editing) && !$USER->editing)) {
                 continue;
             } else if ($pref["hidden"]) {
                 $layout->hiddenblock = true;
             }
 
-            $blockbase->set_block_size($block->blockname);
+            if ((isset($layout->downloadlinks) && !empty($layout->downloadlinks)) ||
+                (isset($layout->morelink) && !empty($layout->morelink))
+            ) {
+                $layout->hasmenu = true;
+            }
+
+            $blockbase->set_block_size($block);
 
             $this->reportsblock[] = $layout;
         }

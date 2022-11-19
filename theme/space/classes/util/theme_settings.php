@@ -44,7 +44,7 @@ class theme_settings {
 
     $templatecontext = [];
     $elements = [
-      'googlefonturl', 'seothemecolor', 'themeauthor', 'displaycustomalert', 'closecustomalert', 'topbarlogoareaon', 'fontawesome', 'fontfiles'
+      'googlefonturl', 'seothemecolor', 'themeauthor', 'displaycustomalert', 'closecustomalert', 'topbarlogoareaon', 'fontawesome', 'fontfiles', 'customsignupoutside', 'showmycoursesbox'
     ];
 
     foreach ($elements as $setting) {
@@ -134,8 +134,7 @@ class theme_settings {
     $templatecontext = [];
 
     $elements = [
-      'customalert', 'darkmodetheme', 'footercustomcss', 'showfooterbuttons', 'showsociallist', 'facebook', 'twitter', 'linkedin', 'youtube', 'instagram',
-      'website', 'cwebsiteurl', 'mobile', 'mail', 'customsocialicon'
+      'customalert', 'darkmodetheme', 'footercustomcss', 'showfooterbuttons', 'showsociallist',  'facebook', 'twitter', 'linkedin', 'youtube', 'instagram', 'cwebsiteurl', 'mobile', 'mail'
     ];
 
     foreach ($elements as $setting) {
@@ -145,7 +144,7 @@ class theme_settings {
     }
 
     $elementshtml = [
-      'footerblock1', 'footerblock2', 'footerblock3', 'footercopy', 'block5slidesperrow', 'customalertcontent'
+      'footerblock1', 'footerblock2', 'footerblock3', 'footercopy', 'block5slidesperrow', 'customalertcontent', 'customsocialicon', 'website'
     ];
 
     foreach ($elementshtml as $setting) {

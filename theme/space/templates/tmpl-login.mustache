@@ -38,10 +38,10 @@
     
     <div class="rui-login-lang-wrapper">{{{ output.render_lang_menu }}}</div>
 
-    <div id="page" class="container-fluid pt-5 mt-0">
-        <div id="page-content" class="row">
+    <div id="page-login" class="container-fluid p-0 {{#customsignupoutside}}mt-md-5 mt-lg-0{{/customsignupoutside}}">
+        <div id="page-content" class="row no-gutters">
             <div id="region-main-box" class="col-12">
-                <section id="region-main" class="col-12 h-100" aria-label="{{#str}}content{{/str}}">
+                <section id="region-main" aria-label="{{#str}}content{{/str}}">
                 <div class="login-wrapper">
                     <div class="login-container">
                     {{{ output.main_content }}}

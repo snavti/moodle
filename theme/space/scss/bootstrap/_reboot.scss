@@ -52,6 +52,10 @@ body {
   text-align: left; // 3
   background-color: $body-bg; // 2
 
+  @include media-breakpoint-between(xs,sm) {
+  font-size: 14px;
+  }
+
   &.theme-dark {
     color: $dm-body-color;
     background-color: $dm-body-bg; // 2

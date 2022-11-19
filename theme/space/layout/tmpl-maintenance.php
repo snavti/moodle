@@ -37,6 +37,7 @@ $templatecontext = [
     'regionmainsettingsmenu' => $regionmainsettingsmenu,
     'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
 ];
+
 // Load theme settings
 $themesettings = new \theme_space\util\theme_settings();
 $templatecontext = array_merge($templatecontext, $themesettings->global_settings());

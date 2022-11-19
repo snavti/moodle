@@ -1,20 +1,67 @@
 .tertiary-navigation {
-  .path-group & {
-    margin-top: $page-padding-global;
-  }
+  margin-top: $page-padding-global;
 
   .navitem {
       display: flex;
+      flex-wrap: wrap;
       margin-bottom: 25px;
+
+      @include media-breakpoint-between(xs,sm) {
+      width: 100%;
+      margin-bottom: 5px;
+
+      .btn {
+        width: 100%;
+      }
+      }
   }
 
   & > a.btn,
   & > div.urlselect {
+      @include media-breakpoint-up(md) {
       margin-bottom: 25px;
+      }
+
+      @include media-breakpoint-between(xs,sm) {
+      margin-bottom: 10px;
+      width: 100%;
+      }
   }
 
+  @include media-breakpoint-between(xs,sm) {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+
+    div {
+        width: 100%;
+        margin: 0;
+    }
+
+    .btn,
+    .form-inline .custom-select {
+      padding: 8px 20px;
+      margin: 2px 0!important;
+      width: 100%;
+      max-width: 100%;
+    } 
+
+    .btn {
+      font-size: $font-size-xs;
+    }
+    
+    .form-inline .custom-select {
+        padding: 3px 16px;
+        height: 40px;
+        line-height: 1.5;
+        font-size: $font-size-xs;
+    }
+  }
+
+  @include media-breakpoint-up(md) {
   .navitem:not(:last-child) {
       margin-right: 20px;
+  }
   }
 }
 

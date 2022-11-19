@@ -124,7 +124,7 @@
                 }
             }
         }
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-between(xs,sm) {
             .langbutton {
                 display: none;
             }
@@ -166,7 +166,9 @@
 }
 
 .pagelayout-embedded #page {
-    margin-top: 0;
+    margin-top: 0!important;
+    padding: 0!important;
+    width: 100%!important;
 }
 
 .rui-courseheadermenu-container {
@@ -194,7 +196,7 @@
       border-color: $dm-border-color;
     }
 
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
     margin-top: 0;
     }
 
@@ -208,6 +210,11 @@
 
       border-radius: $border-radius;
       color: $gray-700;
+
+      .rui-drawer-course-nav & {
+        display: block;
+        margin: 0 0 5px;
+      }
       
       &:last-child {
         margin-right: 0;

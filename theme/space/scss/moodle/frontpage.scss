@@ -7,11 +7,19 @@ $block-el-margin-bottom: 30px;
 
 .rui-fp-margin-bottom {
   margin-bottom: 80px;
+
+  @include media-breakpoint-between(xs,sm) {
+  margin-bottom: 40px;
+  }
 }
 
 .rui-block-hr {
   margin: 80px auto;
   max-width: 260px;
+
+  @include media-breakpoint-between(xs,sm) {
+  margin: 40px auto;
+  }
 }
 
 .rui-block-title {
@@ -318,13 +326,22 @@ $block-el-margin-bottom: 30px;
     color: $white;
 
     @include media-breakpoint-between(xs,sm) {
-    padding: 20px;
+    padding: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     }
   }
 
   .rui-cta-content {
     margin-bottom: 2rem;
     font-size: 1.125rem; //18px
+
+    @include media-breakpoint-between(xs,sm) {
+    margin-bottom: 0;
+    font-size: 14px;
+    }
   }
 
   .rui-cta-title {
@@ -335,7 +352,7 @@ $block-el-margin-bottom: 30px;
     color: $white;
 
     @include media-breakpoint-between(xs,sm) {
-    font-size: 2rem; //32px
+    font-size: 20px
     }
   }
 
@@ -343,6 +360,10 @@ $block-el-margin-bottom: 30px;
     margin-top: $page-padding-global;
     font-size: $font-size-xs;
     opacity: .7;
+
+    @include media-breakpoint-between(xs,sm) {
+    font-size: 12px;
+    }
   }
 
 
@@ -668,6 +689,10 @@ $block-el-margin-bottom: 30px;
   .rui-hero-content {
     width: 500px;
     color: $white;
+
+    @include media-breakpoint-between(xs,sm) {
+      padding: 40px 20px 20px;
+    }
   }
 
   .rui-hero-bg {
@@ -686,24 +711,13 @@ $block-el-margin-bottom: 30px;
     border-radius: $border-radius;
 
     @include media-breakpoint-between(xs,sm) {
-    background-color: $container-bg;
-    padding: 30px 10px;
-    border-radius: 0;
-
-    .theme-dark & {
-      background-color: $dm-container-bg;
-    }
+    padding: 20px;
     }
   }
 
   .rui-hero-content-position {
     position: absolute;
     z-index: 3;
-
-    @include media-breakpoint-between(xs,sm) {
-    position: relative;
-    top: 0!important;
-    }
   }
 
   .rui-hero-content-centered {
@@ -728,13 +742,13 @@ $block-el-margin-bottom: 30px;
 
     @include media-breakpoint-only(md) {
     text-align: center;
-    width: 520px;
-    left: calc(50% - 250px);
+    width: 480px;
+    left: calc(50% - 240px);
     }
 
     @include media-breakpoint-between(xs,sm) {
-    width: 100%;
-    left: 0;
+      width: 260px;
+      left: calc(50% - 130px);
     }
   }
 
@@ -758,16 +772,16 @@ $block-el-margin-bottom: 30px;
     }
 
     @include media-breakpoint-between(xs,sm) {
-      color: $body-color;
-
-      .theme-dark & {
-        color: $dm-body-color;
-      }
-      }
+    font-size: $font-size-base;
+    }
   }
 
   .rui-hero-title + .rui-hero-desc {
     margin: 20px 0 0;
+
+    @include media-breakpoint-between(xs,sm) {
+    margin: 0;
+    }
   }
 
   .rui-hero-desc {
@@ -779,8 +793,7 @@ $block-el-margin-bottom: 30px;
     }
 
     @include media-breakpoint-between(xs,sm) {
-    font-size: $font-size-sm;
-    color: $body-color;
+    font-size: 12px;
 
     .theme-dark & {
       color: $dm-body-color;
@@ -960,8 +973,8 @@ $block-el-margin-bottom: 30px;
 
   $logo-height: 120px;
   $logo-padding: 20px;
-  $logo-position: -$logo-height / 2 - $logo-padding;
-  $logo-position-md: -$logo-height / 2 - $logo-padding + 20px;
+  $logo-position: -$logo-height * 0.5 - $logo-padding;
+  $logo-position-md: -$logo-height * 0.5 - $logo-padding + 20px;
 
   .c-hero-content {
     position: absolute;
@@ -1271,7 +1284,7 @@ $block-el-margin-bottom: 30px;
       margin-top: 30px;
       margin-left: auto;
       margin-right: auto;
-      margin-bottom: -$logo-height / 2;
+      margin-bottom: -$logo-height * 0.5;
   
       padding: $logo-padding;
       max-width: 100%;

@@ -226,7 +226,7 @@
 select.quickgrade {
   display: inline-block;
   width: 100%;
-  max-width: 270px!important;
+  //max-width: 280px!important;
   height: $custom-select-height;
   padding: $custom-select-padding-y ($custom-select-padding-x + $custom-select-indicator-padding) $custom-select-padding-y $custom-select-padding-x;
   font-family: $custom-select-font-family;

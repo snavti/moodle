@@ -30,6 +30,7 @@
  *
  */
 
+// @codingStandardsIgnoreStart
 define('NO_UPGRADE_CHECK', true);
 
 $cronthreshold   = 6;   // Hours.
@@ -38,6 +39,8 @@ $delaythreshold  = 600; // Minutes.
 $delaywarn       = 60;  // Minutes.
 $legacythreshold = 60 * 6; // Minute.
 $legacywarn      = 60 * 2; // Minutes.
+
+// @codingStandardsIgnoreEnd
 
 $dirroot = __DIR__ . '/../../../';
 
@@ -101,10 +104,11 @@ Example:
 } else {
     // If run from the web.
     define('NO_MOODLE_COOKIES', true);
-    // Add requirement for IP validation
+    // Add requirement for IP validation.
     require($dirroot.'config.php');
     require_once(__DIR__.'/nagios.php');
-    require_once(__DIR__.'/iplock.php');
+    tool_heartbeat\lib::validate_ip_against_config();
+
     $options = array(
         'cronerror'   => optional_param('cronerror',   $cronthreshold,   PARAM_NUMBER),
         'cronwarn'    => optional_param('cronwarn',    $cronwarn,        PARAM_NUMBER),
@@ -160,13 +164,17 @@ if (moodle_needs_upgrading()) {
 // We want to periodically emit an error_log which we will detect elsewhere to
 // confirm that all the various web server logs are not stale.
 $nexterror = get_config('tool_heartbeat', 'nexterror');
-$errorperiod = get_config('tool_heartbeat', 'errorlog') || 30 * MINSECS;
-if ($errorperiod > 0 && (!$nexterror || time() > $nexterror) ) {
+$errorperiod = get_config('tool_heartbeat', 'errorlog');
+if (!$errorperiod) {
+    $errorperiod = 30 * MINSECS;
+}
+if (!$nexterror || time() > $nexterror) {
     $nexterror = time() + $errorperiod;
     $now = userdate(time(), $format);
     $next = userdate($nexterror, $format);
+    $period = format_time($errorperiod);
     // @codingStandardsIgnoreStart
-    error_log("heartbeat test $now, next test expected at $next");
+    error_log("heartbeat test $now, next test expected in $period at $next");
     // @codingStandardsIgnoreEnd
     set_config('nexterror', $nexterror, 'tool_heartbeat');
 }
@@ -227,7 +235,24 @@ foreach ($tasks as $task) {
     if ($faildelay > $maxdelay) {
         $maxdelay = $faildelay;
     }
-    $delay .= "TASK: " . $task->get_name() . ' (' .get_class($task) . ") Delay: $faildelay\n";
+    $delay .= "SCHEDULED TASK: " . get_class($task) . ' (' .$task->get_name() . ") Delay: $faildelay\n";
+}
+
+$records = $DB->get_records_sql('SELECT * from {task_adhoc} WHERE faildelay > 0');
+foreach ($records as $record) {
+    $task = \core\task\manager::adhoc_task_from_record($record);
+    if (!$task) {
+        continue;
+    }
+
+    $faildelay = $task->get_fail_delay();
+    if ($faildelay == 0) {
+        continue;
+    }
+    if ($faildelay > $maxdelay) {
+        $maxdelay = $faildelay;
+    }
+    $delay .= "ADHOC TASK: " .get_class($task) . " Delay: $faildelay\n";
 }
 
 if ( empty($legacylastrun) ) {
@@ -237,7 +262,8 @@ $minsincelegacylastrun = floor((time() - $legacylastrun) / 60); // In minutes.
 $when = userdate($legacylastrun, $format);
 
 if ( $minsincelegacylastrun > $options['legacyerror']) {
-    send_critical("Moodle legacy task last run $minsincelegacylastrun mins ago > {$options['legacyerror']} mins\nLast run at $when");
+    send_critical("Moodle legacy task last run $minsincelegacylastrun "
+        . "mins ago > {$options['legacyerror']} mins\nLast run at $when");
 }
 if ( $minsincelegacylastrun > $options['legacywarn']) {
     send_warning("Moodle legacy task last run $minsincelegacylastrun mins ago > {$options['legacywarn']} mins\nLast run at $when");
@@ -251,5 +277,66 @@ if ( $maxminsdelay > $options['delayerror'] ) {
     send_warning("Moodle task faildelay > {$options['delaywarn']} mins\n$delay");
 }
 
-send_good("MOODLE CRON RUNNING\n");
+// If the Check API from 3.9 exists then call those as well.
+if (class_exists('\core\check\manager')) {
 
+    $checks = \core\check\manager::get_checks('status');
+    $output = '';
+    // Should this check block emit as critical?
+    $critical = false;
+
+    foreach ($checks as $check) {
+        $ref = $check->get_ref();
+        $result = $check->get_result();
+
+        $status = $result->get_status();
+
+        // Summary is treated as html.
+        $summary = $result->get_summary();
+        $summary = html_to_text($summary, 80, false);
+
+        if ($status == \core\check\result::WARNING ||
+            $status == \core\check\result::CRITICAL ||
+            $status == \core\check\result::ERROR) {
+
+            // If we have an error, how should we handle it.
+            if ($status == \core\check\result::ERROR && !$critical) {
+                $mapping = get_config('tool_heartbeat', 'errorcritical');
+                if ($mapping === 'critical') {
+                    $critical = true;
+                } else if ($mapping === 'criticalbusiness') {
+                    // Here we should only set the critical flag between 0900 and 1700 server time.
+                    $time = new DateTime('now', core_date::get_server_timezone_object());
+                    $hour = (int) $time->format('H');
+                    $critical = ($hour >= 9 && $hour < 17);
+                }
+            } else if (!$critical) {
+                $critical = $status == \core\check\result::CRITICAL;
+            }
+
+            $output .= $check->get_name() . "\n";
+            $output .= "$summary\n";
+
+            $detail = new moodle_url('/report/status/index.php', ['detail' => $ref]);
+            $output .= 'Details: ' . $detail->out() . "\n\n";
+
+            $link = $check->get_action_link();
+            if ($link) {
+                $output .= $link->url . "\n";
+            }
+        }
+    }
+
+    // Strictly some of these could a critical but softly softly.
+    if ($output) {
+        // For now emit only criticals as criticals. Error status should be a critical later.
+        if ($critical) {
+            send_critical($output);
+        } else {
+            send_warning($output);
+        }
+    }
+
+}
+
+send_good("MOODLE CRON RUNNING\n");

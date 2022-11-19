@@ -1,7 +1,7 @@
-image: moodlehq/moodle-workplace-plugin-ci:7.3
+image: moodlehq/moodle-workplace-plugin-ci:7.4
 
 services:
-- postgres:10
+- postgres:12
 #- mysql:5.7.26
 - name: selenium/standalone-chrome:3
   alias: selenium-standalone-chrome
@@ -10,7 +10,8 @@ variables:
   MOODLE_REPO_WORKPLACE: git@git.in.moodle.com:workplace/workplacedev.git
   MOODLE_BRANCH_WORKPLACE: master
   MOODLE_REPO_LMS: git@git.in.moodle.com:moodle/moodle.git
-  MOODLE_BRANCH_LMS: MOODLE_400_STABLE
+  MOODLE_BRANCH_LMS400: MOODLE_400_STABLE
+  MOODLE_BRANCH_LMS401: master # TODO WP-3904 change to MOODLE_401_STABLE
   MOODLE_BEHAT_WDHOST: "http://selenium-standalone-chrome:4444/wd/hub"
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: ""
@@ -30,6 +31,10 @@ variables:
   - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_tenant.git
   - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_wp.git
   - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_dynamicrule.git
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_program.git
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_reportbuilder.git
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-enrol_program.git
+  - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_certification.git
   - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_organisation.git
   - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-tool_custompage.git
   - moodle-plugin-ci add-plugin --clone git@git.in.moodle.com:workplace/moodle-block_myteams.git
@@ -93,10 +98,19 @@ behat:
     - . check moodle-plugin-ci behat --suite default --profile chrome
     - . check-finish
 
-lms:
+lms400:
   before_script:
     - export MOODLE_REPO=$MOODLE_REPO_LMS
-    - export MOODLE_BRANCH=$MOODLE_BRANCH_LMS
+    - export MOODLE_BRANCH=$MOODLE_BRANCH_LMS400
+  <<: *scriptshorttest
+  except:
+    - master
+    - tags
+
+lms401:
+  before_script:
+    - export MOODLE_REPO=$MOODLE_REPO_LMS
+    - export MOODLE_BRANCH=$MOODLE_BRANCH_LMS401
   <<: *scriptshorttest
   except:
     - master

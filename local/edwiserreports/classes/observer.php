@@ -26,8 +26,6 @@
 /* Local course progress manager namespace */
 namespace local_edwiserreports\observers;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Course progress event observer
  */
@@ -40,4 +38,7 @@ class event_observer {
 
     // Use course observer.
     use course_observer;
+
+    // Authentication observer.
+    use authentication;
 }

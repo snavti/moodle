@@ -63,6 +63,13 @@ $page = new admin_settingpage('theme_space_block1', get_string('settingsblock1',
           $setting->set_updatedcallback('theme_reset_all_caches');
           $page->add($setting);
 
+          $name = 'theme_space/block1sliderinterval';
+          $title = get_string('sliderinterval', 'theme_space');
+          $description = get_string('sliderinterval_desc', 'theme_space');
+          $default = '6000';
+          $setting = new admin_setting_configtext($name, $title, $description, $default);
+          $page->add($setting);
+
           $name = 'theme_space/block1count';
           $title = get_string('block1count', 'theme_space');
           $description = get_string('block1count_desc', 'theme_space');

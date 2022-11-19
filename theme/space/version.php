@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022080906;
+$plugin->version   = 2022102703;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->requires  = 2022041200; // Moodle 4.0
 $plugin->component = 'theme_space';
-$plugin->release = '2.1.2 (Build: 2022080906)';
+$plugin->release = '2.2.3 (Build: 2022102703)';

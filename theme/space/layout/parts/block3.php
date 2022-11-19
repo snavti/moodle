@@ -39,6 +39,19 @@ $caption = format_text(theme_space_get_setting("block3herocaption"),FORMAT_HTML,
 $css = theme_space_get_setting("block3herocss");
 $img = $PAGE->theme->setting_file_url("block3img", "block3img");
 
+$block3wrapperalignclass = null;
+if($block3wrapperalign == 0) {
+    $block3wrapperalignclass = 'rui-hero-content-left';
+}
+
+if($block3wrapperalign == 1) {
+    $block3wrapperalignclass = 'rui-hero-content-centered';
+}
+
+if($block3wrapperalign == 2) {
+    $block3wrapperalignclass = 'rui-hero-content-right';
+}
+
 if(theme_space_get_setting('showblock3wrapper') == '1') {
     $class = 'rui-hero-content-backdrop';
 } else {
@@ -61,7 +74,7 @@ echo '<!-- Start Block #1 -->';
         }
 
         echo '<div class="rui-hero-img">';
-            echo '<div class="rui-hero-content rui-hero-content--img '.$class.' rui-hero-content-position rui-hero-content-left rui-hero-content-backdrop">';
+            echo '<div class="rui-hero-content rui-hero-content--img '.$class.' rui-hero-content-position  '.$block3wrapperalignclass.' rui-hero-content-backdrop">';
                 if(!empty($title)) {
                     echo '<h3 class="rui-hero-title">'.$title.'</h3>';
                 }

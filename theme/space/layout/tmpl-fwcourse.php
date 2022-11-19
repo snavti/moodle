@@ -155,6 +155,11 @@ if(!isloggedin()) {
     $isnotloggedin = false;
 }
 
+//Check if geust user
+if (isguestuser()) {
+    $extraclasses[] = 'moodle-guest-user';
+}
+
 // Default moodle setting menu
 $buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions() && !$PAGE->has_secondary_navigation();
 // If the settings menu will be included in the header then don't add it here.

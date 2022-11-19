@@ -22,11 +22,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_edwiserreports;
-
-use context_system;
-use moodle_url;
-
 require_once(__DIR__ . '/../../config.php');
 require_once('classes/output/renderable.php');
 
@@ -35,9 +30,19 @@ require_login();
 
 local_edwiserreports_get_required_strings_for_js();
 
+// Load color themes from constants.
+local_edwiserreports\utility::load_color_pallets();
+
 // System Context.
 $context = context_system::instance();
 $component = "local_edwiserreports";
+
+// Check capability.
+$capname = 'report/edwiserreports_certificatesblock:view';
+if (!has_capability($capname, $context) &&
+    !can_view_block($capname)) {
+    throw new moodle_exception(get_string('noaccess', 'local_edwiserreports'));
+}
 
 // Require JS for certificates page.
 $PAGE->requires->js_call_amd('local_edwiserreports/certificates', 'init', array($context->id));
@@ -52,7 +57,10 @@ $pageurl = new moodle_url($CFG->wwwroot . "/local/edwiserreports/certificates.ph
 $PAGE->set_context($context);
 
 // Set Page layout.
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('base');
+
+// Add theme class to body.
+$PAGE->add_body_classes(array('theme_' . $PAGE->theme->name));
 
 // Set page URL.
 $PAGE->set_url($pageurl);
@@ -61,7 +69,7 @@ $PAGE->set_url($pageurl);
 $renderable = new \local_edwiserreports\output\certificates_renderable();
 $output = $PAGE->get_renderer($component)->render($renderable);
 
-$PAGE->set_heading(get_string("certificatestats", "local_edwiserreports"));
+$PAGE->set_heading('');
 $PAGE->set_title(get_string("certificatestats", "local_edwiserreports"));
 
 // Print output in page.

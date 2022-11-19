@@ -254,7 +254,7 @@
   }
 
   &.rui-topbar--custom-menu {
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
       position: relative;
       top: 0;
     }
@@ -425,7 +425,7 @@
         background-color: $dm-gray-100;
       }
     
-      @include media-breakpoint-down(sm) {
+      @include media-breakpoint-between(xs,sm) {
         overflow-x: auto;
     
         .header-links {

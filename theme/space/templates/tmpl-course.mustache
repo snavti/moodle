@@ -59,12 +59,13 @@
 
     {{> theme_space/navbar }}
 
-    <div id="page" data-region="mainpage" data-usertour="scroller" class="container-fluid drawers {{#courseindexopen}}show-drawer-right{{/courseindexopen}} {{#blockdraweropen}}show-hidden-drawer{{/blockdraweropen}} drag-container">
+    <div id="page" data-region="mainpage" data-usertour="scroller" class="container-fluid drawers {{#courseindexopen}}show-drawer-left{{/courseindexopen}} {{#blockdraweropen}}show-hidden-drawer{{/blockdraweropen}} drag-container">
         <div id="topofscroll" class="main-inner">
             <div id="page-content" class="page-content wrapper-page">
                 {{> theme_space/navbar-secondary }}
                 {{{ output.breadcrumbs }}}
                 {{{coursepageinformationbanners}}}
+                
                 <div class="wrapper-header">
                     <div class="rui-courseheadermenu-container">{{{ output.courseheadermenu }}}</div>
                 </div>
@@ -89,14 +90,14 @@
 
                                 {{#hasctopbl}}
                                 <div class="my-4 wrapper-xxl">
-                                    <section id="ctopbl" data-region="tmpl-course-blocks" class="rui-blocks-area">
+                                    <section id="ctopbl" data-region="ctopbl" class="rui-blocks-area">
                                         {{{ ctopbl }}}
                                     </section>
                                 </div>
                                 {{/hasctopbl}}
 
                                 {{#hascstopbl}}
-                                <section id="cstopbl" data-region="tmpl-course-blocks" class="rui-blocks-area">
+                                <section id="cstopbl" data-region="stopbl" class="rui-blocks-area">
                                     {{{ cstopbl }}}
                                 </section>
                                 {{/hascstopbl}}
@@ -113,7 +114,7 @@
 
                                 {{#hascsbottombl}}
                                 <div>
-                                    <section id="csbottombl" data-region="tmpl-course-blocks" class="rui-blocks-area">
+                                    <section id="csbottombl" data-region="csbottombl" class="rui-blocks-area">
                                         {{{ csbottombl }}}
                                     </section>
                                 </div>
@@ -122,7 +123,7 @@
                             </div>
                             {{#hassidecourseblocks}}
                             <div class="tmpl-course-blocks">
-                                <section id="sidecourseblocks" data-region="tmpl-incourse-blocks" class="rui-blocks-area">
+                                <section id="sidecourseblocks" data-region="sidecourseblocks" class="rui-blocks-area">
                                     {{{ sidecourseblocks }}}
                                 </section>
                             </div>
@@ -138,7 +139,7 @@
 
                 {{#hascbottombl}}
                 <div class="mt-4 wrapper-xxl">
-                    <section id="cbottombl" data-region="tmpl-course-blocks" class="rui-blocks-area">
+                    <section id="cbottombl" data-region="course-blocks" class="rui-blocks-area">
                         {{{ cbottombl }}}
                     </section>
                 </div>
@@ -146,10 +147,8 @@
 
             </div>
         </div>
-
         {{> theme_space/footer }}
-        
-    </div>       
+    </div>      
 
     {{^hiddensidebar}}
         {{> theme_space/nav-drawer }}

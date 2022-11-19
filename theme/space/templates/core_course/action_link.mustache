@@ -52,15 +52,11 @@
     }
 }}
 {{^disabled}}
-    <a href="{{{url}}}" id="{{id}}" class="btn btn-secondary" {{#attributes}} {{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}}>
-        <span class="text-truncate">{{#attributes}}{{{value}}}{{/attributes}}</span>
-    </a>
+    <a href="{{{url}}}" id="{{id}}" class="btn btn-secondary {{classes}}" {{#attributes}} {{name}}="{{value}}" {{/attributes}}>{{#icon}}{{#pix}}{{key}}, {{component}}, {{title}}{{/pix}}{{/icon}}{{{text}}}</a>
     {{#hasactions}}
         {{> core/actions }}
     {{/hasactions}}
 {{/disabled}}
 {{#disabled}}
-    <span class="currentlink btn btn-secondary" {{#attributes}} {{name}}={{#quote}}{{value}}{{/quote}} {{/attributes}}>
-        <span class="text-truncate">{{#attributes}}{{{value}}}{{/attributes}}</span>
-    </span>
+    <span class="currentlink btn btn-secondary {{classes}}" {{#attributes}} {{name}}="{{value}}" {{/attributes}}>{{#icon}}{{#pix}}{{key}}, {{component}}, {{title}}{{/pix}}{{/icon}}{{text}}</span>
 {{/disabled}}

@@ -24,20 +24,22 @@
 }}
 <div class="container px-0">
     <div tabindex="0" class="file-picker fp-generallayout d-inline-flex flex-wrap w-100" role="dialog" aria-live="assertive">
-        <div role="tablist" class="rui-nav-col">
-                <ul class="nav nav-column flex-md-column fp-repo nav-item small" role="tab" aria-selected="false" tabindex="-1">
-                    <li class="nav-item"><a href="#" class="nav-link" tabindex="-1"><img class="fp-repo-icon" alt=" " width="0" height="0" /><span class="fp-repo-name"></span></a></li>
-                </ul>
-
+        
+        <div class="rui-nav-wrapper">
+            <div role="tablist" class="rui-nav-col">
+                    <ul class="nav nav-column flex-md-column fp-repo nav-item small" role="tab" aria-selected="false" tabindex="-1">
+                        <li class="nav-item"><a href="#" class="nav-link" tabindex="-1"><img class="fp-repo-icon" alt=" " width="0" height="0" /><span class="fp-repo-name"></span></a></li>
+                    </ul>
+            </div>
         </div>
-        <div class="col">
+        <div class="col pl-sm-0 pl-md-3">
             <div class="fp-repo-items" tabindex="0">
                 <div class="fp-navbar clearfix icon-no-spacing p-0 mb-3">
-                    <div class="d-inline-flex">
+                    <div class="d-inline-flex flex-wrap">
 
                         <div class="fp-toolbar mb-0">
 
-                            <div class="d-inline-flex align-items-center">
+                            <div class="d-inline-flex flex-wrap align-items-center">
                                 <div class="fp-tb-back">
                                     <a href="#" class="btn btn-secondary btn-sm">{{#str}}back, repository{{/str}}</a>
                                 </div>

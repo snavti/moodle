@@ -110,6 +110,9 @@ if($courseindexopen == false) {
     $extraclasses[] = 'drawer-open-index--open';
 }
 $hasblocks = (strpos($blockshtml, 'data-block=') !== false);
+if (!$hasblocks) {
+    $blockdraweropen = false;
+}
 $PAGE->set_secondary_navigation(false);
 $renderer = $PAGE->get_renderer('core');
 
@@ -135,6 +138,11 @@ if(!isloggedin()) {
     $isnotloggedin = true;
 } else {
     $isnotloggedin = false;
+}
+
+//Check if geust user
+if (isguestuser()) {
+    $extraclasses[] = 'moodle-guest-user';
 }
 
 // Default moodle setting menu
@@ -175,6 +183,14 @@ if ($PAGE->course->visible == '1') {
 }
 
 $iscoursepage = true;
+
+if (theme_space_get_setting('showcoursenav') == '1') {
+    $showcoursenav = true;
+} else {
+    $showcoursenav = false;
+}
+
+
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
 
 $templatecontext = [
@@ -204,6 +220,7 @@ $templatecontext = [
     'hassidecourseblocks' => $hassidecourseblocks,
     'ipcourseimage' => $courseimage,
     'iscoursepage' => $iscoursepage,
+    'showcoursenav' => $showcoursenav,
     // Moodle 4.0
     'courseindexopen' => $courseindexopen,
     'blockdraweropen' => $blockdraweropen,

@@ -30,6 +30,26 @@ $block1count = theme_space_get_setting('block1count');
 $block1wrapperbg = theme_space_get_setting('block1sliderwrapperbg');
 $block1class = theme_space_get_setting('block1class');
 
+$block1wrapperalignclass = null;
+if($block1wrapperalign == 0) {
+    $block1wrapperalignclass = 'rui-hero-content-left';
+}
+
+if($block1wrapperalign == 1) {
+    $block1wrapperalignclass = 'rui-hero-content-centered';
+}
+
+if($block1wrapperalign == 2) {
+    $block1wrapperalignclass = 'rui-hero-content-right';
+}
+
+if(!empty(theme_space_get_setting('block1sliderinterval'))) {
+    $block1sliderinterval = theme_space_get_setting('block1sliderinterval'); 
+} else {
+    $block1sliderinterval = '7000';
+}
+
+
 if(theme_space_get_setting('showblock1sliderwrapper') == '1') {
     $class = 'rui-hero-content-backdrop';
 } else {
@@ -54,7 +74,7 @@ echo '<!-- Start Block #1 -->';
                         echo '<div class="rui-hero-bg swiper-slide" style="'.$css.'">';
                     }
 
-                    echo '<div class="rui-hero-content rui-hero--slide '.$class.' rui-hero-content-position rui-hero-content-left">';
+                    echo '<div class="rui-hero-content rui-hero--slide '.$class.' rui-hero-content-position '.$block1wrapperalignclass.'">';
                         if(!empty($title)) {
                             echo '<h3 class="rui-hero-title">'.$title.'</h3>';
                         }
@@ -63,7 +83,7 @@ echo '<!-- Start Block #1 -->';
                             echo '<div class="rui-hero-desc">'.$caption.'</div>';
                         }
                     echo '</div>';
-                    echo '<img class="d-flex img-fluid" src="'.$img.'" alt="'.$title.'" />';
+                    echo '<img class="d-flex img-fluid w-100" src="'.$img.'" alt="'.$title.'" />';
                     echo '</div>';
 
                 }
@@ -91,4 +111,4 @@ echo '<!-- Start Block #1 -->';
     echo '<script>function reportWindowSize(){for(var e=document.getElementsByClassName("rui-hero--slide"),o=0,t=0|e.length;o<t;o=o+1|0){var n=e[o].offsetHeight;e[o].style.top="calc(50% - "+n/2+"px)"}}window.addEventListener("resize",reportWindowSize),window.onload=reportWindowSize();</script>';
 echo '<!-- End Block #1 -->';
 
-echo '<script>var swiper=new Swiper(".swiper-block--1",{slidesPerView:1,pagination:{el:".swiper-pagination",type:"progressbar"},navigation:{nextEl:".swiper-button-next",prevEl:".swiper-button-prev"},keyboard:{enabled:!0},mousewheel:{releaseOnEdges:!0},effect:"creative",autoHeight:!0,creativeEffect:{prev:{shadow:!0,translate:["-20%",0,-1]},next:{translate:["100%",0,0]}},breakpoints:{}});</script>';
+echo '<script>var swiper=new Swiper(".swiper-block--1",{slidesPerView:1,pagination:{el:".swiper-pagination",type:"progressbar"},navigation:{nextEl:".swiper-button-next",prevEl:".swiper-button-prev"},autoplay: {delay: '.$block1sliderinterval.',},keyboard:{enabled:!0},mousewheel:{releaseOnEdges:!0},effect:"creative",autoHeight:!0,creativeEffect:{prev:{shadow:!0,translate:["-20%",0,-1]},next:{translate:["100%",0,0]}},breakpoints:{}});</script>';

@@ -43,6 +43,7 @@ $page = new admin_settingpage('theme_space_settingslogin', get_string('settingsl
 	$options[4] = get_string('loginlayout4', 'theme_space');
 	$options[5] = get_string('loginlayout5', 'theme_space');
 	$setting = new admin_setting_configselect($name, $title, $description, 1, $options);
+	$setting->set_updatedcallback('theme_reset_all_caches');
 	$page->add($setting);
 
 	$name = 'theme_space/loginidprovtop';
@@ -78,6 +79,14 @@ $page = new admin_settingpage('theme_space_settingslogin', get_string('settingsl
 	$description = get_string('loginbg_desc', 'theme_space');
 	$opts = array('accepted_types' => array('.png', '.jpg', '.gif', '.webp', '.tiff', '.svg'));
 	$setting = new admin_setting_configstoredfile($name, $title, $description, 'loginbg', 0, $opts);
+	$setting->set_updatedcallback('theme_reset_all_caches');
+	$page->add($setting);
+
+	$name = 'theme_space/loginbgcolor';
+	$title = get_string('loginbgcolor', 'theme_space');
+	$description = get_string('loginbgcolor_desc', 'theme_space');
+	$setting = new admin_setting_configcolourpicker($name, $title, $description, '');
+	$setting->set_updatedcallback('theme_reset_all_caches');
 	$page->add($setting);
 
 	$name = 'theme_space/hideforgotpassword';
@@ -147,15 +156,14 @@ $page = new admin_settingpage('theme_space_settingslogin', get_string('settingsl
 	$title = get_string('stringca', 'theme_space');
 	$description = get_string('stringca_desc', 'theme_space');
 	$default = 'Don\'t have an account?';
-	$setting = new admin_setting_configtext($name, $title, $description, $default);
+	$setting = new admin_setting_configtextarea($name, $title, $description, $default);
 	$page->add($setting);
-
 
 	$name = 'theme_space/stringbacktologin';
 	$title = get_string('stringbacktologin', 'theme_space');
 	$description = get_string('stringbacktologin_desc', 'theme_space');
 	$default = 'Already have an account?';
-	$setting = new admin_setting_configtext($name, $title, $description, $default);
+	$setting = new admin_setting_configtextarea($name, $title, $description, $default);
 	$page->add($setting);
 
 	$name = 'theme_space/hsignup';
@@ -175,13 +183,6 @@ $page = new admin_settingpage('theme_space_settingslogin', get_string('settingsl
 	$description = get_string('signuptext_desc', 'theme_space');
 	$default = '';
 	$setting = new space_setting_confightmleditor($name, $title, $description, $default);
-	$page->add($setting);
-
-	$name = 'theme_space/colorloginbgtext';
-	$title = get_string('colorloginbgtext', 'theme_space');
-	$description = get_string('colorloginbgtext_desc', 'theme_space');
-	$setting = new admin_setting_configcolourpicker($name, $title, $description, '');
-	$setting->set_updatedcallback('theme_reset_all_caches');
 	$page->add($setting);
 
 $settings->add($page);

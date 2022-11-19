@@ -183,7 +183,7 @@ $dm-courseindex-item-dragging-border: theme-color-level('info', -9) !default;
                 color: $courseindex-link-color-selected;
             }
 
-            scroll-margin: 6rem;
+            scroll-margin: 80px;
 
             .theme-dark & {
                 background-color: $dm-courseindex-item-page-bg;

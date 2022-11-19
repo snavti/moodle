@@ -1,0 +1,16 @@
+# .github/workflows/ci.yml
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  ci:
+    uses: catalyst/catalyst-moodle-workflows/.github/workflows/ci.yml@main
+    # Required if you plan to publish (uncomment the below)
+    with:
+      # Any further options in this section
+      disable_behat: true
+      disable_grunt: true
+      disable_release: true
+      disable_phplint: true
+      disable_phpdoc: true

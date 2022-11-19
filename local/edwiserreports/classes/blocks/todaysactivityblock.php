@@ -24,8 +24,6 @@
 
 namespace local_edwiserreports;
 
-defined('MOODLE_INTERNAL') or die;
-
 use stdClass;
 use context_course;
 
@@ -35,7 +33,7 @@ use context_course;
 class todaysactivityblock extends block_base {
     /**
      * Preapre layout for each block
-     * @return object Layout object
+     * @return Object Layout object
      */
     public function get_layout() {
 
@@ -45,7 +43,7 @@ class todaysactivityblock extends block_base {
         $this->layout->info = get_string('todaysactivityblockhelp', 'local_edwiserreports');
         $this->layout->filters = '<div class="flatpickr-wrapper">';
         $this->layout->filters .= '<input class="btn btn-sm dropdown-toggle input-group-addon"';
-        $this->layout->filters .= 'id="flatpickrCalender" placeholder="' .
+        $this->layout->filters .= 'id="flatpickrCalender-todaysactivity" placeholder="' .
         get_string('selectdate', 'local_edwiserreports') .
         '" data-input/></div>';
 
@@ -75,9 +73,9 @@ class todaysactivityblock extends block_base {
 
     /**
      * Get todays enrolments
-     * @param  $starttime Integer  Start Time
-     * @param  $endtime   Integer  End Time
-     * @return            Integer  Todays Course Enrolment Count
+     * @param  Integer $starttime Start Time
+     * @param  Integer $endtime   End Time
+     * @return Integer            Todays Course Enrolment Count
      */
     public function count_user_enrolments($starttime, $endtime) {
         global $DB;
@@ -88,9 +86,9 @@ class todaysactivityblock extends block_base {
 
     /**
      * Get todays module completion count
-     * @param  $starttime Integer  Start Time
-     * @param  $endtime   Integer  End Time
-     * @return            Integer  Todays Module Completion Count
+     * @param  Integer $starttime Start Time
+     * @param  Integer $endtime   End Time
+     * @return Integer            Todays Module Completion Count
      */
     public function count_module_completions($starttime, $endtime) {
         global $DB;
@@ -101,9 +99,9 @@ class todaysactivityblock extends block_base {
 
     /**
      * Get todays course completion count
-     * @param  $starttime Integer  Start Time
-     * @param  $endtime   Integer  End Time
-     * @return            Integer  Todays Course Completion Count
+     * @param  Integer $starttime Start Time
+     * @param  Integer $endtime   End Time
+     * @return Integer            Todays Course Completion Count
      */
     public function count_course_completions($starttime, $endtime) {
         global $DB;
@@ -116,9 +114,9 @@ class todaysactivityblock extends block_base {
 
     /**
      * Get todays registrations count
-     * @param  $starttime Integer  Start Time
-     * @param  $endtime   Integer  End Time
-     * @return            Integer  Todays Registration Count
+     * @param  Integer $starttime Start Time
+     * @param  Integer $endtime   End Time
+     * @return Integer            Todays Registration Count
      */
     public function count_registrations_completions($starttime, $endtime) {
         global $DB;
@@ -130,9 +128,9 @@ class todaysactivityblock extends block_base {
 
     /**
      * Get todays site visit count
-     * @param  $starttime Integer  Start Time
-     * @param  $endtime   Integer  End Time
-     * @return            Integer  Todays Site Visits Count
+     * @param  Integer $starttime Start Time
+     * @param  Integer $endtime   End Time
+     * @return Integer            Todays Site Visits Count
      */
     public function count_site_visits($starttime, $endtime) {
         global $DB;
@@ -153,41 +151,43 @@ class todaysactivityblock extends block_base {
 
     /**
      * Get visits in every hours
-     * @param  $starttime Integer  Start Time
-     * @param  $endtime   Integer  End Time
-     * @return            Integer  Get Visits in Every Hours
+     * @param  Integer $starttime Start Time
+     * @param  Integer $endtime   End Time
+     * @return Integer            Get Visits in Every Hours
      */
     public function get_visits_in_hours($starttime, $endtime) {
         global $DB;
 
-        $starttimehour = $starttime;
-        $endtimehour = $starttime + 60 * 60;
+        // Prepare default array.
+        $visitshour = array_fill(0, 24, []);
 
-        $visitsssql = "SELECT DISTINCT userid
+        $visitsssql = "SELECT id, userid, timecreated
             FROM {logstore_standard_log}
             WHERE timecreated >= :starttime
-            AND timecreated < :endtime";
-        $params = array(
-            'starttime' => $starttimehour,
-            'endtime' => $endtimehour
-        );
+            AND timecreated < :endtime
+            ORDER BY timecreated ASC";
 
-        $visitshour = array();
-        do {
-            $visitshour[] = count($DB->get_records_sql($visitsssql, $params));
-            $starttimehour = $endtimehour;
-            $endtimehour = $endtimehour + 60 * 60;
-            $params['starttime'] = $starttimehour;
-            $params['endtime'] = $endtimehour;
-        } while ($starttimehour < $endtime);
+        $visits = $DB->get_records_sql($visitsssql, array(
+            'starttime' => $starttime,
+            'endtime' => $endtime
+        ));
+
+        foreach ($visits as $visit) {
+            $hour = date('G', $visit->timecreated);
+            $visitshour[$hour][$visit->userid] = true;
+        }
+
+        foreach ($visitshour as $key => $value) {
+            $visitshour[$key] = count($value);
+        }
 
         return $visitshour;
     }
 
     /**
      * Get Todays Activity information
-     * @param [string] $date Date filter in proprtdat format
-     * @return [array] Array of todays activities information
+     * @param  String $date Date filter in proprtdat format
+     * @return Array        Array of todays activities information
      */
     public function get_todaysactivity($date) {
         global $DB;

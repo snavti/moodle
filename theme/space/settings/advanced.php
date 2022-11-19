@@ -48,19 +48,4 @@ $page = new admin_settingpage('theme_space_advanced', get_string('advancedsettin
             array('maxfiles' => 100, 'accepted_types' => array('.ttf', '.eot', '.woff', '.woff2')));
     $page->add($setting);
 
-    // TODO:
-    // - link to FontAwesome
-    // - link to BootstrapIcon
-    // - CustomFonts
-    // - SelfHosted
-    // ------
-    // - Custom HTML HEAD
-    // - Custom HTML FOOTER
-    // ------
-    // - Custom Modal
-
-    // - Show hint in hidden courses
-    // - Show hint for guest access
-    // - Show Theme Author Info
-
 $settings->add($page);

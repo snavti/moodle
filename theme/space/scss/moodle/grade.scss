@@ -67,6 +67,16 @@
     } 
 }
 
+.path-grade-report-grader,
+.path-grade-report-user {
+    .gradepass {
+        color: $success;
+    }
+    .gradefail {
+        color: $danger;
+    }
+}
+
 // Rubrics
 #page-grade-grading-manage {
     #activemethodselector {
@@ -112,93 +122,114 @@
     }
 }
 
-#rubric-rubric {
-    &.gradingform_rubric {
-        #rubric-criteria {
-            margin-bottom: 1em;
-            $rubricPadding: 6px;
+.gradingform_rubric {
+        margin-bottom: 1em;
+        $rubricPadding: 6px;
 
-            .criterion {
-                .description {
-                    vertical-align: top;
-                    padding: $rubricPadding;
+        // When doing evaluation on the rubrics table.
+        &.evaluate .criterion .levels .level {
+            &:hover,
+            &.checked {
+                background: $primary-color-300;
+            }
+            &.checked {
+                border: none;
+                border-left: 1px solid $border-color;
+            }
+        }
 
-                    textarea {
-                        margin-bottom: 0;
-                        height: 115px;
-                    }
+        .criterion {
+            .description {
+                vertical-align: top;
+                padding: $rubricPadding;
+
+                textarea {
+                    margin-bottom: 0;
+                    height: 115px;
+                }
+            }
+
+            .definition {
+                textarea {
+                    width: 80%;
+                    margin-bottom: 0;
+                }
+            }
+
+            .score {
+                position: relative;
+                margin-top: 10px;
+                margin-right: 10px;
+
+                color: $success;
+
+                input {
+                    margin-bottom: 0;
+                }
+            }
+
+            .level {
+                vertical-align: top;
+                padding: $rubricPadding;
+
+                &.currentchecked {
+                    background: $primary-color-100;
+                }
+    
+                &.checked {
+                    background: $primary-color-300;
+                    border: 1px solid $border-color;
                 }
 
-                .definition {
-                    textarea {
-                        width: 80%;
-                        margin-bottom: 0;
-                    }
-                }
-
-                .score {
+                .delete {
                     position: relative;
-                    margin-top: 10px;
-                    margin-right: 10px;
+                    width: 40px;
+                    height: 40px;
+                    margin-top: 5px;
 
                     input {
-                        margin-bottom: 0;
-                    }
-                }
-
-                .level {
-                    vertical-align: top;
-                    padding: $rubricPadding;
-
-                    .delete {
-                        position: relative;
-                        width: 40px;
+                        display: block;
+                        position: absolute;
+                        right: 0;
+                        bottom: 0;
                         height: 40px;
-                        margin-top: 5px;
+                        width: 40px;
+                        border-radius: $border-radius;
+                        margin: 0;
 
-                        input {
-                            display: block;
-                            position: absolute;
-                            right: 0;
-                            bottom: 0;
-                            height: 40px;
-                            width: 40px;
-                            border-radius: $border-radius;
-                            margin: 0;
-
-                            &:hover {
-                                background-color: $red-200;
-                            }
+                        &:hover {
+                            background-color: $red-200;
                         }
-                    }
-                }
-
-                .scorevalue {
-                    input {
-                        // Should handle at least three chars with room to spare.
-                        float: none;
-                        width: 2em;
-
-                        &.hiddenelement,
-                        &.pseudotablink {
-                            // Zero out the width if it's still in the block flow for some reason
-                            // when hidden
-                            width: 0;
-                        }
-                    }
-                }
-
-                .addlevel {
-                    vertical-align: top;
-                    padding-top: 6px;
-
-                    input {
-                        height: 30px;
-                        line-height: 1rem;
                     }
                 }
             }
+
+            .scorevalue {
+                input {
+                    // Should handle at least three chars with room to spare.
+                    float: none;
+                    width: 2em;
+
+                    &.hiddenelement,
+                    &.pseudotablink {
+                        // Zero out the width if it's still in the block flow for some reason
+                        // when hidden
+                        width: 0;
+                    }
+                }
+            }
+
+            .addlevel {
+                vertical-align: top;
+                padding-top: 6px;
+
+                input {
+                    height: 30px;
+                    line-height: 1rem;
+                }
+            }
         }
+        
 
         .addcriterion {
             margin-left: 5px;
@@ -237,8 +268,8 @@
                 }
             }
         }
-    }
 }
+
 .grade-display {
     .description {
         font-size: 1rem;
@@ -447,13 +478,13 @@
             border-color: $table-border-color;
         }
 
-        // .userrow.odd .cell,
-        // .floater .cell.odd,
-        // .heading .cell,
-        // .cell.category,
-        // .avg .cell {
-        //     background-color: $gray-100;
-        // }
+        .userrow.odd .cell,
+        .floater .cell.odd,
+        .heading .cell,
+        .cell.category,
+        .avg .cell {
+            background-color: $gray-100;
+        }
 
         table .clickable {
             cursor: pointer;
@@ -506,7 +537,6 @@
         td.noborder {
             border-right: transparent;
         }
-
     }
 
     .show-drawer-left .gradeparent th.header {
@@ -528,6 +558,14 @@
         .leveleven {
             background-color: $table-bg;
         }
+    }
+
+    .column-contributiontocoursetotal,
+    .column-range,
+    .column-percentage,
+    .column-weight {
+        /*rtl:ignore*/
+        direction: ltr;
     }
 }
 
@@ -769,10 +807,6 @@
     }
 }
 
-#rubric-rubric.gradingform_rubric #rubric-criteria .criterion .level {
-    min-width: 240px;
-}
-
 // Table - Form
 .path-mod-assign  {
     .quickgrade {
@@ -801,11 +835,6 @@
     .active {
         background-color: $primary-color-100;
     }
-}
-
-#rubric-criteria {
-    display: table;
-    width: max-content;
 }
 
 #guide-criteria {
@@ -909,9 +938,6 @@
   margin-left: auto;
   margin-right: auto;
 }
-.gradingform_rubric .criteria {
-  min-width: auto; /*allows the table to auto-fit on the screen rather than a horizontal scroll to appear*/
-}
 .path-mod-assign [data-region="grade-panel"] .gradingform_rubric .criterion .description {
   width: 20%; /* reduces the size of the criterion description from 50% to 20%*/
 }
@@ -919,6 +945,10 @@
     left: 30px;
     width: calc(100% - 60px);
     overflow: auto;
+}
+
+.gradingform_rubric .criterion .description {
+    max-width: 300px;
 }
 
 #graded_users_selector {

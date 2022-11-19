@@ -28,23 +28,28 @@
     }
 }}
 <div class="d-flex justify-content-start">
-    <div class="mr-2">
-        {{>core/drag_handle}}
-    </div>
+    <span class="btn btn-secondary p-1 mr-2">{{>core/drag_handle}}</span>
     <div class="w-100">
         <div class="d-flex align-items-center justify-content-between">
-            <small class="text-muted text-nowrap text-uppercase">{{entityname}} &bull; {{name}}</small>
+            <div class="d-flex">
+                <small class="text-muted text-uppercase px-2">{{entityname}} &bull; {{name}}</small>
+            </div>
             <span class="text-nowrap">
                 <button class="btn btn-link p-0"
                         data-action="report-remove-column"
                         type="button"
                         title="{{#str}}deletecolumn, core_reportbuilder, {{{name}}}{{/str}}"
                         aria-label="{{#str}}deletecolumn, core_reportbuilder, {{{name}}}{{/str}}">
-                    {{#pix}}e/cancel, core{{/pix}}
+                        <span class="btn btn-danger p-1">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.25 6.75L6.75 17.25"></path>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 6.75L17.25 17.25"></path>
+                            </svg>
+                        </span>
                 </button>
             </span>
         </div>
-        <h3 class="h5 text-nowrap">{{{headingeditable}}}</h3>
-        <small class="text-muted text-nowrap">{{{aggregationeditable}}}</small>
+        <h4 class="text-nowrap">{{{headingeditable}}}</h4>
+        <small class="text-nowrap">{{{aggregationeditable}}}</small>
     </div>
 </div>

@@ -13,10 +13,6 @@ $collapse-list-item-hover-bg: theme-color-level('info', -11) !default;
 $collapse-list-item-hover-border: theme-color-level('info', -9) !default;
 
 
-/* TODO: #region-main {
-    overflow-x: auto;
-    overflow-y: visible;
-} */
 
 .sticky-header-settings-menu {
     position: fixed;
@@ -25,18 +21,16 @@ $collapse-list-item-hover-border: theme-color-level('info', -9) !default;
 
     z-index: $zindex-fixed;
 
+    @include media-breakpoint-between(xs,sm) {
+    right: 10px;
+    }
+
     .drawer-open-right & {
         right: $topbar-padding-x + $right-drawer-width;
-    }
-
-    @include media-breakpoint-only(md) {
-    left: 16px;
-    right: auto;
-    }
-
-    @include media-breakpoint-down(sm) {
-    left: 8px;
-    right: auto;
+        
+        @include media-breakpoint-between(xs,md) {
+        right: 10px;
+        }
     }
 }
 
@@ -75,7 +69,7 @@ $collapse-list-item-hover-border: theme-color-level('info', -9) !default;
             }
         }
 
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-between(xs,sm) {
             .header-settings-menu {
                 .scrolled & {
                     right: 65px;
@@ -96,7 +90,7 @@ $collapse-list-item-hover-border: theme-color-level('info', -9) !default;
     }
 }
 
-@include media-breakpoint-down(sm) {
+@include media-breakpoint-between(xs,sm) {
     .context-header-settings-menu,
     .region-main-settings-menu {
         display: flex;
@@ -395,7 +389,7 @@ a.autolink.glossary:hover {
     margin-top: -1px;
 }
 
-@include media-breakpoint-down(sm) {
+@include media-breakpoint-between(xs,sm) {
     .pagelayout-mydashboard,
     .pagelayout-login {
         #region-main-box {
@@ -542,6 +536,12 @@ img.resize {
 img.activityicon {
     height: 40px;
     width: 40px;
+
+
+    @include media-breakpoint-between(xs,sm) {
+        height: 30px;
+        width: 30px;
+    }
 }
 
 .headermain {
@@ -894,6 +894,11 @@ table.mod_index {
                 margin-right: .5rem;
                 width: 40px;
                 height: 40px;
+
+                @include media-breakpoint-between(xs,sm) {
+                    width: 30px;
+                    height: 30px;    
+                }
             }
         }
     }
@@ -1053,7 +1058,7 @@ $comment-area-padding-left: 140px;
 
     .rui-blocks-area & {
         max-width: 100%;
-        margin-left: 38px;
+        margin-left: 39px;
 
         position: relative;
         top: auto;
@@ -2291,8 +2296,8 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
 }
 
 .optionaction.text-primary {
-    background-color: $green-200;
-    color: $gray-700;
+    background-color: $primary-color-200;
+    color: $primary-color-700;
 }
 
 .modchoosercontainer .optionscontainer,
@@ -3052,7 +3057,7 @@ ul {
         margin-right: $grid-gutter-width * 0.5;
         background-color: $card-bg;
     }
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-between(xs,sm) {
         .nav {
             margin-top: $grid-gutter-width;
             margin-right: 0;
@@ -3461,10 +3466,7 @@ $picker-emojis-per-row: 7 !default;
     font-weight: $font-weight-bold;
 }
 
-@include media-breakpoint-down(sm) {
-    #page-navbar {
-        width: 100%;
-    }
+@include media-breakpoint-between(xs,sm) {
     .mform {
         width: 100%;
     }
@@ -3999,10 +4001,10 @@ body#page-user-preferences {
 
 //Video and audio player UI
 .mediaplugin.mediaplugin_videojs {
-    background-color: #000;
-    padding: 10px;
+    // background-color: #000;
+    // padding: 10px;
     margin: 5px 0; //to avoid cutting the time popup
-    border-radius: $border-radius;
+    //border-radius: $border-radius;
 
     // force full width audio player
     div[style*="max-width"] {
@@ -4115,17 +4117,22 @@ body#page-user-preferences {
     align-items: center;
 
     .page-header-image {
-        margin-right: .35rem;
+        margin-right: 1rem;
 
         img {
             border-radius: $border-radius;
-            width: 47px;
-            height: 47px;
+            width: 50px;
+            height: 50px;
+
+            @include media-breakpoint-between(xs,sm) {
+            width: 40px;
+            height: 40px;
+            }
+
         }
     }
 
     .rui-page-title {
-        padding: 10px;
         margin-bottom: 0;
 
         border-radius: $border-radius;
@@ -4134,6 +4141,10 @@ body#page-user-preferences {
         font-size: $font-size-base;
         line-height: 1.5;
         color: $body-color;
+
+        @include media-breakpoint-up(md) {
+        padding: 10px;
+        }
 
         .theme-dark & {
             color: $dm-body-color;
@@ -4194,19 +4205,39 @@ body#page-user-preferences {
 
 .rui-main-content-title--h1 {
     font-size: 2.5rem;
+
+    @include media-breakpoint-between(xs,sm) {
+    font-size: 2rem;
+    }
 }
 
 .rui-main-content-title--h2 {
     font-size: 2rem;
+    line-height: 1.3;
+
+    .rui-icon-container {
+        display: none;
+    }
+
+    @include media-breakpoint-between(xs,sm) {
+    font-size: 1.5rem;
+    }
 }
 
 .rui-main-content-title--h3 {
     font-size: 1.5rem;
     font-weight: $font-weight-medium;
+
+    @include media-breakpoint-between(xs,sm) {
+    font-size: 1.25rem;
+    }
 }
 
 .rui-main-content-title--h4 {
     font-size: 1.25rem;
+    @include media-breakpoint-between(xs,sm) {
+    font-size: 1rem;
+    }
 }
 
 
@@ -4222,12 +4253,27 @@ body#page-user-preferences {
 #frontpage-category-names,
 #frontpage-category-combo {
     margin: 30px auto 0;
+    max-width: $wrapper-md!important;
 
-    .collapsible-actions .aabtn {
-        position: absolute;
-        top: -64px;
-        right: 0;
+    @include media-breakpoint-between(xs,md) {
+        width: 100%;
     }
+
+    
+    .collapsible-actions .aabtn {
+
+        @include media-breakpoint-between(xs,sm) {
+        width: 100%;
+        }
+
+        @include media-breakpoint-up(md) {
+        position: absolute;
+        top: -50px;
+        right: 0;
+        }
+
+    }
+
 }
 
 
